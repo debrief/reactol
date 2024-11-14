@@ -10,6 +10,15 @@ import OlSourceOSM from 'ol/source/OSM';
 import { transform } from 'ol/proj';
 import 'antd/dist/reset.css'
 import './react-geo.css'
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import track1 from './assets/track1.json';
+import points from './assets/points.json';
+import GeoJSON from 'ol/format/GeoJSON.js';
+import Style from 'ol/style/Style';
+import { Circle, Fill, Stroke } from 'ol/style';
+import Feature from 'ol/Feature';
+import { Circle as CircleGeom } from 'ol/geom';
 
 const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
   <Flex justify="center" align="center" style={{ height: '100%' }}>
@@ -19,6 +28,55 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
   </Flex>
 );
 
+const circleFeature = new Feature({
+  geometry: new CircleGeom(transform([ -6.2685, 35.8192], 'EPSG:4326', 'EPSG:3857'), 10000 ),
+});
+
+const vectorSource = new VectorSource({
+  features: new GeoJSON().readFeatures(track1)
+});
+vectorSource.getFeatures().push(circleFeature);
+
+const pointSource = new VectorSource({
+  features: new GeoJSON().readFeatures(points)
+});
+
+const style = new Style({
+  fill: new Fill({
+      color: 'rgba(255, 100, 50, 0.3)'
+  }),
+  stroke: new Stroke({
+      width: 2,
+      color: 'rgba(255, 100, 50, 0.8)'
+  }),
+  image: new Circle({
+      fill: new Fill({
+          color: 'rgba(55, 200, 150, 0.5)'
+      }),
+      stroke: new Stroke({
+          width: 1,
+          color: 'rgba(55, 200, 150, 0.8)'
+      }),
+      radius: 7
+  }),
+});
+
+const vectorLayer = new VectorLayer({
+  source: vectorSource,
+  style: style,
+  properties: {
+    name: 'Tracks'
+  }
+});
+
+const pointLayer = new VectorLayer({
+  source: pointSource,
+  style: style,
+  properties: {
+    name: 'Points'
+  }
+});
+
 const map = new OlMap({
   layers: [
     new OlLayerTile({
@@ -27,6 +85,8 @@ const map = new OlMap({
       },
       source: new OlSourceOSM()
     }),
+    vectorLayer,
+    pointLayer
   ],
   view: new OlView({
     center: transform([-3, 36], 'EPSG:4326', 'EPSG:3857'),
@@ -65,9 +125,7 @@ function App() {
             </Splitter>
           </Splitter.Panel>
           <Splitter.Panel key='right'>
-          <MapComponent id='map'
-          map={map}
-          />
+          <MapComponent id='map'map={map} />
           </Splitter.Panel>
         </Splitter>
         </MapContext.Provider>
