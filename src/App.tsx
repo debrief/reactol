@@ -13,6 +13,7 @@ import './react-geo.css'
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import track1 from './assets/track1.json';
+import points from './assets/points.json';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import Style from 'ol/style/Style';
 import { Circle, Fill, Stroke } from 'ol/style';
@@ -35,6 +36,10 @@ const vectorSource = new VectorSource({
   features: new GeoJSON().readFeatures(track1)
 });
 vectorSource.getFeatures().push(circleFeature);
+
+const pointSource = new VectorSource({
+  features: new GeoJSON().readFeatures(points)
+});
 
 const style = new Style({
   fill: new Fill({
@@ -60,7 +65,15 @@ const vectorLayer = new VectorLayer({
   source: vectorSource,
   style: style,
   properties: {
-    name: 'Vector Layer'
+    name: 'Tracks'
+  }
+});
+
+const pointLayer = new VectorLayer({
+  source: pointSource,
+  style: style,
+  properties: {
+    name: 'Points'
   }
 });
 
@@ -72,7 +85,8 @@ const map = new OlMap({
       },
       source: new OlSourceOSM()
     }),
-    vectorLayer
+    vectorLayer,
+    pointLayer
   ],
   view: new OlView({
     center: transform([-3, 36], 'EPSG:4326', 'EPSG:3857'),
