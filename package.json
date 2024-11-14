@@ -13,6 +13,7 @@
     "@terrestris/ol-util": "^21.0.0",
     "@terrestris/react-geo": "^26.1.0",
     "antd": "^5.22.1",
+    "d3-selection": "^3.0.0",
     "ol": "^10.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

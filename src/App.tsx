@@ -1,4 +1,4 @@
-import { ConfigProvider, Flex, Splitter, Typography } from 'antd';
+import { Card, ConfigProvider, Flex, Splitter, Typography } from 'antd';
 import './App.css'
 import MapComponent from '@terrestris/react-geo/dist/Map/MapComponent/MapComponent';
 import MapContext from '@terrestris/react-util/dist/Context/MapContext/MapContext';
@@ -8,10 +8,8 @@ import OlLayerTile from 'ol/layer/Tile';
 import { LayerTree } from '@terrestris/react-geo';
 import OlSourceOSM from 'ol/source/OSM';
 import { transform } from 'ol/proj';
-import { getCenter } from 'ol/extent';
-// import 'antd/dist/antd.min.css'
-// import 'react-geo.css'
-
+import 'antd/dist/reset.css'
+import './react-geo.css'
 
 const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
   <Flex justify="center" align="center" style={{ height: '100%' }}>
@@ -55,10 +53,14 @@ function App() {
                 <Desc text="Time Control" />
               </Splitter.Panel>
               <Splitter.Panel>
-                <LayerTree className="top"/>
+                <Card title='Layers' style={{width: '100%', height: '100%'}} >
+                  <LayerTree />
+                </Card>
               </Splitter.Panel>
               <Splitter.Panel>
-                <Desc text="Properties" />
+                <Card title='Properties'>
+                  <Desc text="Property editor here" />
+                </Card>
               </Splitter.Panel>
             </Splitter>
           </Splitter.Panel>
