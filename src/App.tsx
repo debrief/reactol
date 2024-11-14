@@ -95,7 +95,6 @@ const map = new OlMap({
 });
 
 function App() {
-  
   return (
     <div className="App">
       <ConfigProvider theme={{
