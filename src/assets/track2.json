@@ -1,134 +1,72 @@
-{ "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -6.268566733278334,
-                    35.81994032131162
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:12:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -5.952693987673172,
-                    35.91946750388371
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:13:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -5.124480520217816,
-                    35.953056340695795
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:14:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -4.693130672111209,
-                    35.8849954379084
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:15:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -4.206325591432488,
-                    35.79717850093746
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:16:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -3.7888710104020618,
-                    35.89971092247565
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:17:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -3.404521894070797,
-                    35.982251619915516
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:18:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -3.0644643128342466,
-                    36.100274443785906
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:19:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -2.5752236795568137,
-                    36.26171082840766
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:20:22.625Z"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -1.9695633585074006,
-                    36.419332810064816
-                ]
-            },
-            "properties": {
-                "time": "2024-11-14T16:21:22.625Z"
-            }
-        }
-   ]
+{
+  "type": "FeatureCollection",
+  "name": "Maritime Route with Time",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"times": [
+        "2024-11-14T16:16:53.662Z",
+        "2024-11-14T16:17:53.662Z",
+        "2024-11-14T16:18:53.662Z",
+        "2024-11-14T16:19:53.662Z",
+        "2024-11-14T16:20:53.662Z",
+        "2024-11-14T16:21:53.662Z",
+        "2024-11-14T16:22:53.662Z",
+        "2024-11-14T16:23:53.662Z",
+        "2024-11-14T16:24:53.662Z",
+        "2024-11-14T16:25:53.662Z"
+    ]},
+      "geometry": {
+        "coordinates": [
+            [
+                -6.26,
+                35.83
+            ],
+            [
+                -5.94,
+                35.93
+            ],
+            [
+                -5.11,
+                35.96
+            ],
+            [
+                -4.68,
+                35.89
+            ],
+            [
+                -4.2,
+                35.81
+            ],
+            [
+                -3.78,
+                35.91
+            ],
+            [
+                -3.39,
+                35.99
+            ],
+            [
+                -3.05,
+                36.11
+            ],
+            [
+                -2.57,
+                36.27
+            ],
+            [
+                -1.96,
+                36.43
+            ]
+        ],
+        "type": "LineString"
+      }
+    }
+  ]
 }
