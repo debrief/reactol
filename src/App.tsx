@@ -7,61 +7,8 @@ import points from './data/points.json'
 import zones from './data/zones.json'
 import { FeatureCollection } from 'geojson'
 
-// const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
-//   <Flex justify="center" align="center" style={{ height: '100%' }}>
-//   <Typography.Title type="secondary" level={5} style={{ whiteSpace: 'nowrap' }}>
-//   {props.text}
-//   </Typography.Title>
-//   </Flex>
-// );
-
 const center: LatLngExpression = [51.505, -0.09]
 const fillBlueOptions = { fillColor: 'blue' }
-
-// const vectorSource = new VectorSource({
-//   features: new GeoJSON().readFeatures(track1)
-// });
-// vectorSource.getFeatures().push(circleFeature);
-
-// const pointSource = new VectorSource({
-//   features: new GeoJSON().readFeatures(points)
-// });
-
-// const style = new Style({
-//   fill: new Fill({
-//       color: 'rgba(255, 100, 50, 0.3)'
-//   }),
-//   stroke: new Stroke({
-//       width: 2,
-//       color: 'rgba(255, 100, 50, 0.8)'
-//   }),
-//   image: new Circle({
-//       fill: new Fill({
-//           color: 'rgba(55, 200, 150, 0.5)'
-//       }),
-//       stroke: new Stroke({
-//           width: 1,
-//           color: 'rgba(55, 200, 150, 0.8)'
-//       }),
-//       radius: 7
-//   }),
-// });
-
-// const vectorLayer = new VectorLayer({
-//   source: vectorSource,
-//   style: style,
-//   properties: {
-//     name: 'Tracks'
-//   }
-// });
-
-// const pointLayer = new VectorLayer({
-//   source: pointSource,
-//   style: style,
-//   properties: {
-//     name: 'Points'
-//   }
-// });
 
 const setColor = () => {
   return { weight: 3 };
