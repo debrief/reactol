@@ -3,8 +3,8 @@ import './App.css'
 import { Circle, MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
 import track1 from './data/track1.json'
 import track2 from './data/track2.json'
-import points from './data/points.json'
-import zones from './data/zones.json'
+import pointsData from './data/points.json'
+import zonesData from './data/zones.json'
 import { FeatureCollection } from 'geojson'
 import React, { useEffect, useState } from 'react'
 
@@ -17,14 +17,22 @@ const setColor = () => {
 
 function App() {
   const [tracks, setTracks] = useState<React.ReactElement[]>([])
+  const [points, setPoints] = useState<React.ReactElement | undefined>(undefined)
+  const [zones, setZones] = useState<React.ReactElement | undefined>(undefined)
 
   useEffect(() => {
     const trackItems = [track1, track2]
     const trackLayers = trackItems.map((track, index) => {
       return <LayersControl.Overlay checked name={`Track-${index}`}>
-               <GeoJSON key={`track-${index}`} data={track as FeatureCollection} style={setColor} />
-             </LayersControl.Overlay>  
+        <GeoJSON key={`track-${index}`} data={track as FeatureCollection} style={setColor} />
+        </LayersControl.Overlay>  
     })
+    setPoints(<LayersControl.Overlay checked name={'Points'}>
+      <GeoJSON key='points' data={pointsData as FeatureCollection} style={setColor} />
+    </LayersControl.Overlay>)
+    setZones(<LayersControl.Overlay checked name={'Zones'}>
+      <GeoJSON key='sones' data={zonesData as FeatureCollection} style={setColor} />
+    </LayersControl.Overlay>)
     setTracks(trackLayers)
   }, [])
   return (
@@ -36,12 +44,8 @@ function App() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
             </LayersControl.BaseLayer>
             {tracks}
-            <LayersControl.Overlay checked name='points'>
-              <GeoJSON key='points' data={points as FeatureCollection} style={setColor} />
-            </LayersControl.Overlay>
-            <LayersControl.Overlay checked name='zones'>
-              <GeoJSON key='zones' data={zones as FeatureCollection} style={setColor} />
-            </LayersControl.Overlay>
+            {points}
+            {zones}
           </LayersControl>
               <Circle center={center} pathOptions={fillBlueOptions} radius={200} />
           <LayerGroup>
