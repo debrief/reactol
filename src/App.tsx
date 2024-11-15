@@ -41,43 +41,39 @@ function App() {
       if (!feature.id) {
         feature.id = `f-${index}`
       }
+      if (!feature.properties) {
+        feature.properties = {}
+      }
+      if (feature.properties.visible === undefined) {
+        feature.properties.visible = true
+      }
     })
     setStore(initialData)
   }, [])
 
-  const getVisibleWithFix = (feature: Feature): boolean => {
-    if (feature.properties) {
-      if (feature.properties.visible === undefined) {
-        feature.properties.visible = true
-        return true
-      } else {
-        return feature.properties.visible
-      }
-    } else {
-      feature.properties = { visible: true }
-      return true
-    }
+  const getVisible = (feature: Feature): boolean => {
+    return feature.properties?.visible 
   }
 
   useEffect(() => {
     if (store) {
       // find tracks
       setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisibleWithFix(feature)} name={`Track-${index}`}>
+        <LayersControl.Overlay checked={getVisible(feature)} name={`Track-${index}`}>
           <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
 
       // find zones
       setZones(store.features.filter((feature) => feature.properties?.dataType === ZONE_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisibleWithFix(feature)} name={`Zone-${index}`}>
+        <LayersControl.Overlay checked={getVisible(feature)} name={`Zone-${index}`}>
           <GeoJSON key={`zone-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
 
       // find points
       setPoints(store.features.filter((feature) => feature.properties?.dataType === REFERENCE_POINT_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisibleWithFix(feature)} name={`Point-${index}`}>
+        <LayersControl.Overlay checked={getVisible(feature)} name={`Point-${index}`}>
           <GeoJSON key={`point-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
