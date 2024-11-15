@@ -6,6 +6,7 @@ import initialData from './data/collection.ts'
 import { Feature, FeatureCollection, Geometry} from 'geojson'
 import React, { useEffect, useState } from 'react'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
+import Layers from './components/Layers.tsx';
 
 const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
   const res: PathOptions = {}
@@ -30,33 +31,49 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
 function App() {
   const [store, setStore] = useState<FeatureCollection | undefined>(undefined)
   const [tracks, setTracks] = useState<React.ReactElement[]>([])
-  const [points, setPoints] = useState<React.ReactElement[] | undefined>([])
-  const [zones, setZones] = useState<React.ReactElement[] | undefined>([])
+  const [points, setPoints] = useState<React.ReactElement[]>([])
+  const [zones, setZones] = useState<React.ReactElement[]>([])
 
   useEffect(() => {
     console.clear()
+    // check that all features in initial-data have an id
+    initialData.features.forEach((feature, index) => {
+      if (!feature.id) {
+        feature.id = `f-${index}`
+      }
+      if (!feature.properties) {
+        feature.properties = {}
+      }
+      if (feature.properties.visible === undefined) {
+        feature.properties.visible = true
+      }
+    })
     setStore(initialData)
   }, [])
+
+  const getVisible = (feature: Feature): boolean => {
+    return feature.properties?.visible 
+  }
 
   useEffect(() => {
     if (store) {
       // find tracks
       setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked name={`Track-${index}`}>
+        <LayersControl.Overlay checked={getVisible(feature)} name={`Track-${index}`}>
           <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
 
       // find zones
       setZones(store.features.filter((feature) => feature.properties?.dataType === ZONE_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked name={`Zone-${index}`}>
+        <LayersControl.Overlay checked={getVisible(feature)} name={`Zone-${index}`}>
           <GeoJSON key={`zone-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
 
       // find points
       setPoints(store.features.filter((feature) => feature.properties?.dataType === REFERENCE_POINT_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked name={`Point-${index}`}>
+        <LayersControl.Overlay checked={getVisible(feature)} name={`Point-${index}`}>
           <GeoJSON key={`point-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
@@ -71,6 +88,27 @@ function App() {
     }
   }
 
+  const setFeatureVisibility = (feature: Feature, visible: boolean): void => {
+    if(!feature.properties) {
+      feature.properties = {}
+    }
+    feature.properties.visible = visible
+  }
+
+  function setChecked(ids: string[]): void {
+    const newStore = JSON.parse(JSON.stringify(store))
+    newStore.features = newStore.features.map((feature: Feature) => {
+      const id = feature.id as string
+      setFeatureVisibility(feature, ids.includes(id))
+      return feature
+    })
+    setStore(newStore)
+  }
+
+  function setSelected(ids: string[]): void {
+    console.log('selected', ids)
+  }
+
   return (
     <div className="App">
       <ConfigProvider theme={antdTheme}>
@@ -82,7 +120,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  <Desc text="Layer control here" />
+                  <Layers zones={zones} tracks={tracks} points={points} setChecked={setChecked} setSelected={setSelected} />
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
