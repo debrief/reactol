@@ -12,7 +12,7 @@ import 'antd/dist/reset.css'
 import './react-geo.css'
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import track1 from './assets/track1.json';
+// import track1 from './assets/track1.json';
 import points from './assets/points.json';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import Style from 'ol/style/Style';
@@ -33,7 +33,8 @@ const circleFeature = new Feature({
 });
 
 const vectorSource = new VectorSource({
-  features: new GeoJSON().readFeatures(track1)
+  url:'track1.json',
+  format: new GeoJSON()
 });
 vectorSource.getFeatures().push(circleFeature);
 

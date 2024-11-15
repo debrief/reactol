@@ -3,7 +3,9 @@
   "features": [
     {
       "type": "Feature",
-      "properties": {"label": "Point Juliet"},
+      "properties": {
+        "label": "Point Juliet"
+      },
       "geometry": {
         "coordinates": [
           -4.8936104075163485,
@@ -14,7 +16,9 @@
     },
     {
       "type": "Feature",
-      "properties": {"label": "Point Kilo"},
+      "properties": {
+        "label": "Point Kilo"
+      },
       "geometry": {
         "coordinates": [
           -3.5247318661170937,
@@ -25,7 +29,9 @@
     },
     {
       "type": "Feature",
-      "properties": {"label": "Point Lima"},
+      "properties": {
+        "label": "Point Lima"
+      },
       "geometry": {
         "coordinates": [
           -4.0060650478869775,
@@ -36,7 +42,9 @@
     },
     {
       "type": "Feature",
-      "properties": {"label": "Point Mike"},
+      "properties": {
+        "label": "Point Mike"
+      },
       "geometry": {
         "coordinates": [
           -2.302065101137316,
