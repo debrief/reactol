@@ -1,19 +1,25 @@
 import { Card, ConfigProvider, Flex, Splitter, Typography } from 'antd';
-import { LatLngExpression } from 'leaflet'
+import { LatLngExpression, PathOptions, StyleFunction } from 'leaflet'
 import './App.css'
 import { Circle, MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
-import track1 from './data/track1.json'
-import track2 from './data/track2.json'
-import pointsData from './data/points.json'
-import zonesData from './data/zones.json'
-import { FeatureCollection } from 'geojson'
+import initialData from './data/collection.ts'
+import { Feature, FeatureCollection, Geometry} from 'geojson'
 import React, { useEffect, useState } from 'react'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constaints.ts';
 
 const center: LatLngExpression = [51.505, -0.09]
 const fillBlueOptions = { fillColor: 'blue' }
 
-const setColor = () => {
-  return { weight: 3 };
+const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
+  const res: PathOptions = {}
+  if (feature) {
+    const feat = feature as Feature
+    if (feat?.properties?.color) {
+      res.color = feat.properties.color
+    }
+  }
+  res.weight = 3
+  return res;
 };
 
 const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
@@ -25,25 +31,40 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
 );
 
 function App() {
+  const [store, setStore] = useState<FeatureCollection | undefined>(undefined)
   const [tracks, setTracks] = useState<React.ReactElement[]>([])
-  const [points, setPoints] = useState<React.ReactElement | undefined>(undefined)
-  const [zones, setZones] = useState<React.ReactElement | undefined>(undefined)
+  const [points, setPoints] = useState<React.ReactElement[] | undefined>([])
+  const [zones, setZones] = useState<React.ReactElement[] | undefined>([])
 
   useEffect(() => {
-    const trackItems = [track1, track2]
-    const trackLayers = trackItems.map((track, index) => {
-      return <LayersControl.Overlay checked name={`Track-${index}`}>
-        <GeoJSON key={`track-${index}`} data={track as FeatureCollection} style={setColor} />
-        </LayersControl.Overlay>  
-    })
-    setPoints(<LayersControl.Overlay checked name={'Points'}>
-      <GeoJSON key='points' data={pointsData as FeatureCollection} style={setColor} />
-    </LayersControl.Overlay>)
-    setZones(<LayersControl.Overlay checked name={'Zones'}>
-      <GeoJSON key='sones' data={zonesData as FeatureCollection} style={setColor} />
-    </LayersControl.Overlay>)
-    setTracks(trackLayers)
+    console.clear()
+    setStore(initialData)
   }, [])
+
+  useEffect(() => {
+    if (store) {
+      // find tracks
+      setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => 
+        <LayersControl.Overlay checked name={`Track-${index}`}>
+          <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
+        </LayersControl.Overlay>  
+      ))
+
+      // find zones
+      setZones(store.features.filter((feature) => feature.properties?.dataType === ZONE_TYPE).map((feature, index) => 
+        <LayersControl.Overlay checked name={`Zone-${index}`}>
+          <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
+        </LayersControl.Overlay>  
+      ))
+
+      // find points
+      setPoints(store.features.filter((feature) => feature.properties?.dataType === REFERENCE_POINT_TYPE).map((feature, index) => 
+        <LayersControl.Overlay checked name={`Point-${index}`}>
+          <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
+        </LayersControl.Overlay>  
+      ))
+    }
+  }, [store])
 
   const antdTheme = {
     components: {
