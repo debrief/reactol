@@ -5,7 +5,8 @@ const track: Feature = {
     type: "Feature",
     properties: {
         dataType: TRACK_TYPE,
-        color: '#F00'
+        color: '#F00',
+        name: 'Track 1'
     },
     geometry: {
       coordinates: [

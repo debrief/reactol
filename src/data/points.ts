@@ -5,7 +5,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      label: "Point Juliet",
+      name: "Point Juliet",
       dataType: REFERENCE_POINT_TYPE
     },
     geometry: {
@@ -19,7 +19,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      label: "Point Kilo",
+      name: "Point Kilo",
       dataType: REFERENCE_POINT_TYPE
     },
     geometry: {
@@ -33,7 +33,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      label: "Point Lima",
+      name: "Point Lima",
       dataType: REFERENCE_POINT_TYPE
     },
     geometry: {
@@ -47,7 +47,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      label: "Point Mike",
+      name: "Point Mike",
       dataType: REFERENCE_POINT_TYPE
     },
     geometry: {

@@ -4,6 +4,7 @@ export default{
     type: "Feature",
     properties: {
       dataType: TRACK_TYPE,
+      name: 'Track 2',
       times: [
         "2024-11-14T16:16:53.662Z",
         "2024-11-14T16:17:53.662Z",
