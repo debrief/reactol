@@ -7,6 +7,7 @@ import { Feature, FeatureCollection, Geometry} from 'geojson'
 import React, { useEffect, useState } from 'react'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
 import Layers from './components/Layers.tsx';
+import Properties from './components/Properties.tsx';
 
 const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
   const res: PathOptions = {}
@@ -33,6 +34,7 @@ function App() {
   const [tracks, setTracks] = useState<React.ReactElement[]>([])
   const [points, setPoints] = useState<React.ReactElement[]>([])
   const [zones, setZones] = useState<React.ReactElement[]>([])
+  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
 
   useEffect(() => {
     console.clear()
@@ -84,6 +86,10 @@ function App() {
     components: {
       Splitter: {
         splitBarSize: 10,
+      },
+      Table: {
+        headerBg: '#555',
+        headerColor: '#fff'
       }
     }
   }
@@ -106,7 +112,8 @@ function App() {
   }
 
   function setSelected(ids: string[]): void {
-    console.log('selected', ids)
+    const selected = store?.features.find((feature) => ids.includes(feature.id as string)) || null;
+    setSelectedFeature(selected);
   }
 
   return (
@@ -124,8 +131,8 @@ function App() {
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
-                <Card title='Properties'>
-                  <Desc text="Property editor here" />
+                <Card title='Detail'>
+                  <Properties feature={selectedFeature} />
                 </Card>
               </Splitter.Panel>
             </Splitter>
