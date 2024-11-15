@@ -30,7 +30,7 @@ const Properties: React.FC<PropertiesProps> = ({ feature }) => {
     },
   ];
 
-  return <Table dataSource={dataSource} columns={columns} pagination={false} />;
+  return <Table bordered dataSource={dataSource} columns={columns} pagination={false} />;
 };
 
 export default Properties;

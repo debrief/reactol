@@ -86,6 +86,10 @@ function App() {
     components: {
       Splitter: {
         splitBarSize: 10,
+      },
+      Table: {
+        headerBg: '#555',
+        headerColor: '#fff'
       }
     }
   }
