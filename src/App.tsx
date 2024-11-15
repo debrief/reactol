@@ -34,11 +34,17 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
 function App() {
   const [store, setStore] = useState<FeatureCollection | undefined>(undefined)
   const [tracks, setTracks] = useState<React.ReactElement[]>([])
-  const [points, setPoints] = useState<React.ReactElement[] | undefined>([])
-  const [zones, setZones] = useState<React.ReactElement[] | undefined>([])
+  const [points, setPoints] = useState<React.ReactElement[]>([])
+  const [zones, setZones] = useState<React.ReactElement[]>([])
 
   useEffect(() => {
     console.clear()
+    // check that all features in initial-data have an id
+    initialData.features.forEach((feature) => {
+      if (!feature.id) {
+        feature.id = new Date().getTime().toString()
+      }
+    })
     setStore(initialData)
   }, [])
 
@@ -75,6 +81,14 @@ function App() {
     }
   }
 
+  function setChecked(ids: string[]): void {
+    console.log('checked', ids)
+  }
+
+  function setSelected(ids: string[]): void {
+    console.log('selected', ids)
+  }
+
   return (
     <div className="App">
        <ConfigProvider theme={antdTheme}>
@@ -87,7 +101,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  <Layers/>
+                  <Layers zones={zones} tracks={tracks} points={points} setChecked={setChecked} setSelected={setSelected} />
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
