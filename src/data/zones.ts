@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { ZONE_TYPE } from '../constaints';
+import { ZONE_TYPE } from '../constants';
 
 const zones: Feature[] = [
   {
