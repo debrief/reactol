@@ -9,6 +9,8 @@ import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
+import { noop } from 'antd/es/_util/warning';
+import { timeBoundsFor } from './helpers/timeBounds.ts';
 
 const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
   const res: PathOptions = {}
@@ -28,6 +30,7 @@ function App() {
   const [points, setPoints] = useState<React.ReactElement[]>([])
   const [zones, setZones] = useState<React.ReactElement[]>([])
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
+  const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
   useEffect(() => {
     console.clear()
@@ -44,6 +47,8 @@ function App() {
       }
     })
     setStore(initialData)
+    console.log('new time bounds:', timeBoundsFor(initialData.features))
+    setTimeBounds(timeBoundsFor(initialData.features))
   }, [])
 
   const getVisible = (feature: Feature): boolean => {
@@ -94,7 +99,7 @@ function App() {
     feature.properties.visible = visible
   }
 
-  function setChecked(ids: string[]): void {
+  const setChecked = (ids: string[]): void => {
     const newStore = JSON.parse(JSON.stringify(store))
     newStore.features = newStore.features.map((feature: Feature) => {
       const id = feature.id as string
@@ -104,9 +109,13 @@ function App() {
     setStore(newStore)
   }
 
-  function setSelected(ids: string[]): void {
+  const setSelected = (ids: string[]): void => {
     const selected = store?.features.find((feature) => ids.includes(feature.id as string)) || null;
     setSelectedFeature(selected);
+  }
+
+  const setTime = (value: number) => {
+    console.log('new time:', value, new Date(value).toISOString())
   }
 
   return (
@@ -117,7 +126,9 @@ function App() {
             <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
               <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
                 <Card title='Time Control'>
-                  <TimeControl />
+                  {timeBounds && 
+                    <TimeControl start={timeBounds[0]} end={timeBounds[1]} 
+                      setLowerLimit={noop} setUpperLimit={noop} setTime={setTime} />}
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
