@@ -12,23 +12,23 @@ export interface LayersProps {
 }
 
 const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setChecked}) => {
-
+  
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
-
+  
   const idFor = (node: React.ReactElement): string => {
     return node.props.children.props.data.id
   }
-
+  
   const nameFor = (node: React.ReactElement): string => {
     const item = node.props.children.props.data
     return item.properties?.name || item.id
   }
-
+  
   const isChecked = (node: React.ReactElement): string => {
     return node.props.children.props.data.properties.visible
   }
-
+  
   useEffect(() => {
     const modelData: TreeDataNode[] = [
       {
@@ -66,28 +66,28 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
     checked.push(...points.filter((item) => isChecked(item)).map((item) => idFor(item)))
     setCheckedKeys(checked)
   }, [zones, tracks, points])
-
+  
   // filter out the branches, just leave the leaves
   const justLeaves = (ids: string[]): string[] => {
     return ids.filter((id) => !id.startsWith('node-'))
   }
-
+  
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
     setSelected(justLeaves(selectedKeys as string[]))
   };
-
+  
   const onCheck: TreeProps['onCheck'] = (checkedKeys,) => {
     setChecked(justLeaves(checkedKeys as string[]))
   };
-
+  
   return <Tree style={{border: 'red 2px solid'}} checkable
-      defaultExpandedKeys={['0-0-0', '0-0-1']}
-      defaultSelectedKeys={['0-0-0', '0-0-1']}
-      defaultCheckedKeys={['0-0-0', '0-0-1']}
-      onSelect={onSelect}
-      onCheck={onCheck}
-      checkedKeys={checkedKeys}
-      treeData={model} />
+    defaultExpandedKeys={['0-0-0', '0-0-1']}
+    defaultSelectedKeys={['0-0-0', '0-0-1']}
+    defaultCheckedKeys={['0-0-0', '0-0-1']}
+    onSelect={onSelect}
+    onCheck={onCheck}
+    checkedKeys={checkedKeys}
+    treeData={model} />
 }
 
 export default Layers;

@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { REFERENCE_POINT_TYPE } from '../constaints';
+import { REFERENCE_POINT_TYPE } from '../constants';
 
 const points: Feature[] = [
   {
