@@ -14,16 +14,24 @@ export interface LayersProps {
 const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setChecked}) => {
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
+  const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
+
+  const idFor = (node: React.ReactElement): string => {
+    return node.props.children.props.data.id
+  }
+
+  const isChecked = (node: React.ReactElement): string => {
+    return node.props.checked
+  }
 
   useEffect(() => {
-    console.log('tracks', tracks[0])
     const modelData: TreeDataNode[] = [
       {
         title: 'Tracks',
         key: 'node-tracks',
         children: tracks.map((track, index) => ({
           title: `Track-${index}`,
-          key: `track-${index}`,
+          key: idFor(track),
           children: []
         }))
       },
@@ -32,7 +40,7 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
         key: 'node-zones',
         children: zones.map((zone, index) => ({
           title: `Zone-${index}`,
-          key: `zone-${index}`,
+          key: idFor(zone),
           children: []
         }))
       },
@@ -41,12 +49,17 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
         key: 'node-points',
         children: points.map((point, index) => ({
           title: `Point-${index}`,
-          key: `point-${index}`,
+          key: idFor(point),
           children: []
         }))
       }
     ]
     setModel(modelData)
+    const checked: string[] = []
+    checked.push(...tracks.filter((item) => isChecked(item)).map((item) => idFor(item)))
+    checked.push(...zones.filter((item) => isChecked(item)).map((item) => idFor(item)))
+    checked.push(...points.filter((item) => isChecked(item)).map((item) => idFor(item)))
+    setCheckedKeys(checked)
   }, [zones, tracks, points])
 
   // filter out the branches, just leave the leaves
@@ -68,6 +81,7 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
       defaultCheckedKeys={['0-0-0', '0-0-1']}
       onSelect={onSelect}
       onCheck={onCheck}
+      checkedKeys={checkedKeys}
       treeData={model} />
 }
 

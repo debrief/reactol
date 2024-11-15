@@ -40,19 +40,33 @@ function App() {
   useEffect(() => {
     console.clear()
     // check that all features in initial-data have an id
-    initialData.features.forEach((feature) => {
+    initialData.features.forEach((feature, index) => {
       if (!feature.id) {
-        feature.id = new Date().getTime().toString()
+        feature.id = `f-${index}`
       }
     })
     setStore(initialData)
   }, [])
 
+  const getVisibleWithFix = (feature: Feature): boolean => {
+    if (feature.properties) {
+      if (feature.properties.visible === undefined) {
+        feature.properties.visible = true
+        return true
+      } else {
+        return feature.properties.visible
+      }
+    } else {
+      feature.properties = { visible: true }
+      return true
+    }
+  }
+
   useEffect(() => {
     if (store) {
       // find tracks
       setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked name={`Track-${index}`}>
+        <LayersControl.Overlay checked={getVisibleWithFix(feature)} name={`Track-${index}`}>
           <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
@@ -81,8 +95,21 @@ function App() {
     }
   }
 
+  const setFeatureVisibility = (feature: Feature, visible: boolean): void => {
+    if(!feature.properties) {
+      feature.properties = {}
+    }
+    feature.properties.visible = visible
+  }
+
   function setChecked(ids: string[]): void {
-    console.log('checked', ids)
+    const newStore = JSON.parse(JSON.stringify(store))
+    newStore.features = newStore.features.map((feature: Feature) => {
+      const id = feature.id as string
+      setFeatureVisibility(feature, ids.includes(id))
+      return feature
+    })
+    setStore(newStore)
   }
 
   function setSelected(ids: string[]): void {
