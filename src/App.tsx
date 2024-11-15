@@ -131,7 +131,7 @@ function App() {
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
-                <Card title='Properties'>
+                <Card title='Detail'>
                   <Properties feature={selectedFeature} />
                 </Card>
               </Splitter.Panel>
