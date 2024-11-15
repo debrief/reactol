@@ -73,14 +73,14 @@ function App() {
 
       // find zones
       setZones(store.features.filter((feature) => feature.properties?.dataType === ZONE_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked name={`Zone-${index}`}>
+        <LayersControl.Overlay checked={getVisibleWithFix(feature)} name={`Zone-${index}`}>
           <GeoJSON key={`zone-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))
 
       // find points
       setPoints(store.features.filter((feature) => feature.properties?.dataType === REFERENCE_POINT_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked name={`Point-${index}`}>
+        <LayersControl.Overlay checked={getVisibleWithFix(feature)} name={`Point-${index}`}>
           <GeoJSON key={`point-${index}`} data={feature} style={setColor} />
         </LayersControl.Overlay>  
       ))

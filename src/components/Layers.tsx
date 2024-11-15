@@ -20,8 +20,13 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
     return node.props.children.props.data.id
   }
 
+  const nameFor = (node: React.ReactElement): string => {
+    const item = node.props.children.props.data
+    return item.properties?.name || item.id
+  }
+
   const isChecked = (node: React.ReactElement): string => {
-    return node.props.checked
+    return node.props.children.props.data.properties.visible
   }
 
   useEffect(() => {
@@ -29,27 +34,27 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
       {
         title: 'Tracks',
         key: 'node-tracks',
-        children: tracks.map((track, index) => ({
-          title: `Track-${index}`,
-          key: idFor(track),
+        children: tracks.map((item) => ({
+          title: nameFor(item),
+          key: idFor(item),
           children: []
         }))
       },
       {
         title: 'Zones',
         key: 'node-zones',
-        children: zones.map((zone, index) => ({
-          title: `Zone-${index}`,
-          key: idFor(zone),
+        children: zones.map((item) => ({
+          title: nameFor(item),
+          key: idFor(item),
           children: []
         }))
       },
       {
         title: 'Points',
         key: 'node-points',
-        children: points.map((point, index) => ({
-          title: `Point-${index}`,
-          key: idFor(point),
+        children: points.map((item) => ({
+          title: nameFor(item),
+          key: idFor(item),
           children: []
         }))
       }
