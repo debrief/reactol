@@ -80,7 +80,7 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
     setChecked(justLeaves(checkedKeys as string[]))
   };
   
-  return <Tree style={{border: 'red 2px solid'}} checkable
+  return <Tree checkable
     defaultExpandedKeys={['0-0-0', '0-0-1']}
     defaultSelectedKeys={['0-0-0', '0-0-1']}
     defaultCheckedKeys={['0-0-0', '0-0-1']}
