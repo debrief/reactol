@@ -6,6 +6,7 @@ import initialData from './data/collection.ts'
 import { Feature, FeatureCollection, Geometry} from 'geojson'
 import React, { useEffect, useState } from 'react'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constaints.ts';
+import Layers from './components/Layers.tsx';
 
 const center: LatLngExpression = [51.505, -0.09]
 const fillBlueOptions = { fillColor: 'blue' }
@@ -86,7 +87,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  <Desc text="Layer control here" />
+                  <Layers/>
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
