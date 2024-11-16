@@ -659,8 +659,3 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		print-color-adjust: exact;
 		}
 	}
-
-/* P7f89 */
-.leaflet-tooltip {
-	background-color: transparent;
-}
