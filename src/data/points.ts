@@ -6,7 +6,8 @@ const points: Feature[] = [
     type: "Feature",
     properties: {
       name: "Point Juliet",
-      dataType: REFERENCE_POINT_TYPE
+      dataType: REFERENCE_POINT_TYPE,
+      color: "#FF0000"
     },
     geometry: {
       coordinates: [
@@ -20,7 +21,8 @@ const points: Feature[] = [
     type: "Feature",
     properties: {
       name: "Point Kilo",
-      dataType: REFERENCE_POINT_TYPE
+      dataType: REFERENCE_POINT_TYPE,
+      color: "#00FF00"
     },
     geometry: {
       coordinates: [
@@ -34,7 +36,8 @@ const points: Feature[] = [
     type: "Feature",
     properties: {
       name: "Point Lima",
-      dataType: REFERENCE_POINT_TYPE
+      dataType: REFERENCE_POINT_TYPE,
+      color: "#0000FF"
     },
     geometry: {
       coordinates: [
@@ -48,7 +51,8 @@ const points: Feature[] = [
     type: "Feature",
     properties: {
       name: "Point Mike",
-      dataType: REFERENCE_POINT_TYPE
+      dataType: REFERENCE_POINT_TYPE,
+      color: "#FFFF00"
     },
     geometry: {
       coordinates: [
