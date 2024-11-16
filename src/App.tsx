@@ -1,5 +1,5 @@
 import { Card, ConfigProvider, Flex, Splitter, Typography } from 'antd';
-import { PathOptions, StyleFunction, CircleMarker, Tooltip } from 'leaflet'
+import { PathOptions, StyleFunction, CircleMarker } from 'leaflet'
 import './App.css'
 import { MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
 import initialData from './data/collection.ts'
@@ -9,8 +9,12 @@ import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 
+interface CustomPathOptions extends PathOptions {
+  radius?: number;
+}
+
 const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
-  const res: PathOptions = {}
+  const res: CustomPathOptions = {}
   if (feature) {
     const feat = feature as Feature
     if (feat?.properties?.color) {
