@@ -1,5 +1,5 @@
 import { Card, ConfigProvider, Flex, Splitter, Typography } from 'antd';
-import { PathOptions, StyleFunction } from 'leaflet'
+import { PathOptions, StyleFunction, CircleMarker } from 'leaflet'
 import './App.css'
 import { MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
 import initialData from './data/collection.ts'
@@ -9,12 +9,19 @@ import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 
+interface CustomPathOptions extends PathOptions {
+  radius?: number;
+}
+
 const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
-  const res: PathOptions = {}
+  const res: CustomPathOptions = {}
   if (feature) {
     const feat = feature as Feature
     if (feat?.properties?.color) {
       res.color = feat.properties.color
+    }
+    if (feat.geometry.type === 'Point') {
+      res.radius = 30
     }
   }
   res.weight = 3
@@ -76,7 +83,12 @@ function App() {
       // find points
       setPoints(store.features.filter((feature) => feature.properties?.dataType === REFERENCE_POINT_TYPE).map((feature, index) => 
         <LayersControl.Overlay checked={getVisible(feature)} name={`Point-${index}`}>
-          <GeoJSON key={`point-${index}`} data={feature} style={setColor} />
+          <GeoJSON key={`point-${index}`} data={feature} pointToLayer={(feature, latlng) => {
+            const pointFeature = feature as Feature;
+            const color = pointFeature.properties?.color || 'blue';
+            const name = pointFeature.properties?.name || '';
+            return new CircleMarker(latlng, { radius: 15, color }).bindTooltip(name, { permanent: true, direction: 'center' });
+          }} />
         </LayersControl.Overlay>  
       ))
     }
