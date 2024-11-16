@@ -87,7 +87,7 @@ function App() {
             const pointFeature = feature as Feature;
             const color = pointFeature.properties?.color || 'blue';
             const name = pointFeature.properties?.name || '';
-            return new CircleMarker(latlng, { radius: 30, color }).bindTooltip(name, { permanent: true, direction: 'center' });
+            return new CircleMarker(latlng, { radius: 15, color }).bindTooltip(name, { permanent: true, direction: 'center' });
           }} />
         </LayersControl.Overlay>  
       ))
