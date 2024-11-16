@@ -24,4 +24,5 @@ html, body, #root, .App, #map {
 
 .leaflet-tooltip {
   background-color: transparent;
+  border: none;
 }
