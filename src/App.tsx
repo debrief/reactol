@@ -1,5 +1,5 @@
 import { Card, ConfigProvider, Flex, Splitter, Typography } from 'antd';
-import { PathOptions, StyleFunction, CircleMarker } from 'leaflet'
+import { PathOptions, StyleFunction, CircleMarker, Polyline } from 'leaflet'
 import './App.css'
 import { MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
 import initialData from './data/collection.ts'
@@ -67,11 +67,21 @@ function App() {
   useEffect(() => {
     if (store) {
       // find tracks
-      setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisible(feature)} name={`Track-${index}`}>
-          <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
-        </LayersControl.Overlay>  
-      ))
+      setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => {
+        const coordinates = feature.geometry.coordinates as [number, number][];
+        const polyline = <Polyline key={`track-${index}`} positions={coordinates} pathOptions={setColor(feature)} />;
+        const circleMarkers = coordinates.map((coord, i) => (
+          <CircleMarker key={`track-${index}-point-${i}`} center={coord} radius={5} pathOptions={setColor(feature)} />
+        ));
+        return (
+          <LayersControl.Overlay checked={getVisible(feature)} name={`Track-${index}`}>
+            <React.Fragment>
+              {polyline}
+              {circleMarkers}
+            </React.Fragment>
+          </LayersControl.Overlay>
+        );
+      }));
 
       // find zones
       setZones(store.features.filter((feature) => feature.properties?.dataType === ZONE_TYPE).map((feature, index) => 
