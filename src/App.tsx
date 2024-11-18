@@ -12,29 +12,35 @@ import track2 from './data/track2.ts';
 import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
+import { format } from 'date-fns';
+
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
-  const initialised = useRef(false); 
+  const storeInitialised = useRef(false); 
+  const timeInitialised = useRef(false);
 
   useEffect(() => {
-    if (!initialised.current) {
-      initialised.current = true
+    if (!storeInitialised.current) {
+      storeInitialised.current = true
       console.clear()
       // store initial data objects
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
       dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
       dispatch({ type: 'featureCollection/featuresAdded', payload: points })
-  
-      console.log('new time bounds:', timeBoundsFor([]), !!setTimeBounds)
-      // setTimeBounds(timeBoundsFor(initialData.features))
     }
   }, [dispatch])
 
+  useEffect(() => {
+    if (!timeInitialised.current) {
+      timeInitialised.current = true
+      setTimeBounds(timeBoundsFor(features))
+    }
+  }, [features])
 
   const antdTheme = {
     components: {
@@ -49,7 +55,7 @@ function App() {
   }
 
   const setTime = (value: number) => {
-    console.log('new time:', value, new Date(value).toISOString())
+    console.log('new time:', value, format(new Date(value), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")) // P4b37
   }
 
 
@@ -68,12 +74,12 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { features && <Layers setSelected={setSelected} /> }
+                  { features && <Layers /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Detail'>
-                  <Properties feature={selectedFeature} />
+                  <Properties />
                 </Card>
               </Splitter.Panel>
             </Splitter>
