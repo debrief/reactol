@@ -2,6 +2,7 @@ import { Feature, Geometry, MultiPoint } from "geojson";
 import { LatLngExpression  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { useAppSelector } from "../app/hooks";
+import { format } from "date-fns";
 
 export interface TrackProps {
   feature: Feature 
@@ -23,19 +24,32 @@ const Track: React.FC<TrackProps> = ({feature}) => {
     }
     return '#000';
   };
+
+  const timeFor = (feature: Feature, index: number): string => {
+    if (feature.properties?.times) {
+      const time = feature.properties.times[index]
+      return format(time, "ddHHmm'Z'")
+    } else {
+      return ''
+    }
+  }
+    
   
   const trackCoords = (feature.geometry as MultiPoint).coordinates.map(item => [item[1], item[0]]) as LatLngExpression[]
 
   return (
     <>
       <Polyline key={feature.id + '-line-' + isSelected} positions={trackCoords} weight={2} color={colorFor(feature)}>
-        <Tooltip position={trackCoords[0]} direction="auto" opacity={1} permanent>
+        <Tooltip key={feature.id + '-tip-' + isSelected}  position={trackCoords[0]} direction="auto" opacity={1} permanent>
           {feature.properties?.name}
         </Tooltip>
-
-        </Polyline>
+      </Polyline>
       { trackCoords.map((item, index) => 
-        <CircleMarker key={feature.id + '-point-' + index} center={item} radius={3} color={colorFor(feature)} /> )}
+        <CircleMarker key={feature.id + '-point-' + index} center={item} radius={3} color={colorFor(feature)}>
+          {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
+            {timeFor(feature, index)}
+          </Tooltip>}
+         </CircleMarker> )}
     </>
   )
 }
