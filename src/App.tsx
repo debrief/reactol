@@ -41,22 +41,27 @@ function App() {
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
-  const initialised = useRef(false); 
+  const storeInitialised = useRef(false); 
+  const timeInitialised = useRef(false);
 
   useEffect(() => {
-    if (!initialised.current) {
-      initialised.current = true
+    if (!storeInitialised.current) {
+      storeInitialised.current = true
       console.clear()
       // store initial data objects
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
       dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
       dispatch({ type: 'featureCollection/featuresAdded', payload: points })
-  
-      console.log('new time bounds:', timeBoundsFor([]), !!setTimeBounds)
-      // setTimeBounds(timeBoundsFor(initialData.features))
     }
   }, [dispatch])
+
+  useEffect(() => {
+    if (!timeInitialised.current) {
+      timeInitialised.current = true
+      setTimeBounds(timeBoundsFor(features))
+    }
+  }, [features])
 
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';
