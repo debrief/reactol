@@ -38,10 +38,10 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowe
     if(newValue[0] !== value[0]) {
       setLowerLimit(unscaledValues[0])
     }
-    if(newValue[1] !== value[2]) {
+    if(newValue[2] !== value[2]) {
       setUpperLimit(unscaledValues[2])
     }
-    if(newValue[2] !== value[1]) {
+    if(newValue[1] !== value[1]) {
       setTime(unscaledValues[1])
     }
     setValue(newValue as [number, number, number])
