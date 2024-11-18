@@ -1,8 +1,8 @@
+import * as turf from "turf";
 import { Feature, Geometry, Polygon } from "geojson";
 import { LatLngExpression  } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useAppSelector } from "../app/hooks";
-import * as turf from "@turf/turf";
 
 export interface TrackProps {
   feature: Feature 
@@ -25,8 +25,8 @@ const Zone: React.FC<TrackProps> = ({feature}) => {
     return '#000';
   };
 
-  const geoCoords = (feature.geometry as Polygon)
-  const centre = turf.center(geoCoords).geometry.coordinates.reverse() as LatLngExpression
+  const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
+  const centre = turf.center(points).geometry.coordinates.reverse() as LatLngExpression
   const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
 
   return (
