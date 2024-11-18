@@ -61,6 +61,6 @@ export default {
         36.13
       ]
     ],
-    type: "LineString"
+    type: "MultiPoint"
   }
 }

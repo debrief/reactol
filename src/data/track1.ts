@@ -52,7 +52,7 @@ const track: Feature = {
       ]
       
     ],
-    type: "LineString"
+    type: "MultiPoint"
   }
 }
 export default track
