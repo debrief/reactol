@@ -37,7 +37,6 @@ const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
-  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
   const initialised = useRef(false); 
@@ -75,11 +74,6 @@ function App() {
     }
   }
 
-  const setSelected = (ids: string[]): void => {
-    const selected = features.find((feature) => ids.includes(feature.id as string)) || null;
-    setSelectedFeature(selected);
-  }
-
   const setTime = (value: number) => {
     console.log('new time:', value, new Date(value).toISOString())
   }
@@ -103,12 +97,12 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { features && <Layers setSelected={setSelected} /> }
+                  { features && <Layers /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Detail'>
-                  <Properties feature={selectedFeature} />
+                  <Properties />
                 </Card>
               </Splitter.Panel>
             </Splitter>

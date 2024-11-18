@@ -1,12 +1,11 @@
 import React from 'react';
 import { Table } from 'antd';
-import { Feature } from 'geojson';
+import { useAppSelector } from '../app/hooks';
+import { selectedFeature } from '../features/selection/selectionSlice';
 
-interface PropertiesProps {
-  feature: Feature | null;
-}
 
-const Properties: React.FC<PropertiesProps> = ({ feature }) => {
+const Properties: React.FC = () => {
+  const feature = useAppSelector(selectedFeature);
   if (!feature) {
     return <div>No feature selected</div>;
   }
