@@ -27,13 +27,16 @@ const Track: React.FC<TrackProps> = ({feature}) => {
 
   const timeFor = (feature: Feature, index: number): string => {
     if (feature.properties?.times) {
+      if (index >= feature.properties.times.length) {
+        console.warn('Too few time elements for this track', feature)
+        return ''
+      }
       const time = feature.properties.times[index]
       return format(time, "ddHHmm'Z'")
     } else {
       return ''
     }
   }
-    
   
   const trackCoords = (feature.geometry as MultiPoint).coordinates.map(item => [item[1], item[0]]) as LatLngExpression[]
 
@@ -42,14 +45,14 @@ const Track: React.FC<TrackProps> = ({feature}) => {
       <Polyline key={feature.id + '-line-' + isSelected} positions={trackCoords} weight={2} color={colorFor(feature)}/>
       <Polyline key={feature.id + '-start-line-' + isSelected} positions={[trackCoords[0]]} weight={2} color={colorFor(feature)}>
         <Tooltip key={feature.id + '-start-name-' + isSelected} 
-           direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
+          direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
       </Polyline>
       { trackCoords.map((item, index) => 
         <CircleMarker key={feature.id + '-point-' + index} center={item} radius={3} color={colorFor(feature)}>
           {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {timeFor(feature, index)}
           </Tooltip>}
-         </CircleMarker> )}
+        </CircleMarker> )}
     </>
   )
 }
