@@ -24,12 +24,9 @@ const unscaled = (start: number, end: number, value: number): number => {
 
 const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowerLimit, setUpperLimit}) => {
   const [value, setValue] = useState<[number, number, number]>([0, steps/2, steps]);
-  const [timeStrings, setTimeStrings] = useState<string[]>([])
 
   useEffect(() => {
-    
-    const val = [0, 50, scaled(start, end, end)]
-    console.log('setting value', val)
+    const val = [0, steps, scaled(start, end, current || (start + end) / 2)]
     setValue(val as [number, number, number])
   }, [start, end, current])
 
@@ -45,7 +42,6 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowe
       setTime(unscaledValues[1])
     }
     setValue(newValue as [number, number, number])
-    setTimeStrings(unscaledValues.map((val) => pf(val)))
   }
 
   const pf = (val: number) => new Date(val).toLocaleTimeString()
@@ -54,7 +50,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowe
     <>
       <Slider
         range={{draggableTrack: true}}
-        tooltip={{visible: true, placement: 'top', formatter: (val) => pf(unscaled(start, end, val || 1))}}
+        tooltip={{open: true, placement: 'top', formatter: (val) => pf(unscaled(start, end, val || 1))}}
         defaultValue={value}
         max={steps}
         min={0}
@@ -69,7 +65,6 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowe
           },
         }}
       />
-      <div>{timeStrings.map((item) => ' / ' + item)}</div>
     </>
   );
 };
