@@ -1,11 +1,10 @@
 import { Card, ConfigProvider, Splitter } from 'antd';
-import { PathOptions, StyleFunction, CircleMarker } from 'leaflet'
+import { PathOptions, StyleFunction, CircleMarker, LatLngExpression } from 'leaflet'
 import './App.css'
-import { MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
+import { MapContainer, Marker, Popup, GeoJSON, TileLayer } from 'react-leaflet'
 import initialData from './data/collection.ts'
 import { Feature, FeatureCollection, Geometry} from 'geojson'
-import React, { useEffect, useState } from 'react'
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
+import { useEffect, useState } from 'react'
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
@@ -33,9 +32,6 @@ const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined
 
 function App() {
   const [store, setStore] = useState<FeatureCollection | undefined>(undefined)
-  const [tracks, setTracks] = useState<React.ReactElement[]>([])
-  const [points, setPoints] = useState<React.ReactElement[]>([])
-  const [zones, setZones] = useState<React.ReactElement[]>([])
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
@@ -58,39 +54,11 @@ function App() {
     setTimeBounds(timeBoundsFor(initialData.features))
   }, [])
 
-  const getVisible = (feature: Feature): boolean => {
-    return feature.properties?.visible 
+  const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
+    const color = pointFeature.properties?.color || 'blue';
+    const name = pointFeature.properties?.name || '';
+    return new CircleMarker(latlng, { radius: 15, color }).bindTooltip(name, { permanent: true, direction: 'center' });
   }
-
-  useEffect(() => {
-    if (store) {
-      // find tracks
-      setTracks(store.features.filter((feature) => feature.properties?.dataType === TRACK_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisible(feature)} name={`Track-${index}`}>
-          <GeoJSON key={`track-${index}`} data={feature} style={setColor} />
-        </LayersControl.Overlay>  
-      ))
-
-      // find zones
-      setZones(store.features.filter((feature) => feature.properties?.dataType === ZONE_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisible(feature)} name={`Zone-${index}`}>
-          <GeoJSON key={`zone-${index}`} data={feature} style={setColor} />
-        </LayersControl.Overlay>  
-      ))
-
-      // find points
-      setPoints(store.features.filter((feature) => feature.properties?.dataType === REFERENCE_POINT_TYPE).map((feature, index) => 
-        <LayersControl.Overlay checked={getVisible(feature)} name={`Point-${index}`}>
-          <GeoJSON key={`point-${index}`} data={feature} pointToLayer={(feature, latlng) => {
-            const pointFeature = feature as Feature;
-            const color = pointFeature.properties?.color || 'blue';
-            const name = pointFeature.properties?.name || '';
-            return new CircleMarker(latlng, { radius: 15, color }).bindTooltip(name, { permanent: true, direction: 'center' });
-          }} />
-        </LayersControl.Overlay>  
-      ))
-    }
-  }, [store])
 
   const antdTheme = {
     components: {
@@ -130,6 +98,10 @@ function App() {
     console.log('new time:', value, new Date(value).toISOString())
   }
 
+  const isVisible = (feature: Feature): boolean => {
+    return feature.properties?.visible
+  }
+
   return (
     <div className="App">
       <ConfigProvider theme={antdTheme}>
@@ -145,7 +117,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  <Layers zones={zones} tracks={tracks} points={points} setChecked={setChecked} setSelected={setSelected} />
+                  { store && <Layers store={store} setChecked={setChecked} setSelected={setSelected} /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
@@ -157,16 +129,12 @@ function App() {
           </Splitter.Panel>
           <Splitter.Panel key='right'>
             <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
-              <LayersControl position="topright">
-                <LayersControl.BaseLayer checked name='OpenStreetMap'>
-                  <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-                </LayersControl.BaseLayer>
-                {tracks}
-                {points}
-                {zones}
-              </LayersControl>
-              <LayerGroup>
-              </LayerGroup>     
+              <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+              { 
+                store?.features.filter(feature => isVisible(feature)).map((feature, index) => 
+                  <GeoJSON key={`${feature.id || index}`} data={feature} style={setColor} pointToLayer={createLabelledPoint}/>)
+              }
               <Marker position={[51.505, -0.09]}>
                 <Popup>
                 A pretty CSS3 popup. <br /> Easily customizable.
