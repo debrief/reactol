@@ -2,8 +2,9 @@ import { Feature, Geometry } from "geojson";
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker } from 'leaflet'
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer } from 'react-leaflet'
 import { useAppSelector } from "../app/hooks";
-import { TRACK_TYPE } from "../constants";
+import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
+import Zone from "./Zone";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -45,6 +46,8 @@ const Map: React.FC = () => {
     switch(feature.properties?.dataType) {
     case TRACK_TYPE:
       return <Track feature={feature}/> 
+    case ZONE_TYPE:
+      return <Zone feature={feature}/>  
     default:
       return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint}/> 
     }
