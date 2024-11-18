@@ -2,6 +2,9 @@ import { Feature, Geometry } from "geojson";
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker } from 'leaflet'
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer } from 'react-leaflet'
 import { useAppSelector } from "../app/hooks";
+import { TRACK_TYPE, ZONE_TYPE } from "../constants";
+import Track from "./Track";
+import Zone from "./Zone";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -39,14 +42,24 @@ const Map: React.FC = () => {
     return res;
   };
 
+  const featureFor = (feature: Feature): React.ReactElement => {
+    switch(feature.properties?.dataType) {
+    case TRACK_TYPE:
+      return <Track feature={feature}/> 
+    case ZONE_TYPE:
+      return <Zone feature={feature}/>  
+    default:
+      return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint}/> 
+    }
+  }
+
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
         { 
-          features.filter(feature => isVisible(feature)).map((feature, index) => 
-            <GeoJSON key={`${feature.id || index}`} data={feature} style={setColor} pointToLayer={createLabelledPoint}/>)
+          features.filter(feature => isVisible(feature)).map((featureFor))
         }
         <Marker position={[51.505, -0.09]}>
           <Popup>
