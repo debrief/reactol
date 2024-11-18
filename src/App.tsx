@@ -14,7 +14,6 @@ import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
 
-
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
@@ -36,9 +35,10 @@ function App() {
   }, [dispatch])
 
   useEffect(() => {
-    if (!timeInitialised.current) {
+    if (features && features.length && !timeInitialised.current) {
       timeInitialised.current = true
-      setTimeBounds(timeBoundsFor(features))
+      const timeBounds = timeBoundsFor(features)
+      setTimeBounds(timeBounds)
     }
   }, [features])
 
@@ -57,7 +57,6 @@ function App() {
   const setTime = (value: number) => {
     console.log('new time:', value, format(new Date(value), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")) // P4b37
   }
-
 
   return (
     <div className="App">
