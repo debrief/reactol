@@ -1,11 +1,11 @@
 import React from 'react';
 import { Table } from 'antd';
 import { useAppSelector } from '../app/hooks';
-import { selectedFeature } from '../features/selection/selectionSlice';
+import { selectedFeatureSelection } from '../features/selection/selectionSlice';
 
 
 const Properties: React.FC = () => {
-  const feature = useAppSelector(selectedFeature);
+  const feature = useAppSelector(selectedFeatureSelection);
   if (!feature) {
     return <div>No feature selected</div>;
   }
