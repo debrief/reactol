@@ -2,14 +2,18 @@ import { Card, ConfigProvider, Splitter } from 'antd';
 import { PathOptions, StyleFunction, CircleMarker, LatLngExpression } from 'leaflet'
 import './App.css'
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer } from 'react-leaflet'
-import initialData from './data/collection.ts'
-import { Feature, FeatureCollection, Geometry} from 'geojson'
-import { useEffect, useState } from 'react'
+import { Feature, Geometry} from 'geojson'
+import { useEffect, useRef, useState } from 'react'
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
 import { noop } from 'antd/es/_util/warning';
 import { timeBoundsFor } from './helpers/timeBounds.ts';
+import { useAppDispatch, useAppSelector } from './app/hooks.ts';
+import track from './data/track1.ts';
+import track2 from './data/track2.ts';
+import zones from './data/zones.ts';
+import points from './data/points.ts';
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -31,28 +35,27 @@ const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined
 };
 
 function App() {
-  const [store, setStore] = useState<FeatureCollection | undefined>(undefined)
+  const features = useAppSelector(state => state.featureCollection.features)
+  const dispatch = useAppDispatch()
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
+  const initialised = useRef(false); 
+
   useEffect(() => {
-    console.clear()
-    // check that all features in initial-data have an id
-    initialData.features.forEach((feature, index) => {
-      if (!feature.id) {
-        feature.id = `f-${index}`
-      }
-      if (!feature.properties) {
-        feature.properties = {}
-      }
-      if (feature.properties.visible === undefined) {
-        feature.properties.visible = true
-      }
-    })
-    setStore(initialData)
-    console.log('new time bounds:', timeBoundsFor(initialData.features))
-    setTimeBounds(timeBoundsFor(initialData.features))
-  }, [])
+    if (!initialised.current) {
+      initialised.current = true
+      console.clear()
+      // store initial data objects
+      dispatch({ type: 'featureCollection/featureAdded', payload: track })
+      dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
+      dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
+      dispatch({ type: 'featureCollection/featuresAdded', payload: points })
+  
+      console.log('new time bounds:', timeBoundsFor([]), !!setTimeBounds)
+      // setTimeBounds(timeBoundsFor(initialData.features))
+    }
+  }, [dispatch])
 
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';
@@ -72,25 +75,8 @@ function App() {
     }
   }
 
-  const setFeatureVisibility = (feature: Feature, visible: boolean): void => {
-    if(!feature.properties) {
-      feature.properties = {}
-    }
-    feature.properties.visible = visible
-  }
-
-  const setChecked = (ids: string[]): void => {
-    const newStore = JSON.parse(JSON.stringify(store))
-    newStore.features = newStore.features.map((feature: Feature) => {
-      const id = feature.id as string
-      setFeatureVisibility(feature, ids.includes(id))
-      return feature
-    })
-    setStore(newStore)
-  }
-
   const setSelected = (ids: string[]): void => {
-    const selected = store?.features.find((feature) => ids.includes(feature.id as string)) || null;
+    const selected = features.find((feature) => ids.includes(feature.id as string)) || null;
     setSelectedFeature(selected);
   }
 
@@ -117,7 +103,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { store && <Layers store={store} setChecked={setChecked} setSelected={setSelected} /> }
+                  { features && <Layers setSelected={setSelected} /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
@@ -132,7 +118,7 @@ function App() {
               <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
               { 
-                store?.features.filter(feature => isVisible(feature)).map((feature, index) => 
+                features.filter(feature => isVisible(feature)).map((feature, index) => 
                   <GeoJSON key={`${feature.id || index}`} data={feature} style={setColor} pointToLayer={createLabelledPoint}/>)
               }
               <Marker position={[51.505, -0.09]}>
