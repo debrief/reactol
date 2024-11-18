@@ -3,13 +3,17 @@ import { PathOptions, StyleFunction, CircleMarker, LatLngExpression } from 'leaf
 import './App.css'
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer } from 'react-leaflet'
 import { Feature, Geometry} from 'geojson'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
 import { noop } from 'antd/es/_util/warning';
 import { timeBoundsFor } from './helpers/timeBounds.ts';
-import { useAppSelector } from './app/hooks.ts';
+import { useAppDispatch, useAppSelector } from './app/hooks.ts';
+import track from './data/track1.ts';
+import track2 from './data/track2.ts';
+import zones from './data/zones.ts';
+import points from './data/points.ts';
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -32,15 +36,26 @@ const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
+  const dispatch = useAppDispatch()
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
+  const initialised = useRef(false); 
+
   useEffect(() => {
-    console.clear()
-    // store initial data objects
-    console.log('new time bounds:', timeBoundsFor([]), !!setTimeBounds)
-    // setTimeBounds(timeBoundsFor(initialData.features))
-  }, [])
+    if (!initialised.current) {
+      initialised.current = true
+      console.clear()
+      // store initial data objects
+      dispatch({ type: 'featureCollection/featureAdded', payload: track })
+      dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
+      dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
+      dispatch({ type: 'featureCollection/featuresAdded', payload: points })
+  
+      console.log('new time bounds:', timeBoundsFor([]), !!setTimeBounds)
+      // setTimeBounds(timeBoundsFor(initialData.features))
+    }
+  }, [dispatch])
 
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';

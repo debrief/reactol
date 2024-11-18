@@ -4,7 +4,7 @@ import type { TreeDataNode, TreeProps } from 'antd';
 import './Layers.css';
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
-import { useAppSelector } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 
 export interface LayersProps {
   setSelected: (ids: string[]) => void
@@ -12,6 +12,7 @@ export interface LayersProps {
 
 const Layers: React.FC<LayersProps> = ({setSelected}) => {
   const features = useAppSelector(state => state.featureCollection.features)
+  const dispatch = useAppDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
@@ -79,15 +80,14 @@ const Layers: React.FC<LayersProps> = ({setSelected}) => {
   };
   
   const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
-    console.log('need to handle checked', checkedKeys)
-    // do dispatch
-    // setChecked(justLeaves(checkedKeys as string[]))
+    const keys = justLeaves(checkedKeys as string[])
+    dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
   
   return <Tree checkable
-    defaultExpandedKeys={['0-0-0', '0-0-1']}
-    defaultSelectedKeys={['0-0-0', '0-0-1']}
-    defaultCheckedKeys={['0-0-0', '0-0-1']}
+    defaultExpandedKeys={[]}
+    defaultSelectedKeys={[]}
+    defaultCheckedKeys={[]}
     onSelect={onSelect}
     onCheck={onCheck}
     checkedKeys={checkedKeys}
