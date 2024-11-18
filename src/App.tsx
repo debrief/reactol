@@ -1,4 +1,4 @@
-import { Card, ConfigProvider, Flex, Splitter, Typography } from 'antd';
+import { Card, ConfigProvider, Splitter } from 'antd';
 import { PathOptions, StyleFunction, CircleMarker } from 'leaflet'
 import './App.css'
 import { MapContainer, Marker, Popup, TileLayer, GeoJSON, LayerGroup, LayersControl } from 'react-leaflet'
@@ -8,6 +8,9 @@ import React, { useEffect, useState } from 'react'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants.ts';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
+import TimeControl from './components/TimeControl.tsx';
+import { noop } from 'antd/es/_util/warning';
+import { timeBoundsFor } from './helpers/timeBounds.ts';
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -28,20 +31,13 @@ const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined
   return res;
 };
 
-const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
-  <Flex justify="center" align="center" style={{ height: '100%' }}>
-    <Typography.Title type="secondary" level={5} style={{ whiteSpace: 'nowrap' }}>
-      {props.text}
-    </Typography.Title>
-  </Flex>
-);
-
 function App() {
   const [store, setStore] = useState<FeatureCollection | undefined>(undefined)
   const [tracks, setTracks] = useState<React.ReactElement[]>([])
   const [points, setPoints] = useState<React.ReactElement[]>([])
   const [zones, setZones] = useState<React.ReactElement[]>([])
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
+  const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
 
   useEffect(() => {
     console.clear()
@@ -58,6 +54,8 @@ function App() {
       }
     })
     setStore(initialData)
+    console.log('new time bounds:', timeBoundsFor(initialData.features))
+    setTimeBounds(timeBoundsFor(initialData.features))
   }, [])
 
   const getVisible = (feature: Feature): boolean => {
@@ -113,7 +111,7 @@ function App() {
     feature.properties.visible = visible
   }
 
-  function setChecked(ids: string[]): void {
+  const setChecked = (ids: string[]): void => {
     const newStore = JSON.parse(JSON.stringify(store))
     newStore.features = newStore.features.map((feature: Feature) => {
       const id = feature.id as string
@@ -123,9 +121,13 @@ function App() {
     setStore(newStore)
   }
 
-  function setSelected(ids: string[]): void {
+  const setSelected = (ids: string[]): void => {
     const selected = store?.features.find((feature) => ids.includes(feature.id as string)) || null;
     setSelectedFeature(selected);
+  }
+
+  const setTime = (value: number) => {
+    console.log('new time:', value, new Date(value).toISOString())
   }
 
   return (
@@ -135,7 +137,11 @@ function App() {
           <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
             <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
               <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
-                <Desc text="Time Control" />
+                <Card title='Time Control'>
+                  {timeBounds && 
+                    <TimeControl start={timeBounds[0]} end={timeBounds[1]} 
+                      setLowerLimit={noop} setUpperLimit={noop} setTime={setTime} />}
+                </Card>
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
