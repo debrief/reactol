@@ -47,26 +47,5 @@ const featuresSlice = createSlice({
   }
 })
 
-
-
-
-// const setFeatureVisibility = (feature: Feature, visible: boolean): void => {
-//   if(!feature.properties) {
-//     feature.properties = {}
-//   }
-//   feature.properties.visible = visible
-// }
-
-// const setChecked = (ids: string[]): void => {
-//   const newStore = JSON.parse(JSON.stringify(store))
-//   newStore.features = newStore.features.map((feature: Feature) => {
-//     const id = feature.id as string
-//     setFeatureVisibility(feature, ids.includes(id))
-//     return feature
-//   })
-//   setStore(newStore)
-// }
-
-
 // Export the generated reducer function
 export default featuresSlice.reducer
