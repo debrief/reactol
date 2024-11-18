@@ -6,7 +6,7 @@ import { Feature, FeatureCollection} from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 
 export interface LayersProps {
-  store: FeatureCollection | undefined
+  store: FeatureCollection
   setSelected: (ids: string[]) => void
   setChecked: (ids: string[]) => void
 }

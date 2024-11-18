@@ -117,7 +117,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  <Layers store={store} setChecked={setChecked} setSelected={setSelected} />
+                  { store && <Layers store={store} setChecked={setChecked} setSelected={setSelected} /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
