@@ -2,31 +2,34 @@ import React, { useEffect } from 'react';
 import { Tree } from 'antd';
 import type { TreeDataNode, TreeProps } from 'antd';
 import './Layers.css';
+import { Feature, FeatureCollection} from 'geojson'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 
 export interface LayersProps {
-  zones: React.ReactElement[]
-  tracks: React.ReactElement[]
-  points: React.ReactElement[]
+  store: FeatureCollection | undefined
   setSelected: (ids: string[]) => void
   setChecked: (ids: string[]) => void
 }
 
-const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setChecked}) => {
+const Layers: React.FC<LayersProps> = ({store, setSelected, setChecked}) => {
   
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   
-  const idFor = (node: React.ReactElement): string => {
-    return node.props.children.props.data.id
+  const idFor = (feature: Feature): string => {
+    return `${feature.id || 'unknown'}`
   }
   
-  const nameFor = (node: React.ReactElement): string => {
-    const item = node.props.children.props.data
-    return item.properties?.name || item.id
+  const nameFor = (feature: Feature): string => {
+    return feature.properties?.name || feature.id
   }
   
-  const isChecked = (node: React.ReactElement): string => {
-    return node.props.children.props.data.properties.visible
+  const isChecked = (feature: Feature): string => {
+    return feature.properties?.visible
+  }
+
+  const filterFor = (feature: Feature, dType: string): boolean => {
+    return feature.properties?.dataType === dType
   }
   
   useEffect(() => {
@@ -34,7 +37,7 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
       {
         title: 'Tracks',
         key: 'node-tracks',
-        children: tracks.map((item) => ({
+        children: store?.features.filter((feature) => filterFor(feature, TRACK_TYPE)).map((item) => ({
           title: nameFor(item),
           key: idFor(item),
           children: []
@@ -43,7 +46,7 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
       {
         title: 'Zones',
         key: 'node-zones',
-        children: zones.map((item) => ({
+        children: store?.features.filter((feature) => filterFor(feature, ZONE_TYPE)).map((item) => ({
           title: nameFor(item),
           key: idFor(item),
           children: []
@@ -52,7 +55,7 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
       {
         title: 'Points',
         key: 'node-points',
-        children: points.map((item) => ({
+        children: store?.features.filter((feature) => filterFor(feature, REFERENCE_POINT_TYPE)).map((item) => ({
           title: nameFor(item),
           key: idFor(item),
           children: []
@@ -60,12 +63,11 @@ const Layers: React.FC<LayersProps> = ({zones, tracks, points, setSelected, setC
       }
     ]
     setModel(modelData)
-    const checked: string[] = []
-    checked.push(...tracks.filter((item) => isChecked(item)).map((item) => idFor(item)))
-    checked.push(...zones.filter((item) => isChecked(item)).map((item) => idFor(item)))
-    checked.push(...points.filter((item) => isChecked(item)).map((item) => idFor(item)))
-    setCheckedKeys(checked)
-  }, [zones, tracks, points])
+    if (store) {
+      const checked: string[] = store.features.filter((feature) => isChecked(feature)).map((feature) => idFor(feature))
+      setCheckedKeys(checked)
+    }
+  }, [store])
   
   // filter out the branches, just leave the leaves
   const justLeaves = (ids: string[]): string[] => {
