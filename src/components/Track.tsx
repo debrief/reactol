@@ -1,6 +1,6 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { LatLngExpression  } from 'leaflet'
-import { Polyline, CircleMarker } from 'react-leaflet'
+import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { useAppSelector } from "../app/hooks";
 
 export interface TrackProps {
@@ -28,7 +28,12 @@ const Track: React.FC<TrackProps> = ({feature}) => {
 
   return (
     <>
-      <Polyline key={feature.id + '-line-' + isSelected} positions={trackCoords} weight={2} color={colorFor(feature)} />
+      <Polyline key={feature.id + '-line-' + isSelected} positions={trackCoords} weight={2} color={colorFor(feature)}>
+        <Tooltip position={trackCoords[0]} direction="auto" opacity={1} permanent>
+          {feature.properties?.name}
+        </Tooltip>
+
+        </Polyline>
       { trackCoords.map((item, index) => 
         <CircleMarker key={feature.id + '-point-' + index} center={item} radius={3} color={colorFor(feature)} /> )}
     </>
