@@ -1,5 +1,6 @@
 import { Slider } from "antd";
 import { useEffect, useState } from "react";
+import { format } from 'date-fns';
 
 export interface TimeProps {
   start: number
@@ -44,7 +45,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowe
     setValue(newValue as [number, number, number])
   }
 
-  const pf = (val: number) => new Date(val).toLocaleTimeString()
+  const pf = (val: number) => format(new Date(val), 'HH:mm:ss')
 
   return (
     <>

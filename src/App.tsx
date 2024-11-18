@@ -14,6 +14,7 @@ import track from './data/track1.ts';
 import track2 from './data/track2.ts';
 import zones from './data/zones.ts';
 import points from './data/points.ts';
+import { format } from 'date-fns'; // Pdabc
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -81,7 +82,7 @@ function App() {
   }
 
   const setTime = (value: number) => {
-    console.log('new time:', value, new Date(value).toISOString())
+    console.log('new time:', value, format(new Date(value), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")) // P4b37
   }
 
   const isVisible = (feature: Feature): boolean => {
