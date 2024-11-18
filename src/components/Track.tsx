@@ -39,10 +39,10 @@ const Track: React.FC<TrackProps> = ({feature}) => {
 
   return (
     <>
-      <Polyline key={feature.id + '-line-' + isSelected} positions={trackCoords} weight={2} color={colorFor(feature)}>
-        <Tooltip key={feature.id + '-tip-' + isSelected}  position={trackCoords[0]} direction="auto" opacity={1} permanent>
-          {feature.properties?.name}
-        </Tooltip>
+      <Polyline key={feature.id + '-line-' + isSelected} positions={trackCoords} weight={2} color={colorFor(feature)}/>
+      <Polyline key={feature.id + '-start-line-' + isSelected} positions={[trackCoords[0]]} weight={2} color={colorFor(feature)}>
+        <Tooltip key={feature.id + '-start-name-' + isSelected} 
+           direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
       </Polyline>
       { trackCoords.map((item, index) => 
         <CircleMarker key={feature.id + '-point-' + index} center={item} radius={3} color={colorFor(feature)}>
