@@ -6,7 +6,6 @@ import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
-import { SelectionState } from "../features/selection/selectionSlice";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
