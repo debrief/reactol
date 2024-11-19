@@ -1,6 +1,6 @@
 import { Col, Row, Slider } from "antd";
 import { ClockCircleOutlined, FilterOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { format } from 'date-fns';
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 
@@ -31,6 +31,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
 
   const [value, setValue] = useState<[number, number, number]>([0, steps / 2, steps]);
   const [playing, setPlaying] = useState(false)
+  const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
     const tStart = limits ? limits[0] : start
@@ -57,24 +58,40 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     }
   }
 
-  
   const PlayControl = useMemo(() => {
     if (playing) {
+      if (!timerRef.current) {
+        timerRef.current =  setInterval(() => {
+          const newValue =  value.map((c, i) => {
+            if (i === 1) {
+              return c + 30;
+            } else {
+              return c;
+            }
+          });
+          setValue(newValue as [number, number, number])
+        }, 1000)
+      }
       return <PauseCircleOutlined onClick={() => setPlaying(false)}/>
     } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
       return <PlayCircleOutlined onClick={() => setPlaying(true)}/>
     }
-  }, [playing])
-  
+  }, [playing, value])
+
   return (
     <>  <Row>
-        <Col span={2}>
+        <Col span={4}>
           {PlayControl}
         </Col>
-        <Col span={9}>
+        <Col span={20}>
         <Slider
           range={{draggableTrack: true}}
           defaultValue={value}
+          value={value}
           tooltip={{open: false}}
           max={steps}
           min={0}
