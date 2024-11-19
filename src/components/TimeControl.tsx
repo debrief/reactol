@@ -37,7 +37,8 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     const tStart = limits ? limits[0] : start
     const tEnd = limits ? limits[1] : end 
     const tCurrent = stateCurrent || current || (tStart + tEnd) / 2
-    const val = [0, steps, scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2)]
+    const val = [0, scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2), steps]
+    console.log('time state updated', tStart, tEnd, tCurrent, val)
     setValue(val as [number, number, number])
   }, [start, end, current])
 
@@ -59,17 +60,22 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   }
 
   const PlayControl = useMemo(() => {
-    if (playing) {
+    if (playing && value[1] < steps) {
       if (!timerRef.current) {
         timerRef.current =  setInterval(() => {
-          const newValue =  value.map((c, i) => {
-            if (i === 1) {
-              return c + 30;
-            } else {
-              return c;
-            }
-          });
-          setValue(newValue as [number, number, number])
+          let curTime = 0
+          setValue(prev => {
+            const newArr: [number, number, number] = [...prev]
+            newArr[1] += 20
+            curTime = newArr[1]
+            return newArr
+          })
+          // also dispatch the time
+          const newTime = unscaled(start, end, curTime)
+          const unscaledValues = value.map((val) => unscaled(start, end, val))
+          unscaledValues[1] = newTime
+          dispatch({type: 'time/timeChanged', payload: unscaledValues})
+      
         }, 1000)
       }
       return <PauseCircleOutlined onClick={() => setPlaying(false)}/>
