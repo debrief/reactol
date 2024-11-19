@@ -28,7 +28,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const {limits, current: stateCurrent} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch()
 
-  const [value, setValue] = useState<[number, number, number]>([0, steps/2, steps]);
+  const [value, setValue] = useState<[number, number, number]>([0, 0, steps]);
 
   useEffect(() => {
     const tStart = limits ? limits[0] : start
