@@ -1,6 +1,7 @@
 import { Slider } from "antd";
 import { useEffect, useState } from "react";
 import { format } from 'date-fns';
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 export interface TimeProps {
   start: number
@@ -23,25 +24,27 @@ const unscaled = (start: number, end: number, value: number): number => {
   return (value / steps) * range + start
 }
 
-const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowerLimit, setUpperLimit}) => {
+const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
+  const {limits, current: stateCurrent} = useAppSelector(state => state.time)
+  const dispatch = useAppDispatch()
+
+
   const [value, setValue] = useState<[number, number, number]>([0, steps/2, steps]);
 
   useEffect(() => {
-    const val = [0, steps, scaled(start, end, current || (start + end) / 2)]
+    const tStart = limits ? limits[0] : start
+    const tEnd = limits ? limits[1] : end 
+    const tCurrent = stateCurrent || current || (tStart + tEnd) / 2
+    const val = [0, steps, scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2)]
     setValue(val as [number, number, number])
   }, [start, end, current])
 
   const setNewValue = (newValue: number[]) => {
     const unscaledValues = newValue.map((val) => unscaled(start, end, val))
-    if(newValue[0] !== value[0]) {
-      setLowerLimit(unscaledValues[0])
-    }
-    if(newValue[2] !== value[2]) {
-      setUpperLimit(unscaledValues[2])
-    }
-    if(newValue[1] !== value[1]) {
-      setTime(unscaledValues[1])
-    }
+
+    dispatch({type: 'time/limitsChanged', payload: [unscaledValues[0], unscaledValues[2]]})
+    dispatch({type: 'time/timeChanged', payload: unscaledValues[1]})
+
     setValue(newValue as [number, number, number])
   }
 
