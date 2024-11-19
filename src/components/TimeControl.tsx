@@ -28,8 +28,6 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const {limits, current: stateCurrent} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch()
 
-  console.log('new time state', stateCurrent)
-
   const [value, setValue] = useState<[number, number, number]>([0, steps/2, steps]);
 
   useEffect(() => {

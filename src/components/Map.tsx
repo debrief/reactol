@@ -19,8 +19,6 @@ const Map: React.FC = () => {
   const selectedFeatureId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
 
-  console.log('current time', current)
-
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';
     const name = pointFeature.properties?.name || '';
@@ -60,6 +58,23 @@ const Map: React.FC = () => {
     return feature.properties?.times
   }
 
+  const CurrentMarker = (feature: Feature, ctr: number, current: number): React.ReactElement => {
+    if (feature.properties?.times) {
+      const times = feature.properties.times
+      const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
+      if (index >= 0) {
+        const poly = feature.geometry as MultiPoint
+        const coords = poly.coordinates
+        const key = `marker-${ctr}-${index}`
+        const location = [coords[index][1], coords[index][0]] as LatLngExpression
+        return <Marker key={key} position={location}>
+        </Marker>
+      }
+    }
+    return <></>
+  }
+
+
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
@@ -73,22 +88,7 @@ const Map: React.FC = () => {
           A pretty CSS3 popup. <br /> Easily customizable.
           </Popup>
         </Marker>
-        {
-          current && features.filter(isTemporal).map((feature, ctr) => {
-            if (feature.properties?.times) {
-              const times = feature.properties.times
-              const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
-              if (index >= 0) {
-                const poly = feature.geometry as MultiPoint
-                const coords = poly.coordinates
-                const key = `marker-${ctr}-${index}`
-                const location = [coords[index][1], coords[index][0]] as LatLngExpression
-                return <Marker key={key} position={location}>
-                </Marker>
-              }
-            }
-          })
-        }
+        { current && features.filter(isTemporal).map((feature, ctr) => CurrentMarker(feature, ctr, current)) }
       </MapContainer>
     </>
   );
