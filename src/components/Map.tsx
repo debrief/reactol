@@ -92,8 +92,8 @@ const Map: React.FC = () => {
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
-        <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+        <TileLayer url='./tiles/{z}/{x}/{y}.png'
+          minZoom={0} maxZoom={12} maxNativeZoom={8} tms={false}/>  
         { 
           features.filter(feature => isVisible(feature)).map((featureFor))
         }
