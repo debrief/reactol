@@ -1,4 +1,4 @@
-import { Slider } from "antd";
+import { Slider, TableColumnProps } from "antd";
 import { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -44,18 +44,26 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     setValue(newValue as [number, number, number])
   }
 
-  const pf = (val: number) => format(new Date(val), 'HH:mm:ss')
+  const pf = (val: number) => format(new Date(val), 'ddHHmm')
+  
+  const timeStr = (val: number | number[] | null, index?: number): string => {
+    if (index !== undefined) {
+      const arr = val as number[]
+      return val ? pf(arr[index]) : '00:00:00'
+    } else {
+      return val ? pf(val as number) : '00:00:00'
+    }
+  }
 
   return (
     <>
       <Slider
         range={{draggableTrack: true}}
-        tooltip={{open: true, placement: 'top', formatter: (val) => pf(unscaled(start, end, val || 1))}}
         defaultValue={value}
+        tooltip={{open: false}}
         max={steps}
         min={0}
         onChange={setNewValue}
-        
         styles={{
           track: {
             background: 'transparent',
@@ -65,6 +73,22 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           },
         }}
       />
+      <table>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>Current</th>
+            <th>End</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr style={{fontFamily: 'monospace', padding: '0 5px'}}>
+              <td>{timeStr(limits, 0)}</td>
+              <td style={{fontWeight: 'bold'}}>{timeStr(stateCurrent)}</td>
+              <td>{timeStr(limits, 1)}</td>
+            </tr>
+          </tbody>
+      </table>
     </>
   );
 };
