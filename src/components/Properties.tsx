@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'antd';
+import { Table, Tooltip } from 'antd';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeatureSelection } from '../features/selection/selectionSlice';
 import './Properties.css';
@@ -10,11 +10,13 @@ const Properties: React.FC = () => {
     return <div>No feature selected</div>;
   }
 
-  const dataSource = Object.entries(feature.properties || {}).map(([key, value], index) => ({
-    key: index,
-    property: key,
-    value: value,
-  }));
+  const dataSource = Object.entries(feature.properties || {}).map(([key, value], index) => {
+    const valStr = Array.isArray(value) ? value.join(', ') : value;
+    return {
+      key: index,
+      property: key,
+      value: valStr,
+    }});
 
   const columns = [
     {
@@ -26,6 +28,14 @@ const Properties: React.FC = () => {
       title: 'Value',
       dataIndex: 'value',
       key: 'value',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (value: string) => (
+        <Tooltip placement="topLeft" title={value}>
+          {value}
+        </Tooltip>
+      ),
     },
   ];
 
