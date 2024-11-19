@@ -1,7 +1,7 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker } from 'leaflet'
-import { useAppSelector } from "../app/hooks";
+import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
@@ -62,6 +62,7 @@ const Map: React.FC = () => {
   const features = useAppSelector(state => state.featureCollection.features)
   const selectedFeatureId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
+  const dispatch = useAppDispatch();
 
   const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
     const res: CustomPathOptions = {}
@@ -78,6 +79,11 @@ const Map: React.FC = () => {
     return res;
   };
 
+  const onFeatureClick = (event: any) => {
+    const featureId = event.layer.feature.id;
+    dispatch({ type: 'selection/selectionChanged', payload: { selected: featureId } });
+  };
+
   const featureFor = (feature: Feature): React.ReactElement => {
     switch(feature.properties?.dataType) {
     case TRACK_TYPE:
@@ -85,7 +91,7 @@ const Map: React.FC = () => {
     case ZONE_TYPE:
       return <Zone feature={feature}/>  
     default:
-      return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint}/> 
+      return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} eventHandlers={{ click: onFeatureClick }}/> 
     }
   }
 
