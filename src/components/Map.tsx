@@ -81,18 +81,19 @@ const Map: React.FC = () => {
     return <></>
   }
 
-  const onFeatureClick = (event: any) => {
-    const featureId = event.layer.feature.id;
-    dispatch({ type: 'selection/selectionChanged', payload: { selected: featureId } });
+  const onTooltipClick = (event: LeafletMouseEvent) => {
+    if (event.target.feature) {
+      const featureId = event.target.feature.id;
+      dispatch({ type: 'selection/selectionChanged', payload: { selected: featureId } });  
+    }
   };
 
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';
     const name = pointFeature.properties?.name || '';
-    return new CircleMarker(latlng, { radius: 1, fillOpacity: 1, color, opacity:1 }).bindTooltip(name, { permanent: true, direction: 'center' }).on('click', onFeatureClick);
+    return new CircleMarker(latlng, { radius: 1, fillOpacity: 1, color, opacity:1 }).bindTooltip(name, { interactive:true, permanent: true, direction: 'center' }).on('click', onTooltipClick);
   }
   
-
   const featureFor = (feature: Feature): React.ReactElement => {
     switch(feature.properties?.dataType) {
     case TRACK_TYPE:
@@ -100,7 +101,7 @@ const Map: React.FC = () => {
     case ZONE_TYPE:
       return <Zone feature={feature}/>  
     default:
-      return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} eventHandlers={{ click: onFeatureClick }}/> 
+      return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} /> 
     }
   }
 
