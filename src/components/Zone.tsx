@@ -2,7 +2,8 @@ import * as turf from "turf";
 import { Feature, Geometry, Polygon } from "geojson";
 import { LatLngExpression  } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
-import { useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { SelectionState } from "../features/selection/selectionSlice";
 
 export interface TrackProps {
   feature: Feature 
@@ -10,6 +11,7 @@ export interface TrackProps {
 
 const Zone: React.FC<TrackProps> = ({feature}) => {
   const selectedFeatureId = useAppSelector(state => state.selected.selected)
+  const dispatch = useAppDispatch()
   const isSelected = feature.id === selectedFeatureId
 
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
@@ -29,9 +31,14 @@ const Zone: React.FC<TrackProps> = ({feature}) => {
   const centre = turf.center(points).geometry.coordinates.reverse() as LatLngExpression
   const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
 
+  const onclick = () => {
+    const payload: SelectionState = {selected: feature.id as string}
+    dispatch({type: 'selection/selectionChanged', payload})
+  }
   return (
     <>
-      <ReactPolygon key={feature.id + '-line2' + isSelected} fill={true} positions={trackCoords} weight={2} color={colorFor(feature)} >
+      <ReactPolygon key={feature.id + '-line2' + isSelected} fill={true} positions={trackCoords} weight={2} 
+        color={colorFor(feature)} eventHandlers={{click: onclick}} >
         <Tooltip position={centre} direction="center" opacity={1} permanent>
           {feature.properties?.name}
         </Tooltip>

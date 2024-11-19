@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeatureSelection } from '../features/selection/selectionSlice';
-
+import './Properties.css';
 
 const Properties: React.FC = () => {
   const feature = useAppSelector(selectedFeatureSelection);

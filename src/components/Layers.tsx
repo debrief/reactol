@@ -5,6 +5,7 @@ import './Layers.css';
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { SelectionState } from '../features/selection/selectionSlice';
 
 const Layers: React.FC = () => {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -72,7 +73,8 @@ const Layers: React.FC = () => {
   }
   
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    dispatch({type: 'selection/selectionChanged', payload: {selected: selectedKeys[0]}})
+    const payload: SelectionState = {selected: selectedKeys[0] as string}
+    dispatch({type: 'selection/selectionChanged', payload})
   };
   
   const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
