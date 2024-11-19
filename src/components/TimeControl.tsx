@@ -1,5 +1,6 @@
-import { Slider } from "antd";
-import { useEffect, useState } from "react";
+import { Col, Row, Slider } from "antd";
+import { ClockCircleOutlined, FilterOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import React, { useEffect, useMemo, useState } from "react";
 import { format } from 'date-fns';
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 
@@ -29,6 +30,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const dispatch = useAppDispatch()
 
   const [value, setValue] = useState<[number, number, number]>([0, steps / 2, steps]);
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     const tStart = limits ? limits[0] : start
@@ -55,30 +57,44 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     }
   }
 
+  
+  const PlayControl = useMemo(() => {
+    if (playing) {
+      return <PauseCircleOutlined onClick={() => setPlaying(false)}/>
+    } else {
+      return <PlayCircleOutlined onClick={() => setPlaying(true)}/>
+    }
+  }, [playing])
+  
   return (
-    <>
-      <Slider
-        range={{draggableTrack: true}}
-        defaultValue={value}
-        tooltip={{open: false}}
-        max={steps}
-        min={0}
-        onChange={setNewValue}
-        styles={{
-          track: {
-            background: 'transparent',
-          },
-          tracks: {
-            background: '#666',
-          },
-        }}
-      />
+    <>  <Row>
+        <Col span={2}>
+          {PlayControl}
+        </Col>
+        <Col span={9}>
+        <Slider
+          range={{draggableTrack: true}}
+          defaultValue={value}
+          tooltip={{open: false}}
+          max={steps}
+          min={0}
+          onChange={setNewValue}
+          styles={{
+            track: {
+              background: 'transparent',
+            },
+            tracks: {
+              background: '#666',
+            },
+          }}/>
+         </Col>
+         </Row>
       <table style={{width: '100%'}}>
         <thead>
           <tr>
-            <th>Start</th>
-            <th>Current</th>
-            <th>End</th>
+            <th><FilterOutlined />Start</th>
+            <th><ClockCircleOutlined />Current</th>
+            <th><FilterOutlined />End</th>
           </tr>
           </thead>
           <tbody>
