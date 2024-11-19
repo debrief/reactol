@@ -31,19 +31,6 @@ const Track: React.FC<TrackProps> = ({feature}) => {
     }
     return '#000';
   };
-
-  const timeFor = (feature: Feature, index: number): string => {
-    if (feature.properties?.times) {
-      if (index >= feature.properties.times.length) {
-        console.warn('Too few time elements for this track', feature)
-        return ''
-      }
-      const time = feature.properties.times[index]
-      return format(time, "ddHHmm'Z'")
-    } else {
-      return ''
-    }
-  }
   
   const trackCoords = useMemo(() => {
     if (limits && feature.properties?.times) {
