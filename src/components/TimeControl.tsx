@@ -25,6 +25,17 @@ const unscaled = (start: number, end: number, value: number): number => {
   return (value / steps) * range + start
 }
 
+const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
+  
+const timeStr = (val: number | number[] | null, index?: number): string => {
+  if (index !== undefined) {
+    const arr = val as number[]
+    return val ? pf(arr[index]) : '000000Z'
+  } else {
+    return val ? pf(val as number) : '000000Z'
+  }
+}
+
 const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const {limits, current: stateCurrent} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch()
@@ -48,17 +59,6 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     setValue(newValue as [number, number, number])
   }
 
-  const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
-  
-  const timeStr = (val: number | number[] | null, index?: number): string => {
-    if (index !== undefined) {
-      const arr = val as number[]
-      return val ? pf(arr[index]) : '000000Z'
-    } else {
-      return val ? pf(val as number) : '000000Z'
-    }
-  }
-
   const PlayControl = useMemo(() => {
     if (playing && value[1] < steps) {
       if (!timerRef.current) {
@@ -66,8 +66,10 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           let curTime = 0
           setValue(prev => {
             const newArr: [number, number, number] = [...prev]
-            newArr[1] += 20
-            curTime = newArr[1]
+            // the first time around, the current time is empty, so use on from `value`
+            const newTime = newArr[1] ? newArr[1] + 20 : value[1]
+            newArr[1] = newTime
+            curTime = newTime
             return newArr
           })
           // also dispatch the time
@@ -90,27 +92,27 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
 
   return (
     <>  <Row>
-        <Col span={4}>
-          {PlayControl}
-        </Col>
-        <Col span={20}>
-        <Slider
-          range={{draggableTrack: true}}
-          defaultValue={value}
-          value={value}
-          tooltip={{open: false}}
-          max={steps}
-          min={0}
-          onChange={setNewValue}
-          styles={{
-            track: {
-              background: 'transparent',
-            },
-            tracks: {
-              background: '#666',
-            },
-          }}/>
-         </Col>
+          <Col span={4}>
+            {PlayControl}
+          </Col>
+          <Col span={20}>
+            <Slider
+              range={{draggableTrack: true}}
+              defaultValue={value}
+              value={value}
+              tooltip={{open: false}}
+              max={steps}
+              min={0}
+              onChange={setNewValue}
+              styles={{
+                track: {
+                  background: 'transparent',
+                },
+                tracks: {
+                  background: '#666',
+                },
+              }}/>
+          </Col>
          </Row>
       <table style={{width: '100%'}}>
         <thead>
