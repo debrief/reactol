@@ -27,3 +27,7 @@ html, body, #root, .App, #map {
   border: none;
   box-shadow: none;
 }
+
+.ant-card-body {
+  padding: 0 !important;
+}

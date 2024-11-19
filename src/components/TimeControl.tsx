@@ -1,6 +1,7 @@
 import { Slider } from "antd";
 import { useEffect, useState } from "react";
 import { format } from 'date-fns';
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 export interface TimeProps {
   start: number
@@ -23,40 +24,46 @@ const unscaled = (start: number, end: number, value: number): number => {
   return (value / steps) * range + start
 }
 
-const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowerLimit, setUpperLimit}) => {
-  const [value, setValue] = useState<[number, number, number]>([0, steps/2, steps]);
+const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
+  const {limits, current: stateCurrent} = useAppSelector(state => state.time)
+  const dispatch = useAppDispatch()
+
+  const [value, setValue] = useState<[number, number, number]>([0, steps / 2, steps]);
 
   useEffect(() => {
-    const val = [0, steps, scaled(start, end, current || (start + end) / 2)]
+    const tStart = limits ? limits[0] : start
+    const tEnd = limits ? limits[1] : end 
+    const tCurrent = stateCurrent || current || (tStart + tEnd) / 2
+    const val = [0, steps, scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2)]
     setValue(val as [number, number, number])
   }, [start, end, current])
 
   const setNewValue = (newValue: number[]) => {
     const unscaledValues = newValue.map((val) => unscaled(start, end, val))
-    if(newValue[0] !== value[0]) {
-      setLowerLimit(unscaledValues[0])
-    }
-    if(newValue[2] !== value[2]) {
-      setUpperLimit(unscaledValues[2])
-    }
-    if(newValue[1] !== value[1]) {
-      setTime(unscaledValues[1])
-    }
+    dispatch({type: 'time/timeChanged', payload: unscaledValues})
     setValue(newValue as [number, number, number])
   }
 
-  const pf = (val: number) => format(new Date(val), 'HH:mm:ss')
+  const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
+  
+  const timeStr = (val: number | number[] | null, index?: number): string => {
+    if (index !== undefined) {
+      const arr = val as number[]
+      return val ? pf(arr[index]) : '000000Z'
+    } else {
+      return val ? pf(val as number) : '000000Z'
+    }
+  }
 
   return (
     <>
       <Slider
         range={{draggableTrack: true}}
-        tooltip={{open: true, placement: 'top', formatter: (val) => pf(unscaled(start, end, val || 1))}}
         defaultValue={value}
+        tooltip={{open: false}}
         max={steps}
         min={0}
         onChange={setNewValue}
-        
         styles={{
           track: {
             background: 'transparent',
@@ -66,6 +73,22 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, setTime, setLowe
           },
         }}
       />
+      <table style={{width: '100%'}}>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>Current</th>
+            <th>End</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr style={{fontFamily: 'monospace'}}>
+              <td>{timeStr(limits, 0)}</td>
+              <td style={{fontWeight: 'bold'}}>{timeStr(stateCurrent)}</td>
+              <td>{timeStr(limits, 1)}</td>
+            </tr>
+          </tbody>
+      </table>
     </>
   );
 };

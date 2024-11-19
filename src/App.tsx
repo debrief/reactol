@@ -39,6 +39,8 @@ function App() {
       timeInitialised.current = true
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
+      const timePayload: number[] = [timeBounds[0], (timeBounds[0] + timeBounds[1]) / 2, timeBounds[1]]
+      dispatch({ type: 'time/timeChanged', payload: timePayload })
     }
   }, [features])
 
