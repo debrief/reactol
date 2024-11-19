@@ -71,25 +71,23 @@ const Map: React.FC = () => {
         const poly = feature.geometry as MultiPoint
         const coords = poly.coordinates
         const isFirst = index === 0
-        // const beforeIndex = isFirst ? 0 : index - 1
-        // const afterIndex = isFirst ? 0 : index
-        if (index > 1) {
-          const beforeCoords = coords[index - 1]
-          const afterCoords = coords[index]
-          const before = turf.point(beforeCoords)
-          const after = turf.point(afterCoords)
-          const turfPath = turf.lineString([beforeCoords, afterCoords])
-          const len = turf.distance(before, after)
-          const beforeTime = timeVal(times[index - 1])
-          const afterTime = timeVal(times[index])
-          const timeDelta = afterTime - beforeTime
-          const proportion = (current - beforeTime) / timeDelta
-          const lenProp = len * proportion
-          const interpolated = turf.along(turfPath, lenProp)
-          const markerLoc = interpolated.geometry.coordinates.reverse() as LatLngExpression
-          const key = `marker-${ctr}-${index}`
-          return <ReactCircleMarker key={key} radius={5} fillColor="#fff" color={feature.properties?.color || '#f9f'} center={markerLoc}/>
-        }
+        const beforeIndex = isFirst ? 0 : index - 1
+        const afterIndex = isFirst ? 0 : index
+        const beforeCoords = coords[beforeIndex]
+        const afterCoords = coords[afterIndex]
+        const before = turf.point(beforeCoords)
+        const after = turf.point(afterCoords)
+        const turfPath = turf.lineString([beforeCoords, afterCoords])
+        const len = turf.distance(before, after)
+        const beforeTime = timeVal(times[beforeIndex])
+        const afterTime = timeVal(times[afterIndex])
+        const timeDelta = afterTime - beforeTime
+        const proportion = (current - beforeTime) / timeDelta
+        const lenProp = len * proportion
+        const interpolated = isNaN(lenProp) ? before : turf.along(turfPath, lenProp)
+        const markerLoc = interpolated.geometry.coordinates.reverse() as LatLngExpression
+        const key = `marker-${ctr}-${index}`
+        return <ReactCircleMarker key={key} radius={5} fillColor="#fff" color={feature.properties?.color || '#f9f'} center={markerLoc}/>
       }
     }
     return <></>
