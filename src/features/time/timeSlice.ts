@@ -13,14 +13,13 @@ const initialState: TimeState = {
 
 // Create the slice and pass in the initial state
 const timeSlice = createSlice({
-  name: 'selection',
+  name: 'time',
   initialState,
   reducers: {
-    limitsChanged(state, action: PayloadAction<[number, number]>) {
-      state.limits = action.payload
-    },
-    timeChanged(state, action: PayloadAction<number>) {
-      state.current = action.payload
+    timeChanged(state, action: PayloadAction<[number, number, number]>) {
+      state.limits = [action.payload[0], action.payload[2]]
+      state.current = action.payload[1]
+      return state
     }
   }
 })

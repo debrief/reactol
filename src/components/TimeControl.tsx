@@ -28,6 +28,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const {limits, current: stateCurrent} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch()
 
+  console.log('new time state', stateCurrent)
 
   const [value, setValue] = useState<[number, number, number]>([0, steps/2, steps]);
 
@@ -41,10 +42,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
 
   const setNewValue = (newValue: number[]) => {
     const unscaledValues = newValue.map((val) => unscaled(start, end, val))
-
-    dispatch({type: 'time/limitsChanged', payload: [unscaledValues[0], unscaledValues[2]]})
-    dispatch({type: 'time/timeChanged', payload: unscaledValues[1]})
-
+    dispatch({type: 'time/timeChanged', payload: unscaledValues})
     setValue(newValue as [number, number, number])
   }
 
