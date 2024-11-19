@@ -4,18 +4,35 @@ import { useAppSelector } from '../app/hooks';
 import { selectedFeatureSelection } from '../features/selection/selectionSlice';
 import './Properties.css';
 
+const formatItem = (value: any) => {
+  switch(typeof value) {
+    case 'boolean':
+      return (value) ? 'true' : 'false';
+    case 'string':
+      return value;
+    case 'number':
+      return value.toString();
+    case 'object':
+      if (Array.isArray(value)) {
+        return value.join(', ');
+      }
+      return JSON.stringify(value);
+    default:
+      return '';
+  }
+}
+
 const Properties: React.FC = () => {
   const feature = useAppSelector(selectedFeatureSelection);
   if (!feature) {
     return <div>No feature selected</div>;
   }
-
+  
   const dataSource = Object.entries(feature.properties || {}).map(([key, value], index) => {
-    const valStr = Array.isArray(value) ? value.join(', ') : value;
     return {
       key: index,
       property: key,
-      value: valStr,
+      value: formatItem(value),
     }});
 
   const columns = [
@@ -23,6 +40,7 @@ const Properties: React.FC = () => {
       title: 'Property',
       dataIndex: 'property',
       key: 'property',
+      width: '80px'
     },
     {
       title: 'Value',
