@@ -1,4 +1,4 @@
-import { Slider, TableColumnProps } from "antd";
+import { Slider } from "antd";
 import { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppDispatch, useAppSelector } from "../app/hooks";
