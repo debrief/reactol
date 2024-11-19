@@ -28,7 +28,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const {limits, current: stateCurrent} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch()
 
-  const [value, setValue] = useState<[number, number, number]>([0, 0, steps]);
+  const [value, setValue] = useState<[number, number, number]>([0, steps / 2, steps]);
 
   useEffect(() => {
     const tStart = limits ? limits[0] : start
@@ -44,14 +44,14 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     setValue(newValue as [number, number, number])
   }
 
-  const pf = (val: number) => format(new Date(val), 'ddHHmm')
+  const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
   
   const timeStr = (val: number | number[] | null, index?: number): string => {
     if (index !== undefined) {
       const arr = val as number[]
-      return val ? pf(arr[index]) : '00:00:00'
+      return val ? pf(arr[index]) : '000000Z'
     } else {
-      return val ? pf(val as number) : '00:00:00'
+      return val ? pf(val as number) : '000000Z'
     }
   }
 
@@ -73,7 +73,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           },
         }}
       />
-      <table>
+      <table style={{width: '100%'}}>
         <thead>
           <tr>
             <th>Start</th>
@@ -82,7 +82,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           </tr>
           </thead>
           <tbody>
-            <tr style={{fontFamily: 'monospace', padding: '0 5px'}}>
+            <tr style={{fontFamily: 'monospace'}}>
               <td>{timeStr(limits, 0)}</td>
               <td style={{fontWeight: 'bold'}}>{timeStr(stateCurrent)}</td>
               <td>{timeStr(limits, 1)}</td>
