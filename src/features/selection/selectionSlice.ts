@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
 
-interface SelectionState {
+export interface SelectionState {
   selected: string | null
 }
 
