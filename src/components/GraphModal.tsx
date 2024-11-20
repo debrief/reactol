@@ -1,10 +1,13 @@
-import { Button, Flex, Form, Layout } from 'antd'
+import { Button, Flex, Form, FormProps, Layout, Select } from 'antd'
 import { Header, Content, Footer } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
 import ReactModal from 'react-modal-resizable-draggable'
 import { Typography } from 'antd';
+import { Feature } from 'geojson'
+import { latCalc } from '../helpers/calculations/latCalc';
+import { speedCalc } from '../helpers/calculations/speedCalc';
 
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 export interface GraphProps {
   open: boolean
@@ -23,11 +26,20 @@ interface GraphForm {
   baseTrack: string
 };
 
+export interface Calculation {
+  label: string
+  value: string
+  isRelative: boolean
+  calculate: {(features: Feature[], baseId?: string): number[][]}
+}
+
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
-  const onFinish = () => {
-    console.log('Finished')
-  }
+  const onFinish: FormProps<GraphForm>['onFinish'] = (values) => {
+    console.log('Success:', values);
+  };
+
+  const options = [latCalc, speedCalc]
 
   return (
     // @ts-ignore */}
@@ -48,7 +60,16 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
                 layout='vertical'
               >
                 <Title level={4}>Side content</Title>
-                <Text>Side content</Text>
+                <Select mode='multiple' placeholder='Select fields' options={options} />
+                <Form.Item<GraphForm> name="fields" valuePropName="checked" label={null}>
+                  <Select mode='multiple' placeholder='Select fields' options={options} />
+                </Form.Item>
+
+                <Form.Item label={null}>
+                  <Button type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                </Form.Item>
               </Form>
             </Flex>
           </Sider>
