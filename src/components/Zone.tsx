@@ -10,9 +10,9 @@ export interface TrackProps {
 }
 
 const Zone: React.FC<TrackProps> = ({feature}) => {
-  const selectedFeatureId = useAppSelector(state => state.selected.selected)
+  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
   const dispatch = useAppDispatch()
-  const isSelected = feature.id === selectedFeatureId
+  const isSelected = selectedFeaturesId && selectedFeaturesId.includes(feature.id as string)
 
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {

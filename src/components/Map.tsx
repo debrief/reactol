@@ -47,7 +47,7 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
 
 const Map: React.FC = () => {
   const features = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatureId = useAppSelector(state => state.selected.selected)
+  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch();
 
@@ -58,14 +58,14 @@ const Map: React.FC = () => {
       if (feat?.properties?.color) {
         res.color = feat.properties.color
       }
-      if(feature.id === selectedFeatureId) {
+      if(selectedFeaturesId && selectedFeaturesId.includes(feature.id as string)) {
         res.color = '#aaa'
       }
     }
     res.weight = 3
     return res;
   };
- 
+
   const InterpolatedLocationMarker = (feature: Feature, ctr: number, current: number): React.ReactElement => {
     if (feature.properties?.times) {
       const times = feature.properties.times

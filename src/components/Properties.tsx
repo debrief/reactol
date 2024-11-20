@@ -23,12 +23,12 @@ const formatItem = (value: any) => {
 }
 
 const Properties: React.FC = () => {
-  const feature = useAppSelector(selectedFeatureSelection);
-  if (!feature) {
+  const features = useAppSelector(selectedFeatureSelection);
+  if (!features || features.length > 1) {
     return <div>No feature selected</div>;
   }
   
-  const dataSource = Object.entries(feature.properties || {}).map(([key, value], index) => {
+  const dataSource = Object.entries(features[0].properties || {}).map(([key, value], index) => {
     return {
       key: index,
       property: key,

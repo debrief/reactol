@@ -16,8 +16,8 @@ interface CoordInstance {
 }
 
 const Track: React.FC<TrackProps> = ({feature}) => {
-  const selectedFeatureId = useAppSelector(state => state.selected.selected)
-  const isSelected = feature.id === selectedFeatureId
+  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
+  const isSelected = selectedFeaturesId && selectedFeaturesId.includes(feature.id as string)
   const {limits} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch()
 
