@@ -15,7 +15,7 @@ export const latCalc: Calculation = {
       const name = feature.properties?.name || feature.id
       return {label: name + ' Latitude', data: feature.properties?.times.map((time: number, index: number) => {
         const geom = feature.geometry as MultiPoint
-        return {date: time, value: geom.coordinates[index][1]}
+        return {date: new Date(time).getTime(), value: geom.coordinates[index][1]}
       })}
     })
   }

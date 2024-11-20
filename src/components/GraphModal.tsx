@@ -10,7 +10,8 @@ import { useEffect } from 'react';
 import React from 'react';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
-import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { VictoryAxis, VictoryChart, VictoryLegend, VictoryLine, VictoryTheme } from 'victory';
+import { format } from 'date-fns';
 
 const { Title } = Typography;
 
@@ -44,25 +45,34 @@ export type GraphDataset = { label: string, data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
-  const [data, setData] = React.useState<GraphDataset[] | null>(null)
+  const [data, setData] = React.useState<GraphDataset[]>([])
   const features = useAppSelector(selectedFeaturesSelection)
+  const [ticks, setTicks] = React.useState<number[]>([])
 
   useEffect(() => {
-    setData(null)
+    setData([])
   },[])
 
   useEffect(() => {
     if (calculations.length === 0) {
-      setData(null)  
+      setData([])  
     } else {
-      console.log('Calculations2:', calculations, !!data)
       const graphData = calculations.map((calc): GraphDataset[] => {
         const data = calc.calculate(features)
-        console.log('calculated:', data)
         return data
       })
-      console.log('graphData2:', graphData.flat(1))
-      setData(graphData.flat(1))  
+      const flattened = graphData.flat(1)
+      // find earliest and latest date values
+      const dates = flattened.map((dataset) => dataset.data.map((datum) => datum.date)).flat(1)
+      console.log('dates', dates)
+      const earliest = Math.min(...dates)
+      const latest = Math.max(...dates)
+      const tickSize = (latest- earliest) / 5
+      const ticks = [earliest, earliest + tickSize, earliest + 2 * tickSize, earliest + 3 * tickSize, earliest + 4 * tickSize, latest]
+      console.log('ticks', ticks, ticks.map(t => new Date(t)), earliest, latest)
+      setTicks(ticks)
+
+      setData(flattened)  
     }
   }, [calculations])
 
@@ -75,9 +85,11 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
   const options = [latCalc, speedCalc]
  
-  const dateFormat = (value: number, _index: number): string => {
-    return new Date(value).toLocaleTimeString()
+  const formatDate = (value: any): string => {
+    return format(value, "ddHHmm'Z'")
   }
+    
+  // const legendLabels = data.map(set => {return {name:set.label}})
 
   return (
     // @ts-ignore */}
@@ -92,18 +104,15 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         <Header>My Modal</Header>
         <Layout style={{height:'100%', border: '2px solid green'}}>
           <Content style={{border: '2px solid red'}}>
-          { data && <LineChart width={500} height={580} data={data}>
-            <Line type="monotone" dataKey="value" stroke="#8884d8" />
-            <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="date" tickFormatter={dateFormat} />
-            <YAxis />
-            <Legend width={100} wrapperStyle={{ top: 40, right: 20, backgroundColor: '#f5f5f5', border: '1px solid #d5d5d5', borderRadius: 3, lineHeight: '40px' }} />
-
-            {data.map((entry, index) => {
-              console.log('data series', entry.label, index)
-              return <Line dot={false} data={entry.data} isAnimationActive={false} type="monotone" dataKey="value" stroke="#8884d8" key={entry.label} />
-            })}
-          </LineChart>}
+          <VictoryChart theme={VictoryTheme.clean}>
+          {/* <VictoryLegend itemsPerRow={2} x={125} y={20} data={legendLabels}/>  */}
+          { ticks.length && <VictoryAxis crossAxis tickValues={ticks} tickFormat={formatDate} /> }
+          <VictoryAxis dependentAxis />
+          {/* <VictoryLine data={data1} />
+          <VictoryLine data={data2} /> */}
+            { data.map((dataset, index) => <VictoryLine key={'line-' + index} 
+                data={dataset.data} x='date' y='value' />      )}
+          </VictoryChart>
           </Content>
           <Sider theme='light'>
             <Flex vertical>

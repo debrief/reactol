@@ -13,7 +13,7 @@ export const speedCalc: Calculation = {
 
       return {label: name + ' Speed', data: feature.properties?.times.map((time: number, index: number) => {
         const geom = feature.geometry as MultiPoint
-        return {date: time, value: geom.coordinates[index][0]}
+        return {date: new Date(time).getTime(), value: Math.abs(geom.coordinates[index][0])}
       })
     }
     })
