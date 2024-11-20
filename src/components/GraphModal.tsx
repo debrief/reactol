@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import React from 'react';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from 'recharts';
 
 const { Title } = Typography;
 
@@ -92,13 +92,16 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         <Header>My Modal</Header>
         <Layout style={{height:'100%', border: '2px solid green'}}>
           <Content style={{border: '2px solid red'}}>
-          { data && <LineChart width={200} height={200} data={data}>
+          { data && <LineChart width={500} height={380} data={data}>
             <Line type="monotone" dataKey="value" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="date" tickFormatter={dateFormat} />
             <YAxis />
+            <Legend width={100} wrapperStyle={{ top: 40, right: 20, backgroundColor: '#f5f5f5', border: '1px solid #d5d5d5', borderRadius: 3, lineHeight: '40px' }} />
+
             {data.map((entry, index) => {
-              return <Line data={entry.data} type="monotone" dataKey="value" stroke="#8884d8" key={index} />
+              console.log('data series', entry.label, index)
+              return <Line data={entry.data} isAnimationActive={false} type="monotone" dataKey="value" stroke="#8884d8" key={entry.label} />
             })}
           </LineChart>}
           </Content>

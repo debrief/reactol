@@ -9,7 +9,9 @@ export const speedCalc: Calculation = {
   calculate:(features: Feature[]): GraphDataset[] => {
     const temporal = features.filter(isTemporal)
     return temporal.map((feature) => {
-      return {label: feature.properties?.name || feature.id, data: feature.properties?.times.map((time: number, index: number) => {
+      const name = feature.properties?.name || feature.id
+
+      return {label: name + ' Speed', data: feature.properties?.times.map((time: number, index: number) => {
         const geom = feature.geometry as MultiPoint
         return {date: time, value: geom.coordinates[index][0]}
       })
