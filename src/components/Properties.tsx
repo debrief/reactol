@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Tooltip } from 'antd';
 import { useAppSelector } from '../app/hooks';
-import { selectedFeatureSelection } from '../features/selection/selectionSlice';
+import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
 import './Properties.css';
 
 const formatItem = (value: any) => {
@@ -23,7 +23,7 @@ const formatItem = (value: any) => {
 }
 
 const Properties: React.FC = () => {
-  const features = useAppSelector(selectedFeatureSelection);
+  const features = useAppSelector(selectedFeaturesSelection);
   if (!features || features.length !== 1) {
     return <div>No feature selected</div>;
   }

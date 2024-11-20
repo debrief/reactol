@@ -24,5 +24,5 @@ const selectionSlice = createSlice({
 // Export the generated reducer function
 export default selectionSlice.reducer
 
-export const selectedFeatureSelection = (state: RootState) =>
+export const selectedFeaturesSelection = (state: RootState) =>
   state.featureCollection.features.filter(feature => state.selected.selected?.includes(feature.id as string))
