@@ -6,6 +6,7 @@ import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
+import { useCallback } from "react";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -47,7 +48,7 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
 
 const Map: React.FC = () => {
   const features = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatureId = useAppSelector(state => state.selected.selected)
+  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch();
 
@@ -58,14 +59,14 @@ const Map: React.FC = () => {
       if (feat?.properties?.color) {
         res.color = feat.properties.color
       }
-      if(feature.id === selectedFeatureId) {
+      if(selectedFeaturesId.includes(feature.id as string)) {
         res.color = '#aaa'
       }
     }
     res.weight = 3
     return res;
   };
- 
+
   const InterpolatedLocationMarker = (feature: Feature, ctr: number, current: number): React.ReactElement => {
     if (feature.properties?.times) {
       const times = feature.properties.times
@@ -80,12 +81,25 @@ const Map: React.FC = () => {
     return <></>
   }
 
-  const onTooltipClick = (event: LeafletMouseEvent) => {
-    if (event.target.feature) {
-      const featureId = event.target.feature.id;
-      dispatch({ type: 'selection/selectionChanged', payload: { selected: featureId } });  
+  const onClickHandler = useCallback((id: string, modifier: boolean): void => {
+    if (modifier) {
+      // add/remove from selection
+      if (selectedFeaturesId.includes(id)) {
+        dispatch({type: 'selection/removeSelection', payload: id as string})
+      } else {
+        dispatch({type: 'selection/addSelection', payload: id as string})
+      } 
+    } else {
+      // just select this item
+      dispatch({type: 'selection/selectionChanged', payload: {selected: [id as string]}})
     }
-  };
+  }, [dispatch, selectedFeaturesId])
+
+  const onTooltipClick = useCallback( (event: LeafletMouseEvent) => {
+    if (event.target.feature) {
+      onClickHandler(event.target.feature.id as string, event.originalEvent.altKey || event.originalEvent.ctrlKey)
+    }
+  }, [onClickHandler]);
 
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';
@@ -96,9 +110,9 @@ const Map: React.FC = () => {
   const featureFor = (feature: Feature): React.ReactElement => {
     switch(feature.properties?.dataType) {
     case TRACK_TYPE:
-      return <Track feature={feature}/> 
+      return <Track feature={feature} onClickHandler={onClickHandler}/> 
     case ZONE_TYPE:
-      return <Zone feature={feature}/>  
+      return <Zone feature={feature} onClickHandler={onClickHandler}/>  
     default:
       return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} /> 
     }

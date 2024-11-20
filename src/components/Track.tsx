@@ -1,13 +1,13 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
-import { LatLngExpression  } from 'leaflet'
+import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppSelector } from "../app/hooks";
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { SelectionState } from "../features/selection/selectionSlice";
 
 export interface TrackProps {
   feature: Feature 
+  onClickHandler: {(id: string, modifier: boolean): void}
 }
 
 interface CoordInstance {
@@ -15,11 +15,10 @@ interface CoordInstance {
   time: string
 }
 
-const Track: React.FC<TrackProps> = ({feature}) => {
-  const selectedFeatureId = useAppSelector(state => state.selected.selected)
-  const isSelected = feature.id === selectedFeatureId
+const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
+  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
+  const isSelected = selectedFeaturesId.includes(feature.id as string)
   const {limits} = useAppSelector(state => state.time)
-  const dispatch = useAppDispatch()
 
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
@@ -60,9 +59,8 @@ const Track: React.FC<TrackProps> = ({feature}) => {
     }
   }, [feature, limits])
 
-  const onclick = () => {
-    const payload: SelectionState = {selected: feature.id as string}
-    dispatch({type: 'selection/selectionChanged', payload})
+  const onclick = (evt: LeafletMouseEvent) => {
+    onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
   return (

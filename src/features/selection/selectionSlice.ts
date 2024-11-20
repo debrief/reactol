@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
 
 export interface SelectionState {
-  selected: string | null
+  selected: string[]
 }
 
 const initialState: SelectionState = {
-  selected: null
+  selected: []
 }
 
 
@@ -17,6 +17,14 @@ const selectionSlice = createSlice({
   reducers: {
     selectionChanged(_state, action: PayloadAction<SelectionState>) {
       return action.payload
+    },
+    addSelection(state, action: PayloadAction<string>) {
+      const res = {selected: [...state.selected, action.payload]}
+      return res
+    },
+    removeSelection(state, action: PayloadAction<string>) {
+      const res = {selected: state.selected.filter((id) => id !== action.payload)}
+      return res
     }
   }
 })
@@ -24,5 +32,5 @@ const selectionSlice = createSlice({
 // Export the generated reducer function
 export default selectionSlice.reducer
 
-export const selectedFeatureSelection = (state: RootState) =>
-  state.featureCollection.features.find(feature => feature.id === state.selected.selected)
+export const selectedFeaturesSelection = (state: RootState) =>
+  state.featureCollection.features.filter(feature => state.selected.selected?.includes(feature.id as string))
