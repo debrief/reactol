@@ -92,7 +92,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         <Header>My Modal</Header>
         <Layout style={{height:'100%', border: '2px solid green'}}>
           <Content style={{border: '2px solid red'}}>
-          { data && <LineChart width={500} height={380} data={data}>
+          { data && <LineChart width={500} height={580} data={data}>
             <Line type="monotone" dataKey="value" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="date" tickFormatter={dateFormat} />
@@ -101,7 +101,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
             {data.map((entry, index) => {
               console.log('data series', entry.label, index)
-              return <Line data={entry.data} isAnimationActive={false} type="monotone" dataKey="value" stroke="#8884d8" key={entry.label} />
+              return <Line dot={false} data={entry.data} isAnimationActive={false} type="monotone" dataKey="value" stroke="#8884d8" key={entry.label} />
             })}
           </LineChart>}
           </Content>
