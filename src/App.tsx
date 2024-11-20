@@ -13,11 +13,14 @@ import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
+import ReactModal from 'react-modal-resizable-draggable'
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
+  const [graphOpen, setGraphOpen] = useState(false)
+
 
   const storeInitialised = useRef(false); 
   const timeInitialised = useRef(false);
@@ -27,6 +30,7 @@ function App() {
       storeInitialised.current = true
       console.clear()
       // store initial data objects
+      dispatch({ type: 'featureCollection/clearStore'})
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
       dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
@@ -75,7 +79,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { features && <Layers /> }
+                  { features && <Layers openGraph={() => setGraphOpen(true)} /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
@@ -89,6 +93,22 @@ function App() {
             <Map />
           </Splitter.Panel>
         </Splitter>
+        <ReactModal 
+          initWidth={800} 
+          initHeight={400} 
+          onFocus={() => console.log("Modal is clicked")}
+          className={"my-modal-custom-class"}
+          onRequestClose={() => setGraphOpen(false)} 
+          isOpen={graphOpen}>
+          {/* <h3>My Modal</h3>
+                    <div className="body">
+                        <p>This is the modal&apos;s body.</p>
+                    </div>
+                    <button onClick={() => setGraphOpen(false)}>
+                        Close modal
+                    </button> */}
+        </ReactModal>
+
       </ConfigProvider>
     </div>
   )

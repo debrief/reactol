@@ -27,6 +27,9 @@ const featuresSlice = createSlice({
   name: 'featureCollection',
   initialState,
   reducers: {
+    clearStore(state) {
+      state.features = []
+    },
     featureAdded(state, action: PayloadAction<Feature>) {
       const cleaned = cleanFeature(action.payload)
       state.features.push(cleaned)
