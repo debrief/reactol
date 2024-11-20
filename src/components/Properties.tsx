@@ -24,7 +24,7 @@ const formatItem = (value: any) => {
 
 const Properties: React.FC = () => {
   const features = useAppSelector(selectedFeatureSelection);
-  if (!features || features.length > 1) {
+  if (!features || features.length !== 1) {
     return <div>No feature selected</div>;
   }
   
