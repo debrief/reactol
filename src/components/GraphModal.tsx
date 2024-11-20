@@ -10,10 +10,12 @@ import { useEffect } from 'react';
 import React from 'react';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
-import { VictoryAxis, VictoryChart, VictoryLegend, VictoryLine, VictoryTheme } from 'victory';
+import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
+import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
+import { rangeCalc } from '../helpers/calculations/rangeCalc';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 export interface GraphProps {
   open: boolean
@@ -48,10 +50,23 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [data, setData] = React.useState<GraphDataset[]>([])
   const features = useAppSelector(selectedFeaturesSelection)
   const [ticks, setTicks] = React.useState<number[]>([])
+  const selectedFeatures = useAppSelector(selectedFeaturesSelection)
+  const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
+  const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
+  const [graphEnabled, setGraphEnabled] = React.useState<boolean>(false)
 
   useEffect(() => {
     setData([])
+    setTracksEnabled(false)
+    setGraphEnabled(false)
   },[])
+  
+  useEffect(() => {
+    const trackItems: Array<BaseOptionType | DefaultOptionType> = selectedFeatures.map((feature) => {
+      return {label: feature.properties?.name || feature.id, value: feature.id}
+    })
+    setTracks(trackItems)
+  },[selectedFeatures])
 
   useEffect(() => {
     if (calculations.length === 0) {
@@ -64,12 +79,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
       const flattened = graphData.flat(1)
       // find earliest and latest date values
       const dates = flattened.map((dataset) => dataset.data.map((datum) => datum.date)).flat(1)
-      console.log('dates', dates)
       const earliest = Math.min(...dates)
       const latest = Math.max(...dates)
       const tickSize = (latest- earliest) / 5
       const ticks = [earliest, earliest + tickSize, earliest + 2 * tickSize, earliest + 3 * tickSize, earliest + 4 * tickSize, latest]
-      console.log('ticks', ticks, ticks.map(t => new Date(t)), earliest, latest)
       setTicks(ticks)
 
       setData(flattened)  
@@ -80,16 +93,25 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const onFinish: FormProps<GraphForm>['onFinish'] = (values) => {
     const calcs = values.fields.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
     setCalculations(calcs.filter(calc => calc !== undefined) as Calculation[])
-    console.log('Success:', values);
   };
 
-  const options = [latCalc, speedCalc]
+  const options = [latCalc, speedCalc, rangeCalc]
  
   const formatDate = (value: any): string => {
     return format(value, "ddHHmm'Z'")
   }
     
   // const legendLabels = data.map(set => {return {name:set.label}})
+  const onCalculationChange = (calcs: string[]) => {
+    const calcItems = calcs.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
+    const hasRelative = calcItems.some((calc) => calc?.isRelative)
+    setTracksEnabled(hasRelative)
+    setGraphEnabled(!hasRelative)
+  }
+
+  const onBaseTrackChange = () => {
+    setGraphEnabled(true)
+  }
 
   return (
     // @ts-ignore */}
@@ -119,13 +141,24 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
               <Form onFinish={onFinish}
                 layout='vertical'
               >
-                <Title level={4}>Side content</Title>
+                <Title level={4}>Graph Control</Title>
+                <Text>Fields to display:</Text>
                 <Form.Item<GraphForm> name="fields" valuePropName="checked" label={null}>
-                  <Select mode='multiple' placeholder='Select fields' options={options} />
+                  <Select onChange={onCalculationChange} 
+                    mode='multiple' placeholder='Select fields' options={options} />
                 </Form.Item>
+                <Text>Base track:</Text>
+                <Form.Item<GraphForm> name="baseTrack" valuePropName="checked" label={null}>
+                  <Select disabled={!tracksEnabled} onChange={onBaseTrackChange}
+                    placeholder='Select base track' options={tracks} />
+                </Form.Item>
+                <Text>View graph:</Text>
                 <Form.Item label={null}>
-                  <Button type="primary" htmlType="submit">
-                    Submit
+                  <Button disabled={!graphEnabled} type="primary" htmlType="submit">
+                    Preview
+                  </Button>
+                  <Button disabled={!graphEnabled} type="default">
+                    Export
                   </Button>
                 </Form.Item>
               </Form>
