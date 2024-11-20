@@ -74,8 +74,6 @@ const Layers: React.FC = () => {
   }
   
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    console.log('layers clicked', selectedKeys)
-
     const payload: SelectionState = {selected: selectedKeys as string[]}
     dispatch({type: 'selection/selectionChanged', payload})
   };
@@ -89,6 +87,7 @@ const Layers: React.FC = () => {
     defaultExpandedKeys={[]}
     defaultSelectedKeys={[]}
     defaultCheckedKeys={[]}
+    multiple={true}
     onSelect={onSelect}
     onCheck={onCheck}
     checkedKeys={checkedKeys}
