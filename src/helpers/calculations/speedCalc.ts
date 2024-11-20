@@ -1,17 +1,19 @@
-import { Calculation, GraphDatum } from "../../components/GraphModal";
-import { Feature } from 'geojson'
+import { Calculation, GraphDataset } from "../../components/GraphModal";
+import { Feature, MultiPoint } from 'geojson'
+import { isTemporal } from "./latCalc";
 
 export const speedCalc: Calculation = {
   label: 'Speed',
   value: 'speed',
   isRelative: false,
-  calculate:(_features: Feature[]): GraphDatum[] => {
-      return [
-        {date: new Date(10000), value: 32},
-        {date: new Date(25000), value: 14},
-        {date: new Date(30000), value: 25},
-        {date: new Date(45000), value: 47},
-        {date: new Date(50000), value: 12},
-      ]  
-  },
+  calculate:(features: Feature[]): GraphDataset[] => {
+    const temporal = features.filter(isTemporal)
+    return temporal.map((feature) => {
+      return {label: feature.properties?.name || feature.id, data: feature.properties?.times.map((time: number, index: number) => {
+        const geom = feature.geometry as MultiPoint
+        return {date: time, value: geom.coordinates[index][0]}
+      })
+    }
+    })
+  }
 }

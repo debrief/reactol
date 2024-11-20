@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import React from 'react';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
-import { AxisOptions, Chart, ChartOptions } from 'react-charts';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 
 const { Title } = Typography;
 
@@ -35,32 +35,34 @@ export interface Calculation {
   label: string
   value: string
   isRelative: boolean
-  calculate: {(features: Feature[], baseId?: string): GraphDatum[]}
+  calculate: {(features: Feature[], baseId?: string): GraphDataset[]}
 }
 
-export type GraphDatum = { date: Date, value: number }
+export type GraphDatum = { date: number, value: number }
+
+export type GraphDataset = { label: string, data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
-  const [config, setConfig] = React.useState<ChartOptions<GraphDatum> | null>(null)
+  const [data, setData] = React.useState<GraphDataset[] | null>(null)
   const features = useAppSelector(selectedFeaturesSelection)
 
   useEffect(() => {
+    setData(null)
+  },[])
+
+  useEffect(() => {
     if (calculations.length === 0) {
-      setConfig(null)  
+      setData(null)  
     } else {
-      console.log('Calculations2:', calculations, !!config)
-      const graphData = calculations.map((calc) => {
+      console.log('Calculations2:', calculations, !!data)
+      const graphData = calculations.map((calc): GraphDataset[] => {
         const data = calc.calculate(features)
         console.log('calculated:', data)
-        return {label: calc.label, data}
+        return data
       })
-      console.log('graphData2:', graphData)
-      setConfig({
-        data: graphData,
-        primaryAxis,
-        secondaryAxes
-      } )  
+      console.log('graphData2:', graphData.flat(1))
+      setData(graphData.flat(1))  
     }
   }, [calculations])
 
@@ -72,46 +74,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   };
 
   const options = [latCalc, speedCalc]
-
-  const data = [
-    {
-      label: 'React Charts',
-      data: [
-        {
-          date: new Date(),
-          value: 202123,
-        }
-        // ...
-      ]
-    },
-    {
-      label: 'React Query',
-      data: [
-        {
-          date: new Date(),
-          value: 10234230,
-        }
-        // ...
-      ]
-    }
-  ]
-
-  const primaryAxis = React.useMemo(
-    (): AxisOptions<GraphDatum> => ({
-      getValue: datum => datum.date,
-      scaleType: 'time',
-
-    }),
-    []
-  )
-  const secondaryAxes = React.useMemo(
-    (): AxisOptions<GraphDatum>[] => [
-      {
-        getValue: datum => datum.value,
-      },
-    ],
-    []
-  )
+ 
+  const dateFormat = (value: number, _index: number): string => {
+    return new Date(value).toLocaleTimeString()
+  }
 
   return (
     // @ts-ignore */}
@@ -126,7 +92,15 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         <Header>My Modal</Header>
         <Layout style={{height:'100%', border: '2px solid green'}}>
           <Content style={{border: '2px solid red'}}>
-            {config && <Chart options={config} style={{height:'100%'}}  />}
+          { data && <LineChart width={200} height={200} data={data}>
+            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" />
+            <XAxis dataKey="date" tickFormatter={dateFormat} />
+            <YAxis />
+            {data.map((entry, index) => {
+              return <Line data={entry.data} type="monotone" dataKey="value" stroke="#8884d8" key={index} />
+            })}
+          </LineChart>}
           </Content>
           <Sider theme='light'>
             <Flex vertical>
@@ -137,7 +111,6 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
                 <Form.Item<GraphForm> name="fields" valuePropName="checked" label={null}>
                   <Select mode='multiple' placeholder='Select fields' options={options} />
                 </Form.Item>
-
                 <Form.Item label={null}>
                   <Button type="primary" htmlType="submit">
                     Submit

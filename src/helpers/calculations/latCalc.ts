@@ -1,17 +1,21 @@
-import { Calculation, GraphDatum } from "../../components/GraphModal";
-import { Feature } from 'geojson'
+import { Calculation, GraphDataset } from "../../components/GraphModal";
+import { Feature, MultiPoint } from 'geojson'
+
+export const isTemporal = (feature: Feature): boolean => {
+  return !!feature.properties?.times
+}
 
 export const latCalc: Calculation = {
   label: 'Latitude',
   value: 'lat',
   isRelative: false,
-  calculate:(_features: Feature[]): GraphDatum[] => {
-    return [
-      {date: new Date(10000), value: 12},
-      {date: new Date(20000), value: 13},
-      {date: new Date(30000), value: 22},
-      {date: new Date(40000), value: 42},
-      {date: new Date(50000), value: 32},
-    ]
-  },
+  calculate:(features: Feature[]): GraphDataset[] => {
+    const temporal = features.filter(isTemporal)
+    return temporal.map((feature) => {
+      return {label: feature.properties?.name || feature.id, data: feature.properties?.times.map((time: number, index: number) => {
+        const geom = feature.geometry as MultiPoint
+        return {date: time, value: geom.coordinates[index][1]}
+      })}
+    })
+  }
 }

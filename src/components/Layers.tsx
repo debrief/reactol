@@ -90,7 +90,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   };
 
   const temporalFeatureSelected = (): boolean => {
-    return  !selectedFeatures.some((feature) => feature.properties?.times)
+    return  selectedFeatures.some((feature) => feature.properties?.times)
   }
 
   const onGraphClick = () => {
