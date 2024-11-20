@@ -32,7 +32,7 @@ const Zone: React.FC<TrackProps> = ({feature}) => {
   const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
 
   const onclick = () => {
-    const payload: SelectionState = {selected: feature.id as string}
+    const payload: SelectionState = {selected: [feature.id as string]}
     dispatch({type: 'selection/selectionChanged', payload})
   }
   return (

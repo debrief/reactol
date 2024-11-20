@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../app/store'
 
 export interface SelectionState {
-  selected: string | null
+  selected: string[] | null
 }
 
 const initialState: SelectionState = {
@@ -25,4 +25,4 @@ const selectionSlice = createSlice({
 export default selectionSlice.reducer
 
 export const selectedFeatureSelection = (state: RootState) =>
-  state.featureCollection.features.find(feature => feature.id === state.selected.selected)
+  state.featureCollection.features.filter(feature => state.selected.selected?.includes(feature.id as string))

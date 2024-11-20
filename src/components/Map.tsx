@@ -83,7 +83,7 @@ const Map: React.FC = () => {
   const onTooltipClick = (event: LeafletMouseEvent) => {
     if (event.target.feature) {
       const featureId = event.target.feature.id;
-      dispatch({ type: 'selection/selectionChanged', payload: { selected: featureId } });  
+      dispatch({ type: 'selection/selectionChanged', payload: { selected: [featureId] } });  
     }
   };
 

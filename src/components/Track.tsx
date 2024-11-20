@@ -61,7 +61,7 @@ const Track: React.FC<TrackProps> = ({feature}) => {
   }, [feature, limits])
 
   const onclick = () => {
-    const payload: SelectionState = {selected: feature.id as string}
+    const payload: SelectionState = {selected: [feature.id as string]}
     dispatch({type: 'selection/selectionChanged', payload})
   }
 
