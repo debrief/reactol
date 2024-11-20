@@ -81,9 +81,12 @@ const Map: React.FC = () => {
   }
 
   const onTooltipClick = (event: LeafletMouseEvent) => {
+    console.log('tooltip click', event);
     if (event.target.feature) {
       const featureId = event.target.feature.id;
-      dispatch({ type: 'selection/selectionChanged', payload: { selected: [featureId] } });  
+      const isSelected = selectedFeaturesId && selectedFeaturesId.includes(featureId as string);
+      console.log('click', featureId, selectedFeaturesId, isSelected);
+      dispatch({ type: 'selection/selectionChanged', payload: { selected: isSelected ? [] : [featureId] } });  
     }
   };
 
