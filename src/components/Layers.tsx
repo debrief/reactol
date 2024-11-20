@@ -9,6 +9,7 @@ import { SelectionState } from '../features/selection/selectionSlice';
 
 const Layers: React.FC = () => {
   const features = useAppSelector(state => state.featureCollection.features)
+  const selectedFeatureIds = useAppSelector(state => state.selected.selected)
   const dispatch = useAppDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
@@ -91,6 +92,7 @@ const Layers: React.FC = () => {
     onSelect={onSelect}
     onCheck={onCheck}
     checkedKeys={checkedKeys}
+    selectedKeys={selectedFeatureIds || []}
     treeData={model} />
 }
 
