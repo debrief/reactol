@@ -6,6 +6,7 @@ import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
+import { useCallback } from "react";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -58,7 +59,7 @@ const Map: React.FC = () => {
       if (feat?.properties?.color) {
         res.color = feat.properties.color
       }
-      if(selectedFeaturesId && selectedFeaturesId.includes(feature.id as string)) {
+      if(selectedFeaturesId.includes(feature.id as string)) {
         res.color = '#aaa'
       }
     }
@@ -80,13 +81,25 @@ const Map: React.FC = () => {
     return <></>
   }
 
-  const onTooltipClick = (event: LeafletMouseEvent) => {
-    if (event.target.feature) {
-      const featureId = event.target.feature.id;
-      const isSelected = selectedFeaturesId && selectedFeaturesId.includes(featureId as string);
-      dispatch({ type: 'selection/selectionChanged', payload: { selected: isSelected ? [] : [featureId] } });  
+  const onClickHandler = useCallback((id: string, modifier: boolean): void => {
+    if (modifier) {
+      // add/remove from selection
+      if (selectedFeaturesId.includes(id)) {
+        dispatch({type: 'selection/removeSelection', payload: id as string})
+      } else {
+        dispatch({type: 'selection/addSelection', payload: id as string})
+      } 
+    } else {
+      // just select this item
+      dispatch({type: 'selection/selectionChanged', payload: {selected: [id as string]}})
     }
-  };
+  }, [dispatch, selectedFeaturesId])
+
+  const onTooltipClick = useCallback( (event: LeafletMouseEvent) => {
+    if (event.target.feature) {
+      onClickHandler(event.target.feature.id as string, event.originalEvent.altKey || event.originalEvent.ctrlKey)
+    }
+  }, [onClickHandler]);
 
   const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression) => {
     const color = pointFeature.properties?.color || 'blue';
@@ -97,9 +110,9 @@ const Map: React.FC = () => {
   const featureFor = (feature: Feature): React.ReactElement => {
     switch(feature.properties?.dataType) {
     case TRACK_TYPE:
-      return <Track feature={feature}/> 
+      return <Track feature={feature} onClickHandler={onClickHandler}/> 
     case ZONE_TYPE:
-      return <Zone feature={feature}/>  
+      return <Zone feature={feature} onClickHandler={onClickHandler}/>  
     default:
       return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} /> 
     }
