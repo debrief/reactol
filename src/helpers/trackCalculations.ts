@@ -1,4 +1,5 @@
 import * as turf from '@turf/turf';
+import { Polygon} from 'geojson'
 
 export function calculateCoursesAndSpeeds(track: any) {
   const poly = track.geometry as Polygon
