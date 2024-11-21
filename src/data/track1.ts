@@ -2,7 +2,7 @@ import { Feature } from 'geojson';
 import { TRACK_TYPE } from '../constants';
 
 const track: Feature = {
-  type: "Feature",
+  type: 'Feature',
   properties: {
     dataType: TRACK_TYPE,
     color: '#F00',
@@ -18,7 +18,32 @@ const track: Feature = {
       "2024-11-14T16:23:53.662Z",
       "2024-11-14T16:24:53.662Z",
       "2024-11-14T16:27:53.662Z"
-    ]
+    ],
+    courses: [
+      -107.8555997351701,
+      -112.29722115682819,
+      -113.48025924364967,
+      -104.10277041245243,
+      -106.24678250586513,
+      -78.24170213318799,
+      -78.50870575109488,
+      -92.31241171629591,
+      -110.99465670295501,
+      -101.65353420962546
+    ],
+    speeds: [
+      3448.725036404326,
+      2797.497243889494,
+      2001.9619426589863,
+      2173.8737612217146,
+      2367.962648297959,
+      2651.18137172972,
+      2370.6438712137965,
+      4489.4876647322135,
+      1854.8138495572869,
+      3172.15075714475
+    ],
+    visible: true
   },
   geometry: {
     coordinates: [
@@ -63,7 +88,10 @@ const track: Feature = {
         35.82
       ]
     ],
-    type: "MultiPoint"
-  }
+    type: 'MultiPoint'
+  },
+  id: 'f-1'
 }
-export default track
+
+
+export default track;

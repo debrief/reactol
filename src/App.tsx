@@ -9,6 +9,7 @@ import { timeBoundsFor } from './helpers/timeBounds.ts';
 import { useAppDispatch, useAppSelector } from './app/hooks.ts';
 import track from './data/track1.ts';
 import track2 from './data/track2.ts';
+import track3 from './data/track3.ts'; // P47f4
 import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
@@ -33,6 +34,7 @@ function App() {
       dispatch({ type: 'featureCollection/clearStore'})
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
+      dispatch({ type: 'featureCollection/featureAdded', payload: track3 }) // Pf450
       dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
       dispatch({ type: 'featureCollection/featuresAdded', payload: points })
     }
