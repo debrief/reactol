@@ -4,7 +4,7 @@ import { calculateCoursesAndSpeeds } from '../helpers/trackCalculations';
 const track = {
   "type": "Feature",
   "properties": {
-    "dataType": "track",
+    "dataType": TRACK_TYPE,
     "color": "#0F0",
     "name": "Track 3",
     "times": [
