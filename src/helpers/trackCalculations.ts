@@ -1,8 +1,10 @@
 import * as turf from '@turf/turf';
+import { Feature, Polygon} from 'geojson'
 
-export function calculateCoursesAndSpeeds(track) {
-  const coordinates = track.geometry.coordinates;
-  const times = track.properties.times;
+export function calculateCoursesAndSpeeds(track: Feature) {
+  const poly = track.geometry as Polygon
+  const coordinates = poly.coordinates as any as [[number, number]];
+  const times = track.properties?.times;
 
   const courses = [];
   const speeds = [];
@@ -11,7 +13,7 @@ export function calculateCoursesAndSpeeds(track) {
     const point1 = turf.point(coordinates[i]);
     const point2 = turf.point(coordinates[i + 1]);
 
-    const distance = turf.distance(point1, point2, { units: 'kilometers' });
+    const distance = turf.distance(point1, point2);
     const bearing = turf.bearing(point1, point2);
 
     const time1 = new Date(times[i]).getTime();

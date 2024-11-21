@@ -72,7 +72,9 @@ if (!track.properties) {
     dataType: 'track',
     color: '#f00',
     name: 'ALBA',
-    times: []
+    times: [],
+    courses: [],
+    speeds: []
   }
 }
 
