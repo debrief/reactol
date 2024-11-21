@@ -1,5 +1,6 @@
 import { Feature } from 'geojson';
 import { TRACK_TYPE } from '../constants';
+import { calculateCoursesAndSpeeds } from '../helpers/trackCalculations';
 
 const track: Feature = {
   type: "Feature",
@@ -66,4 +67,9 @@ const track: Feature = {
     type: "MultiPoint"
   }
 }
+
+const { courses, speeds } = calculateCoursesAndSpeeds(track);
+track.properties.courses = courses;
+track.properties.speeds = speeds;
+
 export default track

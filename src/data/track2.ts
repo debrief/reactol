@@ -1,6 +1,7 @@
 import { TRACK_TYPE } from "../constants";
+import { calculateCoursesAndSpeeds } from '../helpers/trackCalculations';
 
-export default {
+const track = {
   type: "Feature",
   properties: {
     dataType: TRACK_TYPE,
@@ -65,3 +66,9 @@ export default {
     type: "MultiPoint"
   }
 }
+
+const { courses, speeds } = calculateCoursesAndSpeeds(track);
+track.properties.courses = courses;
+track.properties.speeds = speeds;
+
+export default track;
