@@ -24,5 +24,16 @@ export function calculateCoursesAndSpeeds(track) {
     speeds.push(speed);
   }
 
+  // Add one last item to courses and speeds arrays as the average of the previous two items
+  if (courses.length > 1) {
+    const lastCourse = (courses[courses.length - 1] + courses[courses.length - 2]) / 2;
+    courses.push(lastCourse);
+  }
+
+  if (speeds.length > 1) {
+    const lastSpeed = (speeds[speeds.length - 1] + speeds[speeds.length - 2]) / 2;
+    speeds.push(lastSpeed);
+  }
+
   return { courses, speeds };
 }

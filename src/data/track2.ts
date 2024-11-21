@@ -67,6 +67,10 @@ const track = {
   }
 }
 
+if (!track.properties) {
+  track.properties = {};
+}
+
 const { courses, speeds } = calculateCoursesAndSpeeds(track);
 track.properties.courses = courses;
 track.properties.speeds = speeds;
