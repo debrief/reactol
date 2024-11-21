@@ -1,7 +1,7 @@
 import * as turf from '@turf/turf';
 import { Feature, Polygon} from 'geojson'
 
-export function calculateCoursesAndSpeeds(track: Feature) {
+export function calculateCoursesAndSpeeds(track: any) {
   const poly = track.geometry as Polygon
   const coordinates = poly.coordinates as any as [[number, number]];
   const times = track.properties?.times;
