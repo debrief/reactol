@@ -1,4 +1,7 @@
-{
+import { TRACK_TYPE } from "../constants";
+import { calculateCoursesAndSpeeds } from '../helpers/trackCalculations';
+
+const track = {
   "type": "Feature",
   "properties": {
     "dataType": "track",
@@ -85,3 +88,17 @@
     "type": "MultiPoint"
   }
 }
+if (!track.properties) {
+  track.properties = {
+    dataType: 'track',
+    color: '#f00',
+    name: 'ALBA',
+    times: []
+  }
+}
+
+const { courses, speeds } = calculateCoursesAndSpeeds(track);
+(track.properties as any).courses = courses;
+(track.properties as any).speeds = speeds;
+
+export default track;
