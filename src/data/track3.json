@@ -2,7 +2,7 @@
   "type": "Feature",
   "properties": {
     "dataType": "track",
-    "color": "#00F",
+    "color": "#0F0",
     "name": "Track 3",
     "times": [
       "2024-11-14T16:17:00.000Z",
