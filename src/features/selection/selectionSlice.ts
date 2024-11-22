@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { RootState } from '../../app/store'
 
 export interface SelectionState {
   selected: string[]
@@ -31,3 +32,6 @@ const selectionSlice = createSlice({
 // Export the generated reducer function
 export default selectionSlice.reducer
 
+
+export const selectedFeaturesSelection = (state: RootState) =>
+  state.featureCollection.features.filter(feature => state.selected.selected?.includes(feature.id as string))
