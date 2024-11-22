@@ -14,6 +14,7 @@ import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
 import { rangeCalc } from '../helpers/calculations/rangeCalc';
+import { courseCalc } from '../helpers/calculations/courseCalc';
 
 const { Title, Text } = Typography;
 
@@ -95,9 +96,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     setCalculations(calcs.filter(calc => calc !== undefined) as Calculation[])
   };
 
-  const options = [latCalc, speedCalc, rangeCalc]
+  const options = [latCalc, speedCalc, rangeCalc, courseCalc]
  
   const formatDate = (value: any): string => {
+    console.log('formatting date', value)
     return format(value, "ddHHmm'Z'")
   }
     
