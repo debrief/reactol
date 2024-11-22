@@ -158,10 +158,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     className={"my-modal-custom-class"}
     onRequestClose={closeHandler} 
     isOpen={open}>
-      <Layout style={{minHeight:'300px', height:'100%', border: '2px solid blue'}}>
+      <Layout style={{minHeight:'300px', height:'100%'}}>
         <Header>My Modal</Header>
-        <Layout style={{height:'100%', border: '2px solid green'}}>
-          <Content style={{border: '2px solid red'}}>
+        <Layout style={{height:'100%'}}>
+          <Content>
           <VictoryChart theme={VictoryTheme.clean}>
           {/* <VictoryLegend itemsPerRow={2} x={125} y={20} data={legendLabels}/>  */}
           { ticks.length && <VictoryAxis crossAxis label={'Time'} tickValues={ticks} tickFormat={formatDate} /> }
