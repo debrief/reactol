@@ -1,4 +1,4 @@
-import { Calculation, GraphDataset } from "../../components/GraphModal";
+import { Calculation, GraphDataset, GraphDatum } from "../../components/GraphModal";
 import { Feature, MultiPoint, Position } from 'geojson'
 import { isTemporal } from "./latCalc";
 import * as turf from "turf";
@@ -33,7 +33,7 @@ export const rangeCalc: Calculation = {
     return nonBaseTemporal.map((feature) => {
       const name = feature.properties?.name || feature.id
 
-      const ranges = baseTrack.properties?.times.map((time: number, index: number) => {
+      const ranges = baseTrack.properties?.times.map((time: number, index: number): GraphDatum | undefined => {
         const targetPoint = nearestPoint(feature, time)
         const basePoint = baseGeom.coordinates[index]
         if (!targetPoint) {
@@ -45,8 +45,10 @@ export const rangeCalc: Calculation = {
         const distance = turf.distance(turfTarget, turfBase);
         return {date: new Date(time).getTime(), value: distance}
       })
+
+      const nonNullRanges = ranges ? ranges.filter((range: GraphDatum | undefined) => range !== undefined) as GraphDatum[] : []
         
-      return {label: name + ' Range', color: feature.properties?.color || undefined, data: ranges}
+      return {label: name + ' Range', color: feature.properties?.color || undefined, data: nonNullRanges}
     })
   }
 }
