@@ -1,4 +1,4 @@
-import { Feature, Geometry, MultiPoint } from "geojson";
+import { Feature, Geometry, MultiPoint, Point, Polygon, Position } from "geojson";
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
 import { useAppSelector, useAppDispatch } from "../app/hooks";
@@ -6,7 +6,7 @@ import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -24,7 +24,7 @@ const timeVal = (timeStr: string): number => {
   return new Date(timeStr).getTime()
 }
 
-const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index: number): LatLngExpression => {
+const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index: number): Position => {
   const coords = poly.coordinates
   const isFirst = index === 0
   const beforeIndex = isFirst ? 0 : index - 1
@@ -41,7 +41,7 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
   const proportion = (current - beforeTime) / timeDelta
   const lenProp = len * proportion
   const interpolated = isNaN(lenProp) ? before : turf.along(turfPath, lenProp)
-  const markerLoc = interpolated.geometry.coordinates.reverse() as LatLngExpression
+  const markerLoc = interpolated.geometry.coordinates
   return markerLoc
 }
 
@@ -51,6 +51,7 @@ const Map: React.FC = () => {
   const selectedFeaturesId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch();
+  const [currentLocations, setCurrentLocations] = useState<Feature<Point>[]>([])
 
   const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
     const res: CustomPathOptions = {}
@@ -67,18 +68,42 @@ const Map: React.FC = () => {
     return res;
   };
 
-  const InterpolatedLocationMarker = (feature: Feature, ctr: number, current: number): React.ReactElement => {
-    if (feature.properties?.times) {
-      const times = feature.properties.times
-      const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
-      if (index >= 0) {
-        const poly = feature.geometry as MultiPoint
-        const markerLoc = calcInterpLocation(poly, times, current, index)
-        const key = `marker-${ctr}-${index}`
-        return <ReactCircleMarker key={key} radius={5} fillColor="#fff" color={feature.properties?.color || '#f9f'} center={markerLoc}/>
-      }
+  useEffect(() => {
+    if (current && features.length) {
+      const temporalFeatures = features.filter(isTemporal)
+      const pointFeatures = temporalFeatures.map((feature) => {
+        const times = feature.properties?.times
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
+        if (index >= 0) {
+          const poly = feature.geometry as MultiPoint
+          const markerLoc = calcInterpLocation(poly, times, current, index)
+          const pointFeature: Feature<Point> = {
+            type: 'Feature',
+            id: feature.id,
+            geometry: {
+              type: 'Point',
+              coordinates: markerLoc
+            },
+            properties: {
+              name: feature.properties?.name,
+              color: feature.properties?.color
+            }
+          }
+          return pointFeature
+        }
+        return undefined
+      }).filter((f) => f !== undefined) as Feature<Point>[]
+      setCurrentLocations(pointFeatures)
+    } else {
+      setCurrentLocations([])
     }
-    return <></>
+  }, [current, features])
+
+  const InterpolatedLocationMarker = (feature: Feature<Point>, current: number): React.ReactElement => {
+    const loc = feature.geometry.coordinates.slice().reverse() as LatLngExpression
+    const color = feature.properties?.color || '#f9f'
+    return <ReactCircleMarker key={'current-' + feature.id + '-' + current} radius={5} 
+      fillColor={color} color={color} center={loc}/>
   }
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
@@ -112,7 +137,7 @@ const Map: React.FC = () => {
     case TRACK_TYPE:
       return <Track feature={feature} onClickHandler={onClickHandler}/> 
     case ZONE_TYPE:
-      return <Zone feature={feature} onClickHandler={onClickHandler}/>  
+      return <Zone feature={feature as Feature<Polygon>} onClickHandler={onClickHandler} currentLocations={currentLocations}/>  
     default:
       return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} /> 
     }
@@ -131,7 +156,7 @@ const Map: React.FC = () => {
           A pretty CSS3 popup. <br /> Easily customizable.
           </Popup>
         </Marker>
-        { current && features.filter(isTemporal).map((feature, ctr) => InterpolatedLocationMarker(feature, ctr, current)) }
+        { current && currentLocations.map((feature) => InterpolatedLocationMarker(feature, current)) }
       </MapContainer>
     </>
   );
