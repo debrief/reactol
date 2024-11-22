@@ -1,6 +1,6 @@
 import React, { Key, useEffect } from 'react';
 import { Button, Flex, Tree } from 'antd';
-import type { GetProps, TreeDataNode, TreeProps } from 'antd';
+import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
 import { LineChartOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson'
@@ -83,7 +83,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     return ids.filter((id) => !(id as string).startsWith('node-'))
   }
   
-  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys, event ) => {
+  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys ) => {
     const payload: SelectionState = { selected: justLeaves(selectedKeys) as string[] };
     dispatch({ type: 'selection/selectionChanged', payload });
   };
