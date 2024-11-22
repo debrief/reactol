@@ -53,6 +53,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [data, setData] = React.useState<GraphDataset[]>([])
   const features = useAppSelector(selectedFeaturesSelection)
   const [ticks, setTicks] = React.useState<number[]>([])
+  const [baseTrack, setBaseTrack] = React.useState<string>('')
   const selectedFeatures = useAppSelector(selectedFeaturesSelection)
   const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
   const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
@@ -76,7 +77,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
       setData([])  
     } else {
       const graphData = calculations.map((calc): GraphDataset[] => {
-        const data = calc.calculate(features)
+        const data = calc.calculate(features, baseTrack)
         return data
       })
       const flattened = graphData.flat(1)
@@ -90,10 +91,11 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
       setData(flattened)  
     }
-  }, [calculations])
+  }, [calculations, baseTrack, features])
 
 
   const onFinish: FormProps<GraphForm>['onFinish'] = (values) => {
+    setBaseTrack(values.baseTrack)
     const calcs = values.fields.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
     setCalculations(calcs.filter(calc => calc !== undefined) as Calculation[])
   };
