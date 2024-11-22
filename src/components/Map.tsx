@@ -1,7 +1,7 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
-import { useDataSelector, useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
@@ -47,9 +47,8 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
 
 
 const Map: React.FC = () => {
-  const features = useDataSelector(state => state.featureCollection.features)
-  const selectedFeatureIds = useAppSelector(state => state.selected.selected)
-
+  const features = useAppSelector(state => state.featureCollection.features)
+  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch();
 
@@ -60,7 +59,7 @@ const Map: React.FC = () => {
       if (feat?.properties?.color) {
         res.color = feat.properties.color
       }
-      if(selectedFeatureIds.includes(feature.id as string)) {
+      if(selectedFeaturesId.includes(feature.id as string)) {
         res.color = '#aaa'
       }
     }
@@ -85,7 +84,7 @@ const Map: React.FC = () => {
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
       // add/remove from selection
-      if (selectedFeatureIds.includes(id)) {
+      if (selectedFeaturesId.includes(id)) {
         dispatch({type: 'selection/removeSelection', payload: id as string})
       } else {
         dispatch({type: 'selection/addSelection', payload: id as string})
@@ -94,7 +93,7 @@ const Map: React.FC = () => {
       // just select this item
       dispatch({type: 'selection/selectionChanged', payload: {selected: [id as string]}})
     }
-  }, [dispatch, selectedFeatureIds])
+  }, [dispatch, selectedFeaturesId])
 
   const onTooltipClick = useCallback( (event: LeafletMouseEvent) => {
     if (event.target.feature) {

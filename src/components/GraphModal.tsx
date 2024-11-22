@@ -7,7 +7,8 @@ import { Feature } from 'geojson'
 import { speedCalc } from '../helpers/calculations/speedCalc';
 import { useEffect } from 'react';
 import React from 'react';
-import { useAppSelector, useDataSelector } from '../app/hooks';
+import { useAppSelector } from '../app/hooks';
+import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
@@ -48,14 +49,12 @@ export type GraphDataset = { label: string,
   data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
-  const features = useDataSelector(state => state.featureCollection.features)
-  const selectedFeatureIds = useAppSelector(state => state.selected.selected)
-  const selectedFeatures = features.filter((feature) => selectedFeatureIds.includes(feature.id as string))
-
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
+  const features = useAppSelector(selectedFeaturesSelection)
   const [ticks, setTicks] = React.useState<number[]>([])
   const [baseTrack, setBaseTrack] = React.useState<string>('')
+  const selectedFeatures = useAppSelector(selectedFeaturesSelection)
   const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
   const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
   const [graphEnabled, setGraphEnabled] = React.useState<boolean>(false)
