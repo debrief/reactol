@@ -1,7 +1,6 @@
 import React from 'react';
 import { Table, Tooltip } from 'antd';
 import { useAppSelector } from '../app/hooks';
-import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
 import './Properties.css';
 
 const formatItem = (value: any) => {
@@ -14,7 +13,7 @@ const formatItem = (value: any) => {
       return value.toString();
     case 'object':
       if (Array.isArray(value)) {
-        return value.join(', ');
+        return '[Array of items]';
       }
       return JSON.stringify(value);
     default:
@@ -23,11 +22,16 @@ const formatItem = (value: any) => {
 }
 
 const Properties: React.FC = () => {
-  const features = useAppSelector(selectedFeaturesSelection);
-  if (!features || features.length !== 1) {
+  const allFeatures = useAppSelector(state => state.featureCollection.features)
+  const selectedFeatureIds= useAppSelector(state => state.selected.selected)
+  const features = allFeatures.filter(feature => selectedFeatureIds.includes(feature.id as string))
+
+  if (!features || features.length === 0) {
     return <div>No feature selected</div>;
+  } else if (features && features.length > 1) {
+    return <div>Multiple features selected</div>;
   }
-  
+
   const dataSource = Object.entries(features[0].properties || {}).map(([key, value], index) => {
     return {
       key: index,
