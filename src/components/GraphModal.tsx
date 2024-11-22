@@ -4,7 +4,6 @@ import Sider from 'antd/es/layout/Sider'
 import ReactModal from 'react-modal-resizable-draggable'
 import { Typography } from 'antd';
 import { Feature } from 'geojson'
-import { latCalc } from '../helpers/calculations/latCalc';
 import { speedCalc } from '../helpers/calculations/speedCalc';
 import { useEffect } from 'react';
 import React from 'react';

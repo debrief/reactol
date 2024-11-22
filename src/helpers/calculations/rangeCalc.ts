@@ -1,7 +1,7 @@
 import { Calculation, GraphDataset, GraphDatum } from "../../components/GraphModal";
 import { Feature, MultiPoint, Position } from 'geojson'
-import { isTemporal } from "./latCalc";
 import * as turf from "turf";
+import { isTemporal } from "../trackCalculations";
 
 
 /** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter

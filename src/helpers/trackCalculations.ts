@@ -1,5 +1,10 @@
 import * as turf from "turf";
 import { Polygon} from 'geojson'
+import { Feature } from 'geojson'
+
+export const isTemporal = (feature: Feature): boolean => {
+  return !!feature.properties?.times
+}
 
 export function calculateCoursesAndSpeeds(track: any) {
   const poly = track.geometry as Polygon
