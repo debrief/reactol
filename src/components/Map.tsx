@@ -1,7 +1,7 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
-import { useAppSelector, useAppDispatch } from "../app/hooks";
+import { useDataSelector, useAppDispatch } from "../app/hooks";
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
@@ -47,7 +47,7 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
 
 
 const Map: React.FC = () => {
-  const features = useAppSelector(state => state.featureCollection.features)
+  const features = useDataSelector(state => state.featureCollection.features)
   const selectedFeaturesId = useAppSelector(state => state.selected.selected)
   const {current} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch();

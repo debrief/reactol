@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
 
-import featuresReducer from '../features/geoFeatures/geoFeaturesSlice'
 import selectionReducer from '../features/selection/selectionSlice'
 import timeReducer from '../features/time/timeSlice'
 
@@ -8,7 +7,6 @@ export const store = configureStore({
   // Pass in the root reducer setup as the `reducer` argument
   reducer: {
     // Declare that `state.counter` will be updated by the `counterReducer` function
-    featureCollection: featuresReducer,
     selected: selectionReducer,
     time: timeReducer
   }

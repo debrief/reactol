@@ -5,7 +5,7 @@ import './Layers.css';
 import { LineChartOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { useDataDispatch, useDataSelector } from '../app/hooks';
 import { selectedFeaturesSelection, SelectionState } from '../features/selection/selectionSlice';
 
 interface LayerProps {
@@ -13,10 +13,10 @@ interface LayerProps {
 }
 
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
-  const features = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatureIds = useAppSelector(state => state.selected.selected)
-  const selectedFeatures = useAppSelector(selectedFeaturesSelection)
-  const dispatch = useAppDispatch()
+  const features = useDataSelector(state => state.featureCollection.features)
+  const selectedFeatureIds = useDataSelector(state => state.selected.selected)
+  const selectedFeatures = useDataSelector(selectedFeaturesSelection)
+  const dispatch = useDataDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])

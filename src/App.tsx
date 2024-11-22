@@ -6,7 +6,7 @@ import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
 import { noop } from 'antd/es/_util/warning';
 import { timeBoundsFor } from './helpers/timeBounds.ts';
-import { useAppDispatch, useAppSelector } from './app/hooks.ts';
+import { useDataDispatch, useDataSelector } from './app/hooks.ts';
 import track from './data/track1.ts';
 import track2 from './data/track2.ts';
 import track3 from './data/track3.ts'; // P47f4
@@ -17,8 +17,8 @@ import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
 
 function App() {
-  const features = useAppSelector(state => state.featureCollection.features)
-  const dispatch = useAppDispatch()
+  const features = useDataSelector(state => state.featureCollection.features)
+  const dispatch = useDataDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
 
