@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import React from 'react';
 import { useAppSelector } from '../app/hooks';
 import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
-import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from 'victory';
+import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
 import { rangeCalc } from '../helpers/calculations/rangeCalc';
@@ -44,7 +44,9 @@ export interface Calculation {
 
 export type GraphDatum = { date: number, value: number }
 
-export type GraphDataset = { label: string, data: GraphDatum[] }
+export type GraphDataset = { label: string, 
+  color?: string,
+  data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
@@ -110,10 +112,16 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     
   // const legendLabels = data.map(set => {return {name:set.label}})
   const onCalculationChange = (calcs: string[]) => {
-    const calcItems = calcs.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
-    const hasRelative = calcItems.some((calc) => calc?.isRelative)
-    setTracksEnabled(hasRelative)
-    setGraphEnabled(!hasRelative)
+    if(calcs.length === 0) {
+      setTracksEnabled(false)
+      setGraphEnabled(false)
+      setData([])
+    } else {
+      const calcItems = calcs.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
+      const hasRelative = calcItems.some((calc) => calc?.isRelative)
+      setTracksEnabled(hasRelative)
+      setGraphEnabled(!hasRelative)  
+    }
   }
 
   const onBaseTrackChange = () => {
@@ -139,8 +147,16 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
           <VictoryAxis dependentAxis />
           {/* <VictoryLine data={data1} />
           <VictoryLine data={data2} /> */}
-            { data.map((dataset, index) => <VictoryLine key={'line-' + index} 
-                data={dataset.data} x='date' y='value' />      )}
+            <VictoryGroup>
+              { data.map((dataset, index) => <VictoryLine key={'line-' + index} 
+                    data={dataset.data} 
+                    style={{
+                      data: {
+                        stroke: dataset.color || undefined ,
+                        strokeWidth: 2,
+                      },
+                    }} x='date' y='value' />      )}
+            </VictoryGroup>
           </VictoryChart>
           </Content>
           <Sider theme='light'>
