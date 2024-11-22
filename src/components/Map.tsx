@@ -1,12 +1,13 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
-import { useDataSelector, useAppDispatch, useAppSelector } from "../app/hooks";
+import { useDataSelector, useDataDispatch, useAppDispatch, useAppSelector } from "../app/hooks";
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
+import { updateLocation } from "../features/currentLocation/currentLocationSlice";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -52,6 +53,7 @@ const Map: React.FC = () => {
 
   const {current} = useAppSelector(state => state.time)
   const dispatch = useAppDispatch();
+  const dataDispatch = useDataDispatch();
 
   const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
     const res: CustomPathOptions = {}
@@ -118,6 +120,32 @@ const Map: React.FC = () => {
       return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} /> 
     }
   }
+
+  useEffect(() => {
+    if (current) {
+      const currentLocations = features.filter(isTemporal).map((feature) => {
+        const times = feature.properties?.times
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
+        if (index >= 0) {
+          const poly = feature.geometry as MultiPoint
+          const markerLoc = calcInterpLocation(poly, times, current, index)
+          return {
+            type: "Feature",
+            properties: {
+              ...feature.properties,
+              currentLocation: true
+            },
+            geometry: {
+              type: "Point",
+              coordinates: markerLoc
+            }
+          }
+        }
+        return null
+      }).filter(Boolean)
+      dataDispatch(updateLocation(currentLocations))
+    }
+  }, [current, features, dataDispatch])
 
   return (
     <>

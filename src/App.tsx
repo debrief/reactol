@@ -6,7 +6,7 @@ import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
 import { noop } from 'antd/es/_util/warning';
 import { timeBoundsFor } from './helpers/timeBounds.ts';
-import { useDataDispatch, useDataSelector } from './app/hooks.ts';
+import { useDataDispatch, useDataSelector, useAppDispatch, useAppSelector } from './app/hooks.ts';
 import track from './data/track1.ts';
 import track2 from './data/track2.ts';
 import track3 from './data/track3.ts'; // P47f4
@@ -15,10 +15,13 @@ import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
+import { updateLocation } from './features/currentLocation/currentLocationSlice.ts';
 
 function App() {
   const features = useDataSelector(state => state.featureCollection.features)
+  const current = useAppSelector(state => state.time.current)
   const dispatch = useDataDispatch()
+  const appDispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
 
@@ -49,6 +52,32 @@ function App() {
       dispatch({ type: 'time/timeChanged', payload: timePayload })
     }
   }, [features])
+
+  useEffect(() => {
+    if (current) {
+      const currentLocations = features.filter(feature => feature.properties?.times).map((feature) => {
+        const times = feature.properties?.times
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
+        if (index >= 0) {
+          const poly = feature.geometry as MultiPoint
+          const markerLoc = calcInterpLocation(poly, times, current, index)
+          return {
+            type: "Feature",
+            properties: {
+              ...feature.properties,
+              currentLocation: true
+            },
+            geometry: {
+              type: "Point",
+              coordinates: markerLoc
+            }
+          }
+        }
+        return null
+      }).filter(Boolean)
+      appDispatch(updateLocation(currentLocations))
+    }
+  }, [current, features, appDispatch])
 
   const antdTheme = {
     components: {

@@ -2,13 +2,15 @@ import { configureStore } from '@reduxjs/toolkit'
 
 import selectionReducer from '../features/selection/selectionSlice'
 import timeReducer from '../features/time/timeSlice'
+import currentLocationReducer from '../features/currentLocation/currentLocationSlice'
 
 export const store = configureStore({
   // Pass in the root reducer setup as the `reducer` argument
   reducer: {
     // Declare that `state.counter` will be updated by the `counterReducer` function
     selected: selectionReducer,
-    time: timeReducer
+    time: timeReducer,
+    currentLocation: currentLocationReducer
   }
 })
 
