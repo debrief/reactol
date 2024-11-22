@@ -1,15 +1,21 @@
 import React, { useEffect } from 'react';
-import { Tree } from 'antd';
+import { Button, Flex, Tree } from 'antd';
 import type { TreeDataNode, TreeProps } from 'antd';
 import './Layers.css';
+import { LineChartOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { SelectionState } from '../features/selection/selectionSlice';
+import { selectedFeaturesSelection, SelectionState } from '../features/selection/selectionSlice';
 
-const Layers: React.FC = () => {
+interface LayerProps {
+  openGraph: {(): void}
+}
+
+const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const selectedFeatureIds = useAppSelector(state => state.selected.selected)
+  const selectedFeatures = useAppSelector(selectedFeaturesSelection)
   const dispatch = useAppDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
@@ -82,17 +88,30 @@ const Layers: React.FC = () => {
     const keys = justLeaves(checkedKeys as string[])
     dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
+
+  const temporalFeatureSelected = (): boolean => {
+    return  selectedFeatures.some((feature) => feature.properties?.times)
+  }
+
+  const onGraphClick = () => {
+    openGraph()
+  }
   
-  return <Tree checkable
-    defaultExpandedKeys={[]}
-    defaultSelectedKeys={[]}
-    defaultCheckedKeys={[]}
-    multiple={true}
-    onSelect={onSelect}
-    onCheck={onCheck}
-    checkedKeys={checkedKeys}
-    selectedKeys={selectedFeatureIds || []}
-    treeData={model} />
+  return <>
+    <Flex gap='small' justify='end' wrap>
+      <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
+    </Flex>
+    <Tree checkable
+      defaultExpandedKeys={[]}
+      defaultSelectedKeys={[]}
+      defaultCheckedKeys={[]}
+      multiple={true}
+      onSelect={onSelect}
+      onCheck={onCheck}
+      checkedKeys={checkedKeys}
+      selectedKeys={selectedFeatureIds || []}
+      treeData={model} />
+    </>
 }
 
 export default Layers;

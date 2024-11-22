@@ -14,11 +14,14 @@ import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
+import GraphModal from './components/GraphModal.tsx';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
+  const [graphOpen, setGraphOpen] = useState(false)
+
 
   const storeInitialised = useRef(false); 
   const timeInitialised = useRef(false);
@@ -28,6 +31,7 @@ function App() {
       storeInitialised.current = true
       console.clear()
       // store initial data objects
+      dispatch({ type: 'featureCollection/clearStore'})
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
       dispatch({ type: 'featureCollection/featureAdded', payload: track3 }) // Pf450
@@ -77,7 +81,7 @@ function App() {
               </Splitter.Panel>
               <Splitter.Panel>
                 <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { features && <Layers /> }
+                  { features && <Layers openGraph={() => setGraphOpen(true)} /> }
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
@@ -91,6 +95,9 @@ function App() {
             <Map />
           </Splitter.Panel>
         </Splitter>
+        <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
+
+
       </ConfigProvider>
     </div>
   )
