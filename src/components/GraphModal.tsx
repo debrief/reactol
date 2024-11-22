@@ -118,7 +118,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     setCalculations(calcs.filter(calc => calc !== undefined) as Calculation[])
   };
 
-  const options = [latCalc, speedCalc, rangeCalc, courseCalc, bearingCalc]
+  const options = [speedCalc, courseCalc, rangeCalc, bearingCalc]
  
   const formatDate = (value: any): string => {
     try {
@@ -166,8 +166,8 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
           <Content style={{border: '2px solid red'}}>
           <VictoryChart theme={VictoryTheme.clean}>
           {/* <VictoryLegend itemsPerRow={2} x={125} y={20} data={legendLabels}/>  */}
-          { ticks.length && <VictoryAxis crossAxis tickValues={ticks} tickFormat={formatDate} /> }
-          <VictoryAxis dependentAxis />
+          { ticks.length && <VictoryAxis crossAxis label={'Time'} tickValues={ticks} tickFormat={formatDate} /> }
+          <VictoryAxis dependentAxis label={calculations.map(calc => calc.label).join(', ')} />
           {/* <VictoryLine data={data1} />
           <VictoryLine data={data2} /> */}
             <VictoryGroup>
