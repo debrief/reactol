@@ -1,6 +1,7 @@
 import { Card, ConfigProvider, Splitter } from 'antd';
 import './App.css'
 import { useEffect, useRef, useState } from 'react'
+import { Feature, MultiPoint, Point } from 'geojson'
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
@@ -16,6 +17,7 @@ import Map from './components/Map.tsx';
 import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
 import { updateLocation } from './features/currentLocation/currentLocationSlice.ts'; // Pebf8
+import { calcInterpLocation } from './helpers/trackCalculations.ts';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -53,18 +55,20 @@ function App() {
   }, [features])
 
   useEffect(() => { // P22f7
-    if (timeState.current) {
-      const currentFeatures = features.filter(feature => feature.properties?.times)
-      const currentLocations = currentFeatures.map(feature => {
-        const times = feature.properties.times
-        const index = times.findIndex((time: string) => new Date(time).getTime() >= timeState.current)
+    if (timeState.current !== null) {
+      const currentTemporalFeatures = features.filter(feature => feature.properties?.times)
+      const currentLocations = currentTemporalFeatures.map((feature): Feature<Point> | null => {
+        const times = feature.properties?.times
+        const timeNow = timeState.current as number
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= timeNow)
         if (index >= 0) {
-          const point = feature.geometry.coordinates[index]
+          const point = calcInterpLocation(feature.geometry as MultiPoint, times, timeNow, index)
           return {
             type: 'Feature',
+            id: feature.id,
             properties: {
               time: times[index],
-              color: feature.properties.color
+              color: feature.properties?.color || '#aaa'
             },
             geometry: {
               type: 'Point',

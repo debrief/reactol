@@ -1,6 +1,31 @@
 import * as turf from "turf";
-import { Polygon} from 'geojson'
+import { MultiPoint, Polygon, Position} from 'geojson'
 import { Feature } from 'geojson'
+
+const timeVal = (timeStr: string): number => {
+  return new Date(timeStr).getTime()
+}
+
+export const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index: number): Position => {
+  const coords = poly.coordinates
+  const isFirst = index === 0
+  const beforeIndex = isFirst ? 0 : index - 1
+  const afterIndex = isFirst ? 0 : index
+  const beforeCoords = coords[beforeIndex]
+  const afterCoords = coords[afterIndex]
+  const before = turf.point(beforeCoords)
+  const after = turf.point(afterCoords)
+  const turfPath = turf.lineString([beforeCoords, afterCoords])
+  const len = turf.distance(before, after)
+  const beforeTime = timeVal(times[beforeIndex])
+  const afterTime = timeVal(times[afterIndex])
+  const timeDelta = afterTime - beforeTime
+  const proportion = (current - beforeTime) / timeDelta
+  const lenProp = len * proportion
+  const interpolated = isNaN(lenProp) ? before : turf.along(turfPath, lenProp)
+  const markerLoc = interpolated.geometry.coordinates.reverse() as Position
+  return markerLoc
+}
 
 export const isTemporal = (feature: Feature): boolean => {
   return !!feature.properties?.times

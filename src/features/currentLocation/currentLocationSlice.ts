@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Feature } from 'geojson';
+import { Feature, Point } from 'geojson';
 
 interface CurrentLocationState {
-  locations: Feature[];
+  locations: Feature<Point>[];
 }
 
 const initialState: CurrentLocationState = {
@@ -13,7 +13,7 @@ const currentLocationSlice = createSlice({
   name: 'currentLocation',
   initialState,
   reducers: {
-    updateLocation(state, action: PayloadAction<Feature[]>) {
+    updateLocation(state, action: PayloadAction<Feature<Point>[]>) {
       state.locations = action.payload;
     }
   }
