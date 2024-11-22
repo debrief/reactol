@@ -59,13 +59,28 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
   const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
   const [graphEnabled, setGraphEnabled] = React.useState<boolean>(false)
+  const [showBaseWarning, setShowBaseWarning] = React.useState<boolean>(false)
+
+  const [wasOpen, setWasOpen] = React.useState<boolean>(false)
+
+  const closeHandler = () => {
+    setWasOpen(true)
+    doClose()
+  }
 
   useEffect(() => {
     setData([])
     setTracksEnabled(false)
     setGraphEnabled(false)
   },[])
-  
+
+  useEffect(() => {
+    if (open && wasOpen) {
+      setData([])
+      setWasOpen(false)
+    }
+  },[open])
+
   useEffect(() => {
     const trackItems: Array<BaseOptionType | DefaultOptionType> = selectedFeatures.map((feature) => {
       return {label: feature.properties?.name || feature.id, value: feature.id}
@@ -77,20 +92,22 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     if (calculations.length === 0) {
       setData([])  
     } else {
-      const graphData = calculations.map((calc): GraphDataset[] => {
-        const data = calc.calculate(features, baseTrack)
-        return data
-      })
-      const flattened = graphData.flat(1)
-      // find earliest and latest date values
-      const dates = flattened.map((dataset) => dataset.data.map((datum) => datum.date)).flat(1)
-      const earliest = Math.min(...dates)
-      const latest = Math.max(...dates)
-      const tickSize = (latest- earliest) / 5
-      const ticks = [earliest, earliest + tickSize, earliest + 2 * tickSize, earliest + 3 * tickSize, earliest + 4 * tickSize, latest]
-      setTicks(ticks)
-
-      setData(flattened)  
+      if (!tracksEnabled || baseTrack) {
+        const graphData = calculations.map((calc): GraphDataset[] => {
+          const data = calc.calculate(features, baseTrack)
+          return data
+        })
+        console.log('graph data', graphData)
+        const flattened = graphData.flat(1)
+        // find earliest and latest date values
+        const dates = flattened.map((dataset) => dataset.data.map((datum) => datum.date)).flat(1)
+        const earliest = Math.min(...dates)
+        const latest = Math.max(...dates)
+        const tickSize = (latest- earliest) / 5
+        const ticks = [earliest, earliest + tickSize, earliest + 2 * tickSize, earliest + 3 * tickSize, earliest + 4 * tickSize, latest]
+        setTicks(ticks)
+        setData(flattened)  
+      }
     }
   }, [calculations, baseTrack, features])
 
@@ -122,12 +139,16 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     } else {
       const calcItems = calcs.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
       const hasRelative = calcItems.some((calc) => calc?.isRelative)
+      setShowBaseWarning(hasRelative && !baseTrack)
       setTracksEnabled(hasRelative)
       setGraphEnabled(!hasRelative)  
     }
   }
 
-  const onBaseTrackChange = () => {
+  const onBaseTrackChange = (trackId: string) => {
+    console.log('new base track', trackId)
+    setShowBaseWarning(trackId === '')
+    setBaseTrack(trackId)
     setGraphEnabled(true)
   }
 
@@ -137,7 +158,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     initWidth={800} 
     initHeight={500} 
     className={"my-modal-custom-class"}
-    onRequestClose={doClose} 
+    onRequestClose={closeHandler} 
     isOpen={open}>
       <Layout style={{minHeight:'300px', height:'100%', border: '2px solid blue'}}>
         <Header>My Modal</Header>
@@ -173,6 +194,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
                     mode='multiple' placeholder='Select fields' options={options} />
                 </Form.Item>
                 <Text>Base track:</Text>
+                { showBaseWarning && <Title level={5} type='danger'>Please select a base track</Title> }
                 <Form.Item<GraphForm> name="baseTrack" valuePropName="checked" label={null}>
                   <Select disabled={!tracksEnabled} onChange={onBaseTrackChange}
                     placeholder='Select base track' options={tracks} />
@@ -192,7 +214,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         </Layout>
         <Footer style={footerStyle}> 
           <Flex justify='end'>
-            <Button style={{padding:'15px'}} onClick={doClose}>
+            <Button style={{padding:'15px'}} onClick={closeHandler}>
               Close
             </Button>
           </Flex>
