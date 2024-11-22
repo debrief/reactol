@@ -42,7 +42,7 @@ export interface Calculation {
   calculate: {(features: Feature[], baseId?: string): GraphDataset[]}
 }
 
-export type GraphDatum = { date: number, value: number }
+export type GraphDatum = { date: number, value: number | null }
 
 export type GraphDataset = { label: string, 
   color?: string,
