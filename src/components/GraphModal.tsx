@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
 import { rangeCalc } from '../helpers/calculations/rangeCalc';
 import { courseCalc } from '../helpers/calculations/courseCalc';
+import { bearingCalc } from '../helpers/calculations/bearingCalc';
 
 const { Title, Text } = Typography;
 
@@ -100,7 +101,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     setCalculations(calcs.filter(calc => calc !== undefined) as Calculation[])
   };
 
-  const options = [latCalc, speedCalc, rangeCalc, courseCalc]
+  const options = [latCalc, speedCalc, rangeCalc, courseCalc, bearingCalc]
  
   const formatDate = (value: any): string => {
     try {
@@ -135,7 +136,6 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     <ReactModal 
     initWidth={800} 
     initHeight={500} 
-    onFocus={() => console.log("Modal is clicked")}
     className={"my-modal-custom-class"}
     onRequestClose={doClose} 
     isOpen={open}>
