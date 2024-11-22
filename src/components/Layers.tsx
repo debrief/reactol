@@ -79,9 +79,15 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     return ids.filter((id) => !id.startsWith('node-'))
   }
   
-  const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    const payload: SelectionState = {selected: selectedKeys as string[]}
-    dispatch({type: 'selection/selectionChanged', payload})
+  const onSelect: TreeProps['onSelect'] = (selectedKeys, { event }) => {
+    const altKey = event?.event?.altKey || false;
+    if (altKey) {
+      const payload: SelectionState = { selected: selectedKeys as string[] };
+      dispatch({ type: 'selection/selectionChanged', payload });
+    } else {
+      const payload: SelectionState = { selected: [selectedKeys[selectedKeys.length - 1]] as string[] };
+      dispatch({ type: 'selection/selectionChanged', payload });
+    }
   };
   
   const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
