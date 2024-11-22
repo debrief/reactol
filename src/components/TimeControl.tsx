@@ -13,7 +13,7 @@ export interface TimeProps {
   setUpperLimit: (value: number) => void
 }
 
-const steps = 500
+const steps = 100
 
 const scaled = (start: number, end: number, value: number): number => {
   const range = end - start
