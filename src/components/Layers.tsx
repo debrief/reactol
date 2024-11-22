@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { Key, useEffect } from 'react';
 import { Button, Flex, Tree } from 'antd';
-import type { TreeDataNode, TreeProps } from 'antd';
+import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
 import { LineChartOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson'
@@ -11,6 +11,10 @@ import { selectedFeaturesSelection, SelectionState } from '../features/selection
 interface LayerProps {
   openGraph: {(): void}
 }
+
+type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>;
+
+const { DirectoryTree } = Tree;
 
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -75,17 +79,17 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   }, [features])
   
   // filter out the branches, just leave the leaves
-  const justLeaves = (ids: string[]): string[] => {
-    return ids.filter((id) => !id.startsWith('node-'))
+  const justLeaves = (ids: Key[]): Key[] => {
+    return ids.filter((id) => !(id as string).startsWith('node-'))
   }
   
-  const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    const payload: SelectionState = {selected: selectedKeys as string[]}
-    dispatch({type: 'selection/selectionChanged', payload})
+  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys ) => {
+    const payload: SelectionState = { selected: justLeaves(selectedKeys) as string[] };
+    dispatch({ type: 'selection/selectionChanged', payload });
   };
   
-  const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
-    const keys = justLeaves(checkedKeys as string[])
+  const onCheck: DirectoryTreeProps['onCheck'] = (checkedKeys) => {
+    const keys = justLeaves(checkedKeys as Key[])
     dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
 
@@ -101,13 +105,14 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     <Flex gap='small' justify='end' wrap>
       <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
     </Flex>
-    <Tree checkable
+    <DirectoryTree checkable
       defaultExpandedKeys={[]}
       defaultSelectedKeys={[]}
       defaultCheckedKeys={[]}
       multiple={true}
       onSelect={onSelect}
       onCheck={onCheck}
+      showIcon={false}
       checkedKeys={checkedKeys}
       selectedKeys={selectedFeatureIds || []}
       treeData={model} />
