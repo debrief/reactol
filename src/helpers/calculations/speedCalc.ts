@@ -15,7 +15,7 @@ export const speedCalc: Calculation = {
       const name = feature.properties?.name || feature.id
 
 
-      return {label: name + ' Speed', data: feature.properties?.times.map((time: number, index: number) => {
+      return {label: name + ' Speed', color: feature.properties?.color || undefined, data: feature.properties?.times.map((time: number, index: number) => {
         return {date: new Date(time).getTime(), value: feature.properties?.speeds[index]}})}
       })
     }

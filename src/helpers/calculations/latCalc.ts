@@ -13,7 +13,7 @@ export const latCalc: Calculation = {
     const temporal = features.filter(isTemporal)
     return temporal.map((feature) => {
       const name = feature.properties?.name || feature.id
-      return {label: name + ' Latitude', data: feature.properties?.times.map((time: number, index: number) => {
+      return {label: name + ' Latitude', color: feature.properties?.color || undefined, data: feature.properties?.times.map((time: number, index: number) => {
         const geom = feature.geometry as MultiPoint
         return {date: new Date(time).getTime(), value: geom.coordinates[index][1]}
       })}
