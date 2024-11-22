@@ -1,6 +1,6 @@
 import { Calculation, GraphDataset } from "../../components/GraphModal";
 import { Feature } from 'geojson'
-import { isTemporal } from "./latCalc";
+import { isTemporal } from "../trackCalculations";
 
 export const speedCalc: Calculation = {
   label: 'Speed',
