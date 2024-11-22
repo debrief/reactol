@@ -99,8 +99,13 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const options = [latCalc, speedCalc, rangeCalc, courseCalc]
  
   const formatDate = (value: any): string => {
-    console.log('formatting date', value)
-    return format(value, "ddHHmm'Z'")
+    try {
+      const date = new Date(value)
+      return format(date, "ddHHmm'Z'")
+    } catch (e) {
+      console.warn('trouble formatting this graph date', e)
+      return 'n/A'
+    }
   }
     
   // const legendLabels = data.map(set => {return {name:set.label}})
