@@ -9,15 +9,17 @@ import { timeBoundsFor } from './helpers/timeBounds.ts';
 import { useAppDispatch, useAppSelector } from './app/hooks.ts';
 import track from './data/track1.ts';
 import track2 from './data/track2.ts';
-import track3 from './data/track3.ts'; // P47f4
+import track3 from './data/track3.ts'; 
 import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
+import { updateLocation } from './features/currentLocation/currentLocationSlice.ts'; // Pebf8
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
+  const timeState = useAppSelector(state => state.time) // P22f7
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
@@ -34,7 +36,7 @@ function App() {
       dispatch({ type: 'featureCollection/clearStore'})
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
-      dispatch({ type: 'featureCollection/featureAdded', payload: track3 }) // Pf450
+      dispatch({ type: 'featureCollection/featureAdded', payload: track3 }) 
       dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
       dispatch({ type: 'featureCollection/featuresAdded', payload: points })
     }
@@ -50,6 +52,32 @@ function App() {
     }
   }, [features])
 
+  useEffect(() => { // P22f7
+    if (timeState.current) {
+      const currentFeatures = features.filter(feature => feature.properties?.times)
+      const currentLocations = currentFeatures.map(feature => {
+        const times = feature.properties.times
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= timeState.current)
+        if (index >= 0) {
+          const point = feature.geometry.coordinates[index]
+          return {
+            type: 'Feature',
+            properties: {
+              time: times[index],
+              color: feature.properties.color
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: point
+            }
+          }
+        }
+        return null
+      }).filter(location => location !== null)
+      dispatch(updateLocation(currentLocations))
+    }
+  }, [timeState, features, dispatch])
+
   const antdTheme = {
     components: {
       Splitter: {
@@ -63,7 +91,7 @@ function App() {
   }
 
   const setTime = (value: number) => {
-    console.log('new time:', value, format(new Date(value), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")) // P4b37
+    console.log('new time:', value, format(new Date(value), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")) 
   }
 
   return (
