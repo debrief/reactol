@@ -96,7 +96,6 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
           const data = calc.calculate(features, baseTrack)
           return data
         })
-        console.log('graph data', graphData)
         const flattened = graphData.flat(1)
         // find earliest and latest date values
         const dates = flattened.map((dataset) => dataset.data.map((datum) => datum.date)).flat(1)
