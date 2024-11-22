@@ -14,7 +14,7 @@ const formatItem = (value: any) => {
       return value.toString();
     case 'object':
       if (Array.isArray(value)) {
-        return value.join(', ');
+        return '[Array of items]';
       }
       return JSON.stringify(value);
     default:
@@ -24,10 +24,12 @@ const formatItem = (value: any) => {
 
 const Properties: React.FC = () => {
   const features = useAppSelector(selectedFeaturesSelection);
-  if (!features || features.length !== 1) {
+  if (!features || features.length === 0) {
     return <div>No feature selected</div>;
+  } else if (features && features.length > 1) {
+    return <div>Multiple features selected</div>;
   }
-  
+
   const dataSource = Object.entries(features[0].properties || {}).map(([key, value], index) => {
     return {
       key: index,
