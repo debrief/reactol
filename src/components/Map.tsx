@@ -72,7 +72,8 @@ const Map: React.FC = () => {
       const temporalFeatures = features.filter(isTemporal)
       const pointFeatures = temporalFeatures.map((feature) => {
         const times = feature.properties?.times
-        const index = times.findIndex((time: string) => new Date(time).getTime() >= time[1])
+        const timeNow = time[1]
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= timeNow)
         if (index >= 0) {
           const poly = feature.geometry as MultiPoint
           const markerLoc = calcInterpLocation(poly, times, time[1], index)
