@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
-import { noop } from 'antd/es/_util/warning';
 import { timeBoundsFor } from './helpers/timeBounds.ts';
 import { useAppDispatch, useAppSelector } from './app/hooks.ts';
 import track from './data/track1.ts';
@@ -13,7 +12,6 @@ import track3 from './data/track3.ts';
 import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
-import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
 import { AppProvider, useAppContext } from './context/AppContext.tsx';
 
