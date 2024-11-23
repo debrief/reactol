@@ -36,43 +36,48 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
 const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
   const { time, setTime } = useAppContext();
 
-  const [value, setValue] = useState<[number, number, number]>([0, steps / 2, steps]);
+  const [value, setValue] = useState<{ start: number, current: number, end: number }>({ start: 0, current: steps / 2, end: steps });
   const [playing, setPlaying] = useState(false)
   const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const tStart = time[0] || start
-    const tEnd = time[2] || end 
-    const tCurrent = time[1] || current || (tStart + tEnd) / 2
-    const val = [0, scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2), steps]
+    const tStart = time.start || start
+    const tEnd = time.end || end 
+    const tCurrent = time.current || current || (tStart + tEnd) / 2
+    const val = { start: 0, current: scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2), end: steps }
     console.log('time state updated', tStart, tEnd, tCurrent, val)
-    setValue(val as [number, number, number])
+    setValue(val)
   }, [start, end, current])
 
-  const setNewValue = (newValue: number[]) => {
-    const unscaledValues = newValue.map((val) => unscaled(start, end, val))
-    setTime(unscaledValues as [number, number, number])
-    setValue(newValue as [number, number, number])
+  const setNewValue = (newValue: { start: number, current: number, end: number }) => {
+    const unscaledValues = {
+      start: unscaled(start, end, newValue.start),
+      current: unscaled(start, end, newValue.current),
+      end: unscaled(start, end, newValue.end)
+    }
+    setTime(unscaledValues)
+    setValue(newValue)
   }
 
   const PlayControl = useMemo(() => {
-    if (playing && value[1] < steps) {
+    if (playing && value.current < steps) {
       if (!timerRef.current) {
         timerRef.current =  setInterval(() => {
           let curTime = 0
           setValue(prev => {
-            const newArr: [number, number, number] = [...prev]
-            // the first time around, the current time is empty, so use on from `value`
-            const newTime = newArr[1] ? newArr[1] + 20 : value[1]
-            newArr[1] = newTime
+            const newVal = { ...prev }
+            const newTime = newVal.current ? newVal.current + 20 : value.current
+            newVal.current = newTime
             curTime = newTime
-            return newArr
+            return newVal
           })
-          // also dispatch the time
           const newTime = unscaled(start, end, curTime)
-          const unscaledValues = value.map((val) => unscaled(start, end, val))
-          unscaledValues[1] = newTime
-          setTime(unscaledValues as [number, number, number])
+          const unscaledValues = {
+            start: unscaled(start, end, value.start),
+            current: newTime,
+            end: unscaled(start, end, value.end)
+          }
+          setTime(unscaledValues)
       
         }, 1000)
       }
@@ -94,12 +99,12 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           <Col span={20}>
             <Slider
               range={{draggableTrack: true}}
-              defaultValue={value}
-              value={value}
+              defaultValue={[value.start, value.current, value.end]}
+              value={[value.start, value.current, value.end]}
               tooltip={{open: false}}
               max={steps}
               min={0}
-              onChange={setNewValue}
+              onChange={(newValue) => setNewValue({ start: newValue[0], current: newValue[1], end: newValue[2] })}
               styles={{
                 track: {
                   background: 'transparent',
@@ -120,9 +125,9 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           </thead>
           <tbody>
             <tr style={{fontFamily: 'monospace'}}>
-              <td>{timeStr(time, 0)}</td>
-              <td style={{fontWeight: 'bold'}}>{timeStr(time[1])}</td>
-              <td>{timeStr(time, 1)}</td>
+              <td>{timeStr(time.start)}</td>
+              <td style={{fontWeight: 'bold'}}>{timeStr(time.current)}</td>
+              <td>{timeStr(time.end)}</td>
             </tr>
           </tbody>
       </table>
