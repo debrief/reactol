@@ -8,9 +8,6 @@ export interface TimeProps {
   start: number
   end: number
   current?: number
-  setTime: (value: number) => void
-  setLowerLimit: (value: number) => void
-  setUpperLimit: (value: number) => void
 }
 
 const steps = 100

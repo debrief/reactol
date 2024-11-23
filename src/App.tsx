@@ -15,13 +15,14 @@ import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
-import { AppProvider } from './context/AppContext.tsx';
+import { AppProvider, useAppContext } from './context/AppContext.tsx';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
+  const { setTime } = useAppContext();
 
 
   const storeInitialised = useRef(false); 
@@ -47,7 +48,7 @@ function App() {
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
       const timePayload: number[] = [timeBounds[0], (timeBounds[0] + timeBounds[1]) / 2, timeBounds[1]]
-      dispatch({ type: 'time/timeChanged', payload: timePayload })
+      setTime(timePayload)
     }
   }, [features])
 
@@ -63,10 +64,6 @@ function App() {
     }
   }
 
-  const setTime = (value: number) => {
-    console.log('new time:', value, format(new Date(value), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"))
-  }
-
   return (
     <div className="App">
       <ConfigProvider theme={antdTheme}>
@@ -77,8 +74,7 @@ function App() {
                 <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
                   <Card title='Time Control'>
                     {timeBounds && 
-                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} 
-                        setLowerLimit={noop} setUpperLimit={noop} setTime={setTime} />}
+                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} />}
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>
