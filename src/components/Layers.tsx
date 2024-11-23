@@ -19,9 +19,7 @@ const { DirectoryTree } = Tree;
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
   const features = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatureIds = selection;
-  const allFeatures = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatures = allFeatures.filter(feature => selectedFeatureIds.includes(feature.id as string))
+  const selectedFeatures = features.filter(feature => selection.includes(feature.id as string))
   const dispatch = useAppDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
@@ -91,6 +89,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   };
   
   const onCheck: DirectoryTreeProps['onCheck'] = (checkedKeys) => {
+    console.log('on check', checkedKeys)
     const keys = justLeaves(checkedKeys as Key[])
     dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
@@ -116,7 +115,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
       onCheck={onCheck}
       showIcon={false}
       checkedKeys={checkedKeys}
-      selectedKeys={selectedFeatureIds || []}
+      selectedKeys={selection || []}
       treeData={model} />
     </>
 }
