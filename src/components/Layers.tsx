@@ -86,7 +86,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   }
   
   const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys ) => {
-    const payload: SelectionState = { selected: justLeaves(selectedKeys) as string[] };
+    const payload = { selected: justLeaves(selectedKeys) as string[] };
     setSelection(payload.selected);
   };
   

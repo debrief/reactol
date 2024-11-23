@@ -54,9 +54,8 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const { selection } = useAppContext();
   const [ticks, setTicks] = React.useState<number[]>([])
   const [baseTrack, setBaseTrack] = React.useState<string>('')
-  const { selection: selectedFeatureIds } = useAppContext();
   const allFeatures = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatures = allFeatures.filter(feature => selectedFeatureIds.includes(feature.id as string))
+  const selectedFeatures = allFeatures.filter(feature => selection.includes(feature.id as string))
   const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
   const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
   const [graphEnabled, setGraphEnabled] = React.useState<boolean>(false)

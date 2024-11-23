@@ -1,9 +1,9 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
-import { useAppSelector } from "../app/hooks";
 import { format } from "date-fns";
 import { useMemo } from "react";
+import { useAppContext } from "../context/AppContext";
 
 export interface TrackProps {
   feature: Feature 
@@ -16,9 +16,9 @@ interface CoordInstance {
 }
 
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
-  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
-  const isSelected = selectedFeaturesId.includes(feature.id as string)
-  const {limits} = useAppSelector(state => state.time)
+  const { selection, time } = useAppContext()
+  const isSelected = selection.includes(feature.id as string)
+  const limits: [number, number] = [time[0], time[2]]
 
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
