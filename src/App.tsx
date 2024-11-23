@@ -14,6 +14,7 @@ import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
+import { TileLayer } from 'react-leaflet'; // P8f97
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -87,7 +88,12 @@ function App() {
               </Splitter>
             </Splitter.Panel>
             <Splitter.Panel key='right'>
-              <Map />
+              <Map>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+              </Map>
             </Splitter.Panel>
           </Splitter>
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />

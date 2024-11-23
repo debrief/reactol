@@ -1,5 +1,5 @@
 import { Feature, Geometry, MultiPoint, Point, Polygon, Position } from "geojson";
-import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
+import { MapContainer, Marker, Popup, GeoJSON, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
@@ -46,8 +46,11 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
   return markerLoc
 }
 
+interface MapProps {
+  children: React.ReactNode;
+}
 
-const Map: React.FC = () => {
+const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, time } = useAppContext();
   const [currentLocations, setCurrentLocations] = useState<Feature<Point>[]>([])
@@ -146,8 +149,7 @@ const Map: React.FC = () => {
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
-        <TileLayer url='./tiles/{z}/{x}/{y}.png'
-          minZoom={0} maxZoom={12} maxNativeZoom={8} tms={false}/>  
+        {children}
         { 
           features.filter(feature => isVisible(feature)).map((featureFor))
         }
