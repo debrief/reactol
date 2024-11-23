@@ -104,7 +104,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
               tooltip={{open: false}}
               max={steps}
               min={0}
-              onChange={(newValue: [number, number, number]) => setNewValue({ start: newValue[0], current: newValue[1], end: newValue[2] })}
+              onChange={(newValue: [number, number, number]): void => setNewValue({ start: newValue[0], current: newValue[1], end: newValue[2] })}
               styles={{
                 track: {
                   background: 'transparent',
