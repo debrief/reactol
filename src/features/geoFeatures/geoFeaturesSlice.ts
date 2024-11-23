@@ -40,6 +40,7 @@ const featuresSlice = createSlice({
     },
     featuresVisible(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
+      console.log('change feature vis', ids)
       state.features.forEach((feature) => {
         if (!feature.properties) {
           feature.properties = {}
