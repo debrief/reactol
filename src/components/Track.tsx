@@ -44,11 +44,15 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
     if (limits && feature.properties?.times) {
       const coords = (feature.geometry as MultiPoint).coordinates
       const times = feature.properties.times
-      const validCoords: CoordInstance[] = []
-      times.forEach((time: string, index: number) => {
-        if(inRange(time, limits)) {
-          validCoords.push({pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'") })
-        }
+      // const validCoords: CoordInstance[] = []
+      // times.forEach((time: string, index: number) => {
+      //   if(inRange(time, limits)) {
+      //     validCoords.push({pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'") })
+      //   }
+      // })
+      const validCoords: CoordInstance[] = times.filter((time: string) => 
+        inRange(time, limits)).map((time: string, index: number) => {
+          return {pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'")}
       })
       console.log('coords', feature.properties?.name, validCoords.length)
       return validCoords
