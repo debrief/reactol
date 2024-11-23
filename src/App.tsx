@@ -47,7 +47,7 @@ function App() {
       timeInitialised.current = true
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
-      const timePayload: number[] = [timeBounds[0], (timeBounds[0] + timeBounds[1]) / 2, timeBounds[1]]
+      const timePayload: [number, number, number] = [timeBounds[0], (timeBounds[0] + timeBounds[1]) / 2, timeBounds[1]]
       setTime(timePayload)
     }
   }, [features])

@@ -15,6 +15,11 @@ interface CoordInstance {
   time: string
 }
 
+const inRange = (time: string, limits: [number, number]): boolean => {
+  const timeVal = new Date(time).getTime()
+  return timeVal >= limits[0] && timeVal <= limits[1]
+}
+
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
@@ -40,15 +45,12 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
       const coords = (feature.geometry as MultiPoint).coordinates
       const times = feature.properties.times
       const validCoords: CoordInstance[] = []
-      const inRange = (time: string, limits: [number, number]): boolean => {
-        const timeVal = new Date(time).getTime()
-        return timeVal >= limits[0] && timeVal <= limits[1]
-      }
       times.forEach((time: string, index: number) => {
         if(inRange(time, limits)) {
           validCoords.push({pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'") })
         }
       })
+      console.log('coords', feature.properties?.name, validCoords.length)
       return validCoords
     } else {
       const coords = (feature.geometry as MultiPoint).coordinates
