@@ -1,9 +1,9 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
 import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
-import { useAppSelector } from "../app/hooks";
 import { format } from "date-fns";
 import { useMemo } from "react";
+import { useAppContext } from "../context/AppContext";
 
 export interface TrackProps {
   feature: Feature 
@@ -15,10 +15,15 @@ interface CoordInstance {
   time: string
 }
 
+const inRange = (time: string, limits: [number, number]): boolean => {
+  const timeVal = new Date(time).getTime()
+  return timeVal >= limits[0] && timeVal <= limits[1]
+}
+
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
-  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
-  const isSelected = selectedFeaturesId.includes(feature.id as string)
-  const {limits} = useAppSelector(state => state.time)
+  const { selection, time } = useAppContext()
+  const isSelected = selection.includes(feature.id as string)
+  const limits: [number, number] = [time[0], time[2]]
 
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
@@ -37,15 +42,9 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
     if (limits && feature.properties?.times) {
       const coords = (feature.geometry as MultiPoint).coordinates
       const times = feature.properties.times
-      const validCoords: CoordInstance[] = []
-      const inRange = (time: string, limits: [number, number]): boolean => {
-        const timeVal = new Date(time).getTime()
-        return timeVal >= limits[0] && timeVal <= limits[1]
-      }
-      times.forEach((time: string, index: number) => {
-        if(inRange(time, limits)) {
-          validCoords.push({pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'") })
-        }
+      const validCoords: CoordInstance[] = times.filter((time: string) => 
+        inRange(time, limits)).map((time: string, index: number) => {
+          return {pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'")}
       })
       return validCoords
     } else {

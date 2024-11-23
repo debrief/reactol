@@ -1,12 +1,13 @@
 import { Feature, Geometry, MultiPoint, Point, Polygon, Position } from "geojson";
 import { MapContainer, Marker, Popup, GeoJSON, TileLayer, CircleMarker as ReactCircleMarker } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
-import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
 import { useCallback, useEffect, useState } from "react";
+import { useAppSelector } from "../app/hooks";
+import { useAppContext } from "../context/AppContext";
 
 interface CustomPathOptions extends PathOptions {
   radius?: number;
@@ -48,9 +49,7 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
 
 const Map: React.FC = () => {
   const features = useAppSelector(state => state.featureCollection.features)
-  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
-  const {current} = useAppSelector(state => state.time)
-  const dispatch = useAppDispatch();
+  const { selection, setSelection, time } = useAppContext();
   const [currentLocations, setCurrentLocations] = useState<Feature<Point>[]>([])
 
   const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
@@ -60,7 +59,7 @@ const Map: React.FC = () => {
       if (feat?.properties?.color) {
         res.color = feat.properties.color
       }
-      if(selectedFeaturesId.includes(feature.id as string)) {
+      if(selection.includes(feature.id as string)) {
         res.color = '#aaa'
       }
     }
@@ -69,14 +68,15 @@ const Map: React.FC = () => {
   };
 
   useEffect(() => {
-    if (current && features.length) {
+    if (time[1] && features.length) {
       const temporalFeatures = features.filter(isTemporal)
       const pointFeatures = temporalFeatures.map((feature) => {
         const times = feature.properties?.times
-        const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
+        const timeNow = time[1]
+        const index = times.findIndex((time: string) => new Date(time).getTime() >= timeNow)
         if (index >= 0) {
           const poly = feature.geometry as MultiPoint
-          const markerLoc = calcInterpLocation(poly, times, current, index)
+          const markerLoc = calcInterpLocation(poly, times, time[1], index)
           const pointFeature: Feature<Point> = {
             type: 'Feature',
             id: feature.id,
@@ -97,7 +97,7 @@ const Map: React.FC = () => {
     } else {
       setCurrentLocations([])
     }
-  }, [current, features])
+  }, [time, features])
 
   const InterpolatedLocationMarker = (feature: Feature<Point>, current: number): React.ReactElement => {
     const loc = feature.geometry.coordinates.slice().reverse() as LatLngExpression
@@ -109,16 +109,16 @@ const Map: React.FC = () => {
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
       // add/remove from selection
-      if (selectedFeaturesId.includes(id)) {
-        dispatch({type: 'selection/removeSelection', payload: id as string})
+      if (selection.includes(id)) {
+        setSelection(selection.filter((selectedId) => selectedId !== id));
       } else {
-        dispatch({type: 'selection/addSelection', payload: id as string})
+        setSelection([...selection, id]);
       } 
     } else {
       // just select this item
-      dispatch({type: 'selection/selectionChanged', payload: {selected: [id as string]}})
+      setSelection([id]);
     }
-  }, [dispatch, selectedFeaturesId])
+  }, [selection, setSelection])
 
   const onTooltipClick = useCallback( (event: LeafletMouseEvent) => {
     if (event.target.feature) {
@@ -156,7 +156,7 @@ const Map: React.FC = () => {
           A pretty CSS3 popup. <br /> Easily customizable.
           </Popup>
         </Marker>
-        { current && currentLocations.map((feature) => InterpolatedLocationMarker(feature, current)) }
+        { time[1] && currentLocations.map((feature) => InterpolatedLocationMarker(feature, time[1])) }
       </MapContainer>
     </>
   );

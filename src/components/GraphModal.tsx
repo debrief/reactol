@@ -7,14 +7,14 @@ import { Feature } from 'geojson'
 import { speedCalc } from '../helpers/calculations/speedCalc';
 import { useEffect } from 'react';
 import React from 'react';
-import { useAppSelector } from '../app/hooks';
-import { selectedFeaturesSelection } from '../features/selection/selectionSlice';
+import { useAppContext } from '../context/AppContext';
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
 import { rangeCalc } from '../helpers/calculations/rangeCalc';
 import { courseCalc } from '../helpers/calculations/courseCalc';
 import { bearingCalc } from '../helpers/calculations/bearingCalc';
+import { useAppSelector } from '../app/hooks';
 
 const { Title, Text } = Typography;
 
@@ -51,10 +51,11 @@ export type GraphDataset = { label: string,
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
-  const features = useAppSelector(selectedFeaturesSelection)
+  const { selection } = useAppContext();
   const [ticks, setTicks] = React.useState<number[]>([])
   const [baseTrack, setBaseTrack] = React.useState<string>('')
-  const selectedFeatures = useAppSelector(selectedFeaturesSelection)
+  const allFeatures = useAppSelector(state => state.featureCollection.features)
+  const selectedFeatures = allFeatures.filter(feature => selection.includes(feature.id as string))
   const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
   const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
   const [graphEnabled, setGraphEnabled] = React.useState<boolean>(false)
@@ -93,7 +94,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     } else {
       if (!tracksEnabled || baseTrack) {
         const graphData = calculations.map((calc): GraphDataset[] => {
-          const data = calc.calculate(features, baseTrack)
+          const data = calc.calculate(selectedFeatures, baseTrack)
           return data
         })
         const flattened = graphData.flat(1)
@@ -107,7 +108,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         setData(flattened)  
       }
     }
-  }, [calculations, baseTrack, features])
+  }, [calculations, baseTrack, selectedFeatures])
 
 
   const onFinish: FormProps<GraphForm>['onFinish'] = (values) => {

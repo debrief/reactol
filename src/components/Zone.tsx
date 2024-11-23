@@ -3,8 +3,8 @@ import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon"
 import { Feature, Geometry, Point, Polygon, Position } from "geojson";
 import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
-import { useAppSelector } from "../app/hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useAppContext } from "../context/AppContext";
 
 export interface ZoneProps {
   feature: Feature<Polygon> 
@@ -13,9 +13,9 @@ export interface ZoneProps {
 }
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler, currentLocations}) => {
-  const selectedFeaturesId = useAppSelector(state => state.selected.selected)
-  const isSelected = selectedFeaturesId.includes(feature.id as string)
-  const current = useAppSelector(state => state.time.current)
+  const { selection, time } = useAppContext()
+  const isSelected = selection.includes(feature.id as string)
+  const current = time[1]
   const lastTimeHandled = useRef<number | null>(null)
   const [containsVehicle, setContainsVehicle] = useState<boolean>(false)
 

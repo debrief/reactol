@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, Tooltip } from 'antd';
+import { useAppContext } from '../context/AppContext';
 import { useAppSelector } from '../app/hooks';
 import './Properties.css';
 
@@ -22,8 +23,9 @@ const formatItem = (value: any) => {
 }
 
 const Properties: React.FC = () => {
+  const { selection } = useAppContext();
   const allFeatures = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatureIds= useAppSelector(state => state.selected.selected)
+  const selectedFeatureIds = selection;
   const features = allFeatures.filter(feature => selectedFeatureIds.includes(feature.id as string))
 
   if (!features || features.length === 0) {
