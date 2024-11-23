@@ -1,14 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import featuresReducer from '../features/geoFeatures/geoFeaturesSlice'
-import selectionReducer from '../features/selection/selectionSlice'
-import timeReducer from '../features/time/timeSlice'
 
 export const store = configureStore({
   reducer: {
-    featureCollection: featuresReducer,
-    selected: selectionReducer,
-    time: timeReducer
+    featureCollection: featuresReducer
   }
 })
 

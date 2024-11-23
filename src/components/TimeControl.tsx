@@ -2,7 +2,7 @@ import { Col, Row, Slider } from "antd";
 import { ClockCircleOutlined, FilterOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { format } from 'date-fns';
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppContext } from "../context/AppContext";
 
 export interface TimeProps {
   start: number
@@ -37,17 +37,16 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
 }
 
 const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
-  const {limits, current: stateCurrent} = useAppSelector(state => state.time)
-  const dispatch = useAppDispatch()
+  const { time, setTime } = useAppContext();
 
   const [value, setValue] = useState<[number, number, number]>([0, steps / 2, steps]);
   const [playing, setPlaying] = useState(false)
   const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const tStart = limits ? limits[0] : start
-    const tEnd = limits ? limits[1] : end 
-    const tCurrent = stateCurrent || current || (tStart + tEnd) / 2
+    const tStart = time[0] || start
+    const tEnd = time[2] || end 
+    const tCurrent = time[1] || current || (tStart + tEnd) / 2
     const val = [0, scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2), steps]
     console.log('time state updated', tStart, tEnd, tCurrent, val)
     setValue(val as [number, number, number])
@@ -55,7 +54,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
 
   const setNewValue = (newValue: number[]) => {
     const unscaledValues = newValue.map((val) => unscaled(start, end, val))
-    dispatch({type: 'time/timeChanged', payload: unscaledValues})
+    setTime(unscaledValues as [number, number, number])
     setValue(newValue as [number, number, number])
   }
 
@@ -76,7 +75,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           const newTime = unscaled(start, end, curTime)
           const unscaledValues = value.map((val) => unscaled(start, end, val))
           unscaledValues[1] = newTime
-          dispatch({type: 'time/timeChanged', payload: unscaledValues})
+          setTime(unscaledValues as [number, number, number])
       
         }, 1000)
       }
@@ -124,9 +123,9 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
           </thead>
           <tbody>
             <tr style={{fontFamily: 'monospace'}}>
-              <td>{timeStr(limits, 0)}</td>
-              <td style={{fontWeight: 'bold'}}>{timeStr(stateCurrent)}</td>
-              <td>{timeStr(limits, 1)}</td>
+              <td>{timeStr(time, 0)}</td>
+              <td style={{fontWeight: 'bold'}}>{timeStr(time[1])}</td>
+              <td>{timeStr(time, 1)}</td>
             </tr>
           </tbody>
       </table>

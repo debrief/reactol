@@ -5,8 +5,7 @@ import './Layers.css';
 import { LineChartOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { selectedFeaturesSelection, SelectionState } from '../features/selection/selectionSlice';
+import { useAppContext } from '../context/AppContext';
 
 interface LayerProps {
   openGraph: {(): void}
@@ -17,10 +16,11 @@ type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>;
 const { DirectoryTree } = Tree;
 
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
-  const features = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatureIds = useAppSelector(state => state.selected.selected)
-  const selectedFeatures = useAppSelector(selectedFeaturesSelection)
-  const dispatch = useAppDispatch()
+  const { selection, setSelection } = useAppContext();
+  const features = useAppContext(state => state.featureCollection.features)
+  const selectedFeatureIds = selection;
+  const selectedFeatures = useAppContext(selectedFeaturesSelection)
+  const dispatch = useAppContext()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
@@ -85,7 +85,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   
   const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys ) => {
     const payload: SelectionState = { selected: justLeaves(selectedKeys) as string[] };
-    dispatch({ type: 'selection/selectionChanged', payload });
+    setSelection(payload.selected);
   };
   
   const onCheck: DirectoryTreeProps['onCheck'] = (checkedKeys) => {
