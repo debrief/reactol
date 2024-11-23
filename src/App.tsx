@@ -13,7 +13,7 @@ import zones from './data/zones.ts';
 import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
-import { AppProvider, useAppContext } from './context/AppContext.tsx';
+import { useAppContext } from './context/AppContext.tsx';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -65,7 +65,6 @@ function App() {
   return (
     <div className="App">
       <ConfigProvider theme={antdTheme}>
-        <AppProvider>
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
               <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
@@ -92,7 +91,6 @@ function App() {
             </Splitter.Panel>
           </Splitter>
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
-        </AppProvider>
       </ConfigProvider>
     </div>
   )
