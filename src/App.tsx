@@ -15,7 +15,7 @@ import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import { format } from 'date-fns';
 import GraphModal from './components/GraphModal.tsx';
-import { AppProvider, useAppContext } from './context/AppContext.tsx';
+import { AppProvider } from './context/AppContext.tsx';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
