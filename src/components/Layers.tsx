@@ -20,7 +20,8 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
   const features = useAppSelector(state => state.featureCollection.features)
   const selectedFeatureIds = selection;
-  const selectedFeatures = useAppSelector(state => state.featureCollection.features.filter(feature => selection.includes(feature.id as string)))
+  const allFeatures = useAppSelector(state => state.featureCollection.features)
+  const selectedFeatures = allFeatures.filter(feature => selectedFeatureIds.includes(feature.id as string))
   const dispatch = useAppDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
