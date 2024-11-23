@@ -46,7 +46,6 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
         inRange(time, limits)).map((time: string, index: number) => {
           return {pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'")}
       })
-      console.log('coords', feature.properties?.name, validCoords.length)
       return validCoords
     } else {
       const coords = (feature.geometry as MultiPoint).coordinates
