@@ -20,6 +20,8 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
   const isSelected = selection.includes(feature.id as string)
   const limits: [number, number] = [time[0], time[2]]
 
+  console.log('track', feature, limits, selection)
+
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
       return '#aaa'

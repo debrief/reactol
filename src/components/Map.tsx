@@ -52,8 +52,6 @@ const Map: React.FC = () => {
   const { selection, setSelection, time } = useAppContext();
   const [currentLocations, setCurrentLocations] = useState<Feature<Point>[]>([])
 
-  console.log('features', features)
-
   const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
     const res: CustomPathOptions = {}
     if (feature) {
