@@ -6,6 +6,7 @@ import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
 import { useCallback, useEffect, useState } from "react";
+import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 
 interface CustomPathOptions extends PathOptions {
@@ -47,7 +48,7 @@ const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index
 
 
 const Map: React.FC = () => {
-  const features = useAppContext(state => state.featureCollection.features)
+  const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, time } = useAppContext();
   const [currentLocations, setCurrentLocations] = useState<Feature<Point>[]>([])
 
