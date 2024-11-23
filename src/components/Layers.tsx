@@ -6,6 +6,7 @@ import { LineChartOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppContext } from '../context/AppContext';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
 
 interface LayerProps {
   openGraph: {(): void}
@@ -17,10 +18,10 @@ const { DirectoryTree } = Tree;
 
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
-  const features = useAppContext(state => state.featureCollection.features)
+  const features = useAppSelector(state => state.featureCollection.features)
   const selectedFeatureIds = selection;
-  const selectedFeatures = useAppContext(selectedFeaturesSelection)
-  const dispatch = useAppContext()
+  const selectedFeatures = useAppSelector(state => state.featureCollection.features.filter(feature => selection.includes(feature.id as string)))
+  const dispatch = useAppDispatch()
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
