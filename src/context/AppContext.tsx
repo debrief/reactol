@@ -9,7 +9,11 @@ interface AppContextProps {
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
-const AppProvider: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+const AppProvider: React.FC<Props> = ({ children }) => {
   const [selection, setSelection] = useState<string[]>([]);
   const [time, setTime] = useState<[number, number, number]>([0, 0, 0]);
 
