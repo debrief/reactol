@@ -89,7 +89,6 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   };
   
   const onCheck: DirectoryTreeProps['onCheck'] = (checkedKeys) => {
-    console.log('on check', checkedKeys)
     const keys = justLeaves(checkedKeys as Key[])
     dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
