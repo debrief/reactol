@@ -85,7 +85,10 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   
   const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys ) => {
     const payload = { selected: justLeaves(selectedKeys) as string[] };
-    setSelection(payload.selected);
+    // check if the payload selection is different from the current selection
+    if (JSON.stringify(payload.selected) !== JSON.stringify(selection)) {
+      setSelection(payload.selected);
+    }
   };
   
   const onCheck: DirectoryTreeProps['onCheck'] = (checkedKeys) => {
