@@ -80,7 +80,6 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   },[])
 
   useEffect(() => {
-    console.log('graph - selection changed')
     const features = allFeatures.filter(feature => selection.includes(feature.id as string))
     setSelectedFeatures(features)
   },[allFeatures, selection])
@@ -88,7 +87,6 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
   useEffect(() => {
     if (open && wasOpen) {
-      console.log('graph opening')
       setData([])
       setWasOpen(false)
     }
@@ -99,7 +97,6 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
       return {label: feature.properties?.name || feature.id, value: feature.id}
     })
     if (JSON.stringify(trackItems) !== JSON.stringify(tracks)) {
-      console.log('selected features changed')
       setTracks(trackItems)
     }
   },[selectedFeatures])
