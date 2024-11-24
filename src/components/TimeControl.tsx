@@ -49,7 +49,11 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     setValue(val)
   }, [start, end, current])
 
-  const setNewValue = (newValue: { start: number, current: number, end: number }) => {
+  const setNewValue = (value: number | number[]) => {
+    if (!Array.isArray(value)) {
+      throw new Error('Expected an array to time control')
+    }
+    const newValue = { start: value[0], current: value[1], end: value[2] }
     const unscaledValues = {
       start: unscaled(start, end, newValue.start),
       current: unscaled(start, end, newValue.current),
@@ -104,7 +108,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
               tooltip={{open: false}}
               max={steps}
               min={0}
-              onChange={(newValue: [number, number, number]): void => setNewValue({ start: newValue[0], current: newValue[1], end: newValue[2] })}
+              onChange={setNewValue}
               styles={{
                 track: {
                   background: 'transparent',
