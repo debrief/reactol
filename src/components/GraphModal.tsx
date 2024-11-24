@@ -49,13 +49,18 @@ export type GraphDataset = { label: string,
   data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
+
+  if (!open) {
+    return null
+  }
+  const allFeatures = useAppSelector(state => state.featureCollection.features)
+  const { selection } = useAppContext();
+
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
-  const { selection } = useAppContext();
   const [ticks, setTicks] = React.useState<number[]>([])
   const [baseTrack, setBaseTrack] = React.useState<string>('')
-  const allFeatures = useAppSelector(state => state.featureCollection.features)
-  const selectedFeatures = allFeatures.filter(feature => selection.includes(feature.id as string))
+  const [selectedFeatures, setSelectedFeatures] = React.useState<Feature[]>([])
   const [tracks, setTracks] = React.useState<Array<BaseOptionType | DefaultOptionType>>([])
   const [tracksEnabled, setTracksEnabled] = React.useState<boolean>(false)
   const [graphEnabled, setGraphEnabled] = React.useState<boolean>(false)
@@ -75,7 +80,15 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   },[])
 
   useEffect(() => {
+    console.log('graph - selection changed')
+    const features = allFeatures.filter(feature => selection.includes(feature.id as string))
+    setSelectedFeatures(features)
+  },[allFeatures, selection])
+
+
+  useEffect(() => {
     if (open && wasOpen) {
+      console.log('graph opening')
       setData([])
       setWasOpen(false)
     }
@@ -85,7 +98,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     const trackItems: Array<BaseOptionType | DefaultOptionType> = selectedFeatures.map((feature) => {
       return {label: feature.properties?.name || feature.id, value: feature.id}
     })
-    setTracks(trackItems)
+    if (JSON.stringify(trackItems) !== JSON.stringify(tracks)) {
+      console.log('selected features changed')
+      setTracks(trackItems)
+    }
   },[selectedFeatures])
 
   useEffect(() => {
