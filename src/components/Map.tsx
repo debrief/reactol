@@ -153,11 +153,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
         { 
           features.filter(feature => isVisible(feature)).map((featureFor))
         }
-        <Marker position={[51.505, -0.09]}>
-          <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
         { time.current && currentLocations.map((feature) => InterpolatedLocationMarker(feature, time.current)) }
       </MapContainer>
     </>
