@@ -38,7 +38,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
 
   const [value, setValue] = useState<{ start: number, current: number, end: number }>({ start: 0, current: steps / 2, end: steps });
   const [playing, setPlaying] = useState(false)
-  const timerRef = useRef<number | null>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const tStart = time.start || start
