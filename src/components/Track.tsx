@@ -1,23 +1,14 @@
 import { Feature, Geometry, MultiPoint } from "geojson";
-import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
+import { LeafletMouseEvent  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { format } from "date-fns";
 import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
+import { CoordInstance, filterTrack } from "../helpers/filter-track";
 
 export interface TrackProps {
   feature: Feature 
   onClickHandler: {(id: string, modifier: boolean): void}
-}
-
-interface CoordInstance {
-  pos: LatLngExpression
-  time: string
-}
-
-const inRange = (time: string, limits: [number, number]): boolean => {
-  const timeVal = new Date(time).getTime()
-  return timeVal >= limits[0] && timeVal <= limits[1]
 }
 
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
@@ -42,10 +33,7 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
     if (limits && feature.properties?.times) {
       const coords = (feature.geometry as MultiPoint).coordinates
       const times = feature.properties.times
-      const validCoords: CoordInstance[] = times.filter((time: string) => 
-        inRange(time, limits)).map((time: string, index: number) => {
-          return {pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'")}
-      })
+      const validCoords = filterTrack(limits[0], limits[1], times, coords)
       return validCoords
     } else {
       const coords = (feature.geometry as MultiPoint).coordinates
