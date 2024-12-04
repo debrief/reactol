@@ -12,7 +12,7 @@ const inRange = (time: string, limits: [number, number]): boolean => {
   return timeVal >= limits[0] && timeVal <= limits[1]
 }
 
-export const filterTime = (start: number, end: number, times: string[], coords: Position[]): CoordInstance[] => {
+export const filterTrack = (start: number, end: number, times: string[], coords: Position[]): CoordInstance[] => {
   const validIndices = times.map((time: string, index: number) => inRange(time, [start, end]) ? index : -1)
   const timeIndices = validIndices.filter((index: number) => index !== -1)
   const res = timeIndices.map((index: number): CoordInstance => {

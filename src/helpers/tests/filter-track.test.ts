@@ -1,6 +1,6 @@
 import {expect, test} from '@jest/globals';
 
-import { filterTime } from "../filter-time";
+import { filterTrack } from "../filter-track";
 
 import { Feature, MultiPoint } from 'geojson';
 import { TRACK_TYPE } from '../../constants';
@@ -38,7 +38,7 @@ test('span before start', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T09:00:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T11:30:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res[0]).toEqual({pos: [1,1], time: '141000Z'})
   expect(res[1]).toEqual({pos: [2,2], time: '141100Z'})
 });
@@ -49,7 +49,7 @@ test('span after end', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T12:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T21:00:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res[0]).toEqual({pos: [4,4], time: '141300Z'})
   expect(res[1]).toEqual({pos: [5,5], time: '141400Z'})
   expect(res[2]).toEqual({pos: [6,6], time: '141500Z'})
@@ -61,7 +61,7 @@ test('span whole period', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T01:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T21:00:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res.length).toEqual(6)
 });
 
@@ -71,7 +71,7 @@ test('span one value', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T13:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T14:30:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res[0]).toEqual({pos: [5,5], time: '141400Z'})
   expect(res.length).toEqual(1)
 });
@@ -82,7 +82,7 @@ test('before period', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T03:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T04:30:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res.length).toEqual(0)
 });
 
@@ -92,7 +92,7 @@ test('after period', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-15T03:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-15T04:30:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res.length).toEqual(0)
 });
 
@@ -102,6 +102,6 @@ test('between value', () => {
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T13:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T13:40:00.000Z").getTime()
-  const res = filterTime(timeStart, timeEnd, times, coords)
+  const res = filterTrack(timeStart, timeEnd, times, coords)
   expect(res.length).toEqual(0)
 });
