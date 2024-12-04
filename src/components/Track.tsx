@@ -4,16 +4,13 @@ import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { format } from "date-fns";
 import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
+import { CoordInstance } from "../helpers/filter-time";
 
 export interface TrackProps {
   feature: Feature 
   onClickHandler: {(id: string, modifier: boolean): void}
 }
 
-interface CoordInstance {
-  pos: LatLngExpression
-  time: string
-}
 
 const inRange = (time: string, limits: [number, number]): boolean => {
   const timeVal = new Date(time).getTime()
