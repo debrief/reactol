@@ -12,9 +12,7 @@ interface LayerProps {
   openGraph: {(): void}
 }
 
-type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>;
-
-const { DirectoryTree } = Tree;
+type TreeProps = GetProps<typeof Tree>;
 
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
@@ -83,7 +81,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     return ids.filter((id) => !(id as string).startsWith('node-'))
   }
   
-  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys ) => {
+  const onSelect: TreeProps['onSelect'] = (selectedKeys ) => {
     const payload = { selected: justLeaves(selectedKeys) as string[] };
     // check if the payload selection is different from the current selection
     if (JSON.stringify(payload.selected) !== JSON.stringify(selection)) {
@@ -91,7 +89,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     }
   };
   
-  const onCheck: DirectoryTreeProps['onCheck'] = (checkedKeys) => {
+  const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
     const keys = justLeaves(checkedKeys as Key[])
     dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
@@ -108,7 +106,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     <Flex gap='small' justify='end' wrap>
       <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
     </Flex>
-    <DirectoryTree checkable
+    <Tree checkable
       defaultExpandedKeys={[]}
       defaultSelectedKeys={[]}
       defaultCheckedKeys={[]}
