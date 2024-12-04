@@ -1,10 +1,16 @@
 import React, { createContext, useState, useContext } from 'react';
 
+interface TimeState {
+  start: number;
+  current: number;
+  end: number;
+}
+
 interface AppContextProps {
   selection: string[];
   setSelection: React.Dispatch<React.SetStateAction<string[]>>;
-  time: [number, number, number];
-  setTime: React.Dispatch<React.SetStateAction<[number, number, number]>>;
+  time: TimeState;
+  setTime: React.Dispatch<React.SetStateAction<TimeState>>;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -15,7 +21,7 @@ interface Props {
 
 const AppProvider: React.FC<Props> = ({ children }) => {
   const [selection, setSelection] = useState<string[]>([]);
-  const [time, setTime] = useState<[number, number, number]>([0, 0, 0]);
+  const [time, setTime] = useState<TimeState>({ start: 0, current: 0, end: 0 });
 
   return (
     <AppContext.Provider value={{ selection, setSelection, time, setTime }}>

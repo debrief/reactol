@@ -71,15 +71,15 @@ const Map: React.FC<MapProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (time[1] && features.length) {
+    if (time.current && features.length) {
       const temporalFeatures = features.filter(isTemporal)
       const pointFeatures = temporalFeatures.map((feature) => {
         const times = feature.properties?.times
-        const timeNow = time[1]
+        const timeNow = time.current
         const index = times.findIndex((time: string) => new Date(time).getTime() >= timeNow)
         if (index >= 0) {
           const poly = feature.geometry as MultiPoint
-          const markerLoc = calcInterpLocation(poly, times, time[1], index)
+          const markerLoc = calcInterpLocation(poly, times, time.current, index)
           const pointFeature: Feature<Point> = {
             type: 'Feature',
             id: feature.id,
@@ -158,7 +158,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
           A pretty CSS3 popup. <br /> Easily customizable.
           </Popup>
         </Marker>
-        { time[1] && currentLocations.map((feature) => InterpolatedLocationMarker(feature, time[1])) }
+        { time.current && currentLocations.map((feature) => InterpolatedLocationMarker(feature, time.current)) }
       </MapContainer>
     </>
   );

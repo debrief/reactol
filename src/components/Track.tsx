@@ -23,7 +23,7 @@ const inRange = (time: string, limits: [number, number]): boolean => {
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
-  const limits: [number, number] = [time[0], time[2]]
+  const limits: [number, number] = [time.start, time.end]
 
   const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
