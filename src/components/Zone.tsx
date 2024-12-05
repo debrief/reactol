@@ -5,7 +5,7 @@ import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { featureIsVisibleAtTime } from "../helpers/featureIsVisibleAtTime";
+import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
 
 export interface ZoneProps {
   feature: Feature<Polygon> 
@@ -14,6 +14,7 @@ export interface ZoneProps {
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   const { selection, time, currentLocations } = useAppContext()
+  const { start: timeStart, end: timeEnd } = time
   const isSelected = selection.includes(feature.id as string)
   const lastTimeHandled = useRef<number | null>(null)
   const [containsVehicle, setContainsVehicle] = useState<boolean>(false)
@@ -31,10 +32,8 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   }, [currentLocations, time, feature, lastTimeHandled])
 
   const isVisible = useMemo(() => {
-    const isVis = featureIsVisibleAtTime(feature, time.current)
-    console.log('Zone', feature.id, feature.properties?.name, isVis)
-    return isVis
-  }, [feature, time])
+    return featureIsVisibleInPeriod(feature, timeStart, timeEnd)
+  }, [feature, timeStart, timeEnd])
 
   const onclick = (evt: LeafletMouseEvent) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)

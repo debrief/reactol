@@ -9,7 +9,7 @@ const zones: Feature[] = [
       color: "#F00",
       dataType: ZONE_TYPE,
       startTime: "2024-11-14T19:10:00.000Z",
-      endTime: "2024-11-15T12:10:00.000Z"
+      endTime: "2024-11-15T04:10:00.000Z"
     },
     geometry: {
       coordinates: [
