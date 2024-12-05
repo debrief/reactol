@@ -15,6 +15,10 @@ export const featureIsVisibleInPeriod = (feature: Feature, startTime: number, en
         return false
       }
     }
+    if (feature.properties?.time) {
+      const time = timeVal(feature.properties.time)
+      return (time < endTime && time > startTime)
+    }
     return true
   }
   return true
