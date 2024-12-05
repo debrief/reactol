@@ -1,10 +1,11 @@
-import { Feature, Geometry, MultiPoint } from "geojson";
-import { LeafletMouseEvent  } from 'leaflet'
+import { Feature, GeoJsonProperties, Geometry, MultiPoint } from "geojson";
+import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { format } from "date-fns";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { CoordInstance, filterTrack } from "../helpers/filter-track";
+import { Point } from "geojson";
 
 export interface TrackProps {
   feature: Feature 
@@ -12,7 +13,7 @@ export interface TrackProps {
 }
 
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
-  const { selection, time } = useAppContext()
+  const { selection, time, currentLocations } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
   const limits: [number, number] = [time.start, time.end]
 
@@ -29,6 +30,10 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
     return '#000';
   };
   
+  const currentLocation: Feature<Point, GeoJsonProperties> | undefined = useMemo(() => {
+    return currentLocations.find((loc) => loc.id === feature.id)
+  }, [currentLocations]);
+
   const trackCoords = useMemo(() => {
     if (limits && feature.properties?.times) {
       const coords = (feature.geometry as MultiPoint).coordinates
@@ -50,6 +55,18 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
+  const interpolatedLocationMarker = useMemo(() => {
+    if (currentLocation !== undefined) {
+      const loc = currentLocation.geometry.coordinates.slice().reverse() as LatLngExpression
+      const color = currentLocation.properties?.color || '#f9f'
+      return <CircleMarker key={'current-' + feature.id + '-' + time.current} radius={5} 
+        fillColor={color} color={color} center={loc}/>
+    } else {
+      return <></>
+    }
+  }, [currentLocation, feature, time.current]);
+
+
   return (
     <>
       <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={2} color={colorFor(feature)}/>
@@ -63,6 +80,8 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
             {item.time}
           </Tooltip>}
         </CircleMarker> )}
+        { interpolatedLocationMarker }
+
     </>
   )
 }

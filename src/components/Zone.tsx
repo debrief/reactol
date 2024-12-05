@@ -9,11 +9,10 @@ import { useAppContext } from "../context/AppContext";
 export interface ZoneProps {
   feature: Feature<Polygon> 
   onClickHandler: {(id: string, modifier: boolean): void}
-  currentLocations: Feature<Point>[]
 }
 
-const Zone: React.FC<ZoneProps> = ({feature, onClickHandler, currentLocations}) => {
-  const { selection, time } = useAppContext()
+const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
+  const { selection, time, currentLocations } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
   const current = time.current
   const lastTimeHandled = useRef<number | null>(null)

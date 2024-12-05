@@ -1,11 +1,11 @@
 import { Feature, Geometry, MultiPoint, Point, Polygon, Position } from "geojson";
-import { MapContainer, Marker, Popup, GeoJSON, CircleMarker as ReactCircleMarker } from 'react-leaflet'
+import { MapContainer,  GeoJSON } from 'react-leaflet'
 import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
 import { TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import * as turf from "turf";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 
@@ -52,8 +52,7 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
-  const { selection, setSelection, time } = useAppContext();
-  const [currentLocations, setCurrentLocations] = useState<Feature<Point>[]>([])
+  const { selection, setSelection, time, setCurrentLocations } = useAppContext();
 
   const setColor: StyleFunction = (feature: Feature<Geometry, unknown> | undefined) => {
     const res: CustomPathOptions = {}
@@ -102,12 +101,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     }
   }, [time, features])
 
-  const InterpolatedLocationMarker = (feature: Feature<Point>, current: number): React.ReactElement => {
-    const loc = feature.geometry.coordinates.slice().reverse() as LatLngExpression
-    const color = feature.properties?.color || '#f9f'
-    return <ReactCircleMarker key={'current-' + feature.id + '-' + current} radius={5} 
-      fillColor={color} color={color} center={loc}/>
-  }
+
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -140,7 +134,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     case TRACK_TYPE:
       return <Track feature={feature} onClickHandler={onClickHandler}/> 
     case ZONE_TYPE:
-      return <Zone feature={feature as Feature<Polygon>} onClickHandler={onClickHandler} currentLocations={currentLocations}/>  
+      return <Zone feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
     default:
       return <GeoJSON key={`${feature.id || 'index'}`} data={feature} style={setColor} pointToLayer={createLabelledPoint} /> 
     }
@@ -153,7 +147,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
         { 
           features.filter(feature => isVisible(feature)).map((featureFor))
         }
-        { time.current && currentLocations.map((feature) => InterpolatedLocationMarker(feature, time.current)) }
       </MapContainer>
     </>
   );
