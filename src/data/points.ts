@@ -7,7 +7,8 @@ const points: Feature[] = [
     properties: {
       name: "Point Juliet",
       dataType: REFERENCE_POINT_TYPE,
-      color: "#FF0000"
+      color: "#FF0000",
+      time: "2024-11-14T19:10:00.000Z",
     },
     geometry: {
       coordinates: [
@@ -22,7 +23,9 @@ const points: Feature[] = [
     properties: {
       name: "Point Kilo",
       dataType: REFERENCE_POINT_TYPE,
-      color: "#00FF00"
+      color: "#00FF00",
+      startTime: "2024-11-14T21:10:00.000Z",
+      endTime: "2024-11-15T02:10:00.000Z"
     },
     geometry: {
       coordinates: [

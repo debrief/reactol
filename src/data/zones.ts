@@ -7,7 +7,9 @@ const zones: Feature[] = [
     properties: {
       name: "Zone Alpha",
       color: "#F00",
-      dataType: ZONE_TYPE
+      dataType: ZONE_TYPE,
+      startTime: "2024-11-14T19:10:00.000Z",
+      endTime: "2024-11-15T12:10:00.000Z"
     },
     geometry: {
       coordinates: [
@@ -42,7 +44,9 @@ const zones: Feature[] = [
     properties: {
       name: "Zone Bravo",
       color: "#F55",
-      dataType: ZONE_TYPE
+      dataType: ZONE_TYPE,
+      startTime: "2024-11-14T12:10:00.000Z",
+      endTime: "2024-11-15T09:10:00.000Z"
     },
     geometry: {
       coordinates: [
