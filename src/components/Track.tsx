@@ -2,7 +2,7 @@ import { Feature, GeoJsonProperties, Geometry, MultiPoint } from "geojson";
 import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { format } from "date-fns";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
 import { CoordInstance, filterTrack } from "../helpers/filter-track";
 import { Point } from "geojson";
@@ -10,9 +10,11 @@ import { Point } from "geojson";
 export interface TrackProps {
   feature: Feature 
   onClickHandler: {(id: string, modifier: boolean): void}
+  showCurrentLocation?: boolean
+  showTrackLine?: boolean
 }
 
-const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
+const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocation = true, showTrackLine = true}) => {
   const { selection, time, currentLocations } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
   const limits: [number, number] = [time.start, time.end]
@@ -69,18 +71,18 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
 
   return (
     <>
-      <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={2} color={colorFor(feature)}/>
-      { trackCoords.length && <Polyline key={feature.id + '-start-line-' + isSelected} positions={[trackCoords[0].pos]} weight={2} color={colorFor(feature)}>
+      { showTrackLine && <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={2} color={colorFor(feature)}/>}
+      { showTrackLine && trackCoords.length && <Polyline key={feature.id + '-start-line-' + isSelected} positions={[trackCoords[0].pos]} weight={2} color={colorFor(feature)}>
         <Tooltip key={feature.id + '-start-name-' + isSelected} 
           direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
       </Polyline> }
-      { trackCoords.map((item: CoordInstance, index: number) => 
+      { showTrackLine && trackCoords.map((item: CoordInstance, index: number) => 
         <CircleMarker key={feature.id + '-point-' + index} center={item.pos} radius={3} color={colorFor(feature)} eventHandlers={{click: onclick}}>
           {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {item.time}
           </Tooltip>}
         </CircleMarker> )}
-        { interpolatedLocationMarker }
+        { showCurrentLocation && interpolatedLocationMarker }
 
     </>
   )
