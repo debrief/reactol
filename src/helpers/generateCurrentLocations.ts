@@ -11,14 +11,17 @@ const isTemporal = (feature: Feature): boolean => {
   return feature.properties?.times
 }
 
-const timeVal = (timeStr: string): number => {
+export const timeVal = (timeStr: string): number => {
   return new Date(timeStr).getTime()
 }
 
 export const calcInterpLocation = (poly: MultiPoint, times: string[], current: number): Position | undefined => {
-  const index = times.findIndex((time: string) => new Date(time).getTime() >= current)
-  // console.log('index', index, current, times.map((t) => new Date(t).getTime()))
-  if (index >= 0) {
+  const index = times.findIndex((time: string) => timeVal(time) >= current)
+  if (index == 0) {
+    // check if it's the same time as the first point
+    const firstTime = timeVal(times[0])
+    return (firstTime === current) ? poly.coordinates[0] : undefined
+  } else if (index > 0) {
     const coords = poly.coordinates
     const isFirst = index === 0
     const beforeIndex = isFirst ? 0 : index - 1
