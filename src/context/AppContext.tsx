@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 import { Feature, Point } from 'geojson';
 
-interface TimeState {
+export interface TimeState {
   start: number;
   current: number;
   end: number;

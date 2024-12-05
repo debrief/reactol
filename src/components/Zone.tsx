@@ -1,6 +1,6 @@
 import * as turf from "turf";
 import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon"
-import { Feature, Geometry, Point, Polygon, Position } from "geojson";
+import { Feature, Geometry, Polygon, Position } from "geojson";
 import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useEffect, useMemo, useRef, useState } from "react";

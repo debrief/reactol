@@ -83,7 +83,6 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocati
           </Tooltip>}
         </CircleMarker> )}
         { showCurrentLocation && interpolatedLocationMarker }
-
     </>
   )
 }
