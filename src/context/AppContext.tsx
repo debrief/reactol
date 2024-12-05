@@ -1,11 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 import { Feature, Point } from 'geojson';
-
-export interface TimeState {
-  start: number;
-  current: number;
-  end: number;
-}
+import { TimeState } from '../helpers/generateCurrentLocations';
 
 interface AppContextProps {
   selection: string[];

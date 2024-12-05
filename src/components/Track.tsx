@@ -4,7 +4,7 @@ import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { format } from "date-fns";
 import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
-import { CoordInstance, filterTrack } from "../helpers/filter-track";
+import { CoordInstance, filterTrack } from "../helpers/filterTrack";
 import { Point } from "geojson";
 
 export interface TrackProps {

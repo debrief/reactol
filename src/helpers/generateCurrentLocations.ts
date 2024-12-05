@@ -1,6 +1,11 @@
 import * as turf from "turf";
 import { Feature, MultiPoint, Point, Position } from "geojson";
-import { TimeState } from "../context/AppContext"; // Adjust the import path as necessary
+
+export interface TimeState {
+  start: number;
+  current: number;
+  end: number;
+}
 
 const isTemporal = (feature: Feature): boolean => {
   return feature.properties?.times
@@ -10,7 +15,7 @@ const timeVal = (timeStr: string): number => {
   return new Date(timeStr).getTime()
 }
 
-const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index: number): Position => {
+export const calcInterpLocation = (poly: MultiPoint, times: any, current: number, index: number): Position => {
   const coords = poly.coordinates
   const isFirst = index === 0
   const beforeIndex = isFirst ? 0 : index - 1

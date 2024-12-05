@@ -1,6 +1,6 @@
 import {expect, test} from '@jest/globals';
 
-import { filterTrack } from "../filter-track";
+import { filterTrack } from "../filterTrack";
 
 import { Feature, MultiPoint } from 'geojson';
 import { TRACK_TYPE } from '../../constants';
