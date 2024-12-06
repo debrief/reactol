@@ -1,9 +1,9 @@
 import * as turf from "turf";
-import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon"
+import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
 import { Feature, Geometry, Polygon, Position } from "geojson";
-import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
-import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
-import { useEffect, useMemo, useRef, useState } from "react";
+import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
+import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
 
@@ -39,7 +39,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
-  const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
+  const colorFor = useCallback((feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
       return '#aaa'
     }
@@ -50,7 +50,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
       }
     }
     return '#000';
-  };
+  }, [isSelected])
 
   const polygon = useMemo(() => {
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
