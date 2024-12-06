@@ -68,7 +68,6 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocati
       const swappedCoords = allCoords.map((coord: [number, number]) => [coord[1], coord[0]]);
       const lineString = turf.lineString(swappedCoords);
       const lineLength = turf.length(lineString, {units: 'kilometers'});
-      console.log('line string length', lineString, lineLength);
       if (lineLength === 0) {
         return null 
       } 

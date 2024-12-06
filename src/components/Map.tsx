@@ -10,7 +10,7 @@ import { useAppContext } from "../context/AppContext";
 import { generateCurrentLocations } from "../helpers/generateCurrentLocations";
 import { Point as DataPoint } from "./Point";
 import { Button } from 'antd';
-import { LineOutlined } from '@ant-design/icons';
+import { SwapLeftOutlined } from '@ant-design/icons';
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -70,9 +70,9 @@ const Map: React.FC<MapProps> = ({ children }) => {
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         {children}
-        <Control prepend position='topright'>
-          <Button onClick={() => setSnailMode(!snailMode)}> 
-            <LineOutlined />
+        <Control prepend position='topleft'>
+          <Button type={snailMode ? 'primary' : 'dashed'} onClick={() => setSnailMode(!snailMode)}> 
+            <SwapLeftOutlined />
           </Button>
         </Control>
         { 
