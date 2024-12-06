@@ -1,6 +1,5 @@
-import { Feature, Geometry, Point, Polygon } from "geojson";
+import { Feature, Point, Polygon } from "geojson";
 import { MapContainer } from 'react-leaflet'
-import { PathOptions, StyleFunction, LatLngExpression, CircleMarker, LeafletMouseEvent } from 'leaflet'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
@@ -10,29 +9,30 @@ import { useAppContext } from "../context/AppContext";
 import { generateCurrentLocations } from "../helpers/generateCurrentLocations";
 import { Point as DataPoint } from "./Point";
 
-interface CustomPathOptions extends PathOptions {
-  radius?: number;
-}
-
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
-}
-
-const createLabelledPoint = (pointFeature: Feature, latlng: LatLngExpression, onTooltipClick: (event: LeafletMouseEvent) => void) => {
-  const color = pointFeature.properties?.color || 'blue';
-  const name = pointFeature.properties?.name || '';
-  return new CircleMarker(latlng, { radius: 1, fillOpacity: 1, color, opacity:1 }).bindTooltip(name, { interactive:true, permanent: true, direction: 'center' }).on('click', onTooltipClick);
 }
 
 interface MapProps {
   children: React.ReactNode;
 }
 
+const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void): React.ReactElement => {
+  switch(feature.properties?.dataType) {
+  case TRACK_TYPE:
+    return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler}/> 
+  case ZONE_TYPE:
+    return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
+  case REFERENCE_POINT_TYPE:
+    return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
+  default:
+    throw new Error('Unknown feature type:' + feature.properties?.dataType)
+  }
+}
+
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, time, setCurrentLocations } = useAppContext();
-
-
 
   useEffect(() => {
     if (time.current && features.length) {
@@ -57,22 +57,9 @@ const Map: React.FC<MapProps> = ({ children }) => {
     }
   }, [selection, setSelection])
 
-  const featureFor = (feature: Feature): React.ReactElement => {
-    switch(feature.properties?.dataType) {
-    case TRACK_TYPE:
-      return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler}/> 
-    case ZONE_TYPE:
-      return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
-    case REFERENCE_POINT_TYPE:
-      return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
-    default:
-      throw new Error('Unknown feature type:' + feature.properties?.dataType)
-    }
-  }
-
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
-    return vis.map(featureFor)
+    return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
   }, [features])
 
   return (
