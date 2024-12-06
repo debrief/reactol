@@ -12,9 +12,10 @@ export interface TrackProps {
   onClickHandler: {(id: string, modifier: boolean): void}
   showCurrentLocation?: boolean
   showTrackLine?: boolean
+  snailMode?: boolean
 }
 
-const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocation = true, showTrackLine = true}) => {
+const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocation = true, showTrackLine = true, snailMode = false}) => {
   const { selection, time, currentLocations } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
   const limits: [number, number] = [time.start, time.end]
@@ -68,21 +69,40 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocati
     }
   }, [currentLocation, feature, time.current]);
 
+  const snailModePolyline = useMemo(() => {
+    if (snailMode && currentLocation) {
+      const coords = trackCoords.map((val: CoordInstance) => val.pos);
+      const currentLoc = currentLocation.geometry.coordinates.slice().reverse() as LatLngExpression;
+      const allCoords = [...coords, currentLoc];
+      const opacityStep = 1 / allCoords.length;
+      return allCoords.map((coord, index) => (
+        <Polyline
+          key={`snail-${feature.id}-${index}`}
+          positions={[allCoords[index], allCoords[index + 1]]}
+          weight={2}
+          color={colorFor(feature)}
+          opacity={opacityStep * (index + 1)}
+        />
+      ));
+    }
+    return null;
+  }, [snailMode, currentLocation, trackCoords]);
 
   return (
     <>
-      { showTrackLine && <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={2} color={colorFor(feature)}/>}
-      { showTrackLine && trackCoords.length && <Polyline key={feature.id + '-start-line-' + isSelected} positions={[trackCoords[0].pos]} weight={2} color={colorFor(feature)}>
+      { showTrackLine && !snailMode && <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={2} color={colorFor(feature)}/>}
+      { showTrackLine && !snailMode && trackCoords.length && <Polyline key={feature.id + '-start-line-' + isSelected} positions={[trackCoords[0].pos]} weight={2} color={colorFor(feature)}>
         <Tooltip key={feature.id + '-start-name-' + isSelected} 
           direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
       </Polyline> }
-      { showTrackLine && trackCoords.map((item: CoordInstance, index: number) => 
+      { showTrackLine && !snailMode && trackCoords.map((item: CoordInstance, index: number) => 
         <CircleMarker key={feature.id + '-point-' + index} center={item.pos} radius={3} color={colorFor(feature)} eventHandlers={{click: onclick}}>
           {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {item.time}
           </Tooltip>}
         </CircleMarker> )}
         { showCurrentLocation && interpolatedLocationMarker }
+        { snailMode && snailModePolyline }
     </>
   )
 }
