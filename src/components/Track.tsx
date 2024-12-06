@@ -7,6 +7,8 @@ import { useAppContext } from "../context/AppContext";
 import { CoordInstance, filterTrack } from "../helpers/filterTrack";
 import { Point } from "geojson";
 import * as turf from "@turf/turf";
+import { lineChunk } from "@turf/line-chunk";
+import { length } from "@turf/length";
 
 export interface TrackProps {
   feature: Feature 
@@ -67,11 +69,11 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler, showCurrentLocati
       const allCoords: [number, number][] = [...validCoords, currentLoc];
       const swappedCoords = allCoords.map((coord: [number, number]) => [coord[1], coord[0]]);
       const lineString = turf.lineString(swappedCoords);
-      const lineLength = turf.length(lineString, {units: 'kilometers'});
+      const lineLength = length(lineString, {units: 'kilometers'});
       if (lineLength === 0) {
         return null 
       } 
-      const chunkedLine: FeatureCollection<LineString> = turf.lineChunk(lineString, lineLength / 50, {units: 'kilometers'});
+      const chunkedLine: FeatureCollection<LineString> = lineChunk(lineString, lineLength / 50, {units: 'kilometers'});
       const lineStrings = chunkedLine.features.map((feature: Feature<LineString>): [number, number][] => {
         const lString = feature.geometry.coordinates as [number, number][];
         return lString.map((coord: [number, number]) => [coord[1], coord[0]])});
