@@ -1,4 +1,4 @@
-import * as turf from "turf";
+import * as turf from "@turf/turf";
 import { Feature, MultiPoint, Point, Position } from "geojson";
 
 export interface TimeState {

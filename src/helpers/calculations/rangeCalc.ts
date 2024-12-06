@@ -1,6 +1,6 @@
 import { Calculation, GraphDataset, GraphDatum } from "../../components/GraphModal";
-import { Feature, MultiPoint, Position } from 'geojson'
-import * as turf from "turf";
+import { Feature, MultiPoint, Position } from 'geojson';
+import * as turf from "@turf/turf";
 import { isTemporal } from "../trackCalculations";
 
 

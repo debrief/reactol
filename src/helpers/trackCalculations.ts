@@ -1,6 +1,6 @@
-import * as turf from "turf";
-import { Polygon} from 'geojson'
-import { Feature } from 'geojson'
+import * as turf from "@turf/turf";
+import { Polygon } from 'geojson';
+import { Feature } from 'geojson';
 
 export const isTemporal = (feature: Feature): boolean => {
   return !!feature.properties?.times

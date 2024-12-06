@@ -1,4 +1,4 @@
-import * as turf from "turf";
+import * as turf from "@turf/turf";
 import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
 import { Feature, Geometry, Polygon, Position } from "geojson";
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
