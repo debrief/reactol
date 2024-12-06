@@ -1,5 +1,6 @@
 import { Feature, Point, Polygon } from "geojson";
-import { MapContainer, useMap } from 'react-leaflet'
+import { MapContainer } from 'react-leaflet';
+import Control from 'react-leaflet-custom-control';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
@@ -9,7 +10,7 @@ import { useAppContext } from "../context/AppContext";
 import { generateCurrentLocations } from "../helpers/generateCurrentLocations";
 import { Point as DataPoint } from "./Point";
 import { Button } from 'antd';
-import { SnailOutlined } from '@ant-design/icons';
+import { LineOutlined } from '@ant-design/icons';
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -65,22 +66,15 @@ const Map: React.FC<MapProps> = ({ children }) => {
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler, snailMode))
   }, [features, snailMode])
 
-  const SnailModeButton = () => {
-    const map = useMap();
-    return (
-      <Button
-        icon={<SnailOutlined />}
-        onClick={() => setSnailMode(!snailMode)}
-        style={{ position: 'absolute', top: 50, right: 10, zIndex: 1000 }}
-      />
-    );
-  };
-
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         {children}
-        <SnailModeButton />
+        <Control prepend position='topright'>
+          <Button onClick={() => setSnailMode(!snailMode)}> 
+            <LineOutlined />
+          </Button>
+        </Control>
         { 
           visibleFeatures
         }
