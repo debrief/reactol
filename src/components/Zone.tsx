@@ -1,10 +1,11 @@
 import * as turf from "turf";
-import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon"
+import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
 import { Feature, Geometry, Polygon, Position } from "geojson";
-import { LatLngExpression, LeafletMouseEvent  } from 'leaflet'
-import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
-import { useEffect, useMemo, useRef, useState } from "react";
+import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
+import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
+import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
 
 export interface ZoneProps {
   feature: Feature<Polygon> 
@@ -13,14 +14,14 @@ export interface ZoneProps {
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   const { selection, time, currentLocations } = useAppContext()
+  const { start: timeStart, end: timeEnd } = time
   const isSelected = selection.includes(feature.id as string)
-  const current = time.current
   const lastTimeHandled = useRef<number | null>(null)
   const [containsVehicle, setContainsVehicle] = useState<boolean>(false)
 
   useEffect(() => {
-    if (lastTimeHandled.current !== current) {
-      lastTimeHandled.current = current
+    if (lastTimeHandled.current !== time.current) {
+      lastTimeHandled.current = time.current
       setContainsVehicle(currentLocations.some(loc => {
         const point = loc.geometry.coordinates as Position
         const poly = feature as Feature<Polygon>
@@ -28,15 +29,17 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
         return res
       }))
     }
-  }, [currentLocations, current, feature, lastTimeHandled])
+  }, [currentLocations, time, feature, lastTimeHandled])
 
-
+  const isVisible = useMemo(() => {
+    return featureIsVisibleInPeriod(feature, timeStart, timeEnd)
+  }, [feature, timeStart, timeEnd])
 
   const onclick = (evt: LeafletMouseEvent) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
-  const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
+  const colorFor = useCallback((feature: Feature<Geometry, unknown> | undefined): string => {
     if (isSelected) {
       return '#aaa'
     }
@@ -47,7 +50,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
       }
     }
     return '#000';
-  };
+  }, [isSelected])
 
   const polygon = useMemo(() => {
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
@@ -63,7 +66,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
 
   return (
     <>
-    { polygon}
+    { isVisible && polygon}
     </>
   )
 }

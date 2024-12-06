@@ -14,6 +14,34 @@ interface LayerProps {
 
 type TreeProps = GetProps<typeof Tree>;
 
+const idFor = (feature: Feature): string => {
+  return `${feature.id || 'unknown'}`
+}
+
+const nameFor = (feature: Feature): string => {
+  return feature.properties?.name || feature.id
+}
+  
+const isChecked = (feature: Feature): string => {
+  return feature.properties?.visible
+}
+
+const filterFor = (feature: Feature, dType: string): boolean => {
+  return feature.properties?.dataType === dType
+}
+
+const mapFunc = (features: Feature[], title: string, key: string, dType: string): TreeDataNode => {
+  return {
+    title: title,
+    key: key,
+    children: features.filter((feature) => filterFor(feature, dType)).map((item) => ({
+      title: nameFor(item),
+      key: idFor(item),
+      children: []
+    }))
+  }
+}
+
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
   const features = useAppSelector(state => state.featureCollection.features)
@@ -23,52 +51,11 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   
-  const idFor = (feature: Feature): string => {
-    return `${feature.id || 'unknown'}`
-  }
-  
-  const nameFor = (feature: Feature): string => {
-    return feature.properties?.name || feature.id
-  }
-  
-  const isChecked = (feature: Feature): string => {
-    return feature.properties?.visible
-  }
-
-  const filterFor = (feature: Feature, dType: string): boolean => {
-    return feature.properties?.dataType === dType
-  }
-  
   useEffect(() => {
-    const modelData: TreeDataNode[] = [
-      {
-        title: 'Tracks',
-        key: 'node-tracks',
-        children: features.filter((feature) => filterFor(feature, TRACK_TYPE)).map((item) => ({
-          title: nameFor(item),
-          key: idFor(item),
-          children: []
-        }))
-      },
-      {
-        title: 'Zones',
-        key: 'node-zones',
-        children: features.filter((feature) => filterFor(feature, ZONE_TYPE)).map((item) => ({
-          title: nameFor(item),
-          key: idFor(item),
-          children: []
-        }))
-      },
-      {
-        title: 'Points',
-        key: 'node-points',
-        children: features.filter((feature) => filterFor(feature, REFERENCE_POINT_TYPE)).map((item) => ({
-          title: nameFor(item),
-          key: idFor(item),
-          children: []
-        }))
-      }
-    ]
+    const modelData: TreeDataNode[] = []
+    modelData.push(mapFunc(features, 'Tracks', 'node-tracks', TRACK_TYPE))
+    modelData.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
+    modelData.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
     setModel(modelData)
     if (features) {
       const checked: string[] = features.filter((feature) => isChecked(feature)).map((feature) => idFor(feature))
@@ -95,7 +82,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   };
 
   const temporalFeatureSelected = (): boolean => {
-    return  selectedFeatures.some((feature) => feature.properties?.times)
+    return selectedFeatures.some((feature) => feature.properties?.times)
   }
 
   const onGraphClick = () => {
