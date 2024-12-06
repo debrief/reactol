@@ -70,3 +70,26 @@ test('only end', () => {
   delete track.properties.startTime
   expect(featureIsVisibleInPeriod(track, timeVal(times[1]), timeVal(times[2]))).toBe(true)
 });
+
+test('mid time', () => {
+  if (!track.properties) {
+    track.properties = {}
+  }
+  delete track.properties.startTime
+  delete track.properties.endTime
+  track.properties.time = times[2]
+  expect(featureIsVisibleInPeriod(track, timeVal(times[1]), timeVal(times[3]))).toBe(true)
+  expect(featureIsVisibleInPeriod(track, timeVal(times[0]), timeVal(times[1]))).toBe(false)
+});
+
+
+test('missing mid time', () => {
+  if (!track.properties) {
+    track.properties = {}
+  }
+  delete track.properties.startTime
+  delete track.properties.endTime
+  delete track.properties.time
+  expect(featureIsVisibleInPeriod(track, timeVal(times[1]), timeVal(times[3]))).toBe(true)
+  expect(featureIsVisibleInPeriod(track, timeVal(times[0]), timeVal(times[1]))).toBe(true)
+});
