@@ -1,9 +1,11 @@
 import { LeafletMouseEvent } from 'leaflet';
 import React, { useMemo, useState } from 'react';
 import { useMap, useMapEvents } from 'react-leaflet';
+import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import './MouseCoordinates.css';
 import { useAppContext } from '../context/AppContext';
+import { useAppSelector } from '../app/hooks';
 
 const formatCoordinate = (coordinate: number, isLat: boolean) => {
   const toPadStr = (num: number) => ('' + num).padStart(2, '0');
@@ -27,9 +29,25 @@ const bearingToAzimuth = (bearing: number) => {
   return (bearing + 360) % 360;
 }
 
+const featureToPoints = (feature: Feature): FeatureCollection<Point> => {
+  switch (feature.geometry.type) {
+    case 'Point':
+      return turf.featureCollection([feature as Feature<Point>]);
+    case 'LineString':
+      return turf.featureCollection([feature as Feature<LineString>]);
+    case 'MultiPoint':
+      return turf.explode(feature as Feature<MultiPoint>);
+    case 'Polygon':
+      return turf.explode(feature as Feature<Polygon>);
+    default:
+      return turf.featureCollection([]);
+  }
+}
+
 const MouseCoordinates: React.FC = () => {
-  const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0});
   const { selection } = useAppContext();
+  const features = useAppSelector(state => state.featureCollection.features)
+  const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0});
 
   const map = useMap()
 
@@ -40,17 +58,19 @@ const MouseCoordinates: React.FC = () => {
     }
   })
 
-  const rangeBearing: {rng: number, brg: number} = useMemo(() => {
+  const rangeBearing: {rng: number, brg: number, subject: string} = useMemo(() => {
     if (map) {
       const turfMouse = turf.point([mouseCoords.lng, mouseCoords.lat]);
 
       if (selection.length === 1) {
-        const selectedFeature = map.featureGroup.getLayer(selection[0]);
+
+        const selectedFeature = features.find((feature) => feature.id === selection[0])
         if (selectedFeature) {
-          const nearestPoint = turf.nearestPoint(turfMouse, selectedFeature.toGeoJSON());
-          const bearing = bearingToAzimuth(turf.bearing(turfMouse, nearestPoint));
+          const asPoints = featureToPoints(selectedFeature);
+          const nearestPoint = turf.nearestPoint(turfMouse, asPoints);
+          const bearing = bearingToAzimuth(turf.bearing(nearestPoint, turfMouse));
           const range = turf.distance(turfMouse, nearestPoint);
-          return {rng: range, brg: bearing};
+          return {rng: range, brg: bearing, subject: selectedFeature.properties?.name || ''};
         }
       }
 
@@ -58,9 +78,9 @@ const MouseCoordinates: React.FC = () => {
       const turfCentre = turf.point([mapCentre.lng, mapCentre.lat]);
       const bearing = bearingToAzimuth(turf.bearing(turfCentre, turfMouse));
       const range = turf.distance(turfCentre, turfMouse);
-      return {rng: range, brg: bearing};
+      return {rng: range, brg: bearing, subject: 'Map Center'};
     } else {
-      return {rng: 0, brg: 0};
+      return {rng: 0, brg: 0, subject: ''};
     }
   }, [mouseCoords, map, selection]);
   
@@ -68,8 +88,9 @@ const MouseCoordinates: React.FC = () => {
     <div className="mouse-coordinates-panel">
       <p>Lat: {formatCoordinate(mouseCoords.lat, true)}</p>
       <p>Lng: {formatCoordinate(mouseCoords.lng, false)}</p>
-      <p>Rng: {`${(`` + rangeBearing.rng.toFixed(1)).padStart(2, '0')} km`}</p>
-      <p>Brg: {`${(`` + rangeBearing.brg.toFixed(1)).padStart(3, '0')} degs`}</p>
+      <p>Rel to {rangeBearing.subject}:</p>
+      <p>{`${(`` + rangeBearing.rng.toFixed(1)).padStart(5, '0')} km`}/
+         {`${(`` + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
     </div>
   );
 };
