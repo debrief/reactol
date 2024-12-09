@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useMap, useMapEvents } from 'react-leaflet';
 import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } from "geojson";
 import * as turf from "@turf/turf";
-import { nearestPoint } from '@turf/helpers';
+import nearestPoint from '@turf/nearest-point';
 import './MouseCoordinates.css';
 import { useAppContext } from '../context/AppContext';
 import { useAppSelector } from '../app/hooks';
@@ -90,7 +90,7 @@ const MouseCoordinates: React.FC = () => {
     <div className="mouse-coordinates-panel">
       <p>Lat: {formatCoordinate(mouseCoords.lat, true)}</p>
       <p>Lng: {formatCoordinate(mouseCoords.lng, false)}</p>
-      <p>Rel to {rangeBearing.subject}:</p>
+      <p>Rel to <b>{rangeBearing.subject}</b>:</p>
       <p>{`${(`` + rangeBearing.rng.toFixed(1)).padStart(5, '0')} km`}/
          {`${(`` + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
     </div>
