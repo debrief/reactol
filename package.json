@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.3.0",
+    "@turf/helpers": "^7.1.0",
     "@turf/length": "^7.1.0",
     "@turf/line-chunk": "^7.1.0",
     "@turf/turf": "^7.1.0",
