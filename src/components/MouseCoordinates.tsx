@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useMap, useMapEvents } from 'react-leaflet';
 import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } from "geojson";
 import * as turf from "@turf/turf";
+import { nearestPoint } from '@turf/helpers';
 import './MouseCoordinates.css';
 import { useAppContext } from '../context/AppContext';
 import { useAppSelector } from '../app/hooks';
@@ -62,14 +63,15 @@ const MouseCoordinates: React.FC = () => {
     if (map) {
       const turfMouse = turf.point([mouseCoords.lng, mouseCoords.lat]);
 
+      // provide range/bearing to selected item, if 1 feature is selected
       if (selection.length === 1) {
-
         const selectedFeature = features.find((feature) => feature.id === selection[0])
         if (selectedFeature) {
           const asPoints = featureToPoints(selectedFeature);
-          const nearestPoint = turf.nearestPoint(turfMouse, asPoints);
-          const bearing = bearingToAzimuth(turf.bearing(nearestPoint, turfMouse));
-          const range = turf.distance(turfMouse, nearestPoint);
+          const nearestPt = nearestPoint(turfMouse, asPoints);
+          const bearing = bearingToAzimuth(turf.bearing(nearestPt, turfMouse));
+          const pointPos = turf.point(nearestPt.geometry.coordinates);
+          const range = turf.distance(turfMouse, pointPos);
           return {rng: range, brg: bearing, subject: selectedFeature.properties?.name || ''};
         }
       }
