@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useMap, useMapEvents } from 'react-leaflet';
 import * as turf from "@turf/turf";
 import './MouseCoordinates.css';
+import { useAppContext } from '../context/AppContext';
 
 const formatCoordinate = (coordinate: number, isLat: boolean) => {
   const toPadStr = (num: number) => ('' + num).padStart(2, '0');
@@ -28,6 +29,7 @@ const bearingToAzimuth = (bearing: number) => {
 
 const MouseCoordinates: React.FC = () => {
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0});
+  const { selection } = useAppContext();
 
   const map = useMap()
 
@@ -39,19 +41,28 @@ const MouseCoordinates: React.FC = () => {
   })
 
   const rangeBearing: {rng: number, brg: number} = useMemo(() => {
-    // check there is a single item in the selection
     if (map) {
-      const turfMouse = turf.point([mouseCoords.lng, mouseCoords.lat])
-      const mapCentre = map.getCenter()
-      const turfCentre = turf.point([mapCentre.lng, mapCentre.lat])
-      const bearing = bearingToAzimuth(turf.bearing(turfCentre, turfMouse))
-      const range = turf.distance(turfCentre, turfMouse)
-      return {rng: range, brg: bearing}
+      const turfMouse = turf.point([mouseCoords.lng, mouseCoords.lat]);
+
+      if (selection.length === 1) {
+        const selectedFeature = map.featureGroup.getLayer(selection[0]);
+        if (selectedFeature) {
+          const nearestPoint = turf.nearestPoint(turfMouse, selectedFeature.toGeoJSON());
+          const bearing = bearingToAzimuth(turf.bearing(turfMouse, nearestPoint));
+          const range = turf.distance(turfMouse, nearestPoint);
+          return {rng: range, brg: bearing};
+        }
+      }
+
+      const mapCentre = map.getCenter();
+      const turfCentre = turf.point([mapCentre.lng, mapCentre.lat]);
+      const bearing = bearingToAzimuth(turf.bearing(turfCentre, turfMouse));
+      const range = turf.distance(turfCentre, turfMouse);
+      return {rng: range, brg: bearing};
     } else {
-      return {rng: 0, brg: 0}
+      return {rng: 0, brg: 0};
     }
-  }, [mouseCoords, map])
-  
+  }, [mouseCoords, map, selection]);
   
   return (
     <div className="mouse-coordinates-panel">
