@@ -172,7 +172,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     className={"my-modal-custom-class"}
     onRequestClose={closeHandler} 
     isOpen={open}>
-      <Layout style={{minHeight:'300px', height:'100%'}}>
+      <Layout style={{minHeight:'300px', height:'100%'}} theme="dark">
         <Header>My Modal</Header>
         <Layout style={{height:'100%'}}>
           <Content>
@@ -194,7 +194,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
             </VictoryGroup>
           </VictoryChart>
           </Content>
-          <Sider theme='light'>
+          <Sider theme='dark'>
             <Flex vertical>
               <Form onFinish={onFinish}
                 layout='vertical'

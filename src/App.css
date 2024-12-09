@@ -37,13 +37,13 @@ html, body, #root, .App, #map {
   position: absolute;
   z-index: 1000 !important;
   border: 1px solid #ccc;
-  background: white;
+  background: #333;
 }
 .flexible-modal-mask {
   z-index: 800 !important;
   position: fixed;
   height: 100%;
-  background: rgba(55, 55, 55, 0.6);
+  background: rgba(22, 22, 22, 0.8);
   top:0;
   left:0;
   right:0;

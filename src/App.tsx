@@ -65,7 +65,7 @@ function App() {
 
   return (
     <div className="App">
-      <ConfigProvider theme={antdTheme}>
+      <ConfigProvider theme={antdTheme} theme="dark">
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
               <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
