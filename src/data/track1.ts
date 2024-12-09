@@ -6,7 +6,7 @@ const track: Feature = {
   properties: {
     dataType: TRACK_TYPE,
     color: '#F00',
-    name: 'Track 1',
+    name: 'VAN GALEN',
     times: [
       "2024-11-14T16:16:53.662Z",
       "2024-11-14T18:16:53.662Z",

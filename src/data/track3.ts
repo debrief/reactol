@@ -5,7 +5,7 @@ const track = {
   properties: {
     dataType: TRACK_TYPE,
     color: '#0F0',
-    name: 'Track 3',
+    name: 'LEOPOLD I',
     times: [
       '2024-11-14T16:17:00.000Z',
       '2024-11-14T18:17:00.000Z',

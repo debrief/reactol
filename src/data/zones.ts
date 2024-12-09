@@ -5,7 +5,7 @@ const zones: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Zone Alpha",
+      name: "SAP 1-1",
       color: "#F00",
       dataType: ZONE_TYPE,
       startTime: "2024-11-14T19:10:00.000Z",
@@ -42,7 +42,7 @@ const zones: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Zone Bravo",
+      name: "SAP 1-2",
       color: "#F55",
       dataType: ZONE_TYPE,
       startTime: "2024-11-14T12:10:00.000Z",
@@ -79,7 +79,7 @@ const zones: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Zone Charlie",
+      name: "SAP 2",
       color: "#0FF",
       dataType: ZONE_TYPE
     },
@@ -114,7 +114,7 @@ const zones: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Zone Delta",
+      name: "SIR 1",
       color: "#FF0",
       dataType: ZONE_TYPE
     },
@@ -149,7 +149,7 @@ const zones: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Zone Echo",
+      name: "TRA 1",
       color: "#F0F",
       dataType: ZONE_TYPE
     },
