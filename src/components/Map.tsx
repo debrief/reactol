@@ -11,6 +11,7 @@ import { generateCurrentLocations } from "../helpers/generateCurrentLocations";
 import { Point as DataPoint } from "./Point";
 import { Button } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
+import MouseCoordinates from './MouseCoordinates';
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -37,6 +38,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, time, setCurrentLocations } = useAppContext();
   const [snailMode, setSnailMode] = useState(false);
+  const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number } | null>(null);
 
   useEffect(() => {
     if (time.current && features.length) {
@@ -66,9 +68,14 @@ const Map: React.FC<MapProps> = ({ children }) => {
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler, snailMode))
   }, [features, snailMode])
 
+  const handleMouseMove = (event: any) => {
+    const { lat, lng } = event.latlng;
+    setMouseCoords({ lat, lng });
+  };
+
   return (
     <>
-      <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
+      <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true} onmousemove={handleMouseMove}>
         {children}
         <Control prepend position='topleft'>
           <Button type={snailMode ? 'primary' : 'dashed'} onClick={() => setSnailMode(!snailMode)}> 
@@ -78,6 +85,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         { 
           visibleFeatures
         }
+        {mouseCoords && <MouseCoordinates lat={mouseCoords.lat} lng={mouseCoords.lng} />}
       </MapContainer>
     </>
   );
