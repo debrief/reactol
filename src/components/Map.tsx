@@ -38,7 +38,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, time, setCurrentLocations } = useAppContext();
   const [snailMode, setSnailMode] = useState(false);
-  const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number } | null>(null);
 
   useEffect(() => {
     if (time.current && features.length) {
@@ -68,14 +67,9 @@ const Map: React.FC<MapProps> = ({ children }) => {
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler, snailMode))
   }, [features, snailMode])
 
-  const handleMouseMove = (event: LeafletMouseEvent) => {
-    const { lat, lng } = event.latlng;
-    setMouseCoords({ lat, lng });
-  };
-
   return (
     <>
-      <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true} onmousemove={handleMouseMove}>
+      <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         {children}
         <Control prepend position='topleft'>
           <Button type={snailMode ? 'primary' : 'dashed'} onClick={() => setSnailMode(!snailMode)}> 
@@ -85,7 +79,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         { 
           visibleFeatures
         }
-        {mouseCoords && <MouseCoordinates lat={mouseCoords.lat} lng={mouseCoords.lng} />}
+        <MouseCoordinates/>
       </MapContainer>
     </>
   );

@@ -1,6 +1,6 @@
 import { Card, ConfigProvider, Splitter } from 'antd';
-import './App.css'
-import { useEffect, useRef, useState } from 'react'
+import './App.css';
+import { useEffect, useRef, useState } from 'react';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
@@ -15,7 +15,6 @@ import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
-import MouseCoordinates from './components/MouseCoordinates.tsx'; // Pffa7
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -94,7 +93,6 @@ function App() {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <MouseCoordinates /> {/* P95ef */}
               </Map>
             </Splitter.Panel>
           </Splitter>
