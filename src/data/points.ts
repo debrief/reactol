@@ -5,7 +5,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Point Juliet",
+      name: "SONO 1-1",
       dataType: REFERENCE_POINT_TYPE,
       color: "#FF0000",
       time: "2024-11-14T19:10:00.000Z",
@@ -21,7 +21,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Point Kilo",
+      name: "SONO 1-2",
       dataType: REFERENCE_POINT_TYPE,
       color: "#00FF00",
       startTime: "2024-11-14T21:10:00.000Z",
@@ -38,7 +38,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Point Lima",
+      name: "NEW SONO",
       dataType: REFERENCE_POINT_TYPE,
       color: "#0000FF"
     },
@@ -53,7 +53,7 @@ const points: Feature[] = [
   {
     type: "Feature",
     properties: {
-      name: "Point Mike",
+      name: "POINT D-1",
       dataType: REFERENCE_POINT_TYPE,
       color: "#FFFF00"
     },
