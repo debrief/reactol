@@ -68,7 +68,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler, snailMode))
   }, [features, snailMode])
 
-  const handleMouseMove = (event: any) => {
+  const handleMouseMove = (event: LeafletMouseEvent) => {
     const { lat, lng } = event.latlng;
     setMouseCoords({ lat, lng });
   };
