@@ -1,6 +1,7 @@
 import { LeafletMouseEvent } from 'leaflet';
-import React, { useState } from 'react';
-import { useMapEvents } from 'react-leaflet';
+import React, { useMemo, useState } from 'react';
+import { useMap, useMapEvents } from 'react-leaflet';
+import * as turf from "@turf/turf";
 import './MouseCoordinates.css';
 
 const formatCoordinate = (coordinate: number, isLat: boolean) => {
@@ -21,8 +22,14 @@ const formatCoordinate = (coordinate: number, isLat: boolean) => {
   return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}" ${direction}`;
 };
 
+const bearingToAzimuth = (bearing: number) => {
+  return (bearing + 360) % 360;
+}
+
 const MouseCoordinates: React.FC = () => {
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0});
+
+  const map = useMap()
 
   useMapEvents({
     mousemove: (event: LeafletMouseEvent) => {
@@ -30,11 +37,28 @@ const MouseCoordinates: React.FC = () => {
       setMouseCoords({ lat, lng });
     }
   })
+
+  const rangeBearing: {rng: number, brg: number} = useMemo(() => {
+    // check there is a single item in the selection
+    if (map) {
+      const turfMouse = turf.point([mouseCoords.lng, mouseCoords.lat])
+      const mapCentre = map.getCenter()
+      const turfCentre = turf.point([mapCentre.lng, mapCentre.lat])
+      const bearing = bearingToAzimuth(turf.bearing(turfCentre, turfMouse))
+      const range = turf.distance(turfCentre, turfMouse)
+      return {rng: range, brg: bearing}
+    } else {
+      return {rng: 0, brg: 0}
+    }
+  }, [mouseCoords, map])
+  
   
   return (
     <div className="mouse-coordinates-panel">
       <p>Lat: {formatCoordinate(mouseCoords.lat, true)}</p>
       <p>Lng: {formatCoordinate(mouseCoords.lng, false)}</p>
+      <p>Rng: {`${(`` + rangeBearing.rng.toFixed(1)).padStart(2, '0')} km`}</p>
+      <p>Brg: {`${(`` + rangeBearing.brg.toFixed(1)).padStart(3, '0')} degs`}</p>
     </div>
   );
 };
