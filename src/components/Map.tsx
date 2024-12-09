@@ -11,6 +11,7 @@ import { generateCurrentLocations } from "../helpers/generateCurrentLocations";
 import { Point as DataPoint } from "./Point";
 import { Button } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
+import MouseCoordinates from './MouseCoordinates';
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -78,6 +79,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         { 
           visibleFeatures
         }
+        <MouseCoordinates/>
       </MapContainer>
     </>
   );

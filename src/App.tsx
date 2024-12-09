@@ -1,6 +1,6 @@
 import { Card, ConfigProvider, Splitter } from 'antd';
-import './App.css'
-import { useEffect, useRef, useState } from 'react'
+import './App.css';
+import { useEffect, useRef, useState } from 'react';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
@@ -14,7 +14,7 @@ import points from './data/points.ts';
 import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
-import { TileLayer } from 'react-leaflet'; // P8f97
+import { TileLayer } from 'react-leaflet';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
