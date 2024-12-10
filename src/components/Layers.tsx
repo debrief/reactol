@@ -88,7 +88,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const onGraphClick = () => {
     openGraph()
   }
-  
+
   return <>
     <Flex gap='small' justify='end' wrap>
       <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
