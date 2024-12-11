@@ -8,6 +8,7 @@ export interface TimeProps {
   start: number
   end: number
   current?: number
+  onTimeFilterChange?: (timePeriod: string) => void
 }
 
 const steps = 100
@@ -33,7 +34,7 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
   }
 }
 
-const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
+const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChange}) => {
   const { time, setTime } = useAppContext();
 
   const [value, setValue] = useState<{ start: number, current: number, end: number }>({ start: 0, current: steps / 2, end: steps });
@@ -61,6 +62,10 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current}) => {
     }
     setTime(unscaledValues)
     setValue(newValue)
+    if (onTimeFilterChange) {
+      const formattedTimePeriod = `${pf(unscaledValues.start)} - ${pf(unscaledValues.end)}`;
+      onTimeFilterChange(formattedTimePeriod);
+    }
   }
 
   const PlayControl = useMemo(() => {

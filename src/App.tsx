@@ -22,7 +22,8 @@ function App() {
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
   const { setTime } = useAppContext();
-
+  const [showTimePeriod, setShowTimePeriod] = useState(false);
+  const [timePeriod, setTimePeriod] = useState('');
 
   const storeInitialised = useRef(false); 
   const timeInitialised = useRef(false);
@@ -72,7 +73,7 @@ function App() {
                 <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
                   <Card title='Time Control'>
                     {timeBounds && 
-                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} />}
+                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} onTimeFilterChange={setTimePeriod} />}
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>
@@ -88,7 +89,7 @@ function App() {
               </Splitter>
             </Splitter.Panel>
             <Splitter.Panel key='right'>
-              <Map>
+              <Map showTimePeriod={showTimePeriod} timePeriod={timePeriod}>
                 <TileLayer maxNativeZoom={8} maxZoom={10}
                   url="tiles/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
