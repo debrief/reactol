@@ -5,21 +5,23 @@ import { AppProvider } from '../context/AppContext';
 import { configureStore } from '@reduxjs/toolkit';
 import Layers from './Layers'; 
 import featuresReducer from '../features/geoFeatures/geoFeaturesSlice'; 
-import mockFeatures from '../mock/features'
+import { FeatureCollection } from 'geojson';
+import mockFeatures from '../mock/features';
 
-// Mock Redux store with initial state
-const mockStore = configureStore({
-  reducer: {
-    featureCollection: featuresReducer,
-  },
-  preloadedState: {
-    featureCollection: mockFeatures,
-  },
-});
+// Custom function to create a mock store with dynamic features
+const createMockStore = (features: FeatureCollection) =>
+  configureStore({
+    reducer: {
+      featureCollection: featuresReducer,
+    },
+    preloadedState: {
+      featureCollection:  features,
+    },
+  });
 
 // Custom decorator to wrap Layers component with necessary providers
-const withProviders = (Story: React.ComponentType) => (
-  <Provider store={mockStore}> 
+const withProviders = (features: FeatureCollection) => (Story: React.ComponentType) => (
+  <Provider store={createMockStore(features)}> 
     <AppProvider>
       <Story />
     </AppProvider>
@@ -30,13 +32,95 @@ const withProviders = (Story: React.ComponentType) => (
 export default {
   title: 'Components/Layers',
   component: Layers,
-  decorators: [withProviders],  // Apply necessary providers (Redux and AppContext)
 } as Meta<typeof Layers>;
 
 const Template: StoryFn<typeof Layers> = (args) => <Layers {...args} />;
 
 // Default story
 export const Default = Template.bind({});
+Default.decorators = [withProviders(mockFeatures)];
 Default.args = {
   openGraph: () => alert('Graph opened!'),
+};
+
+// Variant 1: Only Tracks
+export const OnlyTracks = Template.bind({});
+OnlyTracks.decorators = [
+  withProviders(
+    {
+    ...mockFeatures,
+    features: mockFeatures.features.filter((feature) => feature.properties?.dataType === 'track')
+    }
+  ),
+];
+OnlyTracks.args = {
+  openGraph: () => console.log('Only tracks shown'),
+};
+
+// Variant 2: No Features Visible
+export const NoVisibleFeatures = Template.bind({});
+NoVisibleFeatures.decorators = [
+  withProviders(
+    {
+    ...mockFeatures,
+    features: mockFeatures.features.map((feature) => ({
+      ...feature,
+      properties: { ...feature.properties, visible: false },
+    }))
+  }
+  ),
+];
+
+NoVisibleFeatures.args = {
+  openGraph: () => console.log('No features visible'),
+};
+
+// Variant 3: All Features Visible
+export const AllVisibleFeatures = Template.bind({});
+AllVisibleFeatures.decorators = [
+  withProviders(
+    {
+    ...mockFeatures,
+    features: mockFeatures.features.map((feature) => ({
+      ...feature,
+      properties: { ...feature.properties, visible: true },
+    }))
+  }
+  ),
+];
+AllVisibleFeatures.args = {
+  openGraph: () => console.log('All features visible'),
+};
+
+// Variant 4: Only Points
+export const OnlyPoints = Template.bind({});
+OnlyPoints.decorators = [
+  withProviders(
+    {
+      ...mockFeatures,
+      features: mockFeatures.features.filter(
+        (feature) => feature.properties?.dataType === 'reference_point'
+      )
+   }
+  ),
+];
+OnlyPoints.args = {
+  openGraph: () => console.log('Only points shown'),
+};
+
+// Variant 5: Mixed Selection
+export const MixedSelection = Template.bind({});
+MixedSelection.decorators = [
+  withProviders(
+    {
+      ...mockFeatures,
+      features: mockFeatures.features.map((feature, index) => ({
+        ...feature,
+        properties: { ...feature.properties, visible: index % 2 === 0 },
+      }))
+    }
+  ),
+];
+MixedSelection.args = {
+  openGraph: () => console.log('Mixed selection of features'),
 };
