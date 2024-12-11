@@ -15,6 +15,7 @@ import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
+import { load } from './helpers/load.ts'; // Import the load function
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -22,7 +23,7 @@ function App() {
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
   const { setTime } = useAppContext();
-
+  const [isDragging, setIsDragging] = useState(false); // State to track if a file is being dragged
 
   const storeInitialised = useRef(false); 
   const timeInitialised = useRef(false);
@@ -63,8 +64,28 @@ function App() {
     }
   }
 
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+
+    const file = event.dataTransfer.files[0];
+    if (file && file.type === "application/json") {
+      const text = await file.text();
+      load(text, features, (newFeatures) => dispatch({ type: 'featureCollection/featuresAdded', payload: newFeatures }));
+    }
+  };
+
   return (
-    <div className="App">
+    <div className={`App ${isDragging ? 'dragging' : ''}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       <ConfigProvider theme={antdTheme}>
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
