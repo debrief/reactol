@@ -80,7 +80,7 @@ function App() {
     const file = event.dataTransfer.files[0];
     if (file && file.type === "application/json") {
       const text = await file.text();
-      load(text, features, (newFeatures) => dispatch({ type: 'featureCollection/featuresAdded', payload: newFeatures }));
+      load(text, features, dispatch);
     }
   };
 
