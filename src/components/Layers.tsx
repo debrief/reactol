@@ -3,7 +3,7 @@ import { Button, Flex, Tree } from 'antd';
 import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
 import { LineChartOutlined } from '@ant-design/icons';
-import { Feature } from 'geojson'
+import { Feature } from 'geojson';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
