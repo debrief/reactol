@@ -71,7 +71,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         {children}
-        <Control prepend position='topleft'>
+        <Control position='topleft'>
           <Button type={snailMode ? 'primary' : 'dashed'} onClick={() => setSnailMode(!snailMode)}> 
             <SwapLeftOutlined />
           </Button>
