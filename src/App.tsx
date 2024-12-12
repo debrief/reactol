@@ -15,7 +15,7 @@ import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
-import { loadJson } from './helpers/loadJson.ts'; // Import the load function
+import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 

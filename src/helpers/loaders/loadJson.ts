@@ -1,5 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { AppDispatch } from '../app/store';
+import { AppDispatch } from '../../app/store';
 
 export const loadJson = (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => {
   try {
