@@ -12,6 +12,8 @@ interface LayerProps {
   openGraph: {(): void}
 }
 
+const ROOT_ID = '-root-'
+
 type TreeProps = GetProps<typeof Tree>;
 
 const idFor = (feature: Feature): string => {
@@ -52,11 +54,15 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   
   useEffect(() => {
-    const modelData: TreeDataNode[] = []
-    modelData.push(mapFunc(features, 'Tracks', 'node-tracks', TRACK_TYPE))
-    modelData.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
-    modelData.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
-    setModel(modelData)
+    const items: TreeDataNode[] = []
+    items.push(mapFunc(features, 'Tracks', 'node-tracks', TRACK_TYPE))
+    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
+    items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
+    const modelData = {
+      title: 'Serial',
+      key: ROOT_ID,
+      children: items }
+    setModel([modelData])
     if (features) {
       const checked: string[] = features.filter((feature) => isChecked(feature)).map((feature) => idFor(feature))
       setCheckedKeys(checked)
@@ -100,7 +106,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
       multiple={true}
       onSelect={onSelect}
       onCheck={onCheck}
-      showIcon={false}
+      showIcon={true}
       checkedKeys={checkedKeys}
       selectedKeys={selection || []}
       treeData={model} />
