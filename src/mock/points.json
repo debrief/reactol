@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+      {
+          "type": "Feature",
+          "properties": {
+              "name": "UPDATED SONO2",
+              "dataType": "reference-point",
+              "color": "#00FFFF",
+              "visible": true
+          },
+          "geometry": {
+              "coordinates": [
+                  -4.1560650478869775,
+                  36.094394874646
+              ],
+              "type": "Point"
+          },
+          "id": "fa-11"
+      },
+      {
+          "type": "Feature",
+          "properties": {
+              "name": "POINT D-1 (moved)",
+              "dataType": "reference-point",
+              "color": "#FFFF00",
+              "visible": true
+          },
+          "geometry": {
+              "coordinates": [
+                  -1.752065101137316,
+                  35.952217563281974
+              ],
+              "type": "Point"
+          },
+          "id": "fa-12"
+      }
+  ]
+}

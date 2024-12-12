@@ -1,4 +1,4 @@
-import { Card, ConfigProvider, Splitter } from 'antd';
+import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd';
 import './App.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Layers from './components/Layers.tsx';
@@ -15,14 +15,28 @@ import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
+import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
+import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
+import { AppDispatch } from './app/store.ts';
+
+interface FileHandler {
+  blobType: string
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => void
+}
+
+const FileHandlers: FileHandler[] = [
+  { blobType: 'application/json', handle: loadJson }
+]
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
+  const [isDragging, setIsDragging] = useState(false); // State to track if a file is being dragged
+  const [error, setError] = useState<string | null>(null); // State to track error messages
   const { setTime, time } = useAppContext();
 
   const storeInitialised = useRef(false); 
@@ -71,8 +85,41 @@ function App() {
     }
   }
 
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+
+    var files = event.dataTransfer.files;
+
+    for (var i = 0; i < files.length; i++) {
+      const file = files[i]
+      const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
+      if (handler) {
+        try {
+          handler.handle(await file.text(), features, dispatch);
+        } catch (e) {
+          setError('' + e); // Set error message
+        }
+      }
+    }
+  };
+
   return (
-    <div className="App">
+    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+      {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
+      <Modal title="Loading Error" open={!!error} onCancel={() => setError(null)} onOk={() => setError(null)}>
+        <Alert type="error" description={error} />
+      </Modal>
+      {error && <div className="error-modal">{error}</div>} {/* Error modal */}
       <ConfigProvider theme={antdTheme}>
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
@@ -99,7 +146,6 @@ function App() {
               <Map>
                 <TileLayer maxNativeZoom={8} maxZoom={10}
                   url="tiles/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 <Control prepend position='topleft'>
                   <div className='time-period' style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>

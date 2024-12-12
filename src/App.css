@@ -70,3 +70,24 @@ html, body, #root, .App, #map {
 .time-period {
   font-size: 3em;
 }
+
+.modal-back {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+}
+
+.drag-overlay {
+  position: fixed;
+  z-index: 1200;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 200px;
+  color: rgba(239, 233, 233, 0.7);
+  pointer-events: none;
+}
