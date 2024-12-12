@@ -38,8 +38,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, time, setCurrentLocations } = useAppContext();
   const [snailMode, setSnailMode] = useState(false);
-  const [showTimePeriod, setShowTimePeriod] = useState(false);
-  const [timePeriod, setTimePeriod] = useState('');
 
   useEffect(() => {
     if (time.current && features.length) {
@@ -49,11 +47,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
       setCurrentLocations([])
     }
   }, [time, features])
-
-  useEffect(() => {
-    const formattedTimePeriod = `${new Date(time.start).toISOString().slice(8, 14)}Z - ${new Date(time.end).toISOString().slice(8, 14)}Z`;
-    setTimePeriod(formattedTimePeriod);
-  }, [time]);
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -78,18 +71,11 @@ const Map: React.FC<MapProps> = ({ children }) => {
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         {children}
-        <Control prepend position='topleft'>
+        <Control position='topleft'>
           <Button type={snailMode ? 'primary' : 'dashed'} onClick={() => setSnailMode(!snailMode)}> 
             <SwapLeftOutlined />
           </Button>
         </Control>
-        {showTimePeriod && (
-          <Control prepend position='topleft'>
-            <div style={{ height: '20px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-              {timePeriod}
-            </div>
-          </Control>
-        )}
         { 
           visibleFeatures
         }

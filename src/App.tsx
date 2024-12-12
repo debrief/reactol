@@ -1,6 +1,6 @@
 import { Card, ConfigProvider, Splitter } from 'antd';
 import './App.css';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Layers from './components/Layers.tsx';
 import Properties from './components/Properties.tsx';
 import TimeControl from './components/TimeControl.tsx';
@@ -15,15 +15,15 @@ import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
+import Control from 'react-leaflet-custom-control';
+import toDTG from './helpers/toDTG.ts';
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
-  const { setTime } = useAppContext();
-  const [showTimePeriod, setShowTimePeriod] = useState(false);
-  const [timePeriod, setTimePeriod] = useState('');
+  const { setTime, time } = useAppContext();
 
   const storeInitialised = useRef(false); 
   const timeInitialised = useRef(false);
@@ -41,6 +41,13 @@ function App() {
       dispatch({ type: 'featureCollection/featuresAdded', payload: points })
     }
   }, [dispatch])
+
+
+  const timePeriod = useMemo(() => {
+    const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`;
+    return formattedTimePeriod;
+  }, [time]);
+
 
   useEffect(() => {
     if (features && features.length && !timeInitialised.current) {
@@ -73,7 +80,7 @@ function App() {
                 <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
                   <Card title='Time Control'>
                     {timeBounds && 
-                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} onTimeFilterChange={setTimePeriod} />}
+                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} />}
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>
@@ -89,11 +96,16 @@ function App() {
               </Splitter>
             </Splitter.Panel>
             <Splitter.Panel key='right'>
-              <Map showTimePeriod={showTimePeriod} timePeriod={timePeriod}>
+              <Map>
                 <TileLayer maxNativeZoom={8} maxZoom={10}
                   url="tiles/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
+                <Control prepend position='topleft'>
+                  <div className='time-period' style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                    {timePeriod}
+                  </div>
+                </Control>
               </Map>
             </Splitter.Panel>
           </Splitter>
