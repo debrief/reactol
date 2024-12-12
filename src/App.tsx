@@ -15,7 +15,7 @@ import Map from './components/Map.tsx';
 import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
-import { load } from './helpers/load.ts'; // Import the load function
+import { loadJson } from './helpers/load.ts'; // Import the load function
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 
@@ -89,7 +89,7 @@ function App() {
     const file = event.dataTransfer.files[0];
     if (file && file.type === "application/json") {
       const text = await file.text();
-      load(text, features, dispatch);
+      loadJson(text, features, dispatch);
     }
   };
 

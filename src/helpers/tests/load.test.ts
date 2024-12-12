@@ -1,7 +1,7 @@
-import { load } from '../load';
-import { FeatureCollection } from 'geojson';
-import { createStore } from 'redux';
+import { loadJson } from '../load';
 import featuresReducer from '../../features/geoFeatures/geoFeaturesSlice';
+import { Feature, Geometry, GeoJsonProperties, FeatureCollection } from "geojson";
+import { createStore } from '@reduxjs/toolkit';
 
 describe('load function', () => {
   let store: ReturnType<typeof createStore>;
@@ -37,13 +37,13 @@ describe('load function', () => {
         }
       ]
     });
+    const existing: Feature<Geometry, GeoJsonProperties>[] = [];
+    loadJson(geoJsonText, existing, store.dispatch);
 
-    load(geoJsonText, { type: 'FeatureCollection', features: [] }, store.dispatch);
-
-    const state = store.getState();
+    const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(2);
-    expect(state.features[0].properties.name).toBe('Feature 1');
-    expect(state.features[1].properties.name).toBe('Feature 2');
+    expect(state.features[0]?.properties?.name).toBe('Feature 1');
+    expect(state.features[1]?.properties?.name).toBe('Feature 2');
   });
 
   it('should not add features to the store from an invalid GeoJSON object', () => {
@@ -52,9 +52,10 @@ describe('load function', () => {
       features: []
     });
 
-    load(invalidGeoJsonText, { type: 'FeatureCollection', features: [] }, store.dispatch);
+    const existing: Feature<Geometry, GeoJsonProperties>[] = [];
+    loadJson(invalidGeoJsonText, existing, store.dispatch);
 
-    const state = store.getState();
+    const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(0);
   });
 });

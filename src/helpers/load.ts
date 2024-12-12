@@ -1,7 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../app/store';
 
-export const load = (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => {
+export const loadJson = (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => {
   try {
     const json = JSON.parse(text);
     if (json.type === 'FeatureCollection') {
