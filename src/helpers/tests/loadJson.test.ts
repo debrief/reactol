@@ -1,6 +1,6 @@
-import { loadJson } from '../load';
+import { loadJson } from '../loadJson';
 import featuresReducer from '../../features/geoFeatures/geoFeaturesSlice';
-import { Feature, Geometry, GeoJsonProperties, FeatureCollection } from "geojson";
+import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from "geojson";
 import { createStore } from '@reduxjs/toolkit';
 
 describe('load function', () => {
@@ -11,7 +11,7 @@ describe('load function', () => {
   });
 
   it('should add features to the store from a valid GeoJSON object', () => {
-    const geoJsonText = JSON.stringify({
+    const sampleData = {
       type: 'FeatureCollection',
       features: [
         {
@@ -36,7 +36,8 @@ describe('load function', () => {
           }
         }
       ]
-    });
+    }
+    const geoJsonText = JSON.stringify(sampleData);
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     loadJson(geoJsonText, existing, store.dispatch);
 
@@ -44,6 +45,17 @@ describe('load function', () => {
     expect(state.features.length).toBe(2);
     expect(state.features[0]?.properties?.name).toBe('Feature 1');
     expect(state.features[1]?.properties?.name).toBe('Feature 2');
+    const secondString = state.features[1] as Feature<LineString>;
+    expect(secondString.geometry.coordinates?.length).toBe(4);
+
+    // add again, check it gets longer
+    const justLineString = JSON.stringify([sampleData.features[1]]);
+    const newExisting = store.getState() as FeatureCollection;
+    loadJson(justLineString, newExisting.features, store.dispatch);
+    const updatedState = store.getState() as FeatureCollection;
+    expect(updatedState.features.length).toBe(2);
+    const newSecondString = state.features[1] as Feature<LineString>;
+    expect(newSecondString.geometry.coordinates?.length).toBe(8);
   });
 
   it('should not add features to the store from an invalid GeoJSON object', () => {
