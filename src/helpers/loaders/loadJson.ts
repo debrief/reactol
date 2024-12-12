@@ -3,16 +3,12 @@ import { AppDispatch } from '../../app/store';
 import combineFeatures from '../combineFeatures';
 
 export const loadJson = (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => {
-  try {
-    const json = JSON.parse(text);
-    if (json.type === 'FeatureCollection') {
-      const newFeatures = json.features;
-      const combined = combineFeatures(features, newFeatures)
-      dispatch({ type: 'featureCollection/featuresUpdated', payload: combined });
-    } else {
-      throw new Error('Invalid GeoJSON format:' + json.type);
-    }
-  } catch (error) {
-    throw new Error('Error parsing GeoJSON: ' + error);
+  const json = JSON.parse(text);
+  if (json.type === 'FeatureCollection') {
+    const newFeatures = json.features;
+    const combined = combineFeatures(features, newFeatures)
+    dispatch({ type: 'featureCollection/featuresUpdated', payload: combined });
+  } else {
+    throw new Error('Invalid GeoJSON format:' + json.type);
   }
 };

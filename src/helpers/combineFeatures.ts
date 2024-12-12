@@ -36,7 +36,7 @@ const combineFeatures = (existingF: Feature[], newF: Feature[]): Feature[] => {
         return {...existing, geometry: { ...existing.geometry, coordinates: combinedCoords}}
       }
       default:
-        throw new Error('Cannot combined features of this type:' + existing.geometry.type)
+        throw new Error('Cannot combine features of this type:' + existing.geometry.type)
     }
   })
   return notInExisting.concat(updatedFeatures)

@@ -1,4 +1,4 @@
-import { Card, ConfigProvider, Splitter } from 'antd';
+import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd';
 import './App.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Layers from './components/Layers.tsx';
@@ -36,6 +36,7 @@ function App() {
   const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
   const [graphOpen, setGraphOpen] = useState(false)
   const [isDragging, setIsDragging] = useState(false); // State to track if a file is being dragged
+  const [error, setError] = useState<string | null>(null); // State to track error messages
   const { setTime, time } = useAppContext();
 
   const storeInitialised = useRef(false); 
@@ -97,14 +98,17 @@ function App() {
     event.preventDefault();
     setIsDragging(false);
 
-
     var files = event.dataTransfer.files;
 
     for (var i = 0; i < files.length; i++) {
       const file = files[i]
       const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
       if (handler) {
-        handler.handle(await file.text(), features, dispatch);
+        try {
+          handler.handle(await file.text(), features, dispatch);
+        } catch (e) {
+          setError('' + e); // Set error message
+        }
       }
     }
   };
@@ -112,6 +116,10 @@ function App() {
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
+      <Modal title="Loading Error" open={!!error} onCancel={() => setError(null)} onOk={() => setError(null)}>
+        <Alert type="error" description={error} />
+      </Modal>
+      {error && <div className="error-modal">{error}</div>} {/* Error modal */}
       <ConfigProvider theme={antdTheme}>
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
