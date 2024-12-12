@@ -38,6 +38,11 @@ const featuresSlice = createSlice({
       const cleaned = action.payload.map(cleanFeature)
       state.features.push(...cleaned)
     },
+    featuresUpdated(state, action: PayloadAction<Feature[]>) {
+      const cleaned = action.payload.map(cleanFeature)
+      const removeUpdated = state.features.filter((feature) => !cleaned.find((f) => f.id === feature.id))
+      state.features = removeUpdated.concat(cleaned)
+    },
     featuresVisible(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
       state.features.forEach((feature) => {

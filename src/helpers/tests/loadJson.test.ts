@@ -15,6 +15,7 @@ describe('load function', () => {
       type: 'FeatureCollection',
       features: [
         {
+          id: 'f-1',
           type: 'Feature',
           properties: { name: 'Feature 1' },
           geometry: {
@@ -23,10 +24,11 @@ describe('load function', () => {
           }
         },
         {
+          id: 'f-2',
           type: 'Feature',
           properties: { name: 'Feature 2' },
           geometry: {
-            type: 'LineString',
+            type: 'MultiPoint',
             coordinates: [
               [102.0, 0.0],
               [103.0, 1.0],
@@ -49,12 +51,15 @@ describe('load function', () => {
     expect(secondString.geometry.coordinates?.length).toBe(4);
 
     // add again, check it gets longer
-    const justLineString = JSON.stringify([sampleData.features[1]]);
+    const sampleCopy = JSON.parse(JSON.stringify(sampleData))
+    sampleCopy.features = [sampleCopy.features[1]]
+    const justLineString = JSON.stringify(sampleCopy);
     const newExisting = store.getState() as FeatureCollection;
     loadJson(justLineString, newExisting.features, store.dispatch);
     const updatedState = store.getState() as FeatureCollection;
     expect(updatedState.features.length).toBe(2);
-    const newSecondString = state.features[1] as Feature<LineString>;
+    const updatedState2 = store.getState() as FeatureCollection;
+    const newSecondString = updatedState2.features[1] as Feature<LineString>;
     expect(newSecondString.geometry.coordinates?.length).toBe(8);
   });
 
@@ -65,7 +70,7 @@ describe('load function', () => {
     });
 
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    loadJson(invalidGeoJsonText, existing, store.dispatch);
+    expect(() => {loadJson(invalidGeoJsonText, existing, store.dispatch)}).toThrowError('Error parsing GeoJSON: Error: Invalid GeoJSON format:InvalidType');
 
     const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(0);

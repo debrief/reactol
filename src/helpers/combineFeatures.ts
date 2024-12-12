@@ -21,7 +21,7 @@ const combineFeatures = (existingF: Feature[], newF: Feature[]): Feature[] => {
           const existingTimes = existing.properties?.times as string[]
           const newTimes = feature.properties?.times as string[]
           const combinedTimes = existingTimes.concat(newTimes)
-          // also extract courses and speeds
+          // also extract courses
           const existingCourses = existing.properties?.courses as number[]
           const newCourses = feature.properties?.courses as number[]
           const combinedCourses = existingCourses.concat(newCourses)
