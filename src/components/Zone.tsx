@@ -1,9 +1,8 @@
 import * as turf from "@turf/turf";
-import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon";
-import { Feature, Geometry, Polygon, Position } from "geojson";
+import { Feature, Geometry, Polygon } from "geojson";
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet';
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
 import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
 
@@ -13,23 +12,9 @@ export interface ZoneProps {
 }
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
-  const { selection, time, currentLocations } = useAppContext()
+  const { selection, time } = useAppContext()
   const { start: timeStart, end: timeEnd } = time
   const isSelected = selection.includes(feature.id as string)
-  const lastTimeHandled = useRef<number | null>(null)
-  const [containsVehicle, setContainsVehicle] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (lastTimeHandled.current !== time.current) {
-      lastTimeHandled.current = time.current
-      setContainsVehicle(currentLocations.some(loc => {
-        const point = loc.geometry.coordinates as Position
-        const poly = feature as Feature<Polygon>
-        const res = booleanPointInPolygon(point, poly)
-        return res
-      }))
-    }
-  }, [currentLocations, time, feature, lastTimeHandled])
 
   const isVisible = useMemo(() => {
     return featureIsVisibleInPeriod(feature, timeStart, timeEnd)
@@ -56,13 +41,13 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
     const centre = turf.center(points).geometry.coordinates.reverse() as LatLngExpression
     const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
-    return <ReactPolygon key={feature.id + '-line-' + isSelected + '-' + containsVehicle} fill={true} positions={trackCoords} weight={containsVehicle ? 4 : 2} 
-      color={colorFor(feature)} eventHandlers={{click: onclick}} fillOpacity={containsVehicle ? 0.3 : 0.1} >
+    return <ReactPolygon key={feature.id + '-line-' + isSelected } fill={true} positions={trackCoords} weight={ 2} 
+      color={colorFor(feature)} eventHandlers={{click: onclick}} fillOpacity={0.1} >
       <Tooltip position={centre} direction="center" opacity={1} permanent>
         {feature.properties?.name}
       </Tooltip>
       </ReactPolygon>  
-  }, [feature, containsVehicle, isSelected])
+  }, [feature, isSelected])
 
   return (
     <>

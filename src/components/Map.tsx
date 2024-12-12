@@ -4,10 +4,9 @@ import Control from 'react-leaflet-custom-control';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
-import { generateCurrentLocations } from "../helpers/generateCurrentLocations";
 import { Point as DataPoint } from "./Point";
 import { Button } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
@@ -21,10 +20,10 @@ interface MapProps {
   children: React.ReactNode;
 }
 
-const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void, snailMode: boolean): React.ReactElement => {
+const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void): React.ReactElement => {
   switch(feature.properties?.dataType) {
   case TRACK_TYPE:
-    return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler} snailMode={snailMode}/> 
+    return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler} /> 
   case ZONE_TYPE:
     return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
   case REFERENCE_POINT_TYPE:
@@ -36,17 +35,8 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
 
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
-  const { selection, setSelection, time, setCurrentLocations } = useAppContext();
+  const { selection, setSelection } = useAppContext();
   const [snailMode, setSnailMode] = useState(false);
-
-  useEffect(() => {
-    if (time.current && features.length) {
-      const pointFeatures = generateCurrentLocations(features, time)
-      setCurrentLocations(pointFeatures)
-    } else {
-      setCurrentLocations([])
-    }
-  }, [time, features])
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -64,7 +54,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
 
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
-    return vis.map((feature: Feature) => featureFor(feature, onClickHandler, snailMode))
+    return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
   }, [features, snailMode])
 
   return (

@@ -4,8 +4,11 @@ import { Feature, MultiPoint, Point, Position } from "geojson";
 export interface TimeState {
   start: number;
   current: number;
+  step: string;
   end: number;
 }
+
+export const TimeSteps = ['00h15m','00h30m', '01h00m', '02h00m', '03h00m', '06h00m']
 
 const isTemporal = (feature: Feature): boolean => {
   return feature.properties?.times

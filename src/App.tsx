@@ -20,6 +20,7 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 import { AppDispatch } from './app/store.ts';
+import { TimeSteps } from './helpers/generateCurrentLocations.ts';
 
 interface FileHandler {
   blobType: string
@@ -68,7 +69,7 @@ function App() {
       timeInitialised.current = true
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
-      const timePayload = { start: timeBounds[0], current: (timeBounds[0] + timeBounds[1]) / 2, end: timeBounds[1] }
+      const timePayload = { start: timeBounds[0], step: TimeSteps[1], current: (timeBounds[0] + timeBounds[1]) / 2, end: timeBounds[1] }
       setTime(timePayload)
     }
   }, [features])
