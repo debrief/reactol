@@ -16,8 +16,19 @@ import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
 import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
+import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
+import { AppDispatch } from './app/store.ts';
+
+interface FileHandler {
+  blobType: string
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => void
+}
+
+const FileHandlers: FileHandler[] = [
+  { blobType: 'application/json', handle: loadJson }
+]
 
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
@@ -86,10 +97,15 @@ function App() {
     event.preventDefault();
     setIsDragging(false);
 
-    const file = event.dataTransfer.files[0];
-    if (file && file.type === "application/json") {
-      const text = await file.text();
-      loadJson(text, features, dispatch);
+
+    var files = event.dataTransfer.files;
+
+    for (var i = 0; i < files.length; i++) {
+      const file = files[i]
+      const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
+      if (handler) {
+        handler.handle(await file.text(), features, dispatch);
+      }
     }
   };
 
