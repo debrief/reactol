@@ -12,7 +12,7 @@ interface LayerProps {
   openGraph: {(): void}
 }
 
-const ROOT_ID = '-root-'
+const ROOT_ID = 'node-root'
 
 type TreeProps = GetProps<typeof Tree>;
 
@@ -43,7 +43,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const [message, setMessage] = React.useState<string>('')
   
   const handleAdd = (e: any, key: string) => {
-    setMessage('TODO - handle creating new ' + key)
+    setMessage('TODO - handle creating new item in ' + key)
     e.stopPropagation()
   }
   
@@ -52,7 +52,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
       title: title,
       key: key,
       selectable: false,
-      icon: <PlusCircleOutlined onClick={(e) => handleAdd(e, key)} />,
+      icon: <PlusCircleOutlined  style={{cursor: 'copy'}} onClick={(e) => handleAdd(e, title)} />,
       children: features.filter((feature) => filterFor(feature, dType)).map((item) => ({
         title: nameFor(item),
         key: idFor(item),
