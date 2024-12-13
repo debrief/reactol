@@ -57,7 +57,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
     const newValue = { start: value[0], end: value[1] }
     const unscaledValues = {
       start: unscaled(start, end, newValue.start),
-      step: '00h30m',
+      step: stepTxt,
       end: unscaled(start, end, newValue.end)
     }
     setTime(unscaledValues)
