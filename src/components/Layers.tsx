@@ -1,8 +1,8 @@
 import React, { Key, useEffect } from 'react';
-import { Button, Flex, Tree } from 'antd';
+import { Alert, Button, Flex, Modal, Tree } from 'antd';
 import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
-import { LineChartOutlined } from '@ant-design/icons';
+import { LineChartOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppContext } from '../context/AppContext';
@@ -12,7 +12,7 @@ interface LayerProps {
   openGraph: {(): void}
 }
 
-const ROOT_ID = '-root-'
+const ROOT_ID = 'node-root'
 
 type TreeProps = GetProps<typeof Tree>;
 
@@ -32,18 +32,6 @@ const filterFor = (feature: Feature, dType: string): boolean => {
   return feature.properties?.dataType === dType
 }
 
-const mapFunc = (features: Feature[], title: string, key: string, dType: string): TreeDataNode => {
-  return {
-    title: title,
-    key: key,
-    children: features.filter((feature) => filterFor(feature, dType)).map((item) => ({
-      title: nameFor(item),
-      key: idFor(item),
-      children: []
-    }))
-  }
-}
-
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
   const features = useAppSelector(state => state.featureCollection.features)
@@ -52,7 +40,26 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
+  const [message, setMessage] = React.useState<string>('')
   
+  const handleAdd = (e: any, key: string) => {
+    setMessage('TODO - handle creating new item in ' + key)
+    e.stopPropagation()
+  }
+  
+  const mapFunc = (features: Feature[], title: string, key: string, dType: string): TreeDataNode => {
+    return {
+      title: title,
+      key: key,
+      selectable: false,
+      icon: <PlusCircleOutlined  style={{cursor: 'copy'}} onClick={(e) => handleAdd(e, title)} />,
+      children: features.filter((feature) => filterFor(feature, dType)).map((item) => ({
+        title: nameFor(item),
+        key: idFor(item),
+        children: []
+      }))
+    }
+  }
   useEffect(() => {
     const items: TreeDataNode[] = []
     items.push(mapFunc(features, 'Tracks', 'node-tracks', TRACK_TYPE))
@@ -96,6 +103,9 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   }
 
   return <>
+    <Modal title="Message" visible={message !== ''} onOk={() => setMessage('')} onCancel={() => setMessage('')}>
+      <Alert type="info" description={message} />
+    </Modal>
     <Flex gap='small' justify='end' wrap>
       <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
     </Flex>
