@@ -11,7 +11,7 @@ export interface TimeProps {
   onTimeFilterChange?: (timePeriod: string) => void
 }
 
-const stepOptions = [
+export const StepOptions = [
   { value: "00h15m" },
   { value: "00h30m" },
   { value: "01h00m" },
@@ -22,10 +22,6 @@ const stepOptions = [
 
 const steps = 100
 
-const scaled = (start: number, end: number, value: number): number => {
-  const range = end - start
-  return (value - start) / (range) * steps
-}
 
 const unscaled = (start: number, end: number, value: number): number => {
   const range = end - start
@@ -43,20 +39,16 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
   }
 }
 
-const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChange}) => {
+const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
   const { time, setTime } = useAppContext();
 
   const [value, setValue] = useState<{ start: number, end: number }>({ start: 0, end: steps });
-  const [stepTxt, setStepTxt] = useState<string>(stepOptions[1].value);
+  const [stepTxt, setStepTxt] = useState<string>(StepOptions[1].value);
 
   useEffect(() => {
-    const tStart = time.start || start
-    const tEnd = time.end || end 
-    const tCurrent = time.current || current || (tStart + tEnd) / 2
-    const val = { start: 0, current: scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2), end: steps }
-    console.log('time state updated', tStart, tEnd, tCurrent, val)
+    const val = { start: 0, end: steps }
     setValue(val)
-  }, [start, end, current])
+  }, [start, end])
 
   const setNewValue = (value: number | number[]) => {
     if (!Array.isArray(value)) {
@@ -65,8 +57,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChan
     const newValue = { start: value[0], end: value[1] }
     const unscaledValues = {
       start: unscaled(start, end, newValue.start),
-      step: 'alpha',
-      current: 0,
+      step: '00h30m',
       end: unscaled(start, end, newValue.end)
     }
     setTime(unscaledValues)
@@ -114,7 +105,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChan
                 value={stepTxt}
                 onChange={(value, _option) => setStepTxt(value)}
                 defaultOpen={false}
-                options={stepOptions}
+                options={StepOptions}
                 placeholder='00h30m'
               /></td>
               <td>{timeStr(time.end)}</td>

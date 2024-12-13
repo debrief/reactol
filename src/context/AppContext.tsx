@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-import { TimeState, TimeSteps } from '../helpers/generateCurrentLocations';
+import { TimeState } from '../App';
 
 interface AppContextProps {
   selection: string[];
@@ -16,7 +16,7 @@ interface Props {
 
 const AppProvider: React.FC<Props> = ({ children }) => {
   const [selection, setSelection] = useState<string[]>([]);
-  const [time, setTime] = useState<TimeState>({ start: 0, current: 0, step: TimeSteps[1], end: 0 });
+  const [time, setTime] = useState<TimeState>({ start: 0,  step: '00h30m', end: 0 });
 
   return (
     <AppContext.Provider value={{ selection, setSelection, time, setTime }}>
