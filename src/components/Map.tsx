@@ -1,15 +1,12 @@
 import { Feature, Point, Polygon } from "geojson";
 import { MapContainer } from 'react-leaflet';
-import Control from 'react-leaflet-custom-control';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 import { Point as DataPoint } from "./Point";
-import { Button } from 'antd';
-import { SwapLeftOutlined } from '@ant-design/icons';
 import MouseCoordinates from './MouseCoordinates';
 
 const isVisible = (feature: Feature): boolean => {
@@ -36,7 +33,6 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection } = useAppContext();
-  const [snailMode, setSnailMode] = useState(false);
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -55,17 +51,12 @@ const Map: React.FC<MapProps> = ({ children }) => {
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
-  }, [features, snailMode])
+  }, [features])
 
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
         {children}
-        <Control position='topleft'>
-          <Button type={snailMode ? 'primary' : 'dashed'} onClick={() => setSnailMode(!snailMode)}> 
-            <SwapLeftOutlined />
-          </Button>
-        </Control>
         { 
           visibleFeatures
         }
