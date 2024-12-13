@@ -42,16 +42,14 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
   
-  const handleAdd = (e: any, key: string) => {
-    setMessage('TODO - handle creating new item in ' + key)
-    e.stopPropagation()
-  }
-  
   const mapFunc = (features: Feature[], title: string, key: string, dType: string): TreeDataNode => {
+    const handleAdd = (e: any, key: string) => {
+      setMessage('TODO - handle creating new item in ' + key)
+      e.stopPropagation()
+    }
     return {
       title: title,
       key: key,
-      selectable: false,
       icon: <PlusCircleOutlined  style={{cursor: 'copy'}} onClick={(e) => handleAdd(e, title)} />,
       children: features.filter((feature) => filterFor(feature, dType)).map((item) => ({
         title: nameFor(item),
@@ -68,6 +66,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     const modelData = {
       title: 'Serial',
       key: ROOT_ID,
+      checkable: false,
       children: items }
     setModel([modelData])
     if (features) {
@@ -110,7 +109,8 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
       <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
     </Flex>
     <Tree checkable
-      defaultExpandedKeys={[]}
+    showLine={true}
+      defaultExpandedKeys={['node-root']}
       defaultSelectedKeys={[]}
       defaultCheckedKeys={[]}
       multiple={true}
