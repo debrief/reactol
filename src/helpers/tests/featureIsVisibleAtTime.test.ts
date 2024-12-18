@@ -3,7 +3,12 @@ import { expect, test } from '@jest/globals';
 import { Feature } from 'geojson';
 import { TRACK_TYPE } from '../../constants';
 import { featureIsVisibleInPeriod } from '../featureIsVisibleAtTime';
-import { timeVal } from '../../App';
+
+// note: method duplicated here to avoid compiler warning
+// TODO: resolve compiler warning when importing this from `App.tsx`
+const timeVal = (timeStr: string): number => {
+  return new Date(timeStr).getTime()
+}
 
 const times = [
   "2024-11-14T16:16:53.662Z",
