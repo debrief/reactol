@@ -1,6 +1,6 @@
-import { Col, Row, Slider } from "antd";
-import { ClockCircleOutlined, FilterOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AutoComplete, Col, Form, Row, Slider } from "antd";
+import { ClockCircleOutlined, FilterOutlined, FilterFilled } from '@ant-design/icons';
+import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppContext } from "../context/AppContext";
 
@@ -11,12 +11,17 @@ export interface TimeProps {
   onTimeFilterChange?: (timePeriod: string) => void
 }
 
+export const StepOptions = [
+  { value: "00h15m" },
+  { value: "00h30m" },
+  { value: "01h00m" },
+  { value: "02h00m" },
+  { value: "03h00m" },
+  { value: "06h00m" }
+]
+
 const steps = 100
 
-const scaled = (start: number, end: number, value: number): number => {
-  const range = end - start
-  return (value - start) / (range) * steps
-}
 
 const unscaled = (start: number, end: number, value: number): number => {
   const range = end - start
@@ -34,31 +39,27 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
   }
 }
 
-const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChange}) => {
+const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
   const { time, setTime } = useAppContext();
 
-  const [value, setValue] = useState<{ start: number, current: number, end: number }>({ start: 0, current: steps / 2, end: steps });
-  const [playing, setPlaying] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const [value, setValue] = useState<{ start: number, end: number }>({ start: 0, end: steps });
+  const [stepTxt, setStepTxt] = useState<string>(StepOptions[1].value);
 
   useEffect(() => {
-    const tStart = time.start || start
-    const tEnd = time.end || end 
-    const tCurrent = time.current || current || (tStart + tEnd) / 2
-    const val = { start: 0, current: scaled(tStart, tEnd, tCurrent || (tStart + tEnd) / 2), end: steps }
-    console.log('time state updated', tStart, tEnd, tCurrent, val)
+    const val = { start: 0, end: steps }
     setValue(val)
-  }, [start, end, current])
+  }, [start, end])
 
   const setNewValue = (value: number | number[]) => {
     if (!Array.isArray(value)) {
       throw new Error('Expected an array to time control')
     }
-    const newValue = { start: value[0], current: value[1], end: value[2] }
+    const newValue = { start: value[0], end: value[1] }
     const unscaledValues = {
       start: unscaled(start, end, newValue.start),
-      current: unscaled(start, end, newValue.current),
-      end: unscaled(start, end, newValue.end)
+      step: stepTxt,
+      end: unscaled(start, end, newValue.end),
+      filterApplied: time.filterApplied
     }
     setTime(unscaledValues)
     setValue(newValue)
@@ -68,48 +69,22 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChan
     }
   }
 
-  const PlayControl = useMemo(() => {
-    if (playing && value.current < steps) {
-      if (!timerRef.current) {
-        timerRef.current =  setInterval(() => {
-          let curTime = 0
-          setValue(prev => {
-            const newVal = { ...prev }
-            const newTime = newVal.current ? newVal.current + 20 : value.current
-            newVal.current = newTime
-            curTime = newTime
-            return newVal
-          })
-          const newTime = unscaled(start, end, curTime)
-          const unscaledValues = {
-            start: unscaled(start, end, value.start),
-            current: newTime,
-            end: unscaled(start, end, value.end)
-          }
-          setTime(unscaledValues)
-      
-        }, 1000)
-      }
-      return <PauseCircleOutlined onClick={() => setPlaying(false)}/>
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-        timerRef.current = null
-      }
-      return <PlayCircleOutlined onClick={() => setPlaying(true)}/>
-    }
-  }, [playing, value])
+  const setFilterApplied = (applied: boolean) => {
+    const newTime = {...time, filterApplied: applied}
+    setTime(newTime)
+  }
 
   return (
     <>  <Row>
           <Col span={4}>
-            {PlayControl}
+            { time.filterApplied ? <FilterFilled onClick={() => setFilterApplied(false)} /> : <FilterOutlined size={30} onClick={() => setFilterApplied(true)}/> }
           </Col>
           <Col span={20}>
+            <Form disabled={!time.filterApplied}>
             <Slider
               range={{draggableTrack: true}}
-              defaultValue={[value.start, value.current, value.end]}
-              value={[value.start, value.current, value.end]}
+              defaultValue={[value.start, value.end]}
+              value={[value.start, value.end]}
               tooltip={{open: false}}
               max={steps}
               min={0}
@@ -122,24 +97,34 @@ const TimeControl: React.FC<TimeProps> = ({start, end, current, onTimeFilterChan
                   background: '#666',
                 },
               }}/>
+              </Form>
           </Col>
          </Row>
-      <table style={{width: '100%'}}>
+         <Form disabled={!time.filterApplied}>
+         <table style={{width: '100%'}}>
         <thead>
           <tr>
             <th><FilterOutlined />Start</th>
-            <th><ClockCircleOutlined />Current</th>
+            <th><ClockCircleOutlined />Step</th>
             <th><FilterOutlined />End</th>
           </tr>
           </thead>
           <tbody>
             <tr style={{fontFamily: 'monospace'}}>
               <td>{timeStr(time.start)}</td>
-              <td style={{fontWeight: 'bold'}}>{timeStr(time.current)}</td>
+              <td><AutoComplete
+                style={{ width:100 }}
+                value={stepTxt}
+                onChange={(value, _option) => setStepTxt(value)}
+                defaultOpen={false}
+                options={StepOptions}
+                placeholder='00h30m'
+              /></td>
               <td>{timeStr(time.end)}</td>
             </tr>
           </tbody>
       </table>
+         </Form>
     </>
   );
 };

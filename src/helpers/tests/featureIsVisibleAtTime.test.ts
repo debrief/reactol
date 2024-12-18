@@ -1,9 +1,9 @@
-import {expect, test} from '@jest/globals';
+import { expect, test } from '@jest/globals';
 
 import { Feature } from 'geojson';
 import { TRACK_TYPE } from '../../constants';
-import { timeVal } from '../generateCurrentLocations';
 import { featureIsVisibleInPeriod } from '../featureIsVisibleAtTime';
+import { timeVal } from '../../App';
 
 const times = [
   "2024-11-14T16:16:53.662Z",

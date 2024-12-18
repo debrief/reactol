@@ -27,6 +27,17 @@ interface FileHandler {
   handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => void
 }
 
+export interface TimeState {
+  filterApplied: boolean;
+  start: number;
+  step: string;
+  end: number;
+}
+
+export const timeVal = (timeStr: string): number => {
+  return new Date(timeStr).getTime()
+}
+
 const FileHandlers: FileHandler[] = [
   { blobType: 'application/json', handle: loadJson },
   { blobType: 'text/plain', handle: loadOpRep } // Add the loadOpRep handler
@@ -70,7 +81,7 @@ function App() {
       timeInitialised.current = true
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
-      const timePayload = { start: timeBounds[0], current: (timeBounds[0] + timeBounds[1]) / 2, end: timeBounds[1] }
+      const timePayload = { filterApplied: false, start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
       setTime(timePayload)
     }
   }, [features])
