@@ -208,15 +208,15 @@ function App() {
       >
         <div>
           <label>Year:</label>
-          <input type="number" value={year || ''} onChange={(e) => setYear(parseInt(e.target.value))} />
+          <input type="number" value={year || '2024'} onChange={(e) => setYear(parseInt(e.target.value))} />
         </div>
         <div>
           <label>Month:</label>
-          <input type="number" value={month || ''} onChange={(e) => setMonth(parseInt(e.target.value))} />
+          <input type="number" value={month || '11'} onChange={(e) => setMonth(parseInt(e.target.value))} />
         </div>
         <div>
           <label>Name:</label>
-          <input type="text" value={name || ''} onChange={(e) => setName(e.target.value)} />
+          <input type="text" value={name || 'new-name'} onChange={(e) => setName(e.target.value)} />
         </div>
       </Modal>
     </div>
