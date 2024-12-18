@@ -15,6 +15,7 @@ const parseOpRepLine = (line: string): OpRepData | null => {
   const regex = /^(\d{6}Z)\/(\d{4}\.\d{2}[NS])–(\d{5}\.\d{2}[EW])\/(\d{3})\/(\d{2}\.\d)\/(\d{3}|-)\/\//;
   const match = line.match(regex);
   if (!match) {
+    console.log('failed to match', line)
     return null;
   }
   return {
