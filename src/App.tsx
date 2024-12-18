@@ -109,6 +109,11 @@ function App() {
 
     var files = event.dataTransfer.files;
 
+    if (files.length > 1) {
+      setError('Only one file can be loaded at a time');
+      return
+    }
+
     for (var i = 0; i < files.length; i++) {
       const file = files[i]
       const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
@@ -182,7 +187,7 @@ function App() {
             </Splitter.Panel>
             <Splitter.Panel key='right'>
               <Map>
-                <TileLayer maxNativeZoom={8} maxZoom={10}
+                <TileLayer maxNativeZoom={8} maxZoom={16}
                   url="tiles/{z}/{x}/{y}.png"
                 />
                 <Control prepend position='topleft'>
