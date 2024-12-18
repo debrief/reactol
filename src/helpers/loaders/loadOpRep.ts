@@ -12,10 +12,14 @@ interface OpRepData {
 }
 
 const parseOpRepLine = (line: string): OpRepData | null => {
-  const regex = /^(\d{6}Z)\/(\d{4}\.\d{2}[NS])–(\d{5}\.\d{2}[EW])\/(\d{3})\/(\d{2}\.\d)\/(\d{3}|-)\/\//;
-  const match = line.match(regex);
+  const cleanLine = line.trim()
+  if (cleanLine.length === 0) {
+    return null;
+  }
+  const regex = /^(\d{6}Z)\/(\d{4}\.\d{2}[NS])–(\d{5}\.\d{2}[EW])\/(\d{1,3})\/(\d{1,2}\.?\d{0,2}?)\/(\d{1,3}|-)\/\//;
+  const match = cleanLine.match(regex);
   if (!match) {
-    console.log('failed to match', line)
+    console.log('failed to match: [' + cleanLine + ']')
     return null;
   }
   return {
@@ -94,7 +98,6 @@ export const loadOpRep = async (text: string, features: Feature<Geometry, GeoJso
 
   const newFeature = convertToGeoJson(data, year, month, name);
 
-  console.log('new  feature', newFeature);
   const combined = combineFeatures(features, [newFeature]);
   dispatch({ type: 'featureCollection/featuresUpdated', payload: combined });
 };

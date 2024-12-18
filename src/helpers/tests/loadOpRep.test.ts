@@ -17,7 +17,7 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch);
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
 
     const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(1);
@@ -36,7 +36,7 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch);
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -51,7 +51,7 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/150//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch);
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -65,7 +65,7 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch);
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -77,14 +77,31 @@ describe('loadOpRep function', () => {
   it('should verify each line of text matches the expected format', async () => {
     const invalidOpRepData = `
       271300Z/3731.25N–01643.69E/095/15.0/-//
-      INVALID_LINE
+      DELIBERATELY_INVALID_LINE
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(invalidOpRepData, existing, store.dispatch);
+    await loadOpRep(invalidOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
     expect(feature.geometry.coordinates.length).toBe(2);
+  });
+
+  it('should correctly use the year, month and name values', async () => {
+    const validOpRepData = `
+      271300Z/3731.25N–01643.69E/095/15.0/-//
+      271302Z/3731.35N–01643.81E/095/15.0/-//
+    `;
+    const existing: Feature<Geometry, GeoJsonProperties>[] = [];
+    await loadOpRep(validOpRepData, existing, store.dispatch, 2023, 11, 'name-b');
+
+    const state = store.getState() as FeatureCollection;
+    const feature = state.features[0] as Feature<MultiPoint>;
+    expect(feature.geometry.coordinates.length).toBe(2);
+    expect(feature.properties?.name).toBe('name-b');
+    const firstTime = feature.properties?.times[0];
+    expect(firstTime).toBeTruthy();
+    expect(firstTime?.startsWith('2023-11')).toBe(true);
   });
 });

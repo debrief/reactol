@@ -34,10 +34,6 @@ export interface TimeState {
   end: number;
 }
 
-export const timeVal = (timeStr: string): number => {
-  return new Date(timeStr).getTime()
-}
-
 const FileHandlers: FileHandler[] = [
   { blobType: 'application/json', handle: loadJson },
   { blobType: 'text/plain', handle: loadOpRep } // Add the loadOpRep handler
