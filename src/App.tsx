@@ -16,6 +16,7 @@ import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
 import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
+import { loadOpRep } from './helpers/loaders/loadOpRep.ts'; // Import the loadOpRep function
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
@@ -27,7 +28,8 @@ interface FileHandler {
 }
 
 const FileHandlers: FileHandler[] = [
-  { blobType: 'application/json', handle: loadJson }
+  { blobType: 'application/json', handle: loadJson },
+  { blobType: 'text/plain', handle: loadOpRep } // Add the loadOpRep handler
 ]
 
 function App() {
@@ -113,6 +115,25 @@ function App() {
     }
   };
 
+  const [year, setYear] = useState<number | null>(null);
+  const [month, setMonth] = useState<number | null>(null);
+  const [name, setName] = useState<string | null>(null);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+
+  const showDialog = () => {
+    setIsDialogVisible(true);
+  };
+
+  const handleDialogOk = () => {
+    setIsDialogVisible(false);
+    // Proceed with parsing the OpRep data
+  };
+
+  const handleDialogCancel = () => {
+    setIsDialogVisible(false);
+    // End the loading process
+  };
+
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
@@ -157,6 +178,25 @@ function App() {
           </Splitter>
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
+      <Modal
+        title="Enter Missing Fields"
+        visible={isDialogVisible}
+        onOk={handleDialogOk}
+        onCancel={handleDialogCancel}
+      >
+        <div>
+          <label>Year:</label>
+          <input type="number" value={year || ''} onChange={(e) => setYear(parseInt(e.target.value))} />
+        </div>
+        <div>
+          <label>Month:</label>
+          <input type="number" value={month || ''} onChange={(e) => setMonth(parseInt(e.target.value))} />
+        </div>
+        <div>
+          <label>Name:</label>
+          <input type="text" value={name || ''} onChange={(e) => setName(e.target.value)} />
+        </div>
+      </Modal>
     </div>
   )
 }
