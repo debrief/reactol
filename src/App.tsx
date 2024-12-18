@@ -131,9 +131,9 @@ function App() {
     }
   };
 
-  const [year, setYear] = useState<number | null>(null);
-  const [month, setMonth] = useState<number | null>(null);
-  const [name, setName] = useState<string | null>(null);
+  const [year, setYear] = useState<number | null>(new Date().getFullYear());
+  const [month, setMonth] = useState<number | null>(new Date().getMonth() + 1);
+  const [name, setName] = useState<string | null>('pending');
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null);
@@ -208,15 +208,15 @@ function App() {
       >
         <div>
           <label>Year:</label>
-          <input type="number" value={year || '2024'} onChange={(e) => setYear(parseInt(e.target.value))} />
+          <input type="number" value={year || ''} onChange={(e) => setYear(parseInt(e.target.value))} />
         </div>
         <div>
           <label>Month:</label>
-          <input type="number" value={month || '11'} onChange={(e) => setMonth(parseInt(e.target.value))} />
+          <input type="number" value={month || ''} onChange={(e) => setMonth(parseInt(e.target.value))} />
         </div>
         <div>
           <label>Name:</label>
-          <input type="text" value={name || 'new-name'} onChange={(e) => setName(e.target.value)} />
+          <input type="text" value={name || ''} onChange={(e) => setName(e.target.value)} />
         </div>
       </Modal>
     </div>
