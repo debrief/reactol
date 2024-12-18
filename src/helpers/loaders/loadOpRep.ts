@@ -1,6 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../../app/store';
-import combineFeatures from '../combineFeatures';
 import { TRACK_TYPE } from '../../constants';
 
 interface OpRepData {
@@ -80,7 +79,7 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
   };
 };
 
-export const loadOpRep = async (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => {
+export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => {
 
   if (!year || !month || !name) {
     return;
@@ -97,8 +96,6 @@ export const loadOpRep = async (text: string, features: Feature<Geometry, GeoJso
   }
 
   const newFeature = convertToGeoJson(data, year, month, name);
-
-  const combined = combineFeatures(features, [newFeature]);
-  dispatch({ type: 'featureCollection/featuresUpdated', payload: combined });
+  dispatch({ type: 'featureCollection/featureAdded', payload: newFeature });
 };
 
