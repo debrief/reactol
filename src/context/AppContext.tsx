@@ -16,8 +16,7 @@ interface Props {
 
 const AppProvider: React.FC<Props> = ({ children }) => {
   const [selection, setSelection] = useState<string[]>([]);
-  const [time, setTime] = useState<TimeState>({ start: 0,  step: '00h30m', end: 0 });
-
+  const [time, setTime] = useState<TimeState>({ filterApplied: false, start: 0,  step: '00h30m', end: 0 });
   return (
     <AppContext.Provider value={{ selection, setSelection, time, setTime }}>
       {children}

@@ -29,13 +29,13 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined, isSelected: b
 const Track: React.FC<TrackProps> = ({feature, onClickHandler, showTrackLine = true}) => {
   const { selection, time } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
-  const limits: [number, number] = [time.start, time.end]
+
 
   const trackCoords = useMemo(() => {
-    if (limits && feature.properties?.times) {
+    if (time && feature.properties?.times) {
       const coords = (feature.geometry as MultiPoint).coordinates
       const times = feature.properties.times
-      const validCoords = filterTrack(limits[0], limits[1], times, coords)
+      const validCoords = filterTrack(time.filterApplied, time.start, time.end, times, coords)
       return validCoords
     } else {
       const coords = (feature.geometry as MultiPoint).coordinates
@@ -46,7 +46,7 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler, showTrackLine = t
         return coords.map((coord: number[]) => {return {pos:[coord[1], coord[0]],time: ''}})
       }
     }
-  }, [feature, limits])
+  }, [feature, time])
 
   const onclick = (evt: LeafletMouseEvent) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)

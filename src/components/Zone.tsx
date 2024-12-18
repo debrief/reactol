@@ -13,11 +13,11 @@ export interface ZoneProps {
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
-  const { start: timeStart, end: timeEnd } = time
+  const { start: timeStart, end: timeEnd, filterApplied } = time
   const isSelected = selection.includes(feature.id as string)
 
   const isVisible = useMemo(() => {
-    return featureIsVisibleInPeriod(feature, timeStart, timeEnd)
+    return filterApplied ? featureIsVisibleInPeriod(feature, timeStart, timeEnd) : true
   }, [feature, timeStart, timeEnd])
 
   const onclick = (evt: LeafletMouseEvent) => {

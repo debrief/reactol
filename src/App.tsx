@@ -27,6 +27,7 @@ interface FileHandler {
 }
 
 export interface TimeState {
+  filterApplied: boolean;
   start: number;
   step: string;
   end: number;
@@ -78,7 +79,7 @@ function App() {
       timeInitialised.current = true
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
-      const timePayload = { start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
+      const timePayload = { filterApplied: false, start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
       setTime(timePayload)
     }
   }, [features])

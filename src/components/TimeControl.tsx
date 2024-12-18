@@ -1,5 +1,5 @@
-import { AutoComplete, Col, Row, Slider } from "antd";
-import { ClockCircleOutlined, FilterOutlined } from '@ant-design/icons';
+import { AutoComplete, Col, Form, Row, Slider } from "antd";
+import { ClockCircleOutlined, FilterOutlined, FilterFilled } from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppContext } from "../context/AppContext";
@@ -58,7 +58,8 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
     const unscaledValues = {
       start: unscaled(start, end, newValue.start),
       step: stepTxt,
-      end: unscaled(start, end, newValue.end)
+      end: unscaled(start, end, newValue.end),
+      filterApplied: time.filterApplied
     }
     setTime(unscaledValues)
     setValue(newValue)
@@ -68,9 +69,18 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
     }
   }
 
+  const setFilterApplied = (applied: boolean) => {
+    const newTime = {...time, filterApplied: applied}
+    setTime(newTime)
+  }
+
   return (
     <>  <Row>
+          <Col span={4}>
+            { time.filterApplied ? <FilterFilled onClick={() => setFilterApplied(false)} /> : <FilterOutlined size={30} onClick={() => setFilterApplied(true)}/> }
+          </Col>
           <Col span={20}>
+            <Form disabled={!time.filterApplied}>
             <Slider
               range={{draggableTrack: true}}
               defaultValue={[value.start, value.end]}
@@ -87,9 +97,11 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
                   background: '#666',
                 },
               }}/>
+              </Form>
           </Col>
          </Row>
-      <table style={{width: '100%'}}>
+         <Form disabled={!time.filterApplied}>
+         <table style={{width: '100%'}}>
         <thead>
           <tr>
             <th><FilterOutlined />Start</th>
@@ -112,6 +124,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
             </tr>
           </tbody>
       </table>
+         </Form>
     </>
   );
 };
