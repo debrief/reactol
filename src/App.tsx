@@ -24,7 +24,7 @@ import { AppDispatch } from './app/store.ts';
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => void
 }
 
 const FileHandlers: FileHandler[] = [
@@ -107,7 +107,11 @@ function App() {
       const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
       if (handler) {
         try {
-          handler.handle(await file.text(), features, dispatch);
+          if (file.type === 'text/plain') {
+            showDialog(file, handler);
+          } else {
+            handler.handle(await file.text(), features, dispatch);
+          }
         } catch (e) {
           setError('' + e); // Set error message
         }
@@ -119,14 +123,20 @@ function App() {
   const [month, setMonth] = useState<number | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null);
 
-  const showDialog = () => {
+  const showDialog = (file: File, handler: FileHandler) => {
+    setCurrentFile(file);
+    setCurrentHandler(handler);
     setIsDialogVisible(true);
   };
 
-  const handleDialogOk = () => {
+  const handleDialogOk = async () => {
     setIsDialogVisible(false);
-    // Proceed with parsing the OpRep data
+    if (currentFile && currentHandler && year && month && name) {
+      currentHandler.handle(await currentFile.text(), features, dispatch, year, month, name);
+    }
   };
 
   const handleDialogCancel = () => {
