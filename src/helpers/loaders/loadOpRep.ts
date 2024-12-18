@@ -1,13 +1,14 @@
-import { Feature, GeoJsonProperties, Geometry, MultiPoint } from 'geojson';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../../app/store';
 import combineFeatures from '../combineFeatures';
+import { TRACK_TYPE } from '../../constants';
 
 interface OpRepData {
   dtg: string;
   position: string;
   course: string;
   speed: string;
-  depth: string;
+  depth?: string;
 }
 
 const parseOpRepLine = (line: string): OpRepData | null => {
@@ -21,16 +22,30 @@ const parseOpRepLine = (line: string): OpRepData | null => {
     position: `${match[2]} ${match[3]}`,
     course: match[4],
     speed: match[5],
-    depth: match[6] === '-' ? '0' : match[6],
+    depth: match[6] === '-' ? undefined : match[6],
   };
 };
 
 const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: string): Feature<Geometry, GeoJsonProperties> => {
+  const latStringToValue = (coord: string) => {
+    const degrees = parseFloat(coord.slice(0, 2));
+    const minutes = parseFloat(coord.slice(2));
+    return degrees + minutes / 60;
+  }
+  const longStringToValue = (coord: string) => {
+    const degrees = parseFloat(coord.slice(0, 3));
+    const minutes = parseFloat(coord.slice(3));
+    return degrees + minutes / 60;
+  }
   const coordinates = data.map((item) => {
-    const lat = parseFloat(item.position.split(' ')[0]);
-    const lon = parseFloat(item.position.split(' ')[1]);
-    const depth = -parseFloat(item.depth);
-    return [lon, lat, depth];
+    const lat = latStringToValue(item.position.split(' ')[0]);
+    const lon = longStringToValue(item.position.split(' ')[1]);
+    if (item.depth !== undefined) {
+      const depth = -parseFloat(item.depth);
+      return [lon, lat, depth];
+    } else {
+      return [lon, lat];
+    }
   });
 
   const times = data.map((item) => {
@@ -50,6 +65,8 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
       coordinates,
     },
     properties: {
+      dataType: TRACK_TYPE,
+      color: coordinates[0].length === 3 ? '#F00' : '#00F',
       name,
       times,
       courses,
@@ -58,10 +75,7 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
   };
 };
 
-export const loadOpRep = async (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => {
-  const year = await promptUserForYear();
-  const month = await promptUserForMonth();
-  const name = await promptUserForName();
+export const loadOpRep = async (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => {
 
   if (!year || !month || !name) {
     return;
@@ -78,21 +92,9 @@ export const loadOpRep = async (text: string, features: Feature<Geometry, GeoJso
   }
 
   const newFeature = convertToGeoJson(data, year, month, name);
+
+  console.log('new  feature', newFeature);
   const combined = combineFeatures(features, [newFeature]);
   dispatch({ type: 'featureCollection/featuresUpdated', payload: combined });
 };
 
-const promptUserForYear = async (): Promise<number | null> => {
-  // Implement the logic to prompt the user for the year
-  return 2023; // Placeholder value
-};
-
-const promptUserForMonth = async (): Promise<number | null> => {
-  // Implement the logic to prompt the user for the month
-  return 1; // Placeholder value
-};
-
-const promptUserForName = async (): Promise<string | null> => {
-  // Implement the logic to prompt the user for the name
-  return 'New Track'; // Placeholder value
-};
