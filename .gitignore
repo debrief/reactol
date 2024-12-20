@@ -89,6 +89,7 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+dist-electron
 
 # Gatsby files
 .cache/
@@ -130,3 +131,9 @@ dist
 
 *storybook.log
 build/
+
+# Vite
+.vite/
+
+# Electron-Forge
+out/
