@@ -2,7 +2,7 @@
   "name": "react-geo-trial",
   "private": true,
   "version": "0.0.0",
-  "productName": "react-geo-trial-app",
+  "productName": "react-geo-trial",
   "license": "MIT",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
