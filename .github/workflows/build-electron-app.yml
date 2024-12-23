@@ -41,7 +41,7 @@ jobs:
 
       # Build the Electron app (Make sure the app is packaged first)
       - name: Package Electron App
-        run: yarn package
+        run: yarn package-electron
 
       # Build the Electron app
       - name: Build app
