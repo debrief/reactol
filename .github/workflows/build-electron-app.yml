@@ -51,7 +51,7 @@ jobs:
 
       # Upload artefacts for PRs or tagged releases
       - name: Upload artefacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success()
         with:
           name: ${{ matrix.os }}-nightly

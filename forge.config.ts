@@ -18,6 +18,7 @@ const config: ForgeConfig = {
   makers: [ new MakerSquirrel({
     name: productName, 
     authors: 'Liti Karapetyan', 
+    // setupExe: `${productName}Installer.exe`
     // description: 'An example Electron app',
     // exe: , 
     // setupExe: , // Installer-ի 
