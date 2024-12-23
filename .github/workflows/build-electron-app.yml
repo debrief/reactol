@@ -1,38 +1,31 @@
 name: react-geo-trial
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types:
+      - published
   pull_request:
     branches:
       - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    name: Build App
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        include:
-          - os: windows-latest
-            target: squirrel
-          - os: macos-latest
-            target: dmg
-          - os: ubuntu-latest
-            target: deb
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
       # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Node.js
-      - name: Set up Node.js
+      # 2. Setup Node.js
+      - name: Setup NodeJs
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18.x'
           cache: 'yarn'
 
       # Install dependencies
@@ -49,10 +42,20 @@ jobs:
         env:
           ELECTRON_MAKER_TARGETS: ${{ matrix.target }}
 
-      # Upload artefacts for PRs or tagged releases
-      - name: Upload artefacts
+      # 5. Upload builds to GitHub Release
+      - name: Upload builds to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: out/**
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 6. Upload Nightly Build
+      - name: Upload Nightly Build
         uses: actions/upload-artifact@v3
         if: success()
         with:
-          name: ${{ matrix.os }}-nightly
+          name: App-nightly-${{ matrix.os }}
           path: out/**
