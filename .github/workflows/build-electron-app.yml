@@ -41,7 +41,7 @@ jobs:
 
       # Build the Electron app
       - name: Build app
-        run: yarn make
+        run: yarn make-electron
         env:
           ELECTRON_MAKER_TARGETS: ${{ matrix.target }}
 
