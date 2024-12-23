@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { timeVal } from './generateCurrentLocations';
+import { timeVal } from './timeVal';
 
 export const featureIsVisibleInPeriod = (feature: Feature, startTime: number, endTime: number): boolean => {
   if (feature.properties) {

@@ -16,6 +16,7 @@ import GraphModal from './components/GraphModal.tsx';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
 import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
+import { loadOpRep } from './helpers/loaders/loadOpRep.ts'; // Import the loadOpRep function
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
@@ -23,11 +24,19 @@ import { AppDispatch } from './app/store.ts';
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => void
+}
+
+export interface TimeState {
+  filterApplied: boolean;
+  start: number;
+  step: string;
+  end: number;
 }
 
 const FileHandlers: FileHandler[] = [
-  { blobType: 'application/json', handle: loadJson }
+  { blobType: 'application/json', handle: loadJson },
+  { blobType: 'text/plain', handle: loadOpRep } // Add the loadOpRep handler
 ]
 
 function App() {
@@ -68,7 +77,7 @@ function App() {
       timeInitialised.current = true
       const timeBounds = timeBoundsFor(features)
       setTimeBounds(timeBounds)
-      const timePayload = { start: timeBounds[0], current: (timeBounds[0] + timeBounds[1]) / 2, end: timeBounds[1] }
+      const timePayload = { filterApplied: false, start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
       setTime(timePayload)
     }
   }, [features])
@@ -100,17 +109,51 @@ function App() {
 
     var files = event.dataTransfer.files;
 
+    if (files.length > 1) {
+      setError('Only one file can be loaded at a time');
+      return
+    }
+
     for (var i = 0; i < files.length; i++) {
       const file = files[i]
       const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
       if (handler) {
         try {
-          handler.handle(await file.text(), features, dispatch);
+          if (file.type === 'text/plain') {
+            showDialog(file, handler);
+          } else {
+            handler.handle(await file.text(), features, dispatch);
+          }
         } catch (e) {
           setError('' + e); // Set error message
         }
       }
     }
+  };
+
+  const [year, setYear] = useState<number | null>(new Date().getFullYear());
+  const [month, setMonth] = useState<number | null>(new Date().getMonth() + 1);
+  const [name, setName] = useState<string | null>('pending');
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null);
+
+  const showDialog = (file: File, handler: FileHandler) => {
+    setCurrentFile(file);
+    setCurrentHandler(handler);
+    setIsDialogVisible(true);
+  };
+
+  const handleDialogOk = async () => {
+    setIsDialogVisible(false);
+    if (currentFile && currentHandler && year && month && name) {
+      currentHandler.handle(await currentFile.text(), features, dispatch, year, month, name);
+    }
+  };
+
+  const handleDialogCancel = () => {
+    setIsDialogVisible(false);
+    // End the loading process
   };
 
   return (
@@ -144,7 +187,7 @@ function App() {
             </Splitter.Panel>
             <Splitter.Panel key='right'>
               <Map>
-                <TileLayer maxNativeZoom={8} maxZoom={10}
+                <TileLayer maxNativeZoom={8} maxZoom={16}
                   url="tiles/{z}/{x}/{y}.png"
                 />
                 <Control prepend position='topleft'>
@@ -157,6 +200,25 @@ function App() {
           </Splitter>
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
+      <Modal
+        title="Enter Missing Fields"
+        visible={isDialogVisible}
+        onOk={handleDialogOk}
+        onCancel={handleDialogCancel}
+      >
+        <div>
+          <label>Year:</label>
+          <input type="number" value={year || ''} onChange={(e) => setYear(parseInt(e.target.value))} />
+        </div>
+        <div>
+          <label>Month:</label>
+          <input type="number" value={month || ''} onChange={(e) => setMonth(parseInt(e.target.value))} />
+        </div>
+        <div>
+          <label>Name:</label>
+          <input type="text" value={name || ''} onChange={(e) => setName(e.target.value)} />
+        </div>
+      </Modal>
     </div>
   )
 }
