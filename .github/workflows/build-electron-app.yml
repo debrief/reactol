@@ -55,4 +55,4 @@ jobs:
         if: success()
         with:
           name: ${{ matrix.os }}-nightly
-          path: out/**/*!(.zip) 
+          path: out/**
