@@ -1,4 +1,4 @@
-name: Build Electron App
+name: react-geo-trial-app
 
 on:
   push:
@@ -38,6 +38,10 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: yarn install
+
+      # Build the Electron app (Make sure the app is packaged first)
+      - name: Package Electron App
+        run: yarn package
 
       # Build the Electron app
       - name: Build app
