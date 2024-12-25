@@ -1,36 +1,27 @@
 import { app, BrowserWindow } from 'electron';
-import  path from 'path';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
-let mainWindow: BrowserWindow | null;
+import { createWindow } from './appWindow';
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
-const createWindow = () => {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Preload script
-    },
-  });
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-
-    // Load the Vite development server
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    // Load the production index.html
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
-  }
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-}
+app.whenReady().then(() => {
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then((name) => console.info(`Added Extension:  ${name}`))
+    .catch((err) => console.info('An error occurred: ', err));
+});
 
 app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on('activate', () => {
+
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
 
-app.on('activate', () => {
-  if (mainWindow === null) createWindow();
+/**
+ * Emitted when all windows have been closed.
+*/
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
 });
