@@ -89,7 +89,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   return (
     <>  <Row>
           <Col span={16} style={{textAlign: 'left'}}>
-            <Checkbox onChange={() => console.log('Lock viewport')}>Lock viewport</Checkbox>
+            <Checkbox disabled={true} onChange={() => console.log('Lock viewport')}>Lock viewport</Checkbox>
             <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}>Apply time filter</Checkbox>
           </Col>
           <Col span={4}>
