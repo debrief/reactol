@@ -5,6 +5,7 @@ describe('TimeSupport', () => {
     it('should parse valid periods correctly', () => {
       expect(TimeSupport.parsePeriod('00h15m')).toBe(15 * 60 * 1000);
       expect(TimeSupport.parsePeriod('01h00m')).toBe(60 * 60 * 1000);
+      expect(TimeSupport.parsePeriod('01h30m')).toBe(90 * 60 * 1000);
     });
 
     it('should throw an error for invalid periods', () => {
