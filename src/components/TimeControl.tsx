@@ -92,7 +92,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
           </Col>
          </Row>
          <Form disabled={!time.filterApplied}>
-         <table style={{width: '100%'}}>
+         <table style={{width: '100%', backgroundColor: time.filterApplied ? 'white' : '#f0f0f0'}}>
          <thead>
           <tr>
             <th>Start</th>
