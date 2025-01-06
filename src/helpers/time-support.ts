@@ -16,6 +16,9 @@ export class TimeSupport {
     }
     const hours = parseInt(match[1], 10);
     const minutes = parseInt(match[2], 10);
+    if (minutes >= 60) {
+      throw new Error("Invalid time format");
+    }
     return (hours * 60 + minutes) * 60 * 1000;
   }
 
