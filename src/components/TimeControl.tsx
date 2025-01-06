@@ -1,14 +1,13 @@
-import { AutoComplete, Col, Form, Row, Slider } from "antd";
-import { ClockCircleOutlined, FilterOutlined, FilterFilled } from '@ant-design/icons';
+import { AutoComplete, Button, Col, Form, Row } from "antd";
+import { FilterOutlined, FilterFilled, CopyOutlined, StepBackwardOutlined, FastBackwardOutlined, StepForwardOutlined, FastForwardOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppContext } from "../context/AppContext";
+import { TimeSupport } from "../helpers/time-support";
 
 export interface TimeProps {
-  start: number
-  end: number
-  current?: number
-  onTimeFilterChange?: (timePeriod: string) => void
+  start: number // earliest time in data
+  end: number // latest time in data
 }
 
 export const StepOptions = [
@@ -19,14 +18,6 @@ export const StepOptions = [
   { value: "03h00m" },
   { value: "06h00m" }
 ]
-
-const steps = 100
-
-
-const unscaled = (start: number, end: number, value: number): number => {
-  const range = end - start
-  return (value / steps) * range + start
-}
 
 const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
   
@@ -39,74 +30,74 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
   }
 }
 
-const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
+const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   const { time, setTime } = useAppContext();
 
-  const [value, setValue] = useState<{ start: number, end: number }>({ start: 0, end: steps });
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[1].value);
+  const [interval, setInterval] = useState<number>(0);
 
   useEffect(() => {
-    const val = { start: 0, end: steps }
-    setValue(val)
-  }, [start, end])
+    try {
+      const period = TimeSupport.parsePeriod(stepTxt)
+      setInterval(period)
+    } catch (err) {
+      console.log('Invalid time format:' + err)
+    }
+  }, [stepTxt, setInterval])
 
-  const setNewValue = (value: number | number[]) => {
-    if (!Array.isArray(value)) {
-      throw new Error('Expected an array to time control')
-    }
-    const newValue = { start: value[0], end: value[1] }
-    const unscaledValues = {
-      start: unscaled(start, end, newValue.start),
-      step: stepTxt,
-      end: unscaled(start, end, newValue.end),
-      filterApplied: time.filterApplied
-    }
-    setTime(unscaledValues)
-    setValue(newValue)
-    if (onTimeFilterChange) {
-      const formattedTimePeriod = `${pf(unscaledValues.start)} - ${pf(unscaledValues.end)}`;
-      onTimeFilterChange(formattedTimePeriod);
-    }
-  }
+  useEffect(() => {
+    const newStart = TimeSupport.roundDown(new Date(start), interval)
+    const newEnd = TimeSupport.increment(newStart, interval)
+    const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
+    setTime(newTime)
+}, [interval, start, end])
 
   const setFilterApplied = (applied: boolean) => {
     const newTime = {...time, filterApplied: applied}
     setTime(newTime)
   }
 
+  const copyMapToClipboard = (): void => {
+    window.alert('Map copied to clipboard')
+  }
+
+  const doStep = (fwd: boolean, large: boolean) => {
+    if (large) {
+      const newStart = fwd ? TimeSupport.roundDown(new Date(end), interval) : TimeSupport.roundDown(new Date(start), interval)
+      const newEnd = TimeSupport.increment(newStart, interval)
+      const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
+      setTime(newTime)
+    } else {
+      const timeNow = new Date(time.start)
+      const newStart = fwd ? TimeSupport.increment(timeNow, interval) : TimeSupport.decrement(timeNow, interval)
+      const newEnd = TimeSupport.increment(newStart, interval)
+      if (newEnd.getTime() >= start && newStart.getTime() <= end) {
+        const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
+        setTime(newTime)
+      }
+    }
+  }
+
+  const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
+
   return (
     <>  <Row>
           <Col span={4}>
-            { time.filterApplied ? <FilterFilled onClick={() => setFilterApplied(false)} /> : <FilterOutlined size={30} onClick={() => setFilterApplied(true)}/> }
+            <Button icon={time.filterApplied ? <FilterFilled/> : <FilterOutlined/>} onClick={() => setFilterApplied(!time.filterApplied)}></Button>
           </Col>
-          <Col span={20}>
-            <Form disabled={!time.filterApplied}>
-            <Slider
-              range={{draggableTrack: true}}
-              defaultValue={[value.start, value.end]}
-              value={[value.start, value.end]}
-              tooltip={{open: false}}
-              max={steps}
-              min={0}
-              onChange={setNewValue}
-              styles={{
-                track: {
-                  background: 'transparent',
-                },
-                tracks: {
-                  background: '#666',
-                },
-              }}/>
-              </Form>
+          <Col span={16}>
+          </Col>
+          <Col span={4}>
+            <Button onClick={copyMapToClipboard} icon={<CopyOutlined/>} />
           </Col>
          </Row>
          <Form disabled={!time.filterApplied}>
-         <table style={{width: '100%'}}>
-        <thead>
+         <table style={{width: '100%', backgroundColor: time.filterApplied ? 'white' : '#f0f0f0'}}>
+         <thead>
           <tr>
-            <th><FilterOutlined />Start</th>
-            <th><ClockCircleOutlined />Step</th>
-            <th><FilterOutlined />End</th>
+            <th>Start</th>
+            <th>Step</th>
+            <th>End</th>
           </tr>
           </thead>
           <tbody>
@@ -122,9 +113,19 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
               /></td>
               <td>{timeStr(time.end)}</td>
             </tr>
+            <tr style={{fontFamily: 'monospace'}}>
+              <td>
+                <Button title="Jump to start" icon={<FastBackwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(false, true)}/>
+                <Button title="Step backard" icon={<StepBackwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(false, false)}/> </td>
+              <td></td>
+              <td>
+                <Button title="Step forward" icon={<StepForwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(true, false)}/>
+                <Button title="Jump to end" icon={<FastForwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(true, true)}/>
+              </td>
+            </tr>
           </tbody>
       </table>
-         </Form>
+      </Form>
     </>
   );
 };
