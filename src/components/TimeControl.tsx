@@ -5,6 +5,8 @@ import {
   FastBackwardOutlined,
   StepForwardOutlined,
   FastForwardOutlined,
+  FilterOutlined,
+  ExpandOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
@@ -89,8 +91,8 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   return (
     <>  <Row>
           <Col span={16} style={{textAlign: 'left'}}>
-            <Checkbox disabled={true} onChange={() => console.log('Lock viewport')}>Lock viewport</Checkbox>
-            <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}>Apply time filter</Checkbox>
+            <Checkbox disabled={true} onChange={() => console.log('Lock viewport')}><ExpandOutlined/>Lock viewport</Checkbox>
+            <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/>Apply time filter</Checkbox>
           </Col>
           <Col span={4}>
           </Col>
