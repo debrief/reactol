@@ -70,7 +70,7 @@ describe('load function', () => {
     });
 
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    expect(() => {loadJson(invalidGeoJsonText, existing, store.dispatch)}).toThrowError('Error parsing GeoJSON: Error: Invalid GeoJSON format:InvalidType');
+    expect(() => loadJson(invalidGeoJsonText, existing, store.dispatch)).toThrow('Invalid GeoJSON format:InvalidType');
 
     const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(0);
