@@ -1,5 +1,5 @@
-import { AutoComplete, Col, Form, Row, Slider } from "antd";
-import { ClockCircleOutlined, FilterOutlined, FilterFilled } from '@ant-design/icons';
+import { AutoComplete, Button, Col, Form, Row } from "antd";
+import { FilterOutlined, FilterFilled, CopyOutlined, StepBackwardOutlined, FastBackwardOutlined, StepForwardOutlined, FastForwardOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppContext } from "../context/AppContext";
@@ -74,39 +74,34 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
     setTime(newTime)
   }
 
+  const copyMapToClipboard = (): void => {
+    window.alert('Map copied to clipboard')
+  }
+
+  const doStep = (fwd: boolean, large: boolean) => {
+    console.log('doStep', fwd, large)
+  }
+
+  const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
+
   return (
     <>  <Row>
           <Col span={4}>
-            { time.filterApplied ? <FilterFilled onClick={() => setFilterApplied(false)} /> : <FilterOutlined size={30} onClick={() => setFilterApplied(true)}/> }
+            <Button icon={time.filterApplied ? <FilterFilled/> : <FilterOutlined/>} onClick={() => setFilterApplied(!time.filterApplied)}></Button>
           </Col>
-          <Col span={20}>
-            <Form disabled={!time.filterApplied}>
-            <Slider
-              range={{draggableTrack: true}}
-              defaultValue={[value.start, value.end]}
-              value={[value.start, value.end]}
-              tooltip={{open: false}}
-              max={steps}
-              min={0}
-              onChange={setNewValue}
-              styles={{
-                track: {
-                  background: 'transparent',
-                },
-                tracks: {
-                  background: '#666',
-                },
-              }}/>
-              </Form>
+          <Col span={16}>
+          </Col>
+          <Col span={4}>
+            <Button onClick={copyMapToClipboard} icon={<CopyOutlined/>} />
           </Col>
          </Row>
          <Form disabled={!time.filterApplied}>
          <table style={{width: '100%'}}>
-        <thead>
+         <thead>
           <tr>
-            <th><FilterOutlined />Start</th>
-            <th><ClockCircleOutlined />Step</th>
-            <th><FilterOutlined />End</th>
+            <th>Start</th>
+            <th>Step</th>
+            <th>End</th>
           </tr>
           </thead>
           <tbody>
@@ -122,9 +117,19 @@ const TimeControl: React.FC<TimeProps> = ({start, end, onTimeFilterChange}) => {
               /></td>
               <td>{timeStr(time.end)}</td>
             </tr>
+            <tr style={{fontFamily: 'monospace'}}>
+              <td>
+                <Button title="Jump to start" icon={<FastBackwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(false, true)}/>
+                <Button title="Step backard" icon={<StepBackwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(false, false)}/> </td>
+              <td></td>
+              <td>
+                <Button title="Step forward" icon={<StepForwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(true, false)}/>
+                <Button title="Jump to end" icon={<FastForwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(true, true)}/>
+              </td>
+            </tr>
           </tbody>
       </table>
-         </Form>
+      </Form>
     </>
   );
 };
