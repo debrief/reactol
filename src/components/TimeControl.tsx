@@ -6,7 +6,9 @@ import {
   StepForwardOutlined,
   FastForwardOutlined,
   FilterOutlined,
-  ExpandOutlined,
+  LockFilled,
+  UnlockOutlined,
+  FilterFilled,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
@@ -98,10 +100,10 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
     <>  <Row>
           <Col span={20} style={{textAlign: 'left'}}>
             <Tooltip title='Lock viewport to prevent accidental map movement'>
-              <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}><ExpandOutlined/></Button>
+              <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}>{viewportFrozen ? <LockFilled/> : <UnlockOutlined/>}</Button>
             </Tooltip>
             <Tooltip title='Enable time controls, to filter tracks by time'>
-              <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/></Button>
+              <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
             </Tooltip>
           </Col>
           <Col span={4}>
