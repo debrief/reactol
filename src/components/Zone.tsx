@@ -41,7 +41,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
     const centre = turf.center(points).geometry.coordinates.reverse() as LatLngExpression
     const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
-    return <ReactPolygon key={feature.id + '-line-' + isSelected } fill={true} positions={trackCoords} weight={ 2} 
+    return <ReactPolygon key={feature.id + '-line-' + isSelected } fill={true} positions={trackCoords} weight={isSelected ? 4 : 2} 
       color={colorFor(feature)} eventHandlers={{click: onclick}} fillOpacity={0.1} >
       <Tooltip position={centre} direction="center" opacity={1} permanent>
         {feature.properties?.name}
