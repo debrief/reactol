@@ -23,9 +23,8 @@ export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   }, [feature])
 
   const color = useMemo(() => {
-    const col = feature.properties?.color || 'blue';
-    return isSelected ? '#aaa' : col;
-  }, [feature, isSelected])
+    return feature.properties?.color || 'blue';
+  }, [feature])
 
   const isVisible = useMemo(() => {
     return filterApplied ? featureIsVisibleInPeriod(feature, timeStart, timeEnd) : true
@@ -39,7 +38,7 @@ export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
 
   return (
     <>
-    { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={isSelected ? 10 : 5} 
+    { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={isSelected ? 8 : 4} 
         fillColor={color} color={color} center={location} eventHandlers={{click: onclick}}>
         <Tooltip key={feature.id + '-tip-'} offset={[0, -20]} direction="center" opacity={1} permanent>
           {name}

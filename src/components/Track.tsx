@@ -11,10 +11,7 @@ export interface TrackProps {
   onClickHandler: {(id: string, modifier: boolean): void}
 }
 
-const colorFor = (feature: Feature<Geometry, unknown> | undefined, isSelected: boolean): string => {
-  if (isSelected) {
-    return '#aaa'
-  }
+const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
   if (feature) {
     const feat = feature as Feature
     if (feat.properties) {
@@ -27,7 +24,6 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined, isSelected: b
 const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
-
 
   const trackCoords: CoordInstance[] = useMemo(() => {
     if (time && feature.properties?.times) {
@@ -54,13 +50,13 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
 
   return (
     <>
-      { <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={isSelected ? 4 : 2} color={colorFor(feature, isSelected)}/>}
-      { trackCoords.length && <CircleMarker key={feature.id + '-start-line-' + isSelected} center={trackCoords[0].pos}  color={colorFor(feature, isSelected)} radius={isSelected ? 10 : 5}>
+      { <Polyline key={feature.id + '-line-' + isSelected} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={isSelected ? 4 : 2} color={colorFor(feature)}/>}
+      { trackCoords.length && <CircleMarker key={feature.id + '-start-line-' + isSelected} center={trackCoords[0].pos}  color={colorFor(feature)} radius={isSelected ? 10 : 5}>
         <Tooltip key={feature.id + '-start-name-' + isSelected} 
           direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
       </CircleMarker> }
       { trackCoords.filter((item) => item.timeVisible).map((item: CoordInstance, index: number) => 
-        <CircleMarker key={feature.id + '-point-' + index} center={item.pos} radius={isSelected ? 10 : 5} color={colorFor(feature, isSelected)} eventHandlers={{click: onclick}}>
+        <CircleMarker fill={isSelected} weight={isSelected ? 4 : 2}  key={feature.id + '-point-' + index} center={item.pos} radius={isSelected ? 6 : 4} color={colorFor(feature)} eventHandlers={{click: onclick}}>
           {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {item.time}
           </Tooltip>}

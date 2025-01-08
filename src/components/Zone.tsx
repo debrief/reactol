@@ -25,9 +25,6 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   }
 
   const colorFor = useCallback((feature: Feature<Geometry, unknown> | undefined): string => {
-    if (isSelected) {
-      return '#aaa'
-    }
     if (feature) {
       const feat = feature as Feature
       if (feat.properties) {
@@ -35,7 +32,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
       }
     }
     return '#000';
-  }, [isSelected])
+  }, [feature])
 
   const polygon = useMemo(() => {
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
