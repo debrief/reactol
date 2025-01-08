@@ -39,7 +39,7 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
 }
 
 const TimeControl: React.FC<TimeProps> = ({start, end}) => {
-  const { time, setTime } = useAppContext();
+  const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext();
 
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[1].value);
   const [interval, setInterval] = useState<number>(0);
@@ -86,18 +86,22 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
     }
   }
 
+  const toggleFreezeViewport = () => {
+    setViewportFrozen(!viewportFrozen)
+  }
+
   const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
 
   return (
     <>  <Row>
           <Col span={16} style={{textAlign: 'left'}}>
-            <Checkbox disabled={true} onChange={() => console.log('Lock viewport')}><ExpandOutlined/>Lock viewport</Checkbox>
-            <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/>Apply time filter</Checkbox>
+            <Checkbox checked={viewportFrozen} onChange={toggleFreezeViewport}><ExpandOutlined/>&nbsp;Lock viewport</Checkbox>
+            <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/>&nbsp;Apply time filter</Checkbox>
           </Col>
           <Col span={4}>
           </Col>
           <Col span={4}>
-            <Button onClick={copyMapToClipboard} icon={<CopyOutlined/>} />
+            <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} />
           </Col>
          </Row>
          <Form disabled={!time.filterApplied}>

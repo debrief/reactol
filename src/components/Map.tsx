@@ -1,5 +1,5 @@
 import { Feature, Point, Polygon } from "geojson";
-import { MapContainer } from 'react-leaflet';
+import { MapContainer, ScaleControl, useMap } from 'react-leaflet';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
@@ -30,9 +30,20 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
   }
 }
 
+/** helper component that freezer map viewport */
+const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
+  const map = useMap()
+  frozen ? map.dragging.disable() : map.dragging.enable()
+  frozen ? map.scrollWheelZoom.disable() : map.scrollWheelZoom.enable()
+  frozen ? map.touchZoom.disable() : map.touchZoom.enable()
+  frozen ? map.doubleClickZoom.disable() : map.doubleClickZoom.enable()
+  frozen ? map.boxZoom.disable() : map.boxZoom.enable()
+  return null
+}
+
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
-  const { selection, setSelection } = useAppContext();
+  const { selection, setSelection, viewportFrozen } = useAppContext();
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -47,20 +58,23 @@ const Map: React.FC<MapProps> = ({ children }) => {
       setSelection([id]);
     }
   }, [selection, setSelection])
-
+  
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
   }, [features])
 
+ 
   return (
     <>
-      <MapContainer center={[35.505, -4.09]} zoom={8} scrollWheelZoom={true}>
+      <MapContainer center={[35.505, -4.09]} zoom={8}  >
+        <ViewportProperties frozen={viewportFrozen}/>
         {children}
         { 
           visibleFeatures
         }
         <MouseCoordinates/>
+        <ScaleControl position={'bottomleft'}/>
       </MapContainer>
     </>
   );
