@@ -167,7 +167,7 @@ function App() {
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
             <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
               <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-                <Splitter.Panel defaultSize='170' min='150' max='350' resizable={true}>
+                <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                   <Card title='Time Control'>
                     {timeBounds && 
                       <TimeControl start={timeBounds[0]} end={timeBounds[1]} />}
