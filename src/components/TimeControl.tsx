@@ -1,5 +1,13 @@
-import { AutoComplete, Button, Col, Form, Row } from "antd";
-import { FilterOutlined, FilterFilled, CopyOutlined, StepBackwardOutlined, FastBackwardOutlined, StepForwardOutlined, FastForwardOutlined } from '@ant-design/icons';
+import { AutoComplete, Button, Checkbox, Col, Form, Row } from "antd";
+import {
+  CopyOutlined,
+  StepBackwardOutlined,
+  FastBackwardOutlined,
+  StepForwardOutlined,
+  FastForwardOutlined,
+  FilterOutlined,
+  ExpandOutlined,
+} from '@ant-design/icons';
 import React, { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import { useAppContext } from "../context/AppContext";
@@ -82,10 +90,11 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
 
   return (
     <>  <Row>
-          <Col span={4}>
-            <Button icon={time.filterApplied ? <FilterFilled/> : <FilterOutlined/>} onClick={() => setFilterApplied(!time.filterApplied)}></Button>
+          <Col span={16} style={{textAlign: 'left'}}>
+            <Checkbox disabled={true} onChange={() => console.log('Lock viewport')}><ExpandOutlined/>Lock viewport</Checkbox>
+            <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/>Apply time filter</Checkbox>
           </Col>
-          <Col span={16}>
+          <Col span={4}>
           </Col>
           <Col span={4}>
             <Button onClick={copyMapToClipboard} icon={<CopyOutlined/>} />

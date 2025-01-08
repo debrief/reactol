@@ -14,7 +14,7 @@ const formatItem = (value: any) => {
       return value.toString();
     case 'object':
       if (Array.isArray(value)) {
-        return '[Array of items]';
+        return `[Array of ${(value as []).length} items]`;
       }
       return JSON.stringify(value);
     default:
