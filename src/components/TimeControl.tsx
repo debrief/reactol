@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Col, Form, Row, Tooltip } from "antd";
+import { AutoComplete, Button, Col, Form, Row, Tooltip } from 'antd';
 import {
   CopyOutlined,
   StepBackwardOutlined,
@@ -10,10 +10,10 @@ import {
   UnlockOutlined,
   FilterFilled,
 } from '@ant-design/icons';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { useAppContext } from "../context/AppContext";
-import { TimeSupport } from "../helpers/time-support";
+import { useAppContext } from '../context/AppContext';
+import { TimeSupport } from '../helpers/time-support';
 
 export interface TimeProps {
   start: number // earliest time in data
@@ -21,12 +21,12 @@ export interface TimeProps {
 }
 
 export const StepOptions = [
-  { value: "00h15m" },
-  { value: "00h30m" },
-  { value: "01h00m" },
-  { value: "02h00m" },
-  { value: "03h00m" },
-  { value: "06h00m" }
+  { value: '00h15m' },
+  { value: '00h30m' },
+  { value: '01h00m' },
+  { value: '02h00m' },
+  { value: '03h00m' },
+  { value: '06h00m' }
 ]
 
 const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
@@ -39,6 +39,15 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
     return val ? pf(val as number) : '000000Z'
   }
 }
+
+interface TimeButtonProps {
+  tooltip: string
+  icon: React.ReactNode 
+  forward: boolean
+  large: boolean
+}
+
+
 
 const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext();
@@ -88,31 +97,38 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
     }
   }
 
+  /** convenience component to make time button construction easier */
+  const TimeButton: React.FC<TimeButtonProps> = ({tooltip, icon, forward, large}) => {
+    return <Tooltip placement='bottom' mouseEnterDelay={0.5} title={tooltip}>
+      <Button color='primary' variant='outlined' icon={icon} disabled={!time.filterApplied} onClick={() => doStep(forward, large)}/>
+    </Tooltip>
+  }
+  
+
   const toggleFreezeViewport = () => {
     setViewportFrozen(!viewportFrozen)
   }
 
   const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
-    
   const buttonStyle = { margin: '0 5px' }
 
   return (
     <>  <Row>
           <Col span={20} style={{textAlign: 'left'}}>
-            <Tooltip title='Lock viewport to prevent accidental map movement'>
+            <Tooltip mouseEnterDelay={0.5} title='Lock viewport to prevent accidental map movement'>
               <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}>{viewportFrozen ? <LockFilled/> : <UnlockOutlined/>}</Button>
             </Tooltip>
-            <Tooltip title='Enable time controls, to filter tracks by time'>
+            <Tooltip mouseEnterDelay={0.5} title='Enable time controls, to filter tracks by time'>
               <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
             </Tooltip>
           </Col>
           <Col span={4}>
             <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} />
           </Col>
-         </Row>
-         <Form disabled={!time.filterApplied}>
-         <table style={{width: '100%', backgroundColor: time.filterApplied ? 'white' : '#f0f0f0'}}>
-         <thead>
+        </Row>
+        <Form disabled={!time.filterApplied}>
+        <table style={{width: '100%', backgroundColor: time.filterApplied ? 'white' : '#f0f0f0'}}>
+        <thead>
           <tr>
             <th>Start</th>
             <th>Step</th>
@@ -134,12 +150,13 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
             </tr>
             <tr style={{fontFamily: 'monospace'}}>
               <td>
-                <Button title="Jump to start" icon={<FastBackwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(false, true)}/>
-                <Button title="Step backard" icon={<StepBackwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(false, false)}/> </td>
+                <TimeButton tooltip='Jump to start' icon={<FastBackwardOutlined style={largeIcon}/>} forward={false} large={true}/>
+                <TimeButton tooltip='Step backward' icon={<StepBackwardOutlined style={largeIcon}/>} forward={false} large={false}/>
+              </td>
               <td></td>
               <td>
-                <Button title="Step forward" icon={<StepForwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(true, false)}/>
-                <Button title="Jump to end" icon={<FastForwardOutlined style={largeIcon}/>} disabled={!time.filterApplied} onClick={() => doStep(true, true)}/>
+                <TimeButton tooltip='Step forward' icon={<StepForwardOutlined style={largeIcon}/>} forward={true} large={false}/>
+                <TimeButton tooltip='Jump to end' icon={<FastForwardOutlined style={largeIcon}/>} forward={true} large={true}/>
               </td>
             </tr>
           </tbody>
