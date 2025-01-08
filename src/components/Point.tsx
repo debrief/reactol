@@ -36,11 +36,15 @@ export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
 
   const name = feature.properties?.name || '';
 
+  const circleRadius = useMemo(() => {
+    return isSelected ? 8 : 4
+  }, [isSelected])
+
   return (
     <>
-    { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={isSelected ? 8 : 4} 
+    { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={circleRadius} 
         fillColor={color} color={color} center={location} eventHandlers={{click: onclick}}>
-        <Tooltip key={feature.id + '-tip-'} offset={[0, -20]} direction="center" opacity={1} permanent>
+        <Tooltip key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
           {name}
         </Tooltip>
       </CircleMarker>}
