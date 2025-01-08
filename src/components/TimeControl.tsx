@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Checkbox, Col, Form, Row } from "antd";
+import { AutoComplete, Button, Col, Form, Row, Tooltip } from "antd";
 import {
   CopyOutlined,
   StepBackwardOutlined,
@@ -41,7 +41,7 @@ const timeStr = (val: number | number[] | null, index?: number): string => {
 const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext();
 
-  const [stepTxt, setStepTxt] = useState<string>(StepOptions[1].value);
+  const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value);
   const [interval, setInterval] = useState<number>(0);
 
   useEffect(() => {
@@ -91,14 +91,18 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   }
 
   const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
+    
+  const buttonStyle = { margin: '0 5px' }
 
   return (
     <>  <Row>
-          <Col span={16} style={{textAlign: 'left'}}>
-            <Checkbox checked={viewportFrozen} onChange={toggleFreezeViewport}><ExpandOutlined/>&nbsp;Lock viewport</Checkbox>
-            <Checkbox checked={time.filterApplied} onChange={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/>&nbsp;Apply time filter</Checkbox>
-          </Col>
-          <Col span={4}>
+          <Col span={20} style={{textAlign: 'left'}}>
+            <Tooltip title='Lock viewport to prevent accidental map movement'>
+              <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}><ExpandOutlined/></Button>
+            </Tooltip>
+            <Tooltip title='Enable time controls, to filter tracks by time'>
+              <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}><FilterOutlined/></Button>
+            </Tooltip>
           </Col>
           <Col span={4}>
             <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} />
