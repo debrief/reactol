@@ -53,7 +53,7 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
   }, [isSelected])
 
   const circleRadius = useMemo(() => {
-    return isSelected ? 6 : 4
+    return isSelected ? 5 : 3
   }, [isSelected])
 
   return (
