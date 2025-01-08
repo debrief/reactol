@@ -165,7 +165,7 @@ function App() {
       {error && <div className="error-modal">{error}</div>} {/* Error modal */}
       <ConfigProvider theme={antdTheme}>
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-            <Splitter.Panel key='left' collapsible defaultSize='400' min='300' max='600'>
+            <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
               <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
                 <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
                   <Card title='Time Control'>
