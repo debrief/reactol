@@ -3,7 +3,7 @@ import { MapContainer, ScaleControl, useMap } from 'react-leaflet';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 import { Point as DataPoint } from "./Point";
@@ -33,11 +33,15 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
 /** helper component that freezer map viewport */
 const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
   const map = useMap()
-  frozen ? map.dragging.disable() : map.dragging.enable()
-  frozen ? map.scrollWheelZoom.disable() : map.scrollWheelZoom.enable()
-  frozen ? map.touchZoom.disable() : map.touchZoom.enable()
-  frozen ? map.doubleClickZoom.disable() : map.doubleClickZoom.enable()
-  frozen ? map.boxZoom.disable() : map.boxZoom.enable()
+  useEffect(() => {
+    if (map) {
+      frozen ? map.dragging.disable() : map.dragging.enable()
+      frozen ? map.scrollWheelZoom.disable() : map.scrollWheelZoom.enable()
+      frozen ? map.touchZoom.disable() : map.touchZoom.enable()
+      frozen ? map.doubleClickZoom.disable() : map.doubleClickZoom.enable()
+      frozen ? map.boxZoom.disable() : map.boxZoom.enable()  
+    }
+  },[map, frozen])
   return null
 }
 
