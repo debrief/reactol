@@ -48,7 +48,7 @@ export default class AutoGraticule extends LayerGroup {
 
     lineStyle: PolylineOptions = {
         stroke: true,
-        color: '#111',
+        color: '#777',
         opacity: 0.6,
         weight: 1,
         interactive: false
