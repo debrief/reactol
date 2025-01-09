@@ -68,25 +68,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     const vis = features.filter(feature => isVisible(feature))
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
   }, [features])
-
-  const formatCoordinate = (coordinate: number, isLat: boolean) => {
-    const toPadStr = (num: number) => ('' + num).padStart(2, '0');
-    const absolute = Math.abs(coordinate);
-    const degrees = Math.floor(absolute);
-    const minutesNotTruncated = (absolute - degrees) * 60;
-    const minutes = Math.floor(minutesNotTruncated);
-    const seconds = Math.floor(((minutesNotTruncated - minutes) * 60));
-    const direction = isLat
-      ? coordinate >= 0
-        ? 'N'
-        : 'S'
-      : coordinate >= 0
-      ? 'E'
-      : 'W';
-
-    return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}" ${direction}`;
-  };
-
+  
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8}  >
