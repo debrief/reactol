@@ -72,7 +72,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
 
   return (
     <>
-      <MapContainer center={[35.505, -4.09]} zoom={8}  >
+      <MapContainer zoomControl={false} center={[35.505, -4.09]} zoom={8}  >
         <ViewportProperties frozen={viewportFrozen}/>
         {children}
         { 
