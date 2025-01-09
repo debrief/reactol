@@ -1,9 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Feature, FeatureCollection } from 'geojson'
+import * as turf from '@turf/turf';
+import { LatLngBounds } from 'leaflet';
 
 const initialState: FeatureCollection = {
   type: 'FeatureCollection',
-  features: []
+  features: [],
+  bbox: [0, 0, 0, 0]
 }
 
 let counter = 0
@@ -51,9 +54,20 @@ const featuresSlice = createSlice({
         }
         feature.properties.visible = ids.includes(feature.id as string)
       })
+    },
+    updateBounds(state) {
+      const visibleFeatures = state.features.filter(feature => feature.properties?.visible);
+      const bbox = turf.bbox(turf.featureCollection(visibleFeatures));
+      state.bbox = bbox;
     }
   }
 })
+
+// Selector to get bounds in Leaflet's LatLngBounds format
+export const selectBounds = (state: FeatureCollection): LatLngBounds => {
+  const [minX, minY, maxX, maxY] = state.bbox;
+  return new LatLngBounds([minY, minX], [maxY, maxX]);
+};
 
 // Export the generated reducer function
 export default featuresSlice.reducer

@@ -1,12 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
-
-import featuresReducer from '../features/geoFeatures/geoFeaturesSlice'
+import featuresReducer, { updateBounds } from '../features/geoFeatures/geoFeaturesSlice'
 
 export const store = configureStore({
   reducer: {
     featureCollection: featuresReducer
   }
 })
+
+store.subscribe(() => {
+  store.dispatch(updateBounds());
+});
 
 // Infer the type of `store`
 export type AppStore = typeof store

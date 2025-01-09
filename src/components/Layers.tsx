@@ -7,6 +7,7 @@ import { Feature } from 'geojson';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppContext } from '../context/AppContext';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { updateBounds } from '../features/geoFeatures/geoFeaturesSlice';
 
 interface LayerProps {
   openGraph: {(): void}
@@ -100,6 +101,10 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const onGraphClick = () => {
     openGraph()
   }
+
+  useEffect(() => {
+    dispatch(updateBounds());
+  }, [features, dispatch]);
 
   return <>
     <Modal title="Message" visible={message !== ''} onOk={() => setMessage('')} onCancel={() => setMessage('')}>
