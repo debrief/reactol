@@ -4,12 +4,11 @@ import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../constants";
 import Track from "./Track";
 import Zone from "./Zone";
 import { useCallback, useEffect, useMemo } from "react";
-import { useAppSelector, useAppDispatch } from "../app/hooks";
+import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 import { Point as DataPoint } from "./Point";
 import MouseCoordinates from './MouseCoordinates';
-import { Graticule } from "./AutoGraticule";
-import { updateBounds } from '../features/geoFeatures/geoFeaturesSlice';
+import { Graticule, HomeControl } from "./AutoGraticule";
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -50,7 +49,6 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.featureCollection.features)
   const { selection, setSelection, viewportFrozen } = useAppContext();
-  const dispatch = useAppDispatch();
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -71,10 +69,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
   }, [features])
 
-  useEffect(() => {
-    dispatch(updateBounds());
-  }, [features, dispatch]);
-  
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8}  >
@@ -86,7 +80,9 @@ const Map: React.FC<MapProps> = ({ children }) => {
         <MouseCoordinates/>
         <ScaleControl position={'bottomleft'}/>
         <Graticule/>
+        <HomeControl/>
       </MapContainer>
+
     </>
   );
 };
