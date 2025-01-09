@@ -64,7 +64,8 @@ const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
           direction='left' opacity={1} permanent>{feature.properties?.name}</Tooltip>
       </CircleMarker> }
       { trackCoords.filter((item) => item.timeVisible).map((item: CoordInstance, index: number) => 
-        <CircleMarker fill={isSelected} weight={lineWeight}  key={feature.id + '-point-' + index} center={item.pos} radius={circleRadius} color={colorFor(feature)} eventHandlers={{click: onclick}}>
+        <CircleMarker fillColor={colorFor(feature)} fill={isSelected} color={colorFor(feature)} fillOpacity={1} weight={lineWeight}  key={feature.id + '-point-' + index} center={item.pos} 
+          radius={circleRadius} eventHandlers={{click: onclick}}>
           {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {item.time}
           </Tooltip>}

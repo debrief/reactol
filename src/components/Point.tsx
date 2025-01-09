@@ -43,7 +43,7 @@ export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   return (
     <>
     { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={circleRadius} 
-        fillColor={color} color={color} center={location} eventHandlers={{click: onclick}}>
+        fillColor={color} color={color} fill={true} fillOpacity={10} center={location} eventHandlers={{click: onclick}}>
         <Tooltip key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
           {name}
         </Tooltip>
