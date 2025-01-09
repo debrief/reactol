@@ -1,5 +1,5 @@
 import { Control } from "leaflet";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { useAppSelector } from "../../app/hooks";
 import { selectBounds } from "../../features/geoFeatures/geoFeaturesSlice";
@@ -11,9 +11,12 @@ export const HomeControl: React.FC = () => {
     const [existing, setExisting] = useState<Control | undefined>(undefined)
     const controlInitialised = useRef(false); 
 
-    const doHome = useCallback(() => {
+    const doHome = () => {
+        // TODO: this just uses the original bounds, not the current bounds, it should use the current bounds
+        console.log('doing fly home to', currentBounds.getCenter().lat, currentBounds.getCenter().lng)
         map.flyToBounds(currentBounds)
-    }, [map, currentBounds])
+    }
+
 
     // note: we need to return a Leaflet control.  It will have a house
     // icon that when clicked will fly the map to the current bounds, via the DoHome function
