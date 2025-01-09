@@ -8,7 +8,8 @@ import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 import { Point as DataPoint } from "./Point";
 import MouseCoordinates from './MouseCoordinates';
-import { Graticule, HomeControl } from "./AutoGraticule";
+import { Graticule } from "./AutoGraticule";
+import { HomeControl } from "./AutoGraticule/HomeControl";
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
