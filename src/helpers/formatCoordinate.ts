@@ -19,5 +19,5 @@ export const formatCoordinate = (coordinate: number, isLat: boolean): string => 
     ? 'E'
     : 'W';
 
-  return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}" ${direction}`;
+  return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}"&nbsp;${direction}`;
 };
