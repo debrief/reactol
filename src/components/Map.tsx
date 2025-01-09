@@ -8,7 +8,7 @@ import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 import { Point as DataPoint } from "./Point";
 import MouseCoordinates from './MouseCoordinates';
-import 'leaflet-auto-graticule'; // P4ca9
+import { Graticule } from "./AutoGraticule";
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -87,10 +87,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
     return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}" ${direction}`;
   };
 
-  const buildLabel = (lat: number, lng: number) => {
-    return `${formatCoordinate(lat, true)}, ${formatCoordinate(lng, false)}`;
-  };
-
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8}  >
@@ -101,7 +97,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         }
         <MouseCoordinates/>
         <ScaleControl position={'bottomleft'}/>
-        <AutoGraticule buildLabel={buildLabel} /> {/* Pf91a */}
+        <Graticule/>
       </MapContainer>
     </>
   );
