@@ -8,6 +8,7 @@ import { useAppSelector } from "../app/hooks";
 import { useAppContext } from "../context/AppContext";
 import { Point as DataPoint } from "./Point";
 import MouseCoordinates from './MouseCoordinates';
+import { Graticule } from "./AutoGraticule";
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -67,8 +68,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     const vis = features.filter(feature => isVisible(feature))
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
   }, [features])
-
- 
+  
   return (
     <>
       <MapContainer center={[35.505, -4.09]} zoom={8}  >
@@ -79,6 +79,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         }
         <MouseCoordinates/>
         <ScaleControl position={'bottomleft'}/>
+        <Graticule/>
       </MapContainer>
     </>
   );
