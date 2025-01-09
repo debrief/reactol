@@ -91,3 +91,15 @@ html, body, #root, .App, #map {
   color: rgba(239, 233, 233, 0.7);
   pointer-events: none;
 }
+
+.ant-card-head-title {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: #555;
+  color: #eee;
+}
+
+.ant-card-head {
+  padding: 0px !important;
+  min-height: 0px !important;
+}
