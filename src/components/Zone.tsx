@@ -24,10 +24,11 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
+  const lineWeight = useMemo(() => {
+    return isSelected ? 4 : 2
+  }, [isSelected])
+
   const colorFor = useCallback((feature: Feature<Geometry, unknown> | undefined): string => {
-    if (isSelected) {
-      return '#aaa'
-    }
     if (feature) {
       const feat = feature as Feature
       if (feat.properties) {
@@ -35,15 +36,15 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
       }
     }
     return '#000';
-  }, [isSelected])
+  }, [feature])
 
   const polygon = useMemo(() => {
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
     const centre = turf.center(points).geometry.coordinates.reverse() as LatLngExpression
     const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
-    return <ReactPolygon key={feature.id + '-line-' + isSelected } fill={true} positions={trackCoords} weight={ 2} 
+    return <ReactPolygon key={feature.id + '-line-' + isSelected } fill={true} positions={trackCoords} weight={lineWeight} 
       color={colorFor(feature)} eventHandlers={{click: onclick}} fillOpacity={0.1} >
-      <Tooltip position={centre} direction="center" opacity={1} permanent>
+      <Tooltip position={centre} direction='center' opacity={1} permanent>
         {feature.properties?.name}
       </Tooltip>
       </ReactPolygon>  
