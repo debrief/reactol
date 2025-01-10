@@ -71,7 +71,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           label='Short Name'
           name='shortName'
           style={itemStyle}
-          rules={[{ required: true, message: "Please enter abbrevieated track name!" }]}
+          rules={[{ required: true, message: "Please enter abbreviated track name!" }]}
         >
           <Space.Compact>
             <Input maxLength={4} />
