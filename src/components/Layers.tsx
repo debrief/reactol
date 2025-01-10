@@ -1,5 +1,5 @@
-import React, { Key, useEffect } from 'react';
-import { Alert, Button, Flex, Modal, Tree } from 'antd';
+import React, { Key, useEffect, useMemo } from 'react';
+import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd';
 import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
 import { LineChartOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -93,9 +93,9 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     dispatch({type: 'featureCollection/featuresVisible', payload: {ids: keys}})
   };
 
-  const temporalFeatureSelected = (): boolean => {
-    return selectedFeatures.some((feature) => feature.properties?.times)
-  }
+  const temporalFeatureSelected = useMemo(() => 
+    selectedFeatures.some((feature) => feature.properties?.times)
+  , [selectedFeatures])
 
   const onGraphClick = () => {
     openGraph()
@@ -106,7 +106,9 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
       <Alert type="info" description={message} />
     </Modal>
     <Flex gap='small' justify='end' wrap>
-      <Button onClick={onGraphClick} disabled={!temporalFeatureSelected()} type="primary"><LineChartOutlined /></Button>
+      <Tooltip title={temporalFeatureSelected ? 'View graph of selected features' : 'Select a time-related feature to enable graphs'}>
+        <Button onClick={onGraphClick} disabled={!temporalFeatureSelected} type="primary"><LineChartOutlined /></Button>
+      </Tooltip> 
     </Flex>
     <Tree checkable
     showLine={true}
