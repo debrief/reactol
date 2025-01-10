@@ -21,11 +21,11 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 import { AppDispatch } from './app/store.ts';
-import { LoadTrackModel } from './components/LoadTrackModal.tsx';
+import { LoadTrackModel, TrackProps } from './components/LoadTrackModal.tsx';
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string, shortName?: string) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: TrackProps) => void
 }
 
 export interface TimeState {
@@ -145,10 +145,10 @@ function App() {
     setIsDialogVisible(true);
   };
 
-  const setLoadTrackResults = async (year: number, month: number, name: string, shortName: string) => {
+  const setLoadTrackResults = async (values: TrackProps) => {
     setIsDialogVisible(false);
     if (currentFile && currentHandler && year && month && name) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, year, month, name, shortName);
+      currentHandler.handle(await currentFile.text(), features, dispatch, values);
     }
   };
 

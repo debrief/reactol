@@ -1,19 +1,22 @@
-import { Button, Form, FormProps, Input, InputNumber, Modal } from "antd"
+import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select } from "antd"
+import { Color } from "antd/es/color-picker"
+
+export type TrackProps = {
+  name: string
+  shortName: string
+  year: number
+  month: number
+  symbol: string
+  color: string
+}
 
 export interface LoadTrackModelProps {
   visible: boolean
-  setResults: (year: number, month: number, name: string, shortName: string) => void
+  setResults: (value: TrackProps) => void
   cancel: () => void
   year?: number
   month?: number
   name?: string
-}
-
-type FieldType = {
-  year: number
-  month: number
-  name: string
-  shortName: string
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
@@ -24,8 +27,11 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   month,
   name,
 }) => {
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    setResults(values.year, values.month, values.name, values.shortName)
+  const onFinish: FormProps<TrackProps>["onFinish"] = (values) => {
+    const colorValue = values.color as any as Color
+    console.log('color', colorValue.toRgbString())
+    values.color = colorValue.toRgbString()
+    setResults(values)
   }
 
   const onCancel = () => {
@@ -34,6 +40,14 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const initialYear = year || new Date().getFullYear()
   const initialMonth = month || new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
+  const symbolOptions = [
+    { value: 'air', label: 'AIR' },
+    { value: 'nav', label: 'NAV' },
+    { value: 'sub', label: 'SUB' },
+    { value: 'lnd', label: 'LND' },
+    { value: 'unk', label: 'UNK' }
+  ]
+    
   return (
     <Modal
       title='Complete track data'
@@ -52,7 +66,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         onFinishFailed={onCancel}
         autoComplete='off'
       >
-        <Form.Item<FieldType>
+        <Form.Item<TrackProps>
           label='Name'
           name='name'
           style={itemStyle}
@@ -60,7 +74,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         >
           <Input />
         </Form.Item>
-        <Form.Item<FieldType>
+        <Form.Item<TrackProps>
           label='Short Name'
           name='shortName'
           style={itemStyle}
@@ -69,7 +83,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           <Input maxLength={4} />
         </Form.Item>
 
-        <Form.Item<FieldType>
+        <Form.Item<TrackProps>
           label='Year'
           name='year'
           style={itemStyle}
@@ -78,13 +92,31 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           <InputNumber min={2020} max={2040} changeOnWheel />
         </Form.Item>
 
-        <Form.Item<FieldType>
+        <Form.Item<TrackProps>
           label='Month'
           name='month'
           style={itemStyle}
           rules={[{ required: true, message: "Please enter Month for data" }]}
         >
           <InputNumber min={1} max={12} changeOnWheel  />
+        </Form.Item>
+
+        <Form.Item<TrackProps>
+          label='Environment'
+          name='symbol'
+          style={itemStyle}
+          rules={[{ required: true, message: "Please enter track symbol" }]}
+        >
+          <Select options={symbolOptions}  />
+        </Form.Item>
+
+        <Form.Item<TrackProps>
+          label='Colour'
+          name='color'
+          style={itemStyle}
+          rules={[{ required: true, message: "Please enter track color" }]}
+        >
+          <ColorPicker format="hex" trigger="hover"  />
         </Form.Item>
 
         <Form.Item label={null}>

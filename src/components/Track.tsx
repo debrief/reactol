@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
 import { CoordInstance, filterTrack } from "../helpers/filterTrack";
 
-export interface TrackProps {
+export interface TrackFeatureProps {
   feature: Feature 
   onClickHandler: {(id: string, modifier: boolean): void}
 }
@@ -21,7 +21,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
   return '#000';
 };
 
-const Track: React.FC<TrackProps> = ({feature, onClickHandler}) => {
+const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
   const isSelected = selection.includes(feature.id as string)
 
