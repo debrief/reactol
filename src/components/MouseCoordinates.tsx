@@ -49,6 +49,7 @@ const MouseCoordinates: React.FC = () => {
   const { selection } = useAppContext();
   const features = useAppSelector(state => state.featureCollection.features)
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0});
+  const { viewportFrozen } = useAppContext();
 
   const map = useMap()
 
@@ -87,7 +88,7 @@ const MouseCoordinates: React.FC = () => {
   }, [mouseCoords, map, selection]);
   
   return (
-    <div className="mouse-coordinates-panel">
+    <div style={{display: viewportFrozen ? 'none' : 'block'}} className="mouse-coordinates-panel">
       <p>Lat: {formatCoordinate(mouseCoords.lat, true)}</p>
       <p>Lng: {formatCoordinate(mouseCoords.lng, false)}</p>
       <p>Rel to <b>{rangeBearing.subject}</b>:</p>
