@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select } from "antd"
+import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select, Space } from "antd"
 import { Color } from "antd/es/color-picker"
 
 export type TrackProps = {
@@ -14,31 +14,25 @@ export interface LoadTrackModelProps {
   visible: boolean
   setResults: (value: TrackProps) => void
   cancel: () => void
-  year?: number
-  month?: number
-  name?: string
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   visible,
   cancel,
-  setResults,
-  year,
-  month,
-  name,
+  setResults
 }) => {
   const onFinish: FormProps<TrackProps>["onFinish"] = (values) => {
     const colorValue = values.color as any as Color
-    console.log('color', colorValue.toRgbString())
     values.color = colorValue.toRgbString()
     setResults(values)
   }
 
   const onCancel = () => {
+    console.log('cancel')
     cancel()
   }
-  const initialYear = year || new Date().getFullYear()
-  const initialMonth = month || new Date().getMonth() + 1
+  const initialYear = new Date().getFullYear()
+  const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
   const symbolOptions = [
     { value: 'air', label: 'AIR' },
@@ -61,9 +55,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
         style={{ maxWidth: 400 }}
-        initialValues={{ name: name, year: initialYear, month: initialMonth }}
+        initialValues={{ year: initialYear, month: initialMonth }}
         onFinish={onFinish}
-        onFinishFailed={onCancel}
         autoComplete='off'
       >
         <Form.Item<TrackProps>
@@ -80,7 +73,9 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           style={itemStyle}
           rules={[{ required: true, message: "Please enter abbrevieated track name!" }]}
         >
-          <Input maxLength={4} />
+          <Space.Compact>
+            <Input maxLength={4} />
+          </Space.Compact>
         </Form.Item>
 
         <Form.Item<TrackProps>
@@ -107,7 +102,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           style={itemStyle}
           rules={[{ required: true, message: "Please enter track symbol" }]}
         >
-          <Select options={symbolOptions}  />
+          <Select defaultValue={symbolOptions[0].value} options={symbolOptions}  />
         </Form.Item>
 
         <Form.Item<TrackProps>
@@ -116,7 +111,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           style={itemStyle}
           rules={[{ required: true, message: "Please enter track color" }]}
         >
-          <ColorPicker format="hex" trigger="hover"  />
+          <ColorPicker disabledFormat showText={false} disabledAlpha defaultValue={"#f00"} format="hex" trigger="hover"  />
         </Form.Item>
 
         <Form.Item label={null}>

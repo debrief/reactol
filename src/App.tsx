@@ -132,9 +132,6 @@ function App() {
     }
   };
 
-  const year = new Date().getFullYear();
-  const month = new Date().getMonth() + 1;
-  const name = 'pending';
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null);
@@ -147,7 +144,7 @@ function App() {
 
   const setLoadTrackResults = async (values: TrackProps) => {
     setIsDialogVisible(false);
-    if (currentFile && currentHandler && year && month && name) {
+    if (currentFile && currentHandler) {
       currentHandler.handle(await currentFile.text(), features, dispatch, values);
     }
   };
@@ -201,7 +198,7 @@ function App() {
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
       <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
-        setResults={setLoadTrackResults} year={year} month={month} name={name} />
+        setResults={setLoadTrackResults}/>
     </div>
   )
 }
