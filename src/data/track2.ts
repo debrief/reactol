@@ -6,6 +6,7 @@ const track = {
     dataType: TRACK_TYPE,
     color: '#00F',
     name: 'VAN AMSTEL',
+    shortName: 'VANA',
     times: [
       '2024-11-14T16:16:53.662Z',
       '2024-11-14T16:17:53.662Z',

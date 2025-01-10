@@ -38,7 +38,7 @@ export const Graticule: React.FC = () => {
         existing.remove()
       }
       const formatter = (value: number, isLat: boolean): string => {
-        return formatCoordinate(value, isLat)
+        return formatCoordinate(value, isLat, true, '&nbsp;')
       }
       const options: GraticuleOptions = {
         redraw: 'moveend',
