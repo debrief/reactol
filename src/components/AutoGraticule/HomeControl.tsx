@@ -15,7 +15,8 @@ const POSITION_CLASSES = {
 
 const buttonStyle = {
     display: 'block',
-    margin: '2px'
+    margin: '4px',
+    padding: '6px'
 }
 
 /** helper component providing a button with a tooltip */
