@@ -7,24 +7,7 @@ import nearestPoint from '@turf/nearest-point';
 import './MouseCoordinates.css';
 import { useAppContext } from '../context/AppContext';
 import { useAppSelector } from '../app/hooks';
-
-const formatCoordinate = (coordinate: number, isLat: boolean) => {
-  const toPadStr = (num: number) => ('' + num).padStart(2, '0');
-  const absolute = Math.abs(coordinate);
-  const degrees = Math.floor(absolute);
-  const minutesNotTruncated = (absolute - degrees) * 60;
-  const minutes = Math.floor(minutesNotTruncated);
-  const seconds = Math.floor(((minutesNotTruncated - minutes) * 60));
-  const direction = isLat
-    ? coordinate >= 0
-      ? 'N'
-      : 'S'
-    : coordinate >= 0
-    ? 'E'
-    : 'W';
-
-  return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}" ${direction}`;
-};
+import { formatCoordinate } from '../helpers/formatCoordinate';
 
 const bearingToAzimuth = (bearing: number) => {
   return (bearing + 360) % 360;
@@ -87,15 +70,14 @@ const MouseCoordinates: React.FC = () => {
     }
   }, [mouseCoords, map, selection]);
   
-  return (
-    <div style={{display: viewportFrozen ? 'none' : 'block'}} className="mouse-coordinates-panel">
-      <p>Lat: {formatCoordinate(mouseCoords.lat, true)}</p>
-      <p>Lng: {formatCoordinate(mouseCoords.lng, false)}</p>
+  return !viewportFrozen && (<div className="mouse-coordinates-panel">
+      <p>Lat: {formatCoordinate(mouseCoords.lat, true, false, ' ')}</p>
+      <p>Lng: {formatCoordinate(mouseCoords.lng, false, false, ' ')}</p>
       <p>Rel to <b>{rangeBearing.subject}</b>:</p>
       <p>{`${(`` + rangeBearing.rng.toFixed(1)).padStart(5, '0')} km`}/
          {`${(`` + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
-    </div>
-  );
+    </div>)
+  
 };
 
 export default MouseCoordinates;
