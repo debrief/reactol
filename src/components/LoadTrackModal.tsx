@@ -57,6 +57,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       open={visible}
       onCancel={onCancel}
       footer={[]}
+      maskClosable={false}
+      destroyOnClose={true}
     >
       <Form
         name='basic'
