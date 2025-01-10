@@ -25,7 +25,7 @@ import { LoadTrackModel } from './components/LoadTrackModal.tsx';
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string, shortName?: string) => void
 }
 
 export interface TimeState {
@@ -145,16 +145,15 @@ function App() {
     setIsDialogVisible(true);
   };
 
-  const setLoadTrackResults = async (year: number, month: number, name: string) => {
+  const setLoadTrackResults = async (year: number, month: number, name: string, shortName: string) => {
     setIsDialogVisible(false);
     if (currentFile && currentHandler && year && month && name) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, year, month, name);
+      currentHandler.handle(await currentFile.text(), features, dispatch, year, month, name, shortName);
     }
   };
 
   const handleDialogCancel = () => {
     setIsDialogVisible(false);
-    // End the loading process
   };
 
   return (

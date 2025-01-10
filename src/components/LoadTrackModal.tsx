@@ -2,7 +2,7 @@ import { Button, Form, FormProps, Input, InputNumber, Modal } from "antd"
 
 export interface LoadTrackModelProps {
   visible: boolean
-  setResults: (year: number, month: number, name: string) => void
+  setResults: (year: number, month: number, name: string, shortName: string) => void
   cancel: () => void
   year?: number
   month?: number
@@ -13,6 +13,7 @@ type FieldType = {
   year: number
   month: number
   name: string
+  shortName: string
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
@@ -24,7 +25,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   name,
 }) => {
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    setResults(values.year, values.month, values.name)
+    setResults(values.year, values.month, values.name, values.shortName)
   }
 
   const onCancel = () => {
@@ -58,6 +59,14 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           rules={[{ required: true, message: "Please enter track name!" }]}
         >
           <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label='Short Name'
+          name='shortName'
+          style={itemStyle}
+          rules={[{ required: true, message: "Please enter abbrevieated track name!" }]}
+        >
+          <Input maxLength={4} />
         </Form.Item>
 
         <Form.Item<FieldType>

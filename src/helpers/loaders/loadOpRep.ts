@@ -30,7 +30,7 @@ const parseOpRepLine = (line: string): OpRepData | null => {
   };
 };
 
-const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: string): Feature<Geometry, GeoJsonProperties> => {
+const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: string, shortName: string): Feature<Geometry, GeoJsonProperties> => {
   const latStringToValue = (coord: string) => {
     const degrees = parseFloat(coord.slice(0, 2));
     const minutes = parseFloat(coord.slice(2));
@@ -72,6 +72,7 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
       dataType: TRACK_TYPE,
       color: coordinates[0].length === 3 ? '#F00' : '#00F',
       name,
+      shortName,
       times,
       courses,
       speeds,
@@ -79,9 +80,9 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
   };
 };
 
-export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => {
+export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string, shortName?: string) => {
 
-  if (!year || !month || !name) {
+  if (!year || !month || !name || !shortName) {
     return;
   }
 
@@ -95,7 +96,7 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     }
   }
 
-  const newFeature = convertToGeoJson(data, year, month, name);
+  const newFeature = convertToGeoJson(data, year, month, name, shortName);
   dispatch({ type: 'featureCollection/featureAdded', payload: newFeature });
 };
 
