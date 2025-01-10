@@ -1,5 +1,7 @@
 import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select, Space } from "antd"
 import { Color } from "antd/es/color-picker"
+import { standardShades } from "../helpers/standardShades"
+import { PresetsItem } from "antd/es/color-picker/interface"
 
 export type TrackProps = {
   name: string
@@ -41,6 +43,12 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     { value: 'lnd', label: 'LND' },
     { value: 'unk', label: 'UNK' }
   ]
+
+  const presetColors: PresetsItem[] = [{
+        label: 'Standard Shades',
+        colors: standardShades.map((shade) => shade.value),
+        defaultOpen: true
+  }]
     
   return (
     <Modal
@@ -49,6 +57,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       open={visible}
       onCancel={onCancel}
       footer={[]}
+      maskClosable={false}
+      destroyOnClose={true}
     >
       <Form
         name='basic'
@@ -111,7 +121,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           style={itemStyle}
           rules={[{ required: true, message: "Please enter track color" }]}
         >
-          <ColorPicker disabledFormat showText={false} disabledAlpha defaultValue={"#f00"} format="hex" trigger="hover"  />
+          <ColorPicker presets={presetColors} disabledFormat showText={false} disabledAlpha defaultValue={"#f00"} format="hex" trigger="hover"  />
         </Form.Item>
 
         <Form.Item label={null}>
