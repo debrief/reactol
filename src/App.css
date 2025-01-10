@@ -103,3 +103,7 @@ html, body, #root, .App, #map {
   padding: 0px !important;
   min-height: 0px !important;
 }
+
+.ant-modal-title {
+  font-weight: bolder !important;
+}
