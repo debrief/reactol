@@ -153,9 +153,10 @@ function App() {
     setIsDialogVisible(false);
   };
 
-  const addToTrack = (trackId: string, values: TrackProps) => {
+  const addToTrack = (trackId: string) => {
     // Implement the logic to add position data to an existing track
     // You can use the trackId and values to update the existing track
+    console.log('adding data to track', trackId)
   };
 
   return (
@@ -203,7 +204,7 @@ function App() {
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
       <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
-        setResults={setLoadTrackResults} addToTrack={addToTrack} />
+        newTrack={setLoadTrackResults} addToTrack={addToTrack} />
     </div>
   )
 }

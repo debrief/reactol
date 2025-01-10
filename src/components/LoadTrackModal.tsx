@@ -16,19 +16,25 @@ export type TrackProps = {
 
 export interface LoadTrackModelProps {
   visible: boolean
-  setResults: (value: TrackProps) => void
+  newTrack: (value: TrackProps) => void
+  addToTrack: (trackId: string) => void
   cancel: () => void
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   visible,
   cancel,
-  setResults
+  newTrack,
+  addToTrack
 }) => {
-  const onFinish: FormProps<TrackProps>["onFinish"] = (values) => {
+  const onFinishAdd: FormProps<{id: string}>["onFinish"] = (id) => {
+    addToTrack(id.id)
+  }
+
+  const onFinishCreate: FormProps<TrackProps>["onFinish"] = (values) => {
     const colorValue = values.color as any as Color
     values.color = colorValue.toRgbString()
-    setResults(values)
+    newTrack(values)
   }
 
   const onCancel = () => {
@@ -67,14 +73,14 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       destroyOnClose={true}
     >
       <Tabs defaultActiveKey="1">
-        <Tabs.TabPane tab="Add to track" key="1">
+        <Tabs.TabPane tab="Add to existing track" key="1">
           <Form
             name='addToTrack'
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 18 }}
             style={{ maxWidth: 400 }}
             initialValues={{ year: initialYear, month: initialMonth }}
-            onFinish={onFinish}
+            onFinish={onFinishAdd}
             autoComplete='off'
           >
             <Form.Item<TrackProps>
@@ -90,7 +96,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
                 Cancel
               </Button>
               <Button type='primary' htmlType='submit'>
-                Submit
+                Add
               </Button>
             </Form.Item>
           </Form>
@@ -102,7 +108,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             wrapperCol={{ span: 18 }}
             style={{ maxWidth: 400 }}
             initialValues={{ year: initialYear, month: initialMonth }}
-            onFinish={onFinish}
+            onFinish={onFinishCreate}
             autoComplete='off'
           >
             <Form.Item<TrackProps>
@@ -165,7 +171,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
                 Cancel
               </Button>
               <Button type='primary' htmlType='submit'>
-                Submit
+                Create
               </Button>
             </Form.Item>
           </Form>
