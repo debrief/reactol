@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-
 import featuresReducer from '../features/geoFeatures/geoFeaturesSlice'
 
 export const store = configureStore({

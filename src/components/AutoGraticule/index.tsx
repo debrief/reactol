@@ -1,16 +1,31 @@
-import { LatLngBounds, LatLngExpression, LayerOptions, LeafletEventHandlerFnMap, PolylineOptions, Map, LayerGroup, Util, Polyline, LatLng, marker, divIcon, latLngBounds } from 'leaflet';
+import {
+    LatLngBounds,
+    LatLngExpression,
+    LayerOptions,
+    LeafletEventHandlerFnMap,
+    PolylineOptions,
+    Map,
+    LayerGroup,
+    Util,
+    Polyline,
+    LatLng,
+    marker,
+    divIcon,
+    latLngBounds,
+} from 'leaflet';
 import './index.css';
 import { useMap } from 'react-leaflet';
 import { useState, useEffect } from 'react';
 import { formatCoordinate } from '../../helpers/formatCoordinate';
 
-export interface AutoGraticuleOptions extends LayerOptions {
+interface GraticuleOptions extends LayerOptions {
     redraw: keyof LeafletEventHandlerFnMap,
 
     /** Minimum distance between two lines in pixels */
     minDistance: number
 
-    formatter?: (lat: number, isLatitude: boolean) => string
+    // method that will format the lat/long value
+    formatter?: (value: number, isLatitude: boolean) => string
 }
 
 /** helper component provides the map graticule */
@@ -25,7 +40,7 @@ export const Graticule: React.FC = () => {
       const formatter = (value: number, isLat: boolean): string => {
         return formatCoordinate(value, isLat)
       }
-      const options: AutoGraticuleOptions = {
+      const options: GraticuleOptions = {
         redraw: 'moveend',
         minDistance: 100,  // Minimum distance between two lines in pixels
         formatter: formatter
@@ -40,7 +55,7 @@ export const Graticule: React.FC = () => {
 
 export default class AutoGraticule extends LayerGroup {
 
-    options: AutoGraticuleOptions = {
+    options: GraticuleOptions = {
         redraw: 'moveend',
         minDistance: 100,  // Minimum distance between two lines in pixels
         formatter: undefined
@@ -57,7 +72,7 @@ export default class AutoGraticule extends LayerGroup {
     _bounds!: LatLngBounds;
 
 
-    constructor(options?: Partial<AutoGraticuleOptions>) {
+    constructor(options?: Partial<GraticuleOptions>) {
         super();
         Util.setOptions(this, options);
     }
