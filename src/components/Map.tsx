@@ -79,7 +79,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
           visibleFeatures
         }
         <MouseCoordinates/>
-        <ScaleControl position={'bottomleft'}/>
+        <ScaleControl imperial={true} metric={false} position={'bottomleft'}/>
         <Graticule/>
         <HomeControl/>
       </MapContainer>
