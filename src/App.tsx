@@ -153,6 +153,11 @@ function App() {
     setIsDialogVisible(false);
   };
 
+  const addToTrack = (trackId: string, values: TrackProps) => {
+    // Implement the logic to add position data to an existing track
+    // You can use the trackId and values to update the existing track
+  };
+
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
@@ -198,7 +203,7 @@ function App() {
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
       <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
-        setResults={setLoadTrackResults}/>
+        setResults={setLoadTrackResults} addToTrack={addToTrack} />
     </div>
   )
 }
