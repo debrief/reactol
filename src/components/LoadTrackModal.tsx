@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select, Space, Tabs } from "antd"
+import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select, Space, Tabs, TabsProps } from "antd"
 import { Color } from "antd/es/color-picker"
 import { standardShades } from "../helpers/standardShades"
 import { PresetsItem } from "antd/es/color-picker/interface"
@@ -12,6 +12,10 @@ export type NewTrackProps = {
   symbol: string
   color: string
   trackId?: string
+}
+
+export type AddTrackProps = {
+  trackId: string
 }
 
 export interface LoadTrackModelProps {
@@ -49,8 +53,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         defaultOpen: true
   }]
   
-  const onFinishAdd: FormProps<{id: string}>["onFinish"] = (id) => {
-    addToTrack(id.id)
+  const onFinishAdd: FormProps<AddTrackProps>["onFinish"] = (id) => {
+    addToTrack(id.trackId)
   }
 
   const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
@@ -64,9 +68,119 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     cancel()
   }
 
+  const tabs: TabsProps['items'] = [
+    {
+      key: '1',
+      label: 'Add to existing track',
+      children: <Form
+      name='addToTrack'
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+      style={{ maxWidth: 400 }}
+      onFinish={onFinishAdd}
+      autoComplete='off'
+    >
+      <Form.Item<AddTrackProps>
+        label='Track'
+        name='trackId'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please select a track!" }]}
+      >
+        <Select options={trackOptions} />
+      </Form.Item>
+      <Form.Item label={null}>
+        <Button type='text' onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type='primary' htmlType='submit'>
+          Add
+        </Button>
+      </Form.Item>
+    </Form>,
+    },
+    {
+      key: '2',
+      label: 'Complete track data',
+      children: <Form
+      name='createTrack'
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+      style={{ maxWidth: 400 }}
+      initialValues={{ year: initialYear, month: initialMonth }}
+      onFinish={onFinishCreate}
+      autoComplete='off'
+    >
+      <Form.Item<NewTrackProps>
+        label='Name'
+        name='name'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please enter track name!" }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item<NewTrackProps>
+        label='Short Name'
+        name='shortName'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please enter abbreviated track name!" }]}
+      >
+        <Space.Compact>
+          <Input maxLength={4} />
+        </Space.Compact>
+      </Form.Item>
+
+      <Form.Item<NewTrackProps>
+        label='Year'
+        name='year'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please enter Year for data" }]}
+      >
+        <InputNumber min={2020} max={2040} changeOnWheel />
+      </Form.Item>
+
+      <Form.Item<NewTrackProps>
+        label='Month'
+        name='month'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please enter Month for data" }]}
+      >
+        <InputNumber min={1} max={12} changeOnWheel  />
+      </Form.Item>
+
+      <Form.Item<NewTrackProps>
+        label='Environment'
+        name='symbol'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please enter track symbol" }]}
+      >
+        <Select defaultValue={symbolOptions[0].value} options={symbolOptions}  />
+      </Form.Item>
+
+      <Form.Item<NewTrackProps>
+        label='Colour'
+        name='color'
+        style={itemStyle}
+        rules={[{ required: true, message: "Please enter track color" }]}
+      >
+        <ColorPicker presets={presetColors} disabledFormat showText={false} disabledAlpha defaultValue={"#f00"} format="hex" trigger="hover"  />
+      </Form.Item>
+
+      <Form.Item label={null}>
+        <Button type='text' onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type='primary' htmlType='submit'>
+          Create
+        </Button>
+      </Form.Item>
+    </Form>,
+    }
+  ];
+
+
   return (
     <Modal
-      title='Complete track data'
+      title=''
       className='load-track-modal'
       open={visible}
       onCancel={onCancel}
@@ -74,109 +188,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       maskClosable={false}
       destroyOnClose={true} // set to true, in order to re-generate track ids
     >
-      <Tabs defaultActiveKey="1">
-        <Tabs.TabPane tab="Add to existing track" key="1">
-          <Form
-            name='addToTrack'
-            labelCol={{ span: 6 }}
-            wrapperCol={{ span: 18 }}
-            style={{ maxWidth: 400 }}
-            onFinish={onFinishAdd}
-            autoComplete='off'
-          >
-            <Form.Item<NewTrackProps>
-              label='Track'
-              name='trackId'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please select a track!" }]}
-            >
-              <Select options={trackOptions} />
-            </Form.Item>
-            <Form.Item label={null}>
-              <Button type='text' onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button type='primary' htmlType='submit'>
-                Add
-              </Button>
-            </Form.Item>
-          </Form>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Create new track" key="2">
-          <Form
-            name='createTrack'
-            labelCol={{ span: 6 }}
-            wrapperCol={{ span: 18 }}
-            style={{ maxWidth: 400 }}
-            initialValues={{ year: initialYear, month: initialMonth }}
-            onFinish={onFinishCreate}
-            autoComplete='off'
-          >
-            <Form.Item<NewTrackProps>
-              label='Name'
-              name='name'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please enter track name!" }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item<NewTrackProps>
-              label='Short Name'
-              name='shortName'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please enter abbreviated track name!" }]}
-            >
-              <Space.Compact>
-                <Input maxLength={4} />
-              </Space.Compact>
-            </Form.Item>
-
-            <Form.Item<NewTrackProps>
-              label='Year'
-              name='year'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please enter Year for data" }]}
-            >
-              <InputNumber min={2020} max={2040} changeOnWheel />
-            </Form.Item>
-
-            <Form.Item<NewTrackProps>
-              label='Month'
-              name='month'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please enter Month for data" }]}
-            >
-              <InputNumber min={1} max={12} changeOnWheel  />
-            </Form.Item>
-
-            <Form.Item<NewTrackProps>
-              label='Environment'
-              name='symbol'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please enter track symbol" }]}
-            >
-              <Select defaultValue={symbolOptions[0].value} options={symbolOptions}  />
-            </Form.Item>
-
-            <Form.Item<NewTrackProps>
-              label='Colour'
-              name='color'
-              style={itemStyle}
-              rules={[{ required: true, message: "Please enter track color" }]}
-            >
-              <ColorPicker presets={presetColors} disabledFormat showText={false} disabledAlpha defaultValue={"#f00"} format="hex" trigger="hover"  />
-            </Form.Item>
-
-            <Form.Item label={null}>
-              <Button type='text' onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button type='primary' htmlType='submit'>
-                Create
-              </Button>
-            </Form.Item>
-          </Form>
-        </Tabs.TabPane>
+      <Tabs defaultActiveKey="1" items={tabs}>
       </Tabs>
     </Modal>
   )
