@@ -1,7 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../../app/store';
 import { TRACK_TYPE } from '../../constants';
-import { TrackProps } from '../../components/LoadTrackModal';
+import { NewTrackProps } from '../../components/LoadTrackModal';
 
 interface OpRepData {
   dtg: string;
@@ -31,7 +31,7 @@ const parseOpRepLine = (line: string): OpRepData | null => {
   };
 };
 
-const convertToGeoJson = (data: OpRepData[], values: TrackProps): Feature<Geometry, GeoJsonProperties> => {
+const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geometry, GeoJsonProperties> => {
   const latStringToValue = (coord: string) => {
     const degrees = parseFloat(coord.slice(0, 2));
     const minutes = parseFloat(coord.slice(2));
@@ -82,7 +82,7 @@ const convertToGeoJson = (data: OpRepData[], values: TrackProps): Feature<Geomet
   };
 };
 
-export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: TrackProps) => {
+export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => {
 
   if (!values || !values.year || !values.month || !values.name || !values.shortName || !values.symbol || !values.color) {
     return;

@@ -4,7 +4,7 @@ import { standardShades } from "../helpers/standardShades"
 import { PresetsItem } from "antd/es/color-picker/interface"
 import { useAppSelector } from "../app/hooks"
 
-export type TrackProps = {
+export type NewTrackProps = {
   name: string
   shortName: string
   year: number
@@ -16,7 +16,7 @@ export type TrackProps = {
 
 export interface LoadTrackModelProps {
   visible: boolean
-  newTrack: (value: TrackProps) => void
+  newTrack: (value: NewTrackProps) => void
   addToTrack: (trackId: string) => void
   cancel: () => void
 }
@@ -31,7 +31,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     addToTrack(id.id)
   }
 
-  const onFinishCreate: FormProps<TrackProps>["onFinish"] = (values) => {
+  const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
     const colorValue = values.color as any as Color
     values.color = colorValue.toRgbString()
     newTrack(values)
@@ -83,7 +83,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             onFinish={onFinishAdd}
             autoComplete='off'
           >
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Track'
               name='trackId'
               style={itemStyle}
@@ -111,7 +111,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             onFinish={onFinishCreate}
             autoComplete='off'
           >
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Name'
               name='name'
               style={itemStyle}
@@ -119,7 +119,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             >
               <Input />
             </Form.Item>
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Short Name'
               name='shortName'
               style={itemStyle}
@@ -130,7 +130,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
               </Space.Compact>
             </Form.Item>
 
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Year'
               name='year'
               style={itemStyle}
@@ -139,7 +139,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
               <InputNumber min={2020} max={2040} changeOnWheel />
             </Form.Item>
 
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Month'
               name='month'
               style={itemStyle}
@@ -148,7 +148,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
               <InputNumber min={1} max={12} changeOnWheel  />
             </Form.Item>
 
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Environment'
               name='symbol'
               style={itemStyle}
@@ -157,7 +157,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
               <Select defaultValue={symbolOptions[0].value} options={symbolOptions}  />
             </Form.Item>
 
-            <Form.Item<TrackProps>
+            <Form.Item<NewTrackProps>
               label='Colour'
               name='color'
               style={itemStyle}
