@@ -21,10 +21,11 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 import { AppDispatch } from './app/store.ts';
+import { LoadTrackModel, NewTrackProps } from './components/LoadTrackModal.tsx';
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => void
 }
 
 export interface TimeState {
@@ -131,9 +132,6 @@ function App() {
     }
   };
 
-  const [year, setYear] = useState<number | null>(new Date().getFullYear());
-  const [month, setMonth] = useState<number | null>(new Date().getMonth() + 1);
-  const [name, setName] = useState<string | null>('pending');
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null);
@@ -144,16 +142,22 @@ function App() {
     setIsDialogVisible(true);
   };
 
-  const handleDialogOk = async () => {
+  const setLoadTrackResults = async (values: NewTrackProps) => {
     setIsDialogVisible(false);
-    if (currentFile && currentHandler && year && month && name) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, year, month, name);
+    if (currentFile && currentHandler) {
+      currentHandler.handle(await currentFile.text(), features, dispatch, values);
     }
   };
 
   const handleDialogCancel = () => {
     setIsDialogVisible(false);
-    // End the loading process
+  };
+
+  const addToTrack = (trackId: string) => {
+    // Implement the logic to add position data to an existing track
+    // You can use the trackId and values to update the existing track
+    setIsDialogVisible(false)
+    window.alert('adding data to track:' + trackId)
   };
 
   return (
@@ -165,9 +169,9 @@ function App() {
       {error && <div className="error-modal">{error}</div>} {/* Error modal */}
       <ConfigProvider theme={antdTheme}>
           <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-            <Splitter.Panel key='left' collapsible defaultSize="20%" min="20%" max="70%">
+            <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
               <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-                <Splitter.Panel defaultSize="20%" min="10%" max="20%" resizable={true}>
+                <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                   <Card title='Time Control'>
                     {timeBounds && 
                       <TimeControl start={timeBounds[0]} end={timeBounds[1]} />}
@@ -200,25 +204,8 @@ function App() {
           </Splitter>
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
-      <Modal
-        title="Enter Missing Fields"
-        visible={isDialogVisible}
-        onOk={handleDialogOk}
-        onCancel={handleDialogCancel}
-      >
-        <div>
-          <label>Year:</label>
-          <input type="number" value={year || ''} onChange={(e) => setYear(parseInt(e.target.value))} />
-        </div>
-        <div>
-          <label>Month:</label>
-          <input type="number" value={month || ''} onChange={(e) => setMonth(parseInt(e.target.value))} />
-        </div>
-        <div>
-          <label>Name:</label>
-          <input type="text" value={name || ''} onChange={(e) => setName(e.target.value)} />
-        </div>
-      </Modal>
+      <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
+        newTrack={setLoadTrackResults} addToTrack={addToTrack} />
     </div>
   )
 }

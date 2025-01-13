@@ -1,6 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../../app/store';
 import { TRACK_TYPE } from '../../constants';
+import { NewTrackProps } from '../../components/LoadTrackModal';
 
 interface OpRepData {
   dtg: string;
@@ -30,7 +31,7 @@ const parseOpRepLine = (line: string): OpRepData | null => {
   };
 };
 
-const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: string): Feature<Geometry, GeoJsonProperties> => {
+const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geometry, GeoJsonProperties> => {
   const latStringToValue = (coord: string) => {
     const degrees = parseFloat(coord.slice(0, 2));
     const minutes = parseFloat(coord.slice(2));
@@ -56,7 +57,7 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
     const day = parseInt(item.dtg.slice(0, 2), 10);
     const hour = parseInt(item.dtg.slice(2, 4), 10);
     const minute = parseInt(item.dtg.slice(4, 6), 10);
-    return new Date(Date.UTC(year, month - 1, day, hour, minute)).toISOString();
+    return new Date(Date.UTC(values.year, values.month - 1, day, hour, minute)).toISOString();
   });
 
   const courses = data.map((item) => parseInt(item.course, 10));
@@ -70,8 +71,10 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
     },
     properties: {
       dataType: TRACK_TYPE,
-      color: coordinates[0].length === 3 ? '#F00' : '#00F',
-      name,
+      color: values.color,
+      name: values.name,
+      shortName: values.shortName,
+      symbol: values.symbol,
       times,
       courses,
       speeds,
@@ -79,9 +82,9 @@ const convertToGeoJson = (data: OpRepData[], year: number, month: number, name: 
   };
 };
 
-export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, year?: number, month?: number, name?: string) => {
+export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => {
 
-  if (!year || !month || !name) {
+  if (!values || !values.year || !values.month || !values.name || !values.shortName || !values.symbol || !values.color) {
     return;
   }
 
@@ -95,7 +98,7 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     }
   }
 
-  const newFeature = convertToGeoJson(data, year, month, name);
+  const newFeature = convertToGeoJson(data, values);
   dispatch({ type: 'featureCollection/featureAdded', payload: newFeature });
 };
 

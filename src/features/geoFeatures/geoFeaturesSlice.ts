@@ -1,9 +1,12 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Feature, FeatureCollection } from 'geojson'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { BBox, Feature, FeatureCollection } from 'geojson';
+import * as turf from '@turf/turf';
+import { LatLngBounds } from 'leaflet';
 
 const initialState: FeatureCollection = {
   type: 'FeatureCollection',
-  features: []
+  features: [],
+  bbox: [0, 0, 0, 0]
 }
 
 let counter = 0
@@ -22,6 +25,12 @@ const cleanFeature = (feature: Feature): Feature => {
   return feature
 }
 
+const updateBounds = (state: FeatureCollection): BBox => {
+  const visibleFeatures = state.features.filter(feature => feature.properties?.visible);
+  return turf.bbox(turf.featureCollection(visibleFeatures)) as BBox;
+}
+
+
 // Create the slice and pass in the initial state
 const featuresSlice = createSlice({
   name: 'featureCollection',
@@ -29,19 +38,23 @@ const featuresSlice = createSlice({
   reducers: {
     clearStore(state) {
       state.features = []
+      state.bbox = updateBounds(state)
     },
     featureAdded(state, action: PayloadAction<Feature>) {
       const cleaned = cleanFeature(action.payload)
       state.features.push(cleaned)
+      state.bbox = updateBounds(state)
     },
     featuresAdded(state, action: PayloadAction<Feature[]>) {
       const cleaned = action.payload.map(cleanFeature)
       state.features.push(...cleaned)
+      state.bbox = updateBounds(state)
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
       const cleaned = action.payload.map(cleanFeature)
       const removeUpdated = state.features.filter((feature) => !cleaned.find((f) => f.id === feature.id))
       state.features = removeUpdated.concat(cleaned)
+      state.bbox = updateBounds(state)
     },
     featuresVisible(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
@@ -51,9 +64,16 @@ const featuresSlice = createSlice({
         }
         feature.properties.visible = ids.includes(feature.id as string)
       })
-    }
+      state.bbox = updateBounds(state)
+    },
   }
 })
+
+// Selector to get bounds in Leaflet's LatLngBounds format
+export const selectBounds = (state: FeatureCollection): LatLngBounds => {
+  const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number];
+  return new LatLngBounds([minY, minX], [maxY, maxX]);
+};
 
 // Export the generated reducer function
 export default featuresSlice.reducer

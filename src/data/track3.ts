@@ -6,6 +6,7 @@ const track = {
     dataType: TRACK_TYPE,
     color: "#0F0",
     name: "LEOPOLD I",
+    shortName: 'LEOP',
     times: [
       "2024-11-14T16:17:00.000Z",
       "2024-11-14T16:18:00.000Z",

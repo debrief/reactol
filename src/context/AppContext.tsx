@@ -6,6 +6,8 @@ interface AppContextProps {
   setSelection: React.Dispatch<React.SetStateAction<string[]>>;
   time: TimeState;
   setTime: React.Dispatch<React.SetStateAction<TimeState>>;
+  viewportFrozen: boolean
+  setViewportFrozen:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -16,9 +18,10 @@ interface Props {
 
 const AppProvider: React.FC<Props> = ({ children }) => {
   const [selection, setSelection] = useState<string[]>([]);
+  const [viewportFrozen, setViewportFrozen] = useState(false);
   const [time, setTime] = useState<TimeState>({ filterApplied: false, start: 0,  step: '00h30m', end: 0 });
   return (
-    <AppContext.Provider value={{ selection, setSelection, time, setTime }}>
+    <AppContext.Provider value={{ selection, setSelection, time, setTime, viewportFrozen, setViewportFrozen }}>
       {children}
     </AppContext.Provider>
   );

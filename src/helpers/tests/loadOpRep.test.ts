@@ -17,7 +17,8 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+      '#ff0'});
 
     const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(1);
@@ -36,7 +37,8 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+    '#ff0'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -51,7 +53,8 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/150//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+      '#ff0'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -65,7 +68,8 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(sampleOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+      '#ff0'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -81,7 +85,8 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(invalidOpRepData, existing, store.dispatch, 2024, 12, 'name-a');
+    await loadOpRep(invalidOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+      '#ff0'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
@@ -94,7 +99,8 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
-    await loadOpRep(validOpRepData, existing, store.dispatch, 2023, 11, 'name-b');
+    await loadOpRep(validOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+      '#ff0'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<MultiPoint>;
