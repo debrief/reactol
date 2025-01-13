@@ -58,8 +58,12 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   }
 
   const onFinishCreate: FormProps<NewTrackProps>['onFinish'] = (values) => {
-    const colorValue = values.color as any as Color
-    values.color = colorValue.toRgbString()
+    // see if we have to conver the color to rgb string, check if 
+    // values.color is an object with a color property
+    if (typeof values.color === 'object') {
+      const colorValue = values.color as any as Color
+      values.color = colorValue.toRgbString()
+    }
     newTrack(values)
   }
 
@@ -101,7 +105,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 18 }}
       style={{ maxWidth: 400 }}
-      initialValues={{ year: initialYear, month: initialMonth }}
+      initialValues={{ year: initialYear, month: initialMonth, 
+        symbol: symbolOptions[0].value, color: presetColors[0].colors[0] }}
       onFinish={onFinishCreate}
       autoComplete='off'
     >
@@ -149,7 +154,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         style={itemStyle}
         rules={[{ required: true, message: 'Please specify the environment for the track' }]}
       >
-        <Select defaultValue={symbolOptions[0].value} options={symbolOptions}  />
+        <Select options={symbolOptions}  />
       </Form.Item>
 
       <Form.Item<NewTrackProps>
@@ -158,7 +163,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         style={itemStyle}
         rules={[{ required: true, message: 'Please enter track color' }]}
       >
-        <ColorPicker presets={presetColors} disabledFormat showText={false} disabledAlpha defaultValue={'#f00'} format='hex' trigger='hover'  />
+        <ColorPicker presets={presetColors} disabledFormat showText={false} disabledAlpha format='hex' trigger='hover'  />
       </Form.Item>
 
       <Form.Item label={null}>
