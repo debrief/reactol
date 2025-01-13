@@ -2,6 +2,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../../app/store';
 import { TRACK_TYPE } from '../../constants';
 import { NewTrackProps } from '../../components/LoadTrackModal';
+import { TrackProps } from '../../types';
 
 interface OpRepData {
   dtg: string;
@@ -31,7 +32,7 @@ const parseOpRepLine = (line: string): OpRepData | null => {
   };
 };
 
-const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geometry, GeoJsonProperties> => {
+const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geometry, TrackProps> => {
   const latStringToValue = (coord: string) => {
     const degrees = parseFloat(coord.slice(0, 2));
     const minutes = parseFloat(coord.slice(2));
@@ -60,8 +61,20 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
     return new Date(Date.UTC(values.year, values.month - 1, day, hour, minute)).toISOString();
   });
 
-  const courses = data.map((item) => parseInt(item.course, 10));
+  const courses = data.map((item) => parseFloat(item.course));
   const speeds = data.map((item) => parseFloat(item.speed));
+
+  const props: TrackProps = {
+    dataType: TRACK_TYPE,
+    color: values.color,
+    name: values.name,
+    shortName: values.shortName,
+    visible: true,
+    symbol: values.symbol,
+    times,
+    courses,
+    speeds
+  }
 
   return {
     type: 'Feature',
@@ -69,16 +82,7 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
       type: 'MultiPoint',
       coordinates,
     },
-    properties: {
-      dataType: TRACK_TYPE,
-      color: values.color,
-      name: values.name,
-      shortName: values.shortName,
-      symbol: values.symbol,
-      times,
-      courses,
-      speeds,
-    },
+    properties: props,
   };
 };
 
