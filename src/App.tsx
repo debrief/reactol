@@ -21,11 +21,11 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 import { AppDispatch } from './app/store.ts';
-import { LoadTrackModel, TrackProps } from './components/LoadTrackModal.tsx';
+import { LoadTrackModel, NewTrackProps } from './components/LoadTrackModal.tsx';
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: TrackProps) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => void
 }
 
 export interface TimeState {
@@ -142,7 +142,7 @@ function App() {
     setIsDialogVisible(true);
   };
 
-  const setLoadTrackResults = async (values: TrackProps) => {
+  const setLoadTrackResults = async (values: NewTrackProps) => {
     setIsDialogVisible(false);
     if (currentFile && currentHandler) {
       currentHandler.handle(await currentFile.text(), features, dispatch, values);
@@ -151,6 +151,13 @@ function App() {
 
   const handleDialogCancel = () => {
     setIsDialogVisible(false);
+  };
+
+  const addToTrack = (trackId: string) => {
+    // Implement the logic to add position data to an existing track
+    // You can use the trackId and values to update the existing track
+    setIsDialogVisible(false)
+    window.alert('adding data to track:' + trackId)
   };
 
   return (
@@ -198,7 +205,7 @@ function App() {
           <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
       <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
-        setResults={setLoadTrackResults}/>
+        newTrack={setLoadTrackResults} addToTrack={addToTrack} />
     </div>
   )
 }
