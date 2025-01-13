@@ -39,8 +39,8 @@ test('span before start', () => {
   const timeStart = new Date("2024-11-14T09:00:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T11:30:00.000Z").getTime()
   const res = filterTrack(true, timeStart, timeEnd, times, coords)
-  expect(res[0]).toEqual({pos: [1,1], time: '141000Z'})
-  expect(res[1]).toEqual({pos: [2,2], time: '141100Z'})
+  expect(res[0]).toEqual({pos: [1,1], time: '141000Z', timeVisible: false})
+  expect(res[1]).toEqual({pos: [2,2], time: '141100Z', timeVisible: false})
 });
 
 test('span after end', () => {
@@ -50,9 +50,9 @@ test('span after end', () => {
   const timeStart = new Date("2024-11-14T12:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T21:00:00.000Z").getTime()
   const res = filterTrack(true, timeStart, timeEnd, times, coords)
-  expect(res[0]).toEqual({pos: [4,4], time: '141300Z'})
-  expect(res[1]).toEqual({pos: [5,5], time: '141400Z'})
-  expect(res[2]).toEqual({pos: [6,6], time: '141500Z'})
+  expect(res[0]).toEqual({pos: [4,4], time: '141300Z', timeVisible: false})
+  expect(res[1]).toEqual({pos: [5,5], time: '141400Z', timeVisible: false})
+  expect(res[2]).toEqual({pos: [6,6], time: '141500Z', timeVisible: false})
 });
 
 test('span whole period', () => {
@@ -72,7 +72,7 @@ test('span one value', () => {
   const timeStart = new Date("2024-11-14T13:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T14:30:00.000Z").getTime()
   const res = filterTrack(true, timeStart, timeEnd, times, coords)
-  expect(res[0]).toEqual({pos: [5,5], time: '141400Z'})
+  expect(res[0]).toEqual({pos: [5,5], time: '141400Z', timeVisible: false})
   expect(res.length).toEqual(1)
 });
 
