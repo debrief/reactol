@@ -6,6 +6,7 @@ export const loadJson = (text: string, features: Feature<Geometry, GeoJsonProper
   const json = JSON.parse(text);
   if (json.type === 'FeatureCollection') {
     const newFeatures = json.features;
+    // TODO: validate the properties in the features against the schema
     const combined = combineFeatures(features, newFeatures)
     dispatch({ type: 'featureCollection/featuresUpdated', payload: combined });
   } else {
