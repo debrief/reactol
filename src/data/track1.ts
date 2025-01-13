@@ -7,7 +7,6 @@ const track: Feature = {
     dataType: TRACK_TYPE,
     color: '#F00',
     name: 'VAN GALEN',
-    shortName: 'VANG',
     times: [
       '2024-11-14T16:16:53.662Z',
       '2024-11-14T16:17:53.662Z',
