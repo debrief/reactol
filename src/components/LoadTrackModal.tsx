@@ -27,20 +27,11 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   newTrack,
   addToTrack
 }) => {
-  const onFinishAdd: FormProps<{id: string}>["onFinish"] = (id) => {
-    addToTrack(id.id)
-  }
+  // collate a list of existing tracks, in case user wants to add data to existing track
+  const features = useAppSelector(state => state.featureCollection.features)
+  const trackOptions = features.filter(feature => feature.properties?.dataType === 'track')
+    .map(feature => ({ value: feature.id, label: feature.properties?.name || feature.id }))
 
-  const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
-    const colorValue = values.color as any as Color
-    values.color = colorValue.toRgbString()
-    newTrack(values)
-  }
-
-  const onCancel = () => {
-    console.log('cancel')
-    cancel()
-  }
   const initialYear = new Date().getFullYear()
   const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
@@ -57,11 +48,22 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
         colors: standardShades.map((shade) => shade.value),
         defaultOpen: true
   }]
+  
+  const onFinishAdd: FormProps<{id: string}>["onFinish"] = (id) => {
+    addToTrack(id.id)
+  }
 
-  const features = useAppSelector(state => state.featureCollection.features)
-  const trackOptions = features.filter(feature => feature.properties?.dataType === 'track')
-    .map(feature => ({ value: feature.id, label: feature.properties?.name || feature.id }))
-    
+  const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
+    const colorValue = values.color as any as Color
+    values.color = colorValue.toRgbString()
+    newTrack(values)
+  }
+
+  const onCancel = () => {
+    console.log('cancel')
+    cancel()
+  }
+
   return (
     <Modal
       title='Complete track data'
@@ -70,7 +72,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       onCancel={onCancel}
       footer={[]}
       maskClosable={false}
-      destroyOnClose={true}
+      destroyOnClose={true} // set to true, in order to re-generate track ids
     >
       <Tabs defaultActiveKey="1">
         <Tabs.TabPane tab="Add to existing track" key="1">
@@ -79,7 +81,6 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 18 }}
             style={{ maxWidth: 400 }}
-            initialValues={{ year: initialYear, month: initialMonth }}
             onFinish={onFinishAdd}
             autoComplete='off'
           >
