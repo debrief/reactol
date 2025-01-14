@@ -111,6 +111,7 @@ function App() {
     var files = event.dataTransfer.files;
 
     if (files.length > 1) {
+      console.log('too many files error')
       setError('Only one file can be loaded at a time');
       return
     }
@@ -126,6 +127,7 @@ function App() {
             handler.handle(await file.text(), features, dispatch);
           }
         } catch (e) {
+          console.log('handler error', e)
           setError('' + e); // Set error message
         }
       }
