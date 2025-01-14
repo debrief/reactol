@@ -16,8 +16,7 @@ import { useAppContext } from '../context/AppContext';
 import { TimeSupport } from '../helpers/time-support';
 
 export interface TimeProps {
-  start: number // earliest time in data
-  end: number // latest time in data
+  bounds: [number, number] | null 
 }
 
 export const StepOptions = [
@@ -49,9 +48,10 @@ interface TimeButtonProps {
 
 
 
-const TimeControl: React.FC<TimeProps> = ({start, end}) => {
+const TimeControl: React.FC<TimeProps> = ({bounds}) => {
   const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext();
-
+  const start = bounds ? bounds[0] : 0
+  const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value);
   const [interval, setInterval] = useState<number>(0);
 
@@ -126,8 +126,8 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
             <Tooltip mouseEnterDelay={0.8} title='Lock viewport to prevent accidental map movement'>
               <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}>{viewportFrozen ? <LockFilled/> : <UnlockOutlined/>}</Button>
             </Tooltip>
-            <Tooltip mouseEnterDelay={0.8} title='Enable time controls, to filter tracks by time'>
-              <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
+            <Tooltip mouseEnterDelay={0.8} title={bounds ? 'Enable time controls, to filter tracks by time': 'No time data available'}>
+              <Button style={buttonStyle} disabled={bounds === null} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
             </Tooltip>
           </Col>
           <Col span={4}>

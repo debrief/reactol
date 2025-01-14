@@ -43,7 +43,7 @@ const FileHandlers: FileHandler[] = [
 function App() {
   const features = useAppSelector(state => state.featureCollection.features)
   const dispatch = useAppDispatch()
-  const [timeBounds, setTimeBounds] = useState<[number, number]>([0, 0])
+  const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
   const [isDragging, setIsDragging] = useState(false); // State to track if a file is being dragged
   const [error, setError] = useState<string | null>(null); // State to track error messages
@@ -67,16 +67,25 @@ function App() {
 
 
   const timePeriod = useMemo(() => {
-    const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`;
-    return formattedTimePeriod;
+    if (time.start && time.end) {
+      const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`;
+      return formattedTimePeriod;  
+    } else {
+      return 'Pending'
+    }
   }, [time]);
 
   useEffect(() => {
     if (features && features.length) {
       const timeBoundsVal = timeBoundsFor(features)
-      setTimeBounds(timeBoundsVal)
-      const timePayload = { filterApplied: false, start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
-      setTime(timePayload)
+      if(timeBoundsVal) {
+        setTimeBounds(timeBoundsVal)
+        const timePayload = { filterApplied: false, start: timeBoundsVal[0], step: '00h30m', end: timeBoundsVal[1] }
+        setTime(timePayload)  
+      } else {
+        setTimeBounds(null)
+        setTime({...time, filterApplied: false, start: 0, end: 0})
+      }
     }
   }, [features])
 
@@ -172,8 +181,7 @@ function App() {
               <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
                 <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                   <Card title='Time Control'>
-                    {timeBounds && 
-                      <TimeControl start={timeBounds[0]} end={timeBounds[1]} />}
+                    <TimeControl bounds={timeBounds}/>
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>
