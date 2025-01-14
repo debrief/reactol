@@ -11,7 +11,7 @@ import track2 from './data/track2.ts';
 import track3 from './data/track3.ts';
 import zones from './data/zones.ts';
 import points from './data/points.ts';
-import Map from './components/Map';
+import Map from './components/spatial/Map/index.tsx';
 import GraphModal from './components/GraphModal';
 import { useAppContext } from './context/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';

@@ -1,15 +1,15 @@
 import { Feature, Point, Polygon } from "geojson";
 import { MapContainer, ScaleControl, useMap } from 'react-leaflet';
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../constants";
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../../constants";
 import Track from "../Track";
 import Zone from "../Zone";
 import { useCallback, useEffect, useMemo } from "react";
-import { useAppSelector } from "../../app/hooks";
-import { useAppContext } from "../../context/AppContext";
+import { useAppSelector } from "../../../app/hooks";
+import { useAppContext } from "../../../context/AppContext";
 import { Point as DataPoint } from "../Point";
 import MouseCoordinates from '../MouseCoordinates';
 import { Graticule } from "../AutoGraticule";
-import { HomeControl } from "../HomeControl";
+import { HomeControl } from "../../HomeControl";
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
