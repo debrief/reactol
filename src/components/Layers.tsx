@@ -38,9 +38,12 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const selectedFeatures = features.filter(feature => selection.includes(feature.id as string))
   const dispatch = useAppDispatch()
 
+  const NODE_TRACKS = 'node-tracks';
+
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
+  const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<string[]>([ROOT_ID]); // Add state for expanded keys
   
   const mapFunc = (features: Feature[], title: string, key: string, dType: string): TreeDataNode => {
     const handleAdd = (e: any, key: string) => {
@@ -60,7 +63,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   }
   useEffect(() => {
     const items: TreeDataNode[] = []
-    items.push(mapFunc(features, 'Tracks', 'node-tracks', TRACK_TYPE))
+    items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
     items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
     const modelData = {
@@ -72,6 +75,9 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     if (features) {
       const checked: string[] = features.filter((feature) => isChecked(feature)).map((feature) => idFor(feature))
       setCheckedKeys(checked)
+      // this would expand all top level items
+      // const expanded: string[] = items.map(item => item.key as string); // include top level keys
+      setDefaultExpandedKeys([NODE_TRACKS]);
     }
   }, [features])
   
@@ -110,18 +116,19 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
         <Button onClick={onGraphClick} disabled={!temporalFeatureSelected} type="primary"><LineChartOutlined /></Button>
       </Tooltip> 
     </Flex>
-    <Tree checkable
-    showLine={true}
-      defaultExpandedKeys={['node-root']}
+    { model.length && <Tree checkable
+      showLine={true}
+      defaultExpandedKeys={defaultExpandedKeys} // Use expandedKeys state
       defaultSelectedKeys={[]}
       defaultCheckedKeys={[]}
       multiple={true}
       onSelect={onSelect}
+      autoExpandParent={true}
       onCheck={onCheck}
       showIcon={true}
       checkedKeys={checkedKeys}
       selectedKeys={selection || []}
-      treeData={model} />
+      treeData={model} /> }
     </>
 }
 
