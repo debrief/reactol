@@ -50,7 +50,6 @@ function App() {
   const { setTime, time } = useAppContext();
 
   const storeInitialised = useRef(false); 
-  const timeInitialised = useRef(false);
 
   useEffect(() => {
     if (!storeInitialised.current) {
@@ -72,12 +71,10 @@ function App() {
     return formattedTimePeriod;
   }, [time]);
 
-
   useEffect(() => {
-    if (features && features.length && !timeInitialised.current) {
-      timeInitialised.current = true
-      const timeBounds = timeBoundsFor(features)
-      setTimeBounds(timeBounds)
+    if (features && features.length) {
+      const timeBoundsVal = timeBoundsFor(features)
+      setTimeBounds(timeBoundsVal)
       const timePayload = { filterApplied: false, start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
       setTime(timePayload)
     }
