@@ -5,8 +5,8 @@ import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } fr
 import * as turf from "@turf/turf";
 import nearestPoint from '@turf/nearest-point';
 import './index.css';
-import { useAppContext } from '../../../context/AppContext';
-import { useAppSelector } from '../../../app/hooks';
+import { useAppContext } from '../../../state/AppContext';
+import { useAppSelector } from '../../../state/hooks';
 import { formatCoordinate } from '../../../helpers/formatCoordinate';
 
 const bearingToAzimuth = (bearing: number) => {

@@ -3,7 +3,7 @@ import { LeafletMouseEvent } from 'leaflet';
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet';
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { useAppContext } from "../../../context/AppContext";
+import { useAppContext } from "../../../state/AppContext";
 import { CoordInstance, filterTrack } from "../../../helpers/filterTrack";
 
 export interface TrackFeatureProps {

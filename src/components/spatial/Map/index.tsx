@@ -4,8 +4,8 @@ import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../../constants"
 import Track from "../Track";
 import Zone from "../Zone";
 import { useCallback, useEffect, useMemo } from "react";
-import { useAppSelector } from "../../../app/hooks";
-import { useAppContext } from "../../../context/AppContext";
+import { useAppSelector } from "../../../state/hooks";
+import { useAppContext } from "../../../state/AppContext";
 import { Point as DataPoint } from "../Point";
 import MouseCoordinates from '../MouseCoordinates';
 import { Graticule } from "../AutoGraticule";

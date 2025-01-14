@@ -7,14 +7,14 @@ import { Feature } from 'geojson';
 import { speedCalc } from '../../helpers/calculations/speedCalc';
 import { useEffect } from 'react';
 import React from 'react';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../state/AppContext';
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
 import { rangeCalc } from '../../helpers/calculations/rangeCalc';
 import { courseCalc } from '../../helpers/calculations/courseCalc';
 import { bearingCalc } from '../../helpers/calculations/bearingCalc';
-import { useAppSelector } from '../../app/hooks';
+import { useAppSelector } from '../../state/hooks';
 
 const { Title, Text } = Typography;
 

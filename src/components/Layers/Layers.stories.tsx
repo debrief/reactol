@@ -1,10 +1,10 @@
 import React from 'react';
 import { Meta, StoryFn } from '@storybook/react';
 import { Provider } from 'react-redux';
-import { AppProvider } from '../../context/AppContext';
+import { AppProvider } from '../../state/AppContext';
 import { configureStore } from '@reduxjs/toolkit';
 import Layers from '.././Layers';
-import featuresReducer from '../../features/geoFeatures/geoFeaturesSlice';
+import featuresReducer from '../../state/geoFeaturesSlice';
 import { FeatureCollection } from 'geojson';
 import mockFeatures from '../../mock/features';
 

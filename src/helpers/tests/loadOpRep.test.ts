@@ -1,5 +1,5 @@
 import { loadOpRep } from '../loaders/loadOpRep';
-import featuresReducer from '../../features/geoFeatures/geoFeaturesSlice';
+import featuresReducer from '../../state/geoFeaturesSlice';
 import { Feature, Geometry, GeoJsonProperties, FeatureCollection, MultiPoint } from "geojson";
 import { createStore } from '@reduxjs/toolkit';
 

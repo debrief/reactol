@@ -11,8 +11,8 @@ import {
 } from '@ant-design/icons';
 import { Feature } from 'geojson';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants';
-import { useAppContext } from '../../context/AppContext';
-import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { useAppContext } from '../../state/AppContext';
+import { useAppSelector, useAppDispatch } from '../../state/hooks';
 
 interface LayerProps {
   openGraph: {(): void}
