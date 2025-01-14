@@ -2,7 +2,13 @@ import React, { Key, useEffect, useMemo } from 'react';
 import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd';
 import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
-import { LineChartOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import {
+  LineChartOutlined,
+  PlusCircleOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
 import { Feature } from 'geojson';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppContext } from '../context/AppContext';
@@ -11,8 +17,6 @@ import { useAppSelector, useAppDispatch } from '../app/hooks';
 interface LayerProps {
   openGraph: {(): void}
 }
-
-const ROOT_ID = 'node-root'
 
 type TreeProps = GetProps<typeof Tree>;
 
@@ -32,6 +36,20 @@ const filterFor = (feature: Feature, dType: string): boolean => {
   return feature.properties?.dataType === dType
 }
 
+interface ToolProps {
+  onClick: () => void
+  icon: React.ReactNode
+  title: string
+  disabled: boolean
+}
+
+const ToolButton: React.FC<ToolProps> = ({onClick, icon, title, disabled}) => {
+  return <Tooltip title={title}>
+  <Button size={'small'} onClick={onClick} disabled={disabled} type="primary" icon={icon} />
+</Tooltip> 
+
+}
+
 const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const { selection, setSelection } = useAppContext();
   const features = useAppSelector(state => state.featureCollection.features)
@@ -43,7 +61,11 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
-  const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<string[]>([ROOT_ID]); // Add state for expanded keys
+  const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<string[]>([NODE_TRACKS]); // Add state for expanded keys
+
+  const clearSelection = () => {
+    setSelection([])
+  }
   
   const mapFunc = (features: Feature[], title: string, key: string, dType: string): TreeDataNode => {
     const handleAdd = (e: any, key: string) => {
@@ -66,12 +88,8 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
     items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
-    const modelData = {
-      title: 'Serial',
-      key: ROOT_ID,
-      checkable: false,
-      children: items }
-    setModel([modelData])
+    const modelData = items
+    setModel(modelData)
     if (features) {
       const checked: string[] = features.filter((feature) => isChecked(feature)).map((feature) => idFor(feature))
       setCheckedKeys(checked)
@@ -107,14 +125,27 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     openGraph()
   }
 
+  const onDeleteClick = () => {
+    dispatch({type: 'featureCollection/featuresDeleted', payload: {ids: selection}})
+    setSelection([])
+  }
+
+  const onDuplicateClick = () => {
+    dispatch({type: 'featureCollection/featuresDuplicated', payload: {ids: selection}})
+  }
+
+  const duplicateDisabled = useMemo(() =>
+     selection.length === 0 || !!selection.find((id) => features.find((feature) => feature.id === id)?.properties?.dataType === TRACK_TYPE), [selection, features])
+
   return <>
     <Modal title="Message" visible={message !== ''} onOk={() => setMessage('')} onCancel={() => setMessage('')}>
       <Alert type="info" description={message} />
     </Modal>
-    <Flex gap='small' justify='end' wrap>
-      <Tooltip title={temporalFeatureSelected ? 'View graph of selected features' : 'Select a time-related feature to enable graphs'}>
-        <Button onClick={onGraphClick} disabled={!temporalFeatureSelected} type="primary"><LineChartOutlined /></Button>
-      </Tooltip> 
+    <Flex gap='small' justify='end' wrap style={{height: '1em'}}>
+      <ToolButton onClick={onGraphClick} disabled={!temporalFeatureSelected} icon={<LineChartOutlined/>} title={temporalFeatureSelected ? 'View graph of selected features' : 'Select a time-related feature to enable graphs'}/>
+      <ToolButton onClick={clearSelection} disabled={selection.length === 0} icon={<CloseCircleOutlined />} title={'Clear selection'}/>
+      <ToolButton onClick={onDeleteClick} disabled={selection.length === 0} icon={<DeleteOutlined />} title={selection.length > 0 ? 'Delete selected items' : 'Select items to enable delete'}/>
+      <ToolButton onClick={onDuplicateClick} disabled={duplicateDisabled} icon={<CopyOutlined />} title={selection.length > 0 ? 'Duplicate selected items' : 'Select non-track items to enable duplicate'}/>
     </Flex>
     { model.length && <Tree checkable
       showLine={true}
