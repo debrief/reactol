@@ -66,6 +66,23 @@ const featuresSlice = createSlice({
       })
       state.bbox = updateBounds(state)
     },
+    featuresDeleted(state, action: PayloadAction<{ ids: string[], }>) {
+      const { ids } = action.payload;
+      state.features = state.features.filter(feature => !ids.includes(feature.id as string));
+      state.bbox = updateBounds(state);
+    },
+    featuresDuplicated(state, action: PayloadAction<{ ids: string[], }>) {
+      const { ids } = action.payload;
+      const newFeatures = state.features
+        .filter(feature => ids.includes(feature.id as string))
+        .map(feature => {
+          const newFeature = { ...feature, id: `f-${++counter}` };
+          newFeature.properties = { ...feature.properties, name: `Copy of ${feature.properties?.name || feature.id}` };
+          return newFeature;
+        });
+      state.features.push(...newFeatures);
+      state.bbox = updateBounds(state);
+    },
   }
 })
 
