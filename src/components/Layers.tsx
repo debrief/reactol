@@ -116,19 +116,25 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     dispatch({type: 'featureCollection/featuresDuplicated', payload: {ids: selection}})
   }
 
+  const duplicateDisabled = useMemo(() =>
+     selection.length > 0 && !!selection.find((id) => features.find((feature) => feature.id === id)?.properties?.dataType === TRACK_TYPE), [selection, features])
+  const smallButton = {
+    padding: '0px 4px',
+  }
+
   return <>
     <Modal title="Message" visible={message !== ''} onOk={() => setMessage('')} onCancel={() => setMessage('')}>
       <Alert type="info" description={message} />
     </Modal>
-    <Flex gap='small' justify='end' wrap>
+    <Flex gap='small' justify='end' wrap style={{height: '1em'}}>
       <Tooltip title={temporalFeatureSelected ? 'View graph of selected features' : 'Select a time-related feature to enable graphs'}>
-        <Button onClick={onGraphClick} disabled={!temporalFeatureSelected} type="primary"><LineChartOutlined /></Button>
+        <Button style={smallButton} onClick={onGraphClick} disabled={!temporalFeatureSelected} type="primary"><LineChartOutlined /></Button>
       </Tooltip> 
       <Tooltip title={selection.length > 0 ? 'Delete selected items' : 'Select items to enable delete'}>
-        <Button onClick={onDeleteClick} disabled={selection.length === 0} type="primary"><DeleteOutlined /></Button>
+        <Button style={smallButton} onClick={onDeleteClick} disabled={selection.length === 0} type="primary"><DeleteOutlined /></Button>
       </Tooltip>
       <Tooltip title={selection.length > 0 ? 'Duplicate selected items' : 'Select items to enable duplicate'}>
-        <Button onClick={onDuplicateClick} disabled={selection.length === 0} type="primary"><CopyOutlined /></Button>
+        <Button style={smallButton} onClick={onDuplicateClick} disabled={duplicateDisabled} type="primary"><CopyOutlined /></Button>
       </Tooltip>
     </Flex>
     { model.length && <Tree checkable
