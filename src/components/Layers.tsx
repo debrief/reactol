@@ -2,7 +2,7 @@ import React, { Key, useEffect, useMemo } from 'react';
 import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd';
 import type { GetProps, TreeDataNode } from 'antd';
 import './Layers.css';
-import { LineChartOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { LineChartOutlined, PlusCircleOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { Feature } from 'geojson';
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
 import { useAppContext } from '../context/AppContext';
@@ -107,6 +107,15 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     openGraph()
   }
 
+  const onDeleteClick = () => {
+    dispatch({type: 'featureCollection/featuresDeleted', payload: {ids: selection}})
+    setSelection([])
+  }
+
+  const onDuplicateClick = () => {
+    dispatch({type: 'featureCollection/featuresDuplicated', payload: {ids: selection}})
+  }
+
   return <>
     <Modal title="Message" visible={message !== ''} onOk={() => setMessage('')} onCancel={() => setMessage('')}>
       <Alert type="info" description={message} />
@@ -115,6 +124,12 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
       <Tooltip title={temporalFeatureSelected ? 'View graph of selected features' : 'Select a time-related feature to enable graphs'}>
         <Button onClick={onGraphClick} disabled={!temporalFeatureSelected} type="primary"><LineChartOutlined /></Button>
       </Tooltip> 
+      <Tooltip title={selection.length > 0 ? 'Delete selected items' : 'Select items to enable delete'}>
+        <Button onClick={onDeleteClick} disabled={selection.length === 0} type="primary"><DeleteOutlined /></Button>
+      </Tooltip>
+      <Tooltip title={selection.length > 0 ? 'Duplicate selected items' : 'Select items to enable duplicate'}>
+        <Button onClick={onDuplicateClick} disabled={selection.length === 0} type="primary"><CopyOutlined /></Button>
+      </Tooltip>
     </Flex>
     { model.length && <Tree checkable
       showLine={true}
