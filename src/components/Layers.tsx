@@ -18,8 +18,6 @@ interface LayerProps {
   openGraph: {(): void}
 }
 
-const ROOT_ID = 'node-root'
-
 type TreeProps = GetProps<typeof Tree>;
 
 const idFor = (feature: Feature): string => {
@@ -63,7 +61,7 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
-  const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<string[]>([ROOT_ID]); // Add state for expanded keys
+  const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<string[]>([NODE_TRACKS]); // Add state for expanded keys
 
   const clearSelection = () => {
     setSelection([])
@@ -90,12 +88,8 @@ const Layers: React.FC<LayerProps> = ({openGraph}) => {
     items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
     items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
-    const modelData = {
-      title: 'Serial',
-      key: ROOT_ID,
-      checkable: false,
-      children: items }
-    setModel([modelData])
+    const modelData = items
+    setModel(modelData)
     if (features) {
       const checked: string[] = features.filter((feature) => isChecked(feature)).map((feature) => idFor(feature))
       setCheckedKeys(checked)
