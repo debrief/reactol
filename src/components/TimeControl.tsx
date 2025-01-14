@@ -10,7 +10,7 @@ import {
   UnlockOutlined,
   FilterFilled,
 } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { useAppContext } from '../context/AppContext';
 import { TimeSupport } from '../helpers/time-support';
@@ -109,6 +109,10 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
     setViewportFrozen(!viewportFrozen)
   }
 
+  const copyTooltip = useMemo(() => {
+    return viewportFrozen ? 'Copy snapshot of map to the clipboard' : 'Lock the viewport in order to take a snapshot of the map'
+  }, [viewportFrozen])
+
   const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
   const buttonStyle = { margin: '0 5px' }
 
@@ -123,7 +127,7 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
             </Tooltip>
           </Col>
           <Col span={4}>
-            <Tooltip title={viewportFrozen ? "Copy snapshot of map to the clipboard" : "Freeze the viewport in order to take a snapshot of the map"}>
+            <Tooltip title={copyTooltip}>
               <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} disabled={!viewportFrozen} />
             </Tooltip>
           </Col>
