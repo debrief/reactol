@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Tooltip } from 'antd';
-import { useAppContext } from '../context/AppContext';
-import { useAppSelector } from '../app/hooks';
+import { useAppContext } from '../../context/AppContext';
+import { useAppSelector } from '../../app/hooks';
 import './index.css';
 
 const formatItem = (value: any) => {

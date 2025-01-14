@@ -10,9 +10,9 @@ import {
   CloseCircleOutlined,
 } from '@ant-design/icons';
 import { Feature } from 'geojson';
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../constants';
-import { useAppContext } from '../context/AppContext';
-import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants';
+import { useAppContext } from '../../context/AppContext';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
 
 interface LayerProps {
   openGraph: {(): void}

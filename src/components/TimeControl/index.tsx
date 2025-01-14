@@ -12,9 +12,8 @@ import {
 } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
-import { useAppContext } from '../context/AppContext';
-import { TimeSupport } from '../helpers/time-support';
-import './index.css';
+import { useAppContext } from '../../context/AppContext';
+import { TimeSupport } from '../../helpers/time-support';
 
 export interface TimeProps {
   bounds: [number, number] | null 

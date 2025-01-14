@@ -1,9 +1,8 @@
 import { Button, ColorPicker, Form, FormProps, Input, InputNumber, Modal, Select, Space, Tabs, TabsProps, Typography } from 'antd'
 import { Color } from 'antd/es/color-picker'
-import { standardShades } from '../helpers/standardShades'
+import { standardShades } from '../../helpers/standardShades'
 import { PresetsItem } from 'antd/es/color-picker/interface'
-import { useAppSelector } from '../app/hooks'
-import './index.css'
+import { useAppSelector } from '../../app/hooks'
 
 export type NewTrackProps = {
   name: string

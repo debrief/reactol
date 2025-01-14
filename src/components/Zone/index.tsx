@@ -3,9 +3,8 @@ import { Feature, Geometry, Polygon } from "geojson";
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet';
 import { useCallback, useMemo } from "react";
-import { useAppContext } from "../context/AppContext";
-import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
-import './index.css';
+import { useAppContext } from "../../context/AppContext";
+import { featureIsVisibleInPeriod } from "../../helpers/featureIsVisibleAtTime";
 
 export interface ZoneProps {
   feature: Feature<Polygon> 

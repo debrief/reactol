@@ -1,21 +1,20 @@
-import { Button, Flex, Form, FormProps, Layout, Select } from 'antd'
-import { Header, Content, Footer } from 'antd/es/layout/layout'
-import Sider from 'antd/es/layout/Sider'
-import ReactModal from 'react-modal-resizable-draggable'
+import { Button, Flex, Form, FormProps, Layout, Select } from 'antd';
+import { Header, Content, Footer } from 'antd/es/layout/layout';
+import Sider from 'antd/es/layout/Sider';
+import ReactModal from 'react-modal-resizable-draggable';
 import { Typography } from 'antd';
-import { Feature } from 'geojson'
-import { speedCalc } from '../helpers/calculations/speedCalc';
+import { Feature } from 'geojson';
+import { speedCalc } from '../../helpers/calculations/speedCalc';
 import { useEffect } from 'react';
 import React from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory';
 import { format } from 'date-fns';
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
-import { rangeCalc } from '../helpers/calculations/rangeCalc';
-import { courseCalc } from '../helpers/calculations/courseCalc';
-import { bearingCalc } from '../helpers/calculations/bearingCalc';
-import { useAppSelector } from '../app/hooks';
-import './index.css';
+import { rangeCalc } from '../../helpers/calculations/rangeCalc';
+import { courseCalc } from '../../helpers/calculations/courseCalc';
+import { bearingCalc } from '../../helpers/calculations/bearingCalc';
+import { useAppSelector } from '../../app/hooks';
 
 const { Title, Text } = Typography;
 
