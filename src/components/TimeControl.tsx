@@ -123,7 +123,9 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
             </Tooltip>
           </Col>
           <Col span={4}>
-            <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} />
+            <Tooltip title={viewportFrozen ? "Copy snapshot of map to the clipboard" : "Freeze the viewport in order to take a snapshot of the map"}>
+              <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} disabled={!viewportFrozen} />
+            </Tooltip>
           </Col>
         </Row>
         <Form disabled={!time.filterApplied}>
