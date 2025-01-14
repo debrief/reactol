@@ -10,6 +10,7 @@ import { Point as DataPoint } from "./Point";
 import MouseCoordinates from './MouseCoordinates';
 import { Graticule } from "./AutoGraticule";
 import { HomeControl } from "./AutoGraticule/HomeControl";
+import './index.css';
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible

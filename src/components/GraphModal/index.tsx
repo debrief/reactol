@@ -15,6 +15,7 @@ import { rangeCalc } from '../helpers/calculations/rangeCalc';
 import { courseCalc } from '../helpers/calculations/courseCalc';
 import { bearingCalc } from '../helpers/calculations/bearingCalc';
 import { useAppSelector } from '../app/hooks';
+import './index.css';
 
 const { Title, Text } = Typography;
 

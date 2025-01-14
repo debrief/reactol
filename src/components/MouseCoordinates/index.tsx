@@ -4,7 +4,7 @@ import { useMap, useMapEvents } from 'react-leaflet';
 import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import nearestPoint from '@turf/nearest-point';
-import './MouseCoordinates.css';
+import './index.css';
 import { useAppContext } from '../context/AppContext';
 import { useAppSelector } from '../app/hooks';
 import { formatCoordinate } from '../helpers/formatCoordinate';

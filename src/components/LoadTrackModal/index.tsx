@@ -3,6 +3,7 @@ import { Color } from 'antd/es/color-picker'
 import { standardShades } from '../helpers/standardShades'
 import { PresetsItem } from 'antd/es/color-picker/interface'
 import { useAppSelector } from '../app/hooks'
+import './index.css'
 
 export type NewTrackProps = {
   name: string

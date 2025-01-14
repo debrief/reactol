@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
 import { CoordInstance, filterTrack } from "../helpers/filterTrack";
+import './index.css';
 
 export interface TrackFeatureProps {
   feature: Feature 

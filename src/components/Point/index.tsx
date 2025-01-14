@@ -4,6 +4,7 @@ import { CircleMarker, Tooltip } from 'react-leaflet';
 import { useMemo } from "react";
 import { useAppContext } from "../context/AppContext";
 import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
+import './index.css';
 
 export interface ZoneProps {
   feature: Feature<GPoint> 

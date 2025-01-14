@@ -1,7 +1,7 @@
 import React, { Key, useEffect, useMemo } from 'react';
 import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd';
 import type { GetProps, TreeDataNode } from 'antd';
-import './Layers.css';
+import './index.css';
 import {
   LineChartOutlined,
   PlusCircleOutlined,
