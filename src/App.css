@@ -68,7 +68,9 @@ html, body, #root, .App, #map {
 }
 
 .time-period {
-  font-size: 3em;
+  font-size: 2em;
+  margin-left: 1.6em;
+  margin-top: 1.5em;
 }
 
 .modal-back {

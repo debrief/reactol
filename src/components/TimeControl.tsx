@@ -29,7 +29,7 @@ export const StepOptions = [
   { value: '06h00m' }
 ]
 
-const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
+const pf = (val: number) => format(new Date(val), "MMM ddHHmm'Z'")
   
 const timeStr = (val: number | number[] | null, index?: number): string => {
   if (index !== undefined) {
@@ -65,11 +65,15 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   }, [stepTxt, setInterval])
 
   useEffect(() => {
-    const newStart = TimeSupport.roundDown(new Date(start), interval)
-    const newEnd = TimeSupport.increment(newStart, interval)
-    const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
-    setTime(newTime)
-}, [interval, start, end])
+    if (time.filterApplied) {
+      const newStart = TimeSupport.roundDown(new Date(start), interval)
+      const newEnd = TimeSupport.increment(newStart, interval)
+      const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
+      setTime(newTime)  
+    } else {
+      setTime({...time, start, end})  
+    }
+}, [interval, start, end, time.filterApplied])
 
   const setFilterApplied = (applied: boolean) => {
     const newTime = {...time, filterApplied: applied}
@@ -119,10 +123,10 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   return (
     <>  <Row>
           <Col span={20} style={{textAlign: 'left'}}>
-            <Tooltip mouseEnterDelay={0.5} title='Lock viewport to prevent accidental map movement'>
+            <Tooltip mouseEnterDelay={0.8} title='Lock viewport to prevent accidental map movement'>
               <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}>{viewportFrozen ? <LockFilled/> : <UnlockOutlined/>}</Button>
             </Tooltip>
-            <Tooltip mouseEnterDelay={0.5} title='Enable time controls, to filter tracks by time'>
+            <Tooltip mouseEnterDelay={0.8} title='Enable time controls, to filter tracks by time'>
               <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
             </Tooltip>
           </Col>

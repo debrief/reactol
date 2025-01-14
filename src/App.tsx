@@ -50,7 +50,6 @@ function App() {
   const { setTime, time } = useAppContext();
 
   const storeInitialised = useRef(false); 
-  const timeInitialised = useRef(false);
 
   useEffect(() => {
     if (!storeInitialised.current) {
@@ -72,12 +71,10 @@ function App() {
     return formattedTimePeriod;
   }, [time]);
 
-
   useEffect(() => {
-    if (features && features.length && !timeInitialised.current) {
-      timeInitialised.current = true
-      const timeBounds = timeBoundsFor(features)
-      setTimeBounds(timeBounds)
+    if (features && features.length) {
+      const timeBoundsVal = timeBoundsFor(features)
+      setTimeBounds(timeBoundsVal)
       const timePayload = { filterApplied: false, start: timeBounds[0], step: '00h30m', end: timeBounds[1] }
       setTime(timePayload)
     }
@@ -111,6 +108,7 @@ function App() {
     var files = event.dataTransfer.files;
 
     if (files.length > 1) {
+      console.log('too many files error')
       setError('Only one file can be loaded at a time');
       return
     }
@@ -126,6 +124,7 @@ function App() {
             handler.handle(await file.text(), features, dispatch);
           }
         } catch (e) {
+          console.log('handler error', e)
           setError('' + e); // Set error message
         }
       }
