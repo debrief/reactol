@@ -1,27 +1,27 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd';
 import './App.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Layers from './components/Layers.tsx';
-import Properties from './components/Properties.tsx';
-import TimeControl from './components/TimeControl.tsx';
+import Layers from './components/Layers';
+import Properties from './components/Properties';
+import TimeControl from './components/TimeControl';
 import { timeBoundsFor } from './helpers/timeBounds.ts';
-import { useAppDispatch, useAppSelector } from './app/hooks.ts';
+import { useAppDispatch, useAppSelector } from './state/hooks.ts';
 import track from './data/track1.ts';
 import track2 from './data/track2.ts';
 import track3 from './data/track3.ts';
 import zones from './data/zones.ts';
 import points from './data/points.ts';
-import Map from './components/Map.tsx';
-import GraphModal from './components/GraphModal.tsx';
-import { useAppContext } from './context/AppContext.tsx';
+import Map from './components/spatial/Map/index.tsx';
+import GraphModal from './components/GraphModal';
+import { useAppContext } from './state/AppContext.tsx';
 import { TileLayer } from 'react-leaflet';
 import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
 import { loadOpRep } from './helpers/loaders/loadOpRep.ts'; // Import the loadOpRep function
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
-import { AppDispatch } from './app/store.ts';
-import { LoadTrackModel, NewTrackProps } from './components/LoadTrackModal.tsx';
+import { AppDispatch } from './state/store.ts';
+import { LoadTrackModel, NewTrackProps } from './components/LoadTrackModal';
 
 interface FileHandler {
   blobType: string

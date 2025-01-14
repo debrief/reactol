@@ -1,8 +1,8 @@
 import React from 'react';
 import { Table, Tooltip } from 'antd';
-import { useAppContext } from '../context/AppContext';
-import { useAppSelector } from '../app/hooks';
-import './Properties.css';
+import { useAppContext } from '../../state/AppContext';
+import { useAppSelector } from '../../state/hooks';
+import './index.css';
 
 const formatItem = (value: any) => {
   switch(typeof value) {

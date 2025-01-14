@@ -1,5 +1,5 @@
 import { loadJson } from '../loaders/loadJson';
-import featuresReducer from '../../features/geoFeatures/geoFeaturesSlice';
+import featuresReducer from '../../state/geoFeaturesSlice';
 import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from "geojson";
 import { createStore } from '@reduxjs/toolkit';
 
