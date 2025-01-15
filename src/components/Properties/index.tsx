@@ -1,13 +1,14 @@
-import React, { ReactNode } from "react"
-import { Table, Tooltip } from "antd"
-import { PointProps } from "../../types"
-import { useAppContext } from "../../state/AppContext"
-import { useAppSelector } from "../../state/hooks"
-import "./index.css"
-import { CoreDataProps } from "../../types"
-import { Feature, GeoJsonProperties, Geometry, Point } from "geojson"
-import { REFERENCE_POINT_TYPE } from "../../constants"
-import { PointForm } from "../PointForm"
+import React, { ReactNode, useState } from "react";
+import { Table, Tooltip } from "antd";
+import { PointProps } from "../../types";
+import { useAppContext } from "../../state/AppContext";
+import { useAppSelector } from "../../state/hooks";
+import "./index.css";
+import { CoreDataProps } from "../../types";
+import { Feature, GeoJsonProperties, Geometry, Point } from "geojson";
+import { REFERENCE_POINT_TYPE } from "../../constants";
+import { PointForm } from "../PointForm";
+import { CoreForm } from "../CoreForm";
 
 const formatItem = (value: unknown) => {
   switch (typeof value) {
@@ -27,24 +28,9 @@ const formatItem = (value: unknown) => {
   }
 }
 
-const editorFor = (
-  feature: Feature<Geometry, GeoJsonProperties>
-): ReactNode | null => {
-  if (feature.properties && feature.properties.dataType !== undefined) {
-    const aProps = feature.properties as CoreDataProps
-    switch (aProps.dataType) {
-    case REFERENCE_POINT_TYPE:
-      return <PointForm point={feature as Feature<Point, PointProps>} />
-    default:
-      return null
-    }
-  } else {
-    return null
-  }
-}
-
 const Properties: React.FC = () => {
   const { selection } = useAppContext()
+  const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const allFeatures = useAppSelector(
     (state) => state.featureCollection.features
   )
@@ -57,9 +43,41 @@ const Properties: React.FC = () => {
     return <div>No feature selected</div>
   } else if (features && features.length > 1) {
     return <div>Multiple features selected</div>
+  } else {
+    setFeatureState(features[0])
   }
 
-  const customEditor = editorFor(features[0])
+  const onReset = () => {
+  }
+
+  const onSave = () => {
+  }
+
+  const editorFor = (
+    feature: Feature<Geometry, GeoJsonProperties>
+  ): ReactNode | null => {
+    if (feature.properties && feature.properties.dataType !== undefined) {
+      const aProps = feature.properties as CoreDataProps
+      switch (aProps.dataType) {
+      case REFERENCE_POINT_TYPE:
+        return (
+          <CoreForm feature={feature} onReset={onReset} onSave={onSave}>
+            <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
+          </CoreForm>
+        )
+      default:
+        return null
+      }
+    } else {
+      return null
+    }
+  }
+
+  if(!featureState) {
+    return null
+  }
+
+  const customEditor = editorFor(featureState)
   if (customEditor) {
     return customEditor
   }

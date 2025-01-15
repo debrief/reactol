@@ -4,6 +4,7 @@ import { PointProps } from "../../types";
 
 export interface PointFormProps {
   point: Feature<Point, PointProps>
+  onChange: (point: Feature<Point, PointProps>) => void
 }
 
 export const PointForm: React.FC<PointFormProps> = ({point}) => {
