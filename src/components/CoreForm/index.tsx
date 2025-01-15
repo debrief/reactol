@@ -13,10 +13,10 @@ export const CoreForm: React.FC<CoreFormProps> = ({name, children, onReset, onSa
       {children}
       <Flex gap='small' justify='end' wrap style={{height: '1em'}}>
         <Tooltip title='Reset all values'>
-          <Button onClick={onReset}>Reset</Button>
+          <Button size='small' onClick={onReset}>Reset</Button>
         </Tooltip>
         <Tooltip title='Save edits'>
-          <Button onClick={onSave}>Save</Button>
+          <Button size='small' onClick={onSave}>Save</Button>
         </Tooltip>
       </Flex>
     </div>
