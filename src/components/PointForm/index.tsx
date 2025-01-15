@@ -1,4 +1,4 @@
-import { Feature, Point } from "geojson";
+import { Feature, Point, Position } from "geojson";
 import { PointProps } from "../../types";
 import { Form, Input } from "antd";
 
@@ -8,10 +8,16 @@ export interface PointFormProps {
   onChange: (point: Feature<Point, PointProps>) => void
 }
 
+type PointsWithCoords = PointProps & {
+  coords: Position
+}
+
 export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
 
-  const localChange = (values: string) => {
-    console.log('values changed', values, onChange)
+  const localChange = (values: Partial<PointsWithCoords>) => {
+    const updatedProps = {...point.properties, ...values}
+    const newVal = {...point, properties: updatedProps} as Feature<Point, PointProps>
+    onChange(newVal)
   }
 
   return (
@@ -20,12 +26,12 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 18 }}
       style={{ maxWidth: 400 }}
-      initialValues={point.properties}
+      initialValues={ {...point.properties, coords: point.geometry.coordinates} as PointsWithCoords }
       autoComplete='off'
-      onChange={localChange}
+      onValuesChange={localChange}
     >
 
-      <Form.Item<PointProps>
+      <Form.Item<PointsWithCoords>
         label='Name'
         name='name'
         rules={[{ required: true, message: 'Please enter track name!' }]}
