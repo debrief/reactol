@@ -37,11 +37,20 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
   const map = useMap()
   useEffect(() => {
     if (map) {
-      frozen ? map.dragging.disable() : map.dragging.enable()
-      frozen ? map.scrollWheelZoom.disable() : map.scrollWheelZoom.enable()
-      frozen ? map.touchZoom.disable() : map.touchZoom.enable()
-      frozen ? map.doubleClickZoom.disable() : map.doubleClickZoom.enable()
-      frozen ? map.boxZoom.disable() : map.boxZoom.enable()  
+      if (frozen) {
+        map.dragging.disable()
+        map.scrollWheelZoom.disable()
+        map.touchZoom.disable()
+        map.doubleClickZoom.disable()
+        map.boxZoom.disable() 
+  
+      } else {
+        map.dragging.enable()
+        map.scrollWheelZoom.enable()
+        map.touchZoom.enable()
+        map.doubleClickZoom.enable()
+        map.boxZoom.enable()  
+      }
     }
   },[map, frozen])
   return null
@@ -68,7 +77,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
-  }, [features])
+  }, [features, onClickHandler])
 
   return (
     <>
