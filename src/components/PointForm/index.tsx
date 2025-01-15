@@ -1,6 +1,7 @@
 import { Feature, Point, Position } from "geojson";
 import { PointProps } from "../../types";
-import { Form, Input } from "antd";
+import { Checkbox, ColorPicker, Form, Input } from "antd";
+import { Color } from "antd/es/color-picker";
 
 
 export interface PointFormProps {
@@ -15,6 +16,9 @@ type PointsWithCoords = PointProps & {
 export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
 
   const localChange = (values: Partial<PointsWithCoords>) => {
+    if (values.color) {
+      values.color = (values.color as unknown as Color).toHexString()
+    }
     const updatedProps = {...point.properties, ...values}
     const newVal = {...point, properties: updatedProps} as Feature<Point, PointProps>
     onChange(newVal)
@@ -37,6 +41,19 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
         rules={[{ required: true, message: 'Please enter track name!' }]}
       >
         <Input />
+      </Form.Item>
+      <Form.Item<PointsWithCoords>
+        label='Visible'
+        name='visible'
+        valuePropName="checked" 
+      >
+        <Checkbox />
+      </Form.Item>
+      <Form.Item<PointsWithCoords>
+        name="color"
+        label="Color"
+        rules={[{ required: true, message: 'color is required!' }]}>
+        <ColorPicker format='hex' trigger='click' />
       </Form.Item>
 
     </Form>
