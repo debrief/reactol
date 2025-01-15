@@ -114,7 +114,7 @@ function App() {
     event.preventDefault();
     setIsDragging(false);
 
-    var files = event.dataTransfer.files;
+    const files = event.dataTransfer.files;
 
     if (files.length > 1) {
       console.log('too many files error')
@@ -122,7 +122,7 @@ function App() {
       return
     }
 
-    for (var i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
       const file = files[i]
       const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
       if (handler) {
@@ -176,40 +176,40 @@ function App() {
       </Modal>
       {error && <div className="error-modal">{error}</div>} {/* Error modal */}
       <ConfigProvider theme={antdTheme}>
-          <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-            <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-              <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-                <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
-                  <Card title='Time Control'>
-                    <TimeControl bounds={timeBounds}/>
-                  </Card>
-                </Splitter.Panel>
-                <Splitter.Panel>
-                  <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                    { features && <Layers openGraph={() => setGraphOpen(true)} /> }
-                  </Card>
-                </Splitter.Panel>
-                <Splitter.Panel>
-                  <Card title='Detail'>
-                    <Properties />
-                  </Card>
-                </Splitter.Panel>
-              </Splitter>
-            </Splitter.Panel>
-            <Splitter.Panel key='right'>
-              <Map>
-                <TileLayer maxNativeZoom={8} maxZoom={16}
-                  url="tiles/{z}/{x}/{y}.png"
-                />
-                <Control prepend position='topleft'>
-                  <div className='time-period' style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-                    {timePeriod}
-                  </div>
-                </Control>
-              </Map>
-            </Splitter.Panel>
-          </Splitter>
-          <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
+        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+          <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
+            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+              <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
+                <Card title='Time Control'>
+                  <TimeControl bounds={timeBounds}/>
+                </Card>
+              </Splitter.Panel>
+              <Splitter.Panel>
+                <Card title='Layers' style={{width: '100%', height: '100%'}} >
+                  { features && <Layers openGraph={() => setGraphOpen(true)} /> }
+                </Card>
+              </Splitter.Panel>
+              <Splitter.Panel>
+                <Card title='Detail'>
+                  <Properties />
+                </Card>
+              </Splitter.Panel>
+            </Splitter>
+          </Splitter.Panel>
+          <Splitter.Panel key='right'>
+            <Map>
+              <TileLayer maxNativeZoom={8} maxZoom={16}
+                url="tiles/{z}/{x}/{y}.png"
+              />
+              <Control prepend position='topleft'>
+                <div className='time-period' style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                  {timePeriod}
+                </div>
+              </Control>
+            </Map>
+          </Splitter.Panel>
+        </Splitter>
+        <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
       <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
         newTrack={setLoadTrackResults} addToTrack={addToTrack} />
