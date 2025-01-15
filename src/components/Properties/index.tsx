@@ -1,5 +1,4 @@
-import React, { ReactNode, useState } from "react";
-import { Table, Tooltip } from "antd";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { PointProps } from "../../types";
 import { useAppContext } from "../../state/AppContext";
 import { useAppDispatch, useAppSelector } from "../../state/hooks";
@@ -9,128 +8,62 @@ import { Feature, GeoJsonProperties, Geometry, Point } from "geojson";
 import { REFERENCE_POINT_TYPE } from "../../constants";
 import { PointForm } from "../PointForm";
 import { CoreForm } from "../CoreForm";
+import { PropertiesViewer } from "./PropertiesViewer";
 
-const formatItem = (value: unknown) => {
-  switch (typeof value) {
-  case "boolean":
-    return value ? "true" : "false"
-  case "string":
-    return value
-  case "number":
-    return value.toString()
-  case "object":
-    if (Array.isArray(value)) {
-      return `[Array of ${(value as []).length} items]`
-    }
-    return JSON.stringify(value)
-  default:
-    return ""
-  }
-}
 
 const Properties: React.FC = () => {
   const { selection } = useAppContext()
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
+  const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const allFeatures = useAppSelector(
     (state) => state.featureCollection.features
   )
+  const [propertyForm, setPropertyForm] = useState<ReactNode | null>(null)
   const dispatch = useAppDispatch()
   const selectedFeatureIds = selection
-  const features = allFeatures.filter((feature) =>
-    selectedFeatureIds.includes(feature.id as string)
-  )
 
-  if (!features || features.length === 0) {
-    return <div>No feature selected</div>
-  } else if (features && features.length > 1) {
-    return <div>Multiple features selected</div>
-  }
+  const onReset = useCallback(() => {
+    setFeatureState(originalState)
+  }, [originalState])
 
-  const originalFeature = features[0]
-
-  if (!featureState) {
-    // store clone of first features items
-    setFeatureState({...originalFeature})
-  }
-
-  const onReset = () => {
-    setFeatureState(originalFeature)
-  }
-
-  const onSave = () => {
+  const onSave = useCallback(() => {
     // update the feature
     dispatch({ type: 'featureCollection/featureUpdated', payload: featureState })
-  }
+  }, [dispatch, featureState])
 
-  const editorFor = (
-    feature: Feature<Geometry, GeoJsonProperties>
-  ): ReactNode | null => {
-    if (feature.properties && feature.properties.dataType !== undefined) {
-      const aProps = feature.properties as CoreDataProps
-      switch (aProps.dataType) {
-      case REFERENCE_POINT_TYPE:
-        return (
-          <CoreForm name={aProps.name} onReset={onReset} onSave={onSave}>
-            <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
-          </CoreForm>
-        )
-      default:
-        return null
-      }
+  useEffect(() => {
+    if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
+      setPropertyForm(<div>No feature selected</div>)
+    } else if (selectedFeatureIds && selectedFeatureIds.length > 1) {
+      setPropertyForm(<div>Multiple features selected</div>)
     } else {
-      return null
+      const selectedFeatureId = selectedFeatureIds[0]
+      const selectedFeature = allFeatures.find((feature) => feature.id === selectedFeatureId)
+      if (selectedFeature) {
+        setFeatureState(selectedFeature)
+        setOriginalState(selectedFeature)
+        // and the form
+        const featureProps = selectedFeature.properties
+        if (featureProps?.dataType) {
+          const aProps = featureProps as CoreDataProps
+          switch (aProps.dataType) {
+          case REFERENCE_POINT_TYPE:
+            setPropertyForm(<CoreForm name={aProps.name + ' (' + selectedFeatureId + ')'} onReset={onReset} onSave={onSave}>
+              <PointForm onChange={setFeatureState} point={selectedFeature as Feature<Point, PointProps>} />
+            </CoreForm>)
+            break;  
+          default:
+            setPropertyForm (<PropertiesViewer feature={selectedFeature} />)
+          }
+        }
+      } else {
+        setPropertyForm(<div>Feature not found</div>)
+      }    
     }
-  }
 
-  if(!featureState) {
-    return null
-  }
+  },[selectedFeatureIds, allFeatures, onReset, onSave])
 
-  const customEditor = editorFor(featureState)
-  if (customEditor) {
-    return customEditor
-  }
-
-  const dataSource = Object.entries(features[0].properties || {}).map(
-    ([key, value], index) => {
-      return {
-        key: index,
-        property: key,
-        value: formatItem(value),
-      }
-    }
-  )
-
-  const columns = [
-    {
-      title: "Property",
-      dataIndex: "property",
-      key: "property",
-      width: "80px",
-    },
-    {
-      title: "Value",
-      dataIndex: "value",
-      key: "value",
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (value: string) => (
-        <Tooltip placement='topLeft' title={value}>
-          {value}
-        </Tooltip>
-      ),
-    },
-  ]
-
-  return (
-    <Table
-      bordered
-      dataSource={dataSource}
-      columns={columns}
-      pagination={false}
-    />
-  )
+  return propertyForm
 }
 
 export default Properties
