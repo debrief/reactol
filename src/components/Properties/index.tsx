@@ -2,7 +2,7 @@ import React, { ReactNode, useState } from "react";
 import { Table, Tooltip } from "antd";
 import { PointProps } from "../../types";
 import { useAppContext } from "../../state/AppContext";
-import { useAppSelector } from "../../state/hooks";
+import { useAppDispatch, useAppSelector } from "../../state/hooks";
 import "./index.css";
 import { CoreDataProps } from "../../types";
 import { Feature, GeoJsonProperties, Geometry, Point } from "geojson";
@@ -34,6 +34,7 @@ const Properties: React.FC = () => {
   const allFeatures = useAppSelector(
     (state) => state.featureCollection.features
   )
+  const dispatch = useAppDispatch()
   const selectedFeatureIds = selection
   const features = allFeatures.filter((feature) =>
     selectedFeatureIds.includes(feature.id as string)
@@ -43,14 +44,22 @@ const Properties: React.FC = () => {
     return <div>No feature selected</div>
   } else if (features && features.length > 1) {
     return <div>Multiple features selected</div>
-  } else {
-    setFeatureState(features[0])
+  }
+
+  const originalFeature = features[0]
+
+  if (!featureState) {
+    // store clone of first features items
+    setFeatureState({...originalFeature})
   }
 
   const onReset = () => {
+    setFeatureState(originalFeature)
   }
 
   const onSave = () => {
+    // update the feature
+    dispatch({ type: 'featureCollection/featureUpdated', payload: featureState })
   }
 
   const editorFor = (
@@ -61,7 +70,7 @@ const Properties: React.FC = () => {
       switch (aProps.dataType) {
       case REFERENCE_POINT_TYPE:
         return (
-          <CoreForm feature={feature} onReset={onReset} onSave={onSave}>
+          <CoreForm name={aProps.name} onReset={onReset} onSave={onSave}>
             <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
           </CoreForm>
         )

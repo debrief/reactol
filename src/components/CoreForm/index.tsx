@@ -1,16 +1,15 @@
 import { Button, Flex, Tooltip } from "antd";
-import { Feature } from "geojson";
 
 export interface CoreFormProps {
-  feature: Feature;
+  name: string;
   children: React.ReactNode;
   onReset: () => void;
   onSave: () => void;
 }
 
-export const CoreForm: React.FC<CoreFormProps> = ({feature, children, onReset, onSave}) => {
+export const CoreForm: React.FC<CoreFormProps> = ({name, children, onReset, onSave}) => {
   return (
-    <div><span>{feature.id || 'unknown'}</span>
+    <div><span>{name}</span>
       {children}
       <Flex gap='small' justify='end' wrap style={{height: '1em'}}>
         <Tooltip title='Reset all values'>
