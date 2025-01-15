@@ -51,9 +51,8 @@ const featuresSlice = createSlice({
       state.bbox = updateBounds(state)
     },
     featureUpdated(state, action: PayloadAction<Feature>) {
-      const updatedStates = state.features.filter((feature) => feature.id !== action.payload.id)
-      updatedStates.push(action.payload)
-      state.features = updatedStates
+      const featureIndex = state.features.findIndex((feature) => feature.id === action.payload.id)
+      state.features.splice(featureIndex, 1, action.payload)
       state.bbox = updateBounds(state)
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
