@@ -1,0 +1,58 @@
+name: react-geo-trial
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build App
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            target: squirrel
+          - os: macos-latest
+            target: dmg
+          - os: ubuntu-latest
+            target: deb
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: yarn install
+
+      # Build the Electron app (Make sure the app is packaged first)
+      - name: Package Electron App
+        run: yarn package-electron
+
+      # Build the Electron app
+      - name: Build app
+        run: yarn make-electron
+        env:
+          ELECTRON_MAKER_TARGETS: ${{ matrix.target }}
+
+      # Upload artefacts for PRs or tagged releases
+      - name: Upload artefacts
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: ${{ matrix.os }}-nightly
+          path: out/make/
