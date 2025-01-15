@@ -1,5 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { AppDispatch } from '../../app/store';
+import { AppDispatch } from '../../state/store';
 import { TRACK_TYPE } from '../../constants';
 import { NewTrackProps } from '../../components/LoadTrackModal';
 import { TrackProps } from '../../types';

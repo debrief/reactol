@@ -10,14 +10,13 @@ import {
   UnlockOutlined,
   FilterFilled,
 } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
-import { useAppContext } from '../context/AppContext';
-import { TimeSupport } from '../helpers/time-support';
+import { useAppContext } from '../../state/AppContext';
+import { TimeSupport } from '../../helpers/time-support';
 
 export interface TimeProps {
-  start: number // earliest time in data
-  end: number // latest time in data
+  bounds: [number, number] | null 
 }
 
 export const StepOptions = [
@@ -29,7 +28,7 @@ export const StepOptions = [
   { value: '06h00m' }
 ]
 
-const pf = (val: number) => format(new Date(val), "ddHHmm'Z'")
+const pf = (val: number) => format(new Date(val), "MMM ddHHmm'Z'")
   
 const timeStr = (val: number | number[] | null, index?: number): string => {
   if (index !== undefined) {
@@ -49,9 +48,10 @@ interface TimeButtonProps {
 
 
 
-const TimeControl: React.FC<TimeProps> = ({start, end}) => {
+const TimeControl: React.FC<TimeProps> = ({bounds}) => {
   const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext();
-
+  const start = bounds ? bounds[0] : 0
+  const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value);
   const [interval, setInterval] = useState<number>(0);
 
@@ -65,11 +65,15 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
   }, [stepTxt, setInterval])
 
   useEffect(() => {
-    const newStart = TimeSupport.roundDown(new Date(start), interval)
-    const newEnd = TimeSupport.increment(newStart, interval)
-    const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
-    setTime(newTime)
-}, [interval, start, end])
+    if (time.filterApplied) {
+      const newStart = TimeSupport.roundDown(new Date(start), interval)
+      const newEnd = TimeSupport.increment(newStart, interval)
+      const newTime = {...time, start: newStart.getTime(), end: newEnd.getTime()}
+      setTime(newTime)  
+    } else {
+      setTime({...time, start, end})  
+    }
+}, [interval, start, end, time.filterApplied])
 
   const setFilterApplied = (applied: boolean) => {
     const newTime = {...time, filterApplied: applied}
@@ -109,21 +113,27 @@ const TimeControl: React.FC<TimeProps> = ({start, end}) => {
     setViewportFrozen(!viewportFrozen)
   }
 
+  const copyTooltip = useMemo(() => {
+    return viewportFrozen ? 'Copy snapshot of map to the clipboard' : 'Lock the viewport in order to take a snapshot of the map'
+  }, [viewportFrozen])
+
   const largeIcon = { fontSize: '1.5em', enabled: !time.filterApplied ? 'disabled' : 'enabled' }
   const buttonStyle = { margin: '0 5px' }
 
   return (
     <>  <Row>
           <Col span={20} style={{textAlign: 'left'}}>
-            <Tooltip mouseEnterDelay={0.5} title='Lock viewport to prevent accidental map movement'>
+            <Tooltip mouseEnterDelay={0.8} title='Lock viewport to prevent accidental map movement'>
               <Button style={buttonStyle} color='primary' variant={viewportFrozen ? 'solid' : 'outlined'} onClick={toggleFreezeViewport}>{viewportFrozen ? <LockFilled/> : <UnlockOutlined/>}</Button>
             </Tooltip>
-            <Tooltip mouseEnterDelay={0.5} title='Enable time controls, to filter tracks by time'>
-              <Button style={buttonStyle} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
+            <Tooltip mouseEnterDelay={0.8} title={bounds ? 'Enable time controls, to filter tracks by time': 'No time data available'}>
+              <Button style={buttonStyle} disabled={bounds === null} color='primary' variant={time.filterApplied ? 'solid' : 'outlined'} onClick={() => setFilterApplied(!time.filterApplied)}>{time.filterApplied ? <FilterFilled/> : <FilterOutlined/> }</Button>
             </Tooltip>
           </Col>
           <Col span={4}>
-            <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} />
+            <Tooltip title={copyTooltip}>
+              <Button onClick={copyMapToClipboard} title='Copy map to clipboard' icon={<CopyOutlined/>} disabled={!viewportFrozen} />
+            </Tooltip>
           </Col>
         </Row>
         <Form disabled={!time.filterApplied}>

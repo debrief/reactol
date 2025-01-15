@@ -2,8 +2,8 @@ import { Feature, Position, Point as GPoint } from "geojson";
 import { LeafletMouseEvent } from 'leaflet';
 import { CircleMarker, Tooltip } from 'react-leaflet';
 import { useMemo } from "react";
-import { useAppContext } from "../context/AppContext";
-import { featureIsVisibleInPeriod } from "../helpers/featureIsVisibleAtTime";
+import { useAppContext } from "../../../state/AppContext";
+import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
 
 export interface ZoneProps {
   feature: Feature<GPoint> 

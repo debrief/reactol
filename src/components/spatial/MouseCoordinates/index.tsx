@@ -4,10 +4,10 @@ import { useMap, useMapEvents } from 'react-leaflet';
 import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import nearestPoint from '@turf/nearest-point';
-import './MouseCoordinates.css';
-import { useAppContext } from '../context/AppContext';
-import { useAppSelector } from '../app/hooks';
-import { formatCoordinate } from '../helpers/formatCoordinate';
+import './index.css';
+import { useAppContext } from '../../../state/AppContext';
+import { useAppSelector } from '../../../state/hooks';
+import { formatCoordinate } from '../../../helpers/formatCoordinate';
 
 const bearingToAzimuth = (bearing: number) => {
   return (bearing + 360) % 360;
