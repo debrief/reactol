@@ -40,8 +40,10 @@ const Properties: React.FC = () => {
       const selectedFeatureId = selectedFeatureIds[0]
       const selectedFeature = allFeatures.find((feature) => feature.id === selectedFeatureId)
       if (selectedFeature) {
-        setFeatureState(selectedFeature)
-        setOriginalState(selectedFeature)
+        if (!featureState) {
+          setFeatureState(selectedFeature)
+          setOriginalState(selectedFeature)  
+        }
         // and the form
         const featureProps = selectedFeature.properties
         if (featureProps?.dataType) {
@@ -60,8 +62,7 @@ const Properties: React.FC = () => {
         setPropertyForm(<div>Feature not found</div>)
       }    
     }
-
-  },[selectedFeatureIds, allFeatures, onReset, onSave])
+  },[selectedFeatureIds, allFeatures, onReset, onSave, featureState])
 
   return propertyForm
 }

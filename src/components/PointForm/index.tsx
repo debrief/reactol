@@ -44,6 +44,8 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
     return null
   }
 
+  const itemStyle = { marginBottom: '0.5em' }
+
   return (
     <Form
       name='createTrack'
@@ -53,30 +55,35 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
       initialValues={values}
       autoComplete='off'
       onValuesChange={localChange}
+      variant='filled'
+      size='middle'
     >
-
       <Form.Item<PointsWithCoords>
         label='Name'
         name='name'
+        style={itemStyle}
         rules={[{ required: true, message: 'Please enter track name!' }]}
       >
-        <Input />
+        <Input/>
       </Form.Item>
       <Form.Item<PointsWithCoords>
         label='Visible'
         name='visible'
+        style={itemStyle}
         valuePropName="checked" 
       >
-        <Checkbox />
+        <Checkbox style={{alignItems: 'start'}}  />
       </Form.Item>
       <Form.Item<PointsWithCoords>
         label="Color"
         name="color"
+        style={itemStyle}
         rules={[{ required: true, message: 'color is required!' }]}>
         <ColorPicker format='hex' trigger='click' />
       </Form.Item>
       <Form.Item<PointsWithCoords>
         label="Time"
+        style={itemStyle}
         name="dTime">
         <DatePicker showTime format={'MMM DDHHmm'} />
       </Form.Item>
