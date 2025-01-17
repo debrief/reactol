@@ -23,15 +23,39 @@ const Properties: React.FC = () => {
   const selectedFeatureIds = selection
 
   const onReset = useCallback(() => {
+    console.log('resetting state to original', originalState?.properties?.name, 'from', featureState?.properties?.name)
     setFeatureState(originalState)
   }, [originalState])
 
-  
+  useEffect(() => {
+    console.log('Feature state changed in properties', featureState)
+  }, [featureState])
 
   const onSave = useCallback(() => {
     // update the feature
     dispatch({ type: 'featureCollection/featureUpdated', payload: featureState })
   }, [dispatch, featureState])
+
+  useEffect(() => {
+    console.log('feature state updated', featureState?.properties?.name)
+    if (featureState) {
+      // and the form
+      const featureProps = featureState.properties
+      if (featureProps?.dataType) {
+        const aProps = featureProps as CoreDataProps
+        console.log('updating prop form')
+        switch (aProps.dataType) {
+        case REFERENCE_POINT_TYPE:
+          setPropertyForm(<CoreForm name={aProps.name + ' (' + featureState.id + ')'} onReset={onReset} onSave={onSave}>
+            <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
+          </CoreForm>)
+          break;  
+        default:
+          setPropertyForm (<PropertiesViewer feature={featureState} />)
+        }
+      }
+    }
+  },[featureState, onSave, onReset])
 
   useEffect(() => {
     if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
@@ -40,31 +64,15 @@ const Properties: React.FC = () => {
       setPropertyForm(<div>Multiple features selected</div>)
     } else {
       const selectedFeatureId = selectedFeatureIds[0]
-      const selectedFeature = allFeatures.find((feature) => feature.id === selectedFeatureId)
-      if (selectedFeature) {
-        if (!featureState) {
-          setFeatureState(selectedFeature)
-          setOriginalState(selectedFeature)  
-        }
-        // and the form
-        const featureProps = selectedFeature.properties
-        if (featureProps?.dataType) {
-          const aProps = featureProps as CoreDataProps
-          switch (aProps.dataType) {
-          case REFERENCE_POINT_TYPE:
-            setPropertyForm(<CoreForm name={aProps.name + ' (' + selectedFeatureId + ')'} onReset={onReset} onSave={onSave}>
-              <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
-            </CoreForm>)
-            break;  
-          default:
-            setPropertyForm (<PropertiesViewer feature={selectedFeature} />)
-          }
-        }
+      const selectedFeat = allFeatures.find((feature) => feature.id === selectedFeatureId)
+      if (selectedFeat) {
+        setOriginalState(selectedFeat)  
+        setFeatureState(selectedFeat)
       } else {
         setPropertyForm(<div>Feature not found</div>)
       }    
     }
-  },[selectedFeatureIds, allFeatures, onReset, onSave, featureState])
+  },[selectedFeatureIds, allFeatures])
 
   return propertyForm
 }
