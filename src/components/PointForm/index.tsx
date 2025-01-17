@@ -12,20 +12,25 @@ export interface PointFormProps {
 }
 
 type PointsWithCoords = PointProps & {
-  coords: Position
+  coordinates: Position
   dTime: Dayjs
 }
 
 const convert = (point: Feature<Point, PointProps>): PointsWithCoords => {
-  return {...point.properties, coords: point.geometry.coordinates, dTime: dayjs(point.properties.time)} as PointsWithCoords
+  return {...point?.properties, 
+    coordinates: point?.geometry.coordinates, 
+    dTime: dayjs(point?.properties.time)} as PointsWithCoords
 }
 
 export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
-  const [values, setValues] = useState<PointsWithCoords | null>(null)
+  const [state, setState] = useState<PointsWithCoords | null>(null)
 
   useEffect(() => {
-    setValues(convert(point))
-  }, [point, setValues])
+    if (point) {
+      const newState = convert(point)
+      setState(newState)
+    }
+  }, [point, setState])
 
   const localChange = (values: Partial<PointsWithCoords>) => {
     if (values.color) {
@@ -35,12 +40,12 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
       values.time = (values.dTime as Dayjs).toISOString()
       delete values.dTime
     }
-    const updatedProps = {...point.properties, ...values}
-    const newVal = {...point, properties: updatedProps} as Feature<Point, PointProps>
-    onChange(newVal)
+    const updatedProps = {...point.properties, ...values} as PointsWithCoords
+    const updatedPoint = {...point, properties: updatedProps} as Feature<Point, PointProps>
+    onChange(updatedPoint)
   }
 
-  if (!values) {
+  if (!state) {
     return null
   }
 
@@ -52,7 +57,7 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 14 }}
       style={{ maxWidth: 400 }}
-      initialValues={values}
+      initialValues={state}
       autoComplete='off'
       onValuesChange={localChange}
       variant='filled'
