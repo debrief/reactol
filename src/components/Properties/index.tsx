@@ -26,6 +26,8 @@ const Properties: React.FC = () => {
     setFeatureState(originalState)
   }, [originalState])
 
+  
+
   const onSave = useCallback(() => {
     // update the feature
     dispatch({ type: 'featureCollection/featureUpdated', payload: featureState })
@@ -51,7 +53,7 @@ const Properties: React.FC = () => {
           switch (aProps.dataType) {
           case REFERENCE_POINT_TYPE:
             setPropertyForm(<CoreForm name={aProps.name + ' (' + selectedFeatureId + ')'} onReset={onReset} onSave={onSave}>
-              <PointForm onChange={setFeatureState} point={selectedFeature as Feature<Point, PointProps>} />
+              <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
             </CoreForm>)
             break;  
           default:
