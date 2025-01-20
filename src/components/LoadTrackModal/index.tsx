@@ -11,12 +11,11 @@ import {
   Tabs,
   TabsProps,
   Typography,
-} from "antd"
-import { Color } from "antd/es/color-picker"
-import { standardShades } from "../../helpers/standardShades"
-import { PresetsItem } from "antd/es/color-picker/interface"
-import { useAppSelector } from "../../state/hooks"
-import { AddTrackProps, NewTrackProps } from "../../types"
+} from "antd";
+import { Color } from "antd/es/color-picker";
+import { presetColors } from "../../helpers/standardShades";
+import { useAppSelector } from "../../state/hooks";
+import { AddTrackProps, NewTrackProps } from "../../types";
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -49,14 +48,6 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     { value: "sub", label: "SUB" },
     { value: "lnd", label: "LND" },
     { value: "unk", label: "UNK" },
-  ]
-
-  const presetColors: PresetsItem[] = [
-    {
-      label: "Standard Shades",
-      colors: standardShades.map((shade) => shade.value),
-      defaultOpen: true,
-    },
   ]
 
   const onFinishAdd: FormProps<AddTrackProps>["onFinish"] = (id) => {
