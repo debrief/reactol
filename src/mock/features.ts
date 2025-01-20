@@ -28,7 +28,7 @@ const mockFeatures: FeatureCollection = {
         visible: false,
       },
       geometry: {
-        type: "MultiPoint",
+        type: "LineString",
         coordinates: [
           [-1.97, 36.42],
           [-2.58, 36.26],
@@ -96,7 +96,7 @@ const mockFeatures: FeatureCollection = {
         visible: true,
       },
       geometry: {
-        type: "MultiPoint",
+        type: "LineString",
         coordinates: [
           [-2.0, 36.45],
           [-2.1, 36.48],
@@ -146,7 +146,7 @@ const mockFeatures: FeatureCollection = {
         visible: true,
       },
       geometry: {
-        type: "MultiPoint",
+        type: "LineString",
         coordinates: [
           [-3.5, 36.5],
           [-3.6, 36.6],

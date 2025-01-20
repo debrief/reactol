@@ -1,4 +1,4 @@
-import { Feature, MultiPoint } from 'geojson';
+import { Feature, LineString } from 'geojson';
 import { TRACK_TYPE } from '../constants';
 const combineFeatures = (existingF: Feature[], newF: Feature[]): Feature[] => {
   const notInExisting = newF.filter((feature: Feature) => !existingF.find((feature2: Feature) => feature2.id === feature.id))
@@ -11,9 +11,9 @@ const combineFeatures = (existingF: Feature[], newF: Feature[]): Feature[] => {
       throw new Error('Cannot combine features of different geometry types')
     }
     switch(existing.geometry.type) {
-      case 'MultiPoint': {
+      case 'LineString': {
         const existingCoords = existing.geometry.coordinates as number[][]
-        const newAsLine = feature as Feature<MultiPoint>
+        const newAsLine = feature as Feature<LineString>
         const newCoords = newAsLine.geometry.coordinates as number[][]
         const combinedCoords = existingCoords.concat(newCoords)
         // check if it's of dataType track

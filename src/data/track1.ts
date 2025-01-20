@@ -7585,7 +7585,7 @@ const track: Feature = {
         35.82
       ]
     ],
-    type: 'MultiPoint'
+    type: 'LineString'
   },
   id: 'f-1'
 }

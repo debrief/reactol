@@ -1,4 +1,4 @@
-import { Feature, Geometry, MultiPoint } from "geojson";
+import { Feature, Geometry, LineString } from "geojson";
 import { LeafletMouseEvent } from 'leaflet';
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet';
 import { format } from "date-fns";
@@ -27,12 +27,12 @@ const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
 
   const trackCoords: CoordInstance[] = useMemo(() => {
     if (time && feature.properties?.times) {
-      const coords = (feature.geometry as MultiPoint).coordinates
+      const coords = (feature.geometry as LineString).coordinates
       const times = feature.properties.times
       const validCoords = filterTrack(time.filterApplied, time.start, time.end, times, coords)
       return validCoords
     } else {
-      const coords = (feature.geometry as MultiPoint).coordinates
+      const coords = (feature.geometry as LineString).coordinates
       const times = feature.properties?.times
       const timeFreq = Math.floor(times.length / 20)
 

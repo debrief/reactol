@@ -1,8 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { AppDispatch } from '../../state/store';
 import { TRACK_TYPE } from '../../constants';
-import { NewTrackProps } from '../../components/LoadTrackModal';
-import { TrackProps } from '../../types';
+import { NewTrackProps, TrackProps } from '../../types';
 
 interface OpRepData {
   dtg: string;
@@ -79,7 +78,7 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
   return {
     type: 'Feature',
     geometry: {
-      type: 'MultiPoint',
+      type: 'LineString',
       coordinates,
     },
     properties: props,

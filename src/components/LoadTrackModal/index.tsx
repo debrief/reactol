@@ -16,20 +16,7 @@ import { Color } from "antd/es/color-picker"
 import { standardShades } from "../../helpers/standardShades"
 import { PresetsItem } from "antd/es/color-picker/interface"
 import { useAppSelector } from "../../state/hooks"
-
-export type NewTrackProps = {
-  name: string
-  shortName: string
-  year: number
-  month: number
-  symbol: string
-  color: string
-  trackId?: string
-}
-
-export type AddTrackProps = {
-  trackId: string
-}
+import { AddTrackProps, NewTrackProps } from "../../types"
 
 export interface LoadTrackModelProps {
   visible: boolean
