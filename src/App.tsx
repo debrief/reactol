@@ -57,7 +57,7 @@ function App() {
       storeInitialised.current = true
       console.clear()
       // store initial data objects
-      dispatch({ type: 'featureCollection/clearStore'})
+      dispatch({ type: 'featureCollection/storeCleared'})
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
       dispatch({ type: 'featureCollection/featureAdded', payload: track3 })

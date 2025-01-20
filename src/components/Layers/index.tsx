@@ -145,7 +145,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const onCheck: TreeProps["onCheck"] = (checkedKeys) => {
     const keys = justLeaves(checkedKeys as Key[])
     dispatch({
-      type: "featureCollection/featuresVisible",
+      type: "featureCollection/featureVisibilities",
       payload: { ids: keys },
     })
   }
