@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals';
 
 import { filterTrack } from "../filterTrack";
 
-import { Feature, MultiPoint } from 'geojson';
+import { Feature, LineString } from 'geojson';
 import { TRACK_TYPE } from '../../constants';
 
 const track: Feature = {
@@ -23,7 +23,7 @@ const track: Feature = {
   },
   geometry: {
     coordinates: [[1.0, 1.0], [2.0, 2.0], [3.0, 3.0], [4.0, 4.0], [5.0, 5.0], [6.0, 6.0]],
-    type: 'MultiPoint'
+    type: 'LineString'
   },
   id: 'f-1'
 }
@@ -34,7 +34,7 @@ export default track;
 
 test('span before start', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T09:00:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T11:30:00.000Z").getTime()
@@ -45,7 +45,7 @@ test('span before start', () => {
 
 test('span after end', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T12:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T21:00:00.000Z").getTime()
@@ -57,7 +57,7 @@ test('span after end', () => {
 
 test('span whole period', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T01:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T21:00:00.000Z").getTime()
@@ -67,7 +67,7 @@ test('span whole period', () => {
 
 test('span one value', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T13:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T14:30:00.000Z").getTime()
@@ -78,7 +78,7 @@ test('span one value', () => {
 
 test('before period', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T03:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T04:30:00.000Z").getTime()
@@ -88,7 +88,7 @@ test('before period', () => {
 
 test('after period', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-15T03:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-15T04:30:00.000Z").getTime()
@@ -98,7 +98,7 @@ test('after period', () => {
 
 test('between value', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T13:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T13:40:00.000Z").getTime()
@@ -108,7 +108,7 @@ test('between value', () => {
 
 test('filter not applied', () => {
   const times = track.properties?.times
-  const geom = track.geometry as MultiPoint
+  const geom = track.geometry as LineString
   const coords = geom.coordinates
   const timeStart = new Date("2024-11-14T13:30:00.000Z").getTime()
   const timeEnd = new Date("2024-11-14T13:40:00.000Z").getTime()

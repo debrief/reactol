@@ -7585,7 +7585,7 @@ const track = {
         36.470147067048856
       ]
     ],
-    type: "MultiPoint"
+    type: "LineString"
   },
   id: "f-3"
 }

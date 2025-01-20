@@ -1,8 +1,8 @@
+import _ from 'lodash';
 import { loadJson } from '../loaders/loadJson';
 import featuresReducer from '../../state/geoFeaturesSlice';
 import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from "geojson";
 import { createStore } from '@reduxjs/toolkit';
-import _ from 'lodash';
 
 describe('load function', () => {
   let store: ReturnType<typeof createStore>;
@@ -29,7 +29,7 @@ describe('load function', () => {
           type: 'Feature',
           properties: { name: 'Feature 2' },
           geometry: {
-            type: 'MultiPoint',
+            type: 'LineString',
             coordinates: [
               [102.0, 0.0],
               [103.0, 1.0],

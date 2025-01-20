@@ -26,3 +26,17 @@ type CorePointProps = CoreDataProps & { dataType: typeof REFERENCE_POINT_TYPE }
 export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime);
 
 export type PointProps = CorePointProps & (PointTime | PeriodTime);
+
+export type NewTrackProps = {
+  name: string
+  shortName: string
+  year: number
+  month: number
+  symbol: string
+  color: string
+  trackId?: string
+}
+
+export type AddTrackProps = {
+  trackId: string
+}
