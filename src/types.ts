@@ -14,6 +14,8 @@ export type TrackProps = CoreDataProps & {
   times: string[]
   courses?: number[]
   speeds?: number[]
+  labelInterval?: number
+  symbolInterval?: number
 }
 
 // use types to ensure that either a centre time, or optional start/end times are used, but not both
