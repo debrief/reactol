@@ -71,7 +71,6 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
       initialValues={state}
       autoComplete='off'
       onValuesChange={localChange}
-      variant='filled'
       size='middle'>
       <Form.Item<FormTypeProps>
         label='Name'
