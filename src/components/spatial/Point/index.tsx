@@ -5,12 +5,12 @@ import { useMemo } from "react";
 import { useAppContext } from "../../../state/AppContext";
 import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
 
-export interface ZoneProps {
+export interface PointSymbolProps {
   feature: Feature<GPoint> 
   onClickHandler: {(id: string, modifier: boolean): void}
 }
 
-export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
+export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
   const { start: timeStart, end: timeEnd, filterApplied } = time
   const isSelected = selection.includes(feature.id as string)
