@@ -15,16 +15,16 @@ const bearingToAzimuth = (bearing: number) => {
 
 const featureToPoints = (feature: Feature): FeatureCollection<Point> => {
   switch (feature.geometry.type) {
-    case 'Point':
-      return turf.featureCollection([feature as Feature<Point>]);
-    case 'LineString':
-      return turf.featureCollection([feature as Feature<LineString>]);
-    case 'MultiPoint':
-      return turf.explode(feature as Feature<MultiPoint>);
-    case 'Polygon':
-      return turf.explode(feature as Feature<Polygon>);
-    default:
-      return turf.featureCollection([]);
+  case 'Point':
+    return turf.featureCollection([feature as Feature<Point>]);
+  case 'LineString':
+    return turf.explode(feature as Feature<LineString>);
+  case 'MultiPoint':
+    return turf.explode(feature as Feature<MultiPoint>);
+  case 'Polygon':
+    return turf.explode(feature as Feature<Polygon>);
+  default:
+    return turf.featureCollection([]);
   }
 }
 
@@ -68,15 +68,15 @@ const MouseCoordinates: React.FC = () => {
     } else {
       return {rng: 0, brg: 0, subject: ''};
     }
-  }, [mouseCoords, map, selection]);
+  }, [mouseCoords, map, selection, features]);
   
   return !viewportFrozen && (<div className="mouse-coordinates-panel">
-      <p>Lat: {formatCoordinate(mouseCoords.lat, true, false, ' ')}</p>
-      <p>Lng: {formatCoordinate(mouseCoords.lng, false, false, ' ')}</p>
-      <p>Rel to <b>{rangeBearing.subject}</b>:</p>
-      <p>{`${(`` + rangeBearing.rng.toFixed(1)).padStart(5, '0')} km`}/
-         {`${(`` + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
-    </div>)
+    <p>Lat: {formatCoordinate(mouseCoords.lat, true, false, ' ')}</p>
+    <p>Lng: {formatCoordinate(mouseCoords.lng, false, false, ' ')}</p>
+    <p>Rel to <b>{rangeBearing.subject}</b>:</p>
+    <p>{`${(`` + rangeBearing.rng.toFixed(1)).padStart(5, '0')} km`}/
+      {`${(`` + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
+  </div>)
   
 };
 
