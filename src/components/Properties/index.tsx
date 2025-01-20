@@ -1,14 +1,15 @@
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import { PointProps } from "../../types";
+import { PointProps, TrackProps } from "../../types";
 import { useAppContext } from "../../state/AppContext";
 import { useAppDispatch, useAppSelector } from "../../state/hooks";
 import "./index.css";
 import { CoreDataProps } from "../../types";
-import { Feature, GeoJsonProperties, Geometry, Point } from "geojson";
-import { REFERENCE_POINT_TYPE } from "../../constants";
+import { Feature, GeoJsonProperties, Geometry, LineString, Point } from "geojson";
+import { REFERENCE_POINT_TYPE, TRACK_TYPE } from "../../constants";
 import { PointForm } from "../PointForm";
 import { CoreForm } from "../CoreForm";
 import { PropertiesViewer } from "./PropertiesViewer";
+import { TrackForm } from "../TrackForm";
 
 
 const Properties: React.FC = () => {
@@ -46,7 +47,12 @@ const Properties: React.FC = () => {
           setPropertyForm(<CoreForm name={aProps.name + ' (' + featureState.id + ')'} onReset={onReset} onSave={onSave}>
             <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
           </CoreForm>)
-          break;  
+          break;
+        case TRACK_TYPE:    
+          setPropertyForm(<CoreForm name={aProps.name + ' (' + featureState.id + ')'} onReset={onReset} onSave={onSave}>
+            <TrackForm onChange={setFeatureState} track={featureState as Feature<LineString, TrackProps>} />
+          </CoreForm>)
+          break;
         default:
           setPropertyForm (<PropertiesViewer feature={featureState} />)
         }
