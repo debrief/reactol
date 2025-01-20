@@ -22,14 +22,13 @@ const Properties: React.FC = () => {
   const dispatch = useAppDispatch()
   const selectedFeatureIds = selection
 
+  // useEffect(() => {
+  //   console.log('Feature state changed in properties', featureState)
+  // }, [featureState])
+
   const onReset = useCallback(() => {
-    console.log('resetting state to original', originalState?.properties?.name, 'from', featureState?.properties?.name)
     setFeatureState(originalState)
   }, [originalState])
-
-  useEffect(() => {
-    console.log('Feature state changed in properties', featureState)
-  }, [featureState])
 
   const onSave = useCallback(() => {
     // update the feature
@@ -37,13 +36,11 @@ const Properties: React.FC = () => {
   }, [dispatch, featureState])
 
   useEffect(() => {
-    console.log('feature state updated', featureState?.properties?.name)
     if (featureState) {
       // and the form
       const featureProps = featureState.properties
       if (featureProps?.dataType) {
         const aProps = featureProps as CoreDataProps
-        console.log('updating prop form')
         switch (aProps.dataType) {
         case REFERENCE_POINT_TYPE:
           setPropertyForm(<CoreForm name={aProps.name + ' (' + featureState.id + ')'} onReset={onReset} onSave={onSave}>
