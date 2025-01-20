@@ -2,6 +2,7 @@ import { loadJson } from '../loaders/loadJson';
 import featuresReducer from '../../state/geoFeaturesSlice';
 import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from "geojson";
 import { createStore } from '@reduxjs/toolkit';
+import _ from 'lodash';
 
 describe('load function', () => {
   let store: ReturnType<typeof createStore>;
@@ -51,7 +52,7 @@ describe('load function', () => {
     expect(secondString.geometry.coordinates?.length).toBe(4);
 
     // add again, check it gets longer
-    const sampleCopy = JSON.parse(JSON.stringify(sampleData))
+    const sampleCopy = _.cloneDeep(sampleData)
     sampleCopy.features = [sampleCopy.features[1]]
     const justLineString = JSON.stringify(sampleCopy);
     const newExisting = store.getState() as FeatureCollection;
