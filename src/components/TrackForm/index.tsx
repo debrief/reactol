@@ -45,30 +45,17 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
     { label: '6h', value: '' + 6 * 60 * 1000 * 60 }
   ]
 
-  const setLabelInterval = (value: string) => {
-    const interval = parseInt(value)
-    console.log('Label interval:', interval)
-  }
-
-  const setSymbolInterval = (value: string) => {
-    console.log('symbol interval:', value)
-  }
-
   return (
     <>
       <Form
         name='createTrack'
         labelCol={{ span: 6 }}
-        wrapperCol={{ span: 14 }}
+        wrapperCol={{ span: 18 }}
         style={{ maxWidth: 400 }}
         initialValues={state}
         autoComplete='off'
         onValuesChange={localChange}
         size='middle'>
-        <Flex gap='small'>
-          <Select style={{width: '40%'}} onChange={setSymbolInterval} options={intervals} placeholder='Select symbol interval' />
-          <Select style={{width: '40%'}} onChange={setLabelInterval} options={intervals} placeholder='Select label interval' />
-        </Flex>  
         <Form.Item<TrackProps>
           label='Name'
           name='name'
@@ -90,6 +77,23 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           valuePropName="checked" >
           <Checkbox style={{alignItems: 'start'}}  />
         </Form.Item>
+        <Form.Item<TrackProps>
+          label='Markers'>
+          <Flex gap='small'>
+            <Form.Item<TrackProps>
+              label='Labels'
+              name='labelInterval'
+              style={itemStyle}>
+              <Select options={intervals} />
+            </Form.Item>
+            <Form.Item<TrackProps>
+              label='Symbols'
+              name='symbolInterval'
+              style={itemStyle}>
+              <Select options={intervals} />
+            </Form.Item>
+          </Flex>
+        </Form.Item>  
         <Form.Item<TrackProps>
           label="Color"
           name='color'
