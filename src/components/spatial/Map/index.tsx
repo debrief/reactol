@@ -67,7 +67,9 @@ const CopyToClipboardControl: React.FC = () => {
       const mapNode = map.getContainer() // Get the map container DOM element
 
       try {
-        const imageBlob = await domToImage.toBlob(mapNode)
+        const width = mapNode.clientWidth
+        const height = mapNode.clientHeight
+        const imageBlob = await domToImage.toBlob(mapNode, { width, height })
         const clipboardItem = new ClipboardItem({ "image/png": imageBlob })
         await navigator.clipboard.write([clipboardItem])
         const buttonElement = document.querySelector(".leaflet-control-custom") as HTMLElement
