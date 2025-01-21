@@ -37,6 +37,8 @@ export type NewTrackProps = {
   symbol: string
   color: string
   trackId?: string
+  labelInterval?: number
+  symbolInterval?: number
 }
 
 export type AddTrackProps = {

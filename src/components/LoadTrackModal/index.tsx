@@ -1,6 +1,7 @@
 import {
   Button,
   ColorPicker,
+  Flex,
   Form,
   FormProps,
   Input,
@@ -16,6 +17,7 @@ import { Color } from "antd/es/color-picker";
 import { presetColors } from "../../helpers/standardShades";
 import { useAppSelector } from "../../state/hooks";
 import { AddTrackProps, NewTrackProps } from "../../types";
+import { defaultIntervals } from "../../helpers/timeIntervals";
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -194,6 +196,27 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
               trigger='hover'
             />
           </Form.Item>
+          <Form.Item<NewTrackProps>
+            style={itemStyle}
+            label='Markers'>
+            <Flex gap='small'>
+              <Form.Item<NewTrackProps>
+                label='Labels'
+                className="labelInterval"
+                name='labelInterval'
+                style={itemStyle}>
+                <Select options={defaultIntervals} size='small' style={{width:'60px'}} />
+              </Form.Item>
+              <Form.Item<NewTrackProps>
+                label='Symbols'
+                name='symbolInterval'
+                className="labelSymbol"
+                style={itemStyle}>
+                <Select options={defaultIntervals} size='small' style={{width:'60px'}} />
+              </Form.Item>
+            </Flex>
+          </Form.Item>  
+          
 
           <Form.Item label={null}>
             <Button type='text' onClick={cancel}>
