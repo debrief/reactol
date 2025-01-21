@@ -29,16 +29,9 @@ export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime);
 
 export type PointProps = CorePointProps & (PointTime | PeriodTime);
 
-export type NewTrackProps = {
-  name: string
-  shortName: string
+export type NewTrackProps = Omit<TrackProps, "times" | "courses" | "speeds"> & {
   year: number
   month: number
-  symbol: string
-  color: string
-  trackId?: string
-  labelInterval?: number
-  symbolInterval?: number
 }
 
 export type AddTrackProps = {
