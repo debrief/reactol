@@ -18,6 +18,7 @@ import { presetColors } from "../../helpers/standardShades";
 import { useAppSelector } from "../../state/hooks";
 import { AddTrackProps, NewTrackProps } from "../../types";
 import { defaultIntervals } from "../../helpers/timeIntervals";
+import "./index.css";
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -66,9 +67,18 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     newTrack(values)
   }
 
+  const initialNewTrackValues: Partial<NewTrackProps> = {
+    year: initialYear,
+    month: initialMonth,
+    symbol: symbolOptions[0].value,
+    color: presetColors[0].colors[0] as string,
+    labelInterval: Number(defaultIntervals[4].value),
+    symbolInterval: Number(defaultIntervals[3].value),
+  }
+
   const tabs: TabsProps["items"] = [
     {
-      key: "1",
+      key: "add",
       label: "Add to existing track",
       children: (
         <Form
@@ -78,7 +88,13 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           style={{ maxWidth: 400 }}
           onFinish={onFinishAdd}
           autoComplete='off'
+          disabled={trackOptions.length === 0}
         >
+          { trackOptions.length ? <Typography.Text>
+            Select a track to add data to, from the list below:
+          </Typography.Text> : <Typography.Text>
+            No tracks available to add to. Please load as a new track.
+          </Typography.Text>  } 
           <Form.Item<AddTrackProps>
             label='Track'
             name='trackId'
@@ -104,7 +120,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       ),
     },
     {
-      key: "2",
+      key: "create",
       label: "Create new track",
       children: (
         <Form
@@ -112,12 +128,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
           style={{ maxWidth: 400 }}
-          initialValues={{
-            year: initialYear,
-            month: initialMonth,
-            symbol: symbolOptions[0].value,
-            color: presetColors[0].colors[0],
-          }}
+          initialValues={initialNewTrackValues}
           onFinish={onFinishCreate}
           autoComplete='off'
         >
@@ -205,14 +216,14 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
                 className="labelInterval"
                 name='labelInterval'
                 style={itemStyle}>
-                <Select options={defaultIntervals} size='small' style={{width:'60px'}} />
+                <Select options={defaultIntervals} size='small' style={{width:'70px'}} />
               </Form.Item>
               <Form.Item<NewTrackProps>
                 label='Symbols'
                 name='symbolInterval'
                 className="labelSymbol"
                 style={itemStyle}>
-                <Select options={defaultIntervals} size='small' style={{width:'60px'}} />
+                <Select options={defaultIntervals} size='small' style={{width:'70px'}} />
               </Form.Item>
             </Flex>
           </Form.Item>  
@@ -241,7 +252,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       maskClosable={false}
       destroyOnClose={true} // set to true, in order to re-generate track ids
     >
-      <Tabs defaultActiveKey='1' items={tabs}></Tabs>
+      <Tabs defaultActiveKey={trackOptions.length > 0 ? 'add' : 'create'} items={tabs}></Tabs>
     </Modal>
   )
 }
