@@ -7,6 +7,8 @@ const track = {
     color: "#0F0",
     name: "LEOPOLD I",
     shortName: 'LEOP',
+    labelInterval: 2 * 60 * 60 * 1000,
+    symbolInterval: 30 * 60 * 1000,
     times: [
       "2024-11-14T16:17:00.000Z",
       "2024-11-14T16:18:00.000Z",

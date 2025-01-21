@@ -8,6 +8,8 @@ const track: Feature = {
     color: '#F00',
     name: 'VAN GALEN',
     shortName: 'VANG',
+    labelInterval: 2 * 60 * 60 * 1000  ,
+    symbolInterval: 30 * 60 * 1000,
     times: [
       '2024-11-14T16:16:53.662Z',
       '2024-11-14T16:17:53.662Z',
