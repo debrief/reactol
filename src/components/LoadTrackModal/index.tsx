@@ -67,8 +67,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     month: initialMonth,
     symbol: symbolOptions[0].value,
     color: presetColors[0].colors[0] as string,
-    labelInterval: Number(defaultIntervals[4].value),
-    symbolInterval: Number(defaultIntervals[3].value),
+    labelInterval: '' + Number(defaultIntervals[5].value),
+    symbolInterval: '' + Number(defaultIntervals[4].value),
   }
 
   const tabs: TabsProps["items"] = [
