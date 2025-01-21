@@ -8,6 +8,7 @@ import {
   FilterOutlined,
   LockFilled,
   UnlockOutlined,
+  CheckCircleOutlined,
   FilterFilled,
 } from "@ant-design/icons"
 import React, { useEffect, useMemo, useState } from "react"
@@ -47,11 +48,12 @@ interface TimeButtonProps {
 }
 
 const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
-  const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext()
+  const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useAppContext()
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
   const [interval, setInterval] = useState<number>(0)
+  const [iconState, setIconState] = useState<React.ReactNode>(<CopyOutlined />)
 
   useEffect(() => {
     try {
@@ -82,9 +84,15 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
     setTime(newTime)
   }
 
-  const copyMapToClipboard = (): void => {
-    window.alert("Map copied to clipboard")
-  }
+  const handleCopyMap = () => {
+    setIconState(<CheckCircleOutlined />)
+    copyMapToClipboard()
+
+    setTimeout(() => {
+      setIconState(<CopyOutlined />)
+    }, 2000)
+  };
+
 
   const doStep = (fwd: boolean, large: boolean) => {
     if (large) {
@@ -191,9 +199,9 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
         <Col span={4}>
           <Tooltip title={copyTooltip}>
             <Button
-              onClick={copyMapToClipboard}
+              onClick={handleCopyMap}
               title='Copy map to clipboard'
-              icon={<CopyOutlined />}
+              icon={iconState}
               disabled={!viewportFrozen}
             />
           </Tooltip>
