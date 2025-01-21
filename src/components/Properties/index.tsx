@@ -63,8 +63,12 @@ const Properties: React.FC = () => {
   useEffect(() => {
     if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
       setPropertyForm(<div>No feature selected</div>)
+      setOriginalState(null)
+      setFeatureState(null)
     } else if (selectedFeatureIds && selectedFeatureIds.length > 1) {
       setPropertyForm(<div>Multiple features selected</div>)
+      setOriginalState(null)
+      setFeatureState(null)
     } else {
       const selectedFeatureId = selectedFeatureIds[0]
       const selectedFeat = allFeatures.find((feature) => feature.id === selectedFeatureId)
