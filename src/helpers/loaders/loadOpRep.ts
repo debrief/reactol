@@ -72,7 +72,9 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
     symbol: values.symbol,
     times,
     courses,
-    speeds
+    speeds,
+    labelInterval: values.labelInterval,
+    symbolInterval: values.symbolInterval
   }
 
   return {

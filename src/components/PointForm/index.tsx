@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { PointProps } from "../../types";
 import _ from 'lodash';
+import { presetColors } from "../../helpers/standardShades";
 
 export interface PointFormProps {
   point: Feature<Point, PointProps>
@@ -91,7 +92,7 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
         name='color'
         style={itemStyle}
         rules={[{ required: true, message: 'color is required!' }]}>
-        <ColorPicker format='hex' trigger='click' />
+        <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
       <Form.Item<FormTypeProps>
         label="Time"
