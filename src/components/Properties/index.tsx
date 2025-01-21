@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../state/hooks";
 import "./index.css";
 import { CoreDataProps } from "../../types";
 import { Feature, GeoJsonProperties, Geometry, LineString, Point } from "geojson";
-import { REFERENCE_POINT_TYPE, TRACK_TYPE } from "../../constants";
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../constants";
 import { PointForm } from "../PointForm";
 import { CoreForm } from "../CoreForm";
 import { PropertiesViewer } from "./PropertiesViewer";
@@ -44,14 +44,17 @@ const Properties: React.FC = () => {
         const aProps = featureProps as CoreDataProps
         switch (aProps.dataType) {
         case REFERENCE_POINT_TYPE:
-          setPropertyForm(<CoreForm name={aProps.name + ' (' + featureState.id + ')'} onReset={onReset} onSave={onSave}>
+          setPropertyForm(<CoreForm onReset={onReset} onSave={onSave}>
             <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
           </CoreForm>)
           break;
         case TRACK_TYPE:    
-          setPropertyForm(<CoreForm name={aProps.name + ' (' + featureState.id + ')'} onReset={onReset} onSave={onSave}>
+          setPropertyForm(<CoreForm onReset={onReset} onSave={onSave}>
             <TrackForm onChange={setFeatureState} track={featureState as Feature<LineString, TrackProps>} />
           </CoreForm>)
+          break;
+        case ZONE_TYPE:
+          setPropertyForm(<div>Zone form pending</div>)
           break;
         default:
           setPropertyForm (<PropertiesViewer feature={featureState} />)

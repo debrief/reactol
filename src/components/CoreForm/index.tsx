@@ -1,17 +1,16 @@
 import { Button, Flex, Tooltip } from "antd";
 
 export interface CoreFormProps {
-  name: string;
   children: React.ReactNode;
   onReset: () => void;
   onSave: () => void;
 }
 
-export const CoreForm: React.FC<CoreFormProps> = ({name, children, onReset, onSave}) => {
+export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave}) => {
   return (
-    <div><span>{name}</span>
+    <div style={{marginTop: '5px'}}>
       {children}
-      <Flex gap='small' justify='end' wrap style={{height: '1em'}}>
+      <Flex gap='small' justify='end' wrap style={{height: '1em', borderTop: '2px solid #ccc', paddingTop: '5px'}}>
         <Tooltip title='Reset all values' placement="top">
           <Button size='small' onClick={onReset}>Reset</Button>
         </Tooltip>
