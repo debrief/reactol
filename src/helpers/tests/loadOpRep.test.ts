@@ -19,7 +19,7 @@ describe('loadOpRep function', () => {
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
-      '#ff0', visible: true, dataType: TRACK_TYPE});
+      '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'});
 
     const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(1);
@@ -29,6 +29,8 @@ describe('loadOpRep function', () => {
     expect(feature.properties?.times.length).toBe(3);
     expect(feature.properties?.courses.length).toBe(3);
     expect(feature.properties?.speeds.length).toBe(3);
+    expect(feature.properties?.labelInterval).toBe(600000);
+    expect(feature.properties?.symbolInterval).toBe(60000);
   });
 
   it('should convert parsed data into GeoJson LineString track object', async () => {
@@ -39,7 +41,7 @@ describe('loadOpRep function', () => {
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
-    '#ff0', visible: true, dataType: TRACK_TYPE});
+    '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<LineString>;
@@ -55,7 +57,7 @@ describe('loadOpRep function', () => {
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
-      '#ff0', visible: true, dataType: TRACK_TYPE});
+      '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<LineString>;
@@ -70,7 +72,7 @@ describe('loadOpRep function', () => {
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
-      '#ff0', visible: true, dataType: TRACK_TYPE});
+      '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<LineString>;
@@ -87,7 +89,7 @@ describe('loadOpRep function', () => {
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     await loadOpRep(invalidOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
-      '#ff0', visible: true, dataType: TRACK_TYPE});
+      '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<LineString>;
@@ -101,7 +103,7 @@ describe('loadOpRep function', () => {
     `;
     const existing: Feature<Geometry, GeoJsonProperties>[] = [];
     await loadOpRep(validOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
-      '#ff0', visible: true, dataType: TRACK_TYPE});
+      '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'});
 
     const state = store.getState() as FeatureCollection;
     const feature = state.features[0] as Feature<LineString>;
