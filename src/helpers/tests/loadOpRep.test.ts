@@ -1,6 +1,6 @@
 import { loadOpRep } from '../loaders/loadOpRep';
 import featuresReducer from '../../state/geoFeaturesSlice';
-import { Feature, Geometry, GeoJsonProperties, FeatureCollection, MultiPoint } from "geojson";
+import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from "geojson";
 import { createStore } from '@reduxjs/toolkit';
 
 describe('loadOpRep function', () => {
@@ -22,15 +22,15 @@ describe('loadOpRep function', () => {
 
     const state = store.getState() as FeatureCollection;
     expect(state.features.length).toBe(1);
-    const feature = state.features[0] as Feature<MultiPoint>;
-    expect(feature.geometry.type).toBe('MultiPoint');
+    const feature = state.features[0] as Feature<LineString>;
+    expect(feature.geometry.type).toBe('LineString');
     expect(feature.geometry.coordinates.length).toBe(3);
     expect(feature.properties?.times.length).toBe(3);
     expect(feature.properties?.courses.length).toBe(3);
     expect(feature.properties?.speeds.length).toBe(3);
   });
 
-  it('should convert parsed data into GeoJson MultiPoint track object', async () => {
+  it('should convert parsed data into GeoJson LineString track object', async () => {
     const sampleOpRepData = `
       271300Z/3731.25N–01643.69E/095/15.0/-//
       271301Z/3731.30N–01643.75E/095/15.0/-//
@@ -41,8 +41,8 @@ describe('loadOpRep function', () => {
     '#ff0'});
 
     const state = store.getState() as FeatureCollection;
-    const feature = state.features[0] as Feature<MultiPoint>;
-    expect(feature.geometry.type).toBe('MultiPoint');
+    const feature = state.features[0] as Feature<LineString>;
+    expect(feature.geometry.type).toBe('LineString');
     expect(feature.geometry.coordinates.length).toBe(3);
   });
 
@@ -57,7 +57,7 @@ describe('loadOpRep function', () => {
       '#ff0'});
 
     const state = store.getState() as FeatureCollection;
-    const feature = state.features[0] as Feature<MultiPoint>;
+    const feature = state.features[0] as Feature<LineString>;
     expect(feature.geometry.coordinates[0][2]).toBe(-150);
   });
 
@@ -72,7 +72,7 @@ describe('loadOpRep function', () => {
       '#ff0'});
 
     const state = store.getState() as FeatureCollection;
-    const feature = state.features[0] as Feature<MultiPoint>;
+    const feature = state.features[0] as Feature<LineString>;
     expect(feature.properties?.times.length).toBe(3);
     expect(feature.properties?.courses.length).toBe(3);
     expect(feature.properties?.speeds.length).toBe(3);
@@ -89,7 +89,7 @@ describe('loadOpRep function', () => {
       '#ff0'});
 
     const state = store.getState() as FeatureCollection;
-    const feature = state.features[0] as Feature<MultiPoint>;
+    const feature = state.features[0] as Feature<LineString>;
     expect(feature.geometry.coordinates.length).toBe(2);
   });
 
@@ -103,7 +103,7 @@ describe('loadOpRep function', () => {
       '#ff0'});
 
     const state = store.getState() as FeatureCollection;
-    const feature = state.features[0] as Feature<MultiPoint>;
+    const feature = state.features[0] as Feature<LineString>;
     expect(feature.geometry.coordinates.length).toBe(2);
     expect(feature.properties?.name).toBe('name-b');
     const firstTime = feature.properties?.times[0];

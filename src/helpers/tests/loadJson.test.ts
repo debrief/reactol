@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { loadJson } from '../loaders/loadJson';
 import featuresReducer from '../../state/geoFeaturesSlice';
 import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from "geojson";
@@ -28,7 +29,7 @@ describe('load function', () => {
           type: 'Feature',
           properties: { name: 'Feature 2' },
           geometry: {
-            type: 'MultiPoint',
+            type: 'LineString',
             coordinates: [
               [102.0, 0.0],
               [103.0, 1.0],
@@ -51,7 +52,7 @@ describe('load function', () => {
     expect(secondString.geometry.coordinates?.length).toBe(4);
 
     // add again, check it gets longer
-    const sampleCopy = JSON.parse(JSON.stringify(sampleData))
+    const sampleCopy = _.cloneDeep(sampleData)
     sampleCopy.features = [sampleCopy.features[1]]
     const justLineString = JSON.stringify(sampleCopy);
     const newExisting = store.getState() as FeatureCollection;

@@ -6,7 +6,7 @@ import { LatLngBounds } from 'leaflet';
 const initialState: FeatureCollection = {
   type: 'FeatureCollection',
   features: [],
-  bbox: [0, 0, 0, 0]
+  bbox: undefined
 }
 
 let counter = 0
@@ -25,9 +25,13 @@ const cleanFeature = (feature: Feature): Feature => {
   return feature
 }
 
-const updateBounds = (state: FeatureCollection): BBox => {
+const updateBounds = (state: FeatureCollection): BBox | undefined => {
   const visibleFeatures = state.features.filter(feature => feature.properties?.visible);
-  return turf.bbox(turf.featureCollection(visibleFeatures)) as BBox;
+  if (visibleFeatures.length === 0) {
+    return undefined
+  } else {
+    return turf.bbox(turf.featureCollection(visibleFeatures)) as BBox;
+  }
 }
 
 
@@ -36,7 +40,7 @@ const featuresSlice = createSlice({
   name: 'featureCollection',
   initialState,
   reducers: {
-    clearStore(state) {
+    storeCleared(state) {
       state.features = []
       state.bbox = updateBounds(state)
     },
@@ -50,13 +54,18 @@ const featuresSlice = createSlice({
       state.features.push(...cleaned)
       state.bbox = updateBounds(state)
     },
+    featureUpdated(state, action: PayloadAction<Feature>) {
+      const featureIndex = state.features.findIndex((feature) => feature.id === action.payload.id)
+      state.features.splice(featureIndex, 1, action.payload)
+      state.bbox = updateBounds(state)
+    },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
       const cleaned = action.payload.map(cleanFeature)
       const removeUpdated = state.features.filter((feature) => !cleaned.find((f) => f.id === feature.id))
       state.features = removeUpdated.concat(cleaned)
       state.bbox = updateBounds(state)
     },
-    featuresVisible(state, action: PayloadAction<{ ids: string[], }>) {
+    featureVisibilities(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
       state.features.forEach((feature) => {
         if (!feature.properties) {

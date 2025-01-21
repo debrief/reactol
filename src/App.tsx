@@ -21,7 +21,8 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import Control from 'react-leaflet-custom-control';
 import toDTG from './helpers/toDTG.ts';
 import { AppDispatch } from './state/store.ts';
-import { LoadTrackModel, NewTrackProps } from './components/LoadTrackModal';
+import { LoadTrackModel } from './components/LoadTrackModal';
+import { NewTrackProps } from './types.ts';
 
 interface FileHandler {
   blobType: string
@@ -56,7 +57,7 @@ function App() {
       storeInitialised.current = true
       console.clear()
       // store initial data objects
-      dispatch({ type: 'featureCollection/clearStore'})
+      dispatch({ type: 'featureCollection/storeCleared'})
       dispatch({ type: 'featureCollection/featureAdded', payload: track })
       dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
       dispatch({ type: 'featureCollection/featureAdded', payload: track3 })
