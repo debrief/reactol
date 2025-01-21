@@ -195,44 +195,46 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       >
         <Alert type='info' description={message} />
       </Modal>
-      <Flex gap='small' justify='end' wrap style={{ height: "1em" }}>
-        <ToolButton
-          onClick={onGraphClick}
-          disabled={!temporalFeatureSelected}
-          icon={<LineChartOutlined />}
-          title={
-            temporalFeatureSelected
-              ? "View graph of selected features"
-              : "Select a time-related feature to enable graphs"
-          }
-        />
-        <ToolButton
-          onClick={clearSelection}
-          disabled={selection.length === 0}
-          icon={<CloseCircleOutlined />}
-          title={"Clear selection"}
-        />
-        <ToolButton
-          onClick={onDeleteClick}
-          disabled={selection.length === 0}
-          icon={<DeleteOutlined />}
-          title={
-            selection.length > 0
-              ? "Delete selected items"
-              : "Select items to enable delete"
-          }
-        />
-        <ToolButton
-          onClick={onDuplicateClick}
-          disabled={duplicateDisabled}
-          icon={<CopyOutlined />}
-          title={
-            selection.length > 0
-              ? "Duplicate selected items"
-              : "Select non-track items to enable duplicate"
-          }
-        />
-      </Flex>
+      <div style={{ position: "sticky", top: 0, zIndex: 1, background: "#fff" }}>
+        <Flex className='toolbar' gap='small' justify='end' wrap style={{ height: "1em" }}>
+          <ToolButton
+            onClick={onGraphClick}
+            disabled={!temporalFeatureSelected}
+            icon={<LineChartOutlined />}
+            title={
+              temporalFeatureSelected
+                ? "View graph of selected features"
+                : "Select a time-related feature to enable graphs"
+            }
+          />
+          <ToolButton
+            onClick={clearSelection}
+            disabled={selection.length === 0}
+            icon={<CloseCircleOutlined />}
+            title={"Clear selection"}
+          />
+          <ToolButton
+            onClick={onDeleteClick}
+            disabled={selection.length === 0}
+            icon={<DeleteOutlined />}
+            title={
+              selection.length > 0
+                ? "Delete selected items"
+                : "Select items to enable delete"
+            }
+          />
+          <ToolButton
+            onClick={onDuplicateClick}
+            disabled={duplicateDisabled}
+            icon={<CopyOutlined />}
+            title={
+              selection.length > 0
+                ? "Duplicate selected items"
+                : "Select non-track items to enable duplicate"
+            }
+          />
+        </Flex>
+      </div>
       {model.length && (
         <Tree
           checkable
