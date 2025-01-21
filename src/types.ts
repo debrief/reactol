@@ -10,7 +10,7 @@ export type CoreDataProps = {
 export type TrackProps = CoreDataProps & {
   dataType: typeof TRACK_TYPE
   shortName: string
-  symbol: string
+  symbol: "air" | "nav" | "sub" | "lnd" | "unk"
   times: string[]
   courses?: number[]
   speeds?: number[]
@@ -29,16 +29,11 @@ export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime);
 
 export type PointProps = CorePointProps & (PointTime | PeriodTime);
 
-export type NewTrackProps = {
-  name: string
-  shortName: string
+export type NewTrackProps = Omit<TrackProps, "times" | "courses" | "speeds" | "labelInterval" | "symbolInterval"> & {
   year: number
   month: number
-  symbol: string
-  color: string
-  trackId?: string
-  labelInterval?: number
-  symbolInterval?: number
+  labelInterval: string
+  symbolInterval: string
 }
 
 export type AddTrackProps = {
