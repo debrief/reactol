@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { PointProps } from "../../types";
-import _ from 'lodash';
 import { presetColors } from "../../helpers/standardShades";
 
 export interface PointFormProps {
@@ -20,7 +19,7 @@ type FormTypeProps = Omit<PointProps, 'time'> & {
 
 const convert = (point: Readonly<PointProps>): FormTypeProps=> {
   const oldVal = point
-  const newVal = _.cloneDeep(point) as FormTypeProps
+  const newVal = {...point} as FormTypeProps
   if (oldVal.time) {
     newVal.dTime = dayjs(oldVal.time)
     delete (newVal as Partial<PointProps>).time
@@ -30,7 +29,7 @@ const convert = (point: Readonly<PointProps>): FormTypeProps=> {
 
 const convertBack = (point: Readonly<FormTypeProps>): PointProps => {
   const oldVal = point 
-  const newVal = _.cloneDeep(point) as PointProps
+  const newVal = {...point} as PointProps
   if (point.dTime) {
     newVal.time = oldVal.dTime.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTime
