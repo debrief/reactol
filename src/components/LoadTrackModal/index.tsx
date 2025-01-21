@@ -229,7 +229,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           </Form.Item>  
           
 
-          <Form.Item label={null}>
+          <Form.Item style={itemStyle} label={null}>
             <Button type='text' onClick={cancel}>
               Cancel
             </Button>
