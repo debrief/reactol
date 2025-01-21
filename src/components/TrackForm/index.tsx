@@ -63,14 +63,15 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
   return (
     <>
       <Form
-        name='createTrack'
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
+        name='trackPropertiesForm'
+        className="propertiesForm"
+        labelCol={{ span: 7 }}
+        wrapperCol={{ span: 17 }}
         style={{ maxWidth: 400 }}
         initialValues={state}
         autoComplete='off'
         onValuesChange={localChange}
-        size='middle'>
+        size='small'>
         <Form.Item<FormTypeProps>
           label='Name'
           name='name'
@@ -114,14 +115,14 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
               className="labelInterval"
               name='labelInterval'
               style={itemStyle}>
-              <Select options={defaultIntervals} size='small' style={{width:'70px'}} />
+              <Select options={defaultIntervals} size='small' style={{width:'55px'}} />
             </Form.Item>
             <Form.Item<FormTypeProps>
               label='Symbols'
               name='symbolInterval'
               className="labelSymbol"
               style={itemStyle}>
-              <Select options={defaultIntervals} size='small' style={{width:'70px'}} />
+              <Select options={defaultIntervals} size='small' style={{width:'55px'}} />
             </Form.Item>
           </Flex>
         </Form.Item>  
