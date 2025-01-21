@@ -1,11 +1,30 @@
-.labelInterval .ant-form-item-label label, .labelSymbol .ant-form-item-label label {
-  font-size: 12px;
+.labelInterval .ant-form-item-label label, .labelSymbol .ant-form-item-label label,
+.labelInterval .ant-select-selection-item, .labelSymbol .ant-select-selection-item,
+div.ant-select-item-option, .ant-select-arrow {
+  font-size: 9px !important;
 }
 
-.labelInterval .ant-select-selection-item, .labelSymbol .ant-select-selection-item {
-  font-size: 12px;
-}
-
-div.ant-select-item-option {
+.propertiesForm .ant-form-item label,
+.propertiesForm .ant-form-item-control-input,
+.propertiesForm .ant-form-item-control-input input,
+.propertiesForm .ant-select-selection-item
+{
   font-size: 12px !important;
+  min-height: 0px !important;
+}
+
+.propertiesForm .ant-form-item {
+  margin-bottom: 0px !important;
+}
+
+.ant-select-item-option {
+  padding: 0px !important;
+}
+
+.ant-form-item-label >label::after {
+  margin-inline-end: 2px !important;
+}
+
+.ant-select-selector {
+  padding: 0px !important;
 }

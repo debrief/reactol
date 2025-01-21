@@ -1,12 +1,15 @@
+import { Feature, LineString } from 'geojson';
 import { TRACK_TYPE } from '../constants';
+import { TrackProps } from '../types';
 
-const track = {
+const track: Feature<LineString, TrackProps> = {
   type: 'Feature',
   properties: {
     dataType: TRACK_TYPE,
     color: '#00F',
     name: 'VAN AMSTEL',
     shortName: 'VANA',
+    symbol: 'sub',
     labelInterval: 2 * 60 * 60 * 1000,
     symbolInterval: 30 * 60 * 1000,
     times: [
