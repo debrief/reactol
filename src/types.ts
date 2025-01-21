@@ -10,7 +10,7 @@ export type CoreDataProps = {
 export type TrackProps = CoreDataProps & {
   dataType: typeof TRACK_TYPE
   shortName: string
-  symbol: string
+  symbol: "air" | "nav" | "sub" | "lnd" | "unk"
   times: string[]
   courses?: number[]
   speeds?: number[]
