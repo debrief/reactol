@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { useAppContext } from "../../../state/AppContext";
 import { CoordInstance, filterTrack } from "../../../helpers/filterTrack";
+import { TrackProps } from "../../../types";
 
 export interface TrackFeatureProps {
   feature: Feature 
@@ -27,9 +28,18 @@ const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
 
   const trackCoords: CoordInstance[] = useMemo(() => {
     const coords = (feature.geometry as LineString).coordinates
-    if (time && feature.properties?.times) {
-      const times = feature.properties.times
-      const validCoords = filterTrack(time.filterApplied, time.start, time.end, times, coords)
+    const props = feature.properties as TrackProps
+    if (time && props?.times) {
+      const times = props?.times
+      const validCoords = filterTrack(time.filterApplied, time.start, time.end, times, coords, props.labelInterval, props.symbolInterval)
+      // sanity check, that we don't have too many labels
+      const numLabels = validCoords.filter((item) => item.labelVisible).length
+      if (numLabels > 20) {
+        const freq = Math.floor(numLabels / 20)
+        validCoords.forEach((item, index) => {
+          item.labelVisible = index % freq === 0
+        })
+      }
       return validCoords
     } else {
       const times = feature.properties?.times
@@ -69,10 +79,10 @@ const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
         <Tooltip key={feature.id + '-start-name-' + isSelected} 
           direction='left' opacity={1} permanent>{feature.properties?.shortName}</Tooltip>
       </CircleMarker> }
-      { trackCoords.filter((item) => item.timeVisible).map((item: CoordInstance, index: number) => 
+      { trackCoords.filter((item) => item.labelVisible || item.symbolVisible).map((item: CoordInstance, index: number) => 
         <CircleMarker fillColor={colorFor(feature)} fill={isSelected} color={colorFor(feature)} fillOpacity={1} weight={lineWeight}  key={'-point-' + itemId + '-' + index} center={item.pos} 
-          radius={circleRadius} eventHandlers={{click: onclick}}>
-          {feature.properties?.times && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
+          radius={item.symbolVisible ? circleRadius : 0} eventHandlers={{click: onclick}}>
+          {item.labelVisible && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {item.time}
           </Tooltip>}
         </CircleMarker> )}
