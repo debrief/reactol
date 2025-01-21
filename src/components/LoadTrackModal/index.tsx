@@ -19,6 +19,7 @@ import { useAppSelector } from "../../state/hooks";
 import { AddTrackProps, NewTrackProps } from "../../types";
 import { defaultIntervals } from "../../helpers/timeIntervals";
 import "./index.css";
+import { symbolOptions } from "../../helpers/symbolTypes";
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -45,13 +46,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const initialYear = new Date().getFullYear()
   const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
-  const symbolOptions = [
-    { value: "air", label: "AIR" },
-    { value: "nav", label: "NAV" },
-    { value: "sub", label: "SUB" },
-    { value: "lnd", label: "LND" },
-    { value: "unk", label: "UNK" },
-  ]
+
 
   const onFinishAdd: FormProps<AddTrackProps>["onFinish"] = (id) => {
     addToTrack(id.trackId)
