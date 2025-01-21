@@ -4,6 +4,7 @@ import { Color } from "antd/es/color-picker";
 import { useEffect, useState } from "react";
 import { TrackProps } from "../../types";
 import { presetColors } from "../../helpers/standardShades";
+import './index.css';
 
 export interface TrackFormProps {
   track: Feature<LineString, TrackProps>
@@ -78,19 +79,22 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           <Checkbox style={{alignItems: 'start'}}  />
         </Form.Item>
         <Form.Item<TrackProps>
+          style={itemStyle}
           label='Markers'>
           <Flex gap='small'>
             <Form.Item<TrackProps>
               label='Labels'
+              className="labelInterval"
               name='labelInterval'
               style={itemStyle}>
-              <Select options={intervals} />
+              <Select options={intervals} size='small' style={{width:'60px'}} />
             </Form.Item>
             <Form.Item<TrackProps>
               label='Symbols'
               name='symbolInterval'
+              className="labelSymbol"
               style={itemStyle}>
-              <Select options={intervals} />
+              <Select options={intervals} size='small' style={{width:'60px'}} />
             </Form.Item>
           </Flex>
         </Form.Item>  
