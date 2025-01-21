@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { TrackProps } from "../../types";
 import { presetColors } from "../../helpers/standardShades";
 import './index.css';
+import { defaultIntervals } from "../../helpers/timeIntervals";
 
 export interface TrackFormProps {
   track: Feature<LineString, TrackProps>
@@ -34,17 +35,6 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
   }
 
   const itemStyle = { marginBottom: '0.5em' }
-
-  const intervals = [
-    { label: '1m', value: '' + 1000 * 60 },
-    { label: '5m', value: '' + 5 * 1000 * 60 },
-    { label: '10m', value: '' + 10 * 1000 * 60 },
-    { label: '15m', value: '' + 15 * 1000 * 60 },
-    { label: '30m', value: '' + 30 * 1000 * 60 },
-    { label: '1h', value: '' + 60 * 1000 * 60 },
-    { label: '2h', value: '' + 2 * 60 * 1000 * 60 },
-    { label: '6h', value: '' + 6 * 60 * 1000 * 60 }
-  ]
 
   return (
     <>
@@ -87,14 +77,14 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
               className="labelInterval"
               name='labelInterval'
               style={itemStyle}>
-              <Select options={intervals} size='small' style={{width:'60px'}} />
+              <Select options={defaultIntervals} size='small' style={{width:'60px'}} />
             </Form.Item>
             <Form.Item<TrackProps>
               label='Symbols'
               name='symbolInterval'
               className="labelSymbol"
               style={itemStyle}>
-              <Select options={intervals} size='small' style={{width:'60px'}} />
+              <Select options={defaultIntervals} size='small' style={{width:'60px'}} />
             </Form.Item>
           </Flex>
         </Form.Item>  
