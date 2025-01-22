@@ -8,7 +8,7 @@ import {
   FilterOutlined,
   LockFilled,
   UnlockOutlined,
-  FilterFilled,
+  FilterFilled
 } from "@ant-design/icons"
 import React, { useEffect, useMemo, useState } from "react"
 import { format } from "date-fns"
@@ -47,7 +47,7 @@ interface TimeButtonProps {
 }
 
 const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
-  const { time, setTime, viewportFrozen, setViewportFrozen } = useAppContext()
+  const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useAppContext()
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
@@ -80,10 +80,6 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
   const setFilterApplied = (applied: boolean) => {
     const newTime = { ...time, filterApplied: applied }
     setTime(newTime)
-  }
-
-  const copyMapToClipboard = (): void => {
-    window.alert("Map copied to clipboard")
   }
 
   const doStep = (fwd: boolean, large: boolean) => {
