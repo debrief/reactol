@@ -37,7 +37,7 @@ const updateBounds = (state: FeatureCollection): BBox | undefined => {
 
 // Create the slice and pass in the initial state
 const featuresSlice = createSlice({
-  name: 'featureCollection',
+  name: 'fColl',
   initialState,
   reducers: {
     storeCleared(state) {
