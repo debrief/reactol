@@ -96,9 +96,13 @@ const featuresSlice = createSlice({
 })
 
 // Selector to get bounds in Leaflet's LatLngBounds format
-export const selectBounds = (state: FeatureCollection): LatLngBounds => {
-  const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number];
-  return new LatLngBounds([minY, minX], [maxY, maxX]);
+export const selectBounds = (state: FeatureCollection): LatLngBounds | null => {
+  if (!state.bbox) {
+    return null;
+  } else {
+    const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number];
+    return new LatLngBounds([minY, minX], [maxY, maxX]);  
+  }
 };
 
 // Export the generated reducer function

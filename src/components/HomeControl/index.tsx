@@ -47,7 +47,7 @@ export const HomeControl: React.FC = () => {
   const { viewportFrozen } = useAppContext()
 
   const doHome = useCallback(() => {
-    if (map) {
+    if (map && currentBounds) {
       map.flyToBounds(currentBounds)
     }
   }, [map, currentBounds])
