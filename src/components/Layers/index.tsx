@@ -1,4 +1,4 @@
-import React, { Key, useEffect, useMemo } from "react"
+import React, { Key, useEffect, useMemo, useState } from "react"
 import { Alert, Button, Flex, Modal, Tooltip, Tree } from "antd"
 import type { GetProps, TreeDataNode } from "antd"
 import "./index.css"
@@ -13,6 +13,8 @@ import { Feature } from "geojson"
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../constants"
 import { useAppContext } from "../../state/AppContext"
 import { useAppSelector, useAppDispatch } from "../../state/hooks"
+import { LoadTrackModel } from "../LoadTrackModal"
+import { NewTrackProps, TrackProps } from "../../types"
 
 interface LayerProps {
   openGraph: { (): void }
@@ -78,6 +80,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<
     string[]
   >([NODE_TRACKS]) // Add state for expanded keys
+  const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
 
   const clearSelection = () => {
     setSelection([])
@@ -89,8 +92,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     key: string,
     dType: string
   ): TreeDataNode => {
-    const handleAdd = (e: React.MouseEvent, key: string) => {
-      setMessage("TODO - handle creating new item in " + key)
+    const handleAdd = (e: React.MouseEvent, key: string, title: string) => {
+      if (key === NODE_TRACKS) {
+        setcreateTrackDialogVisible(true)
+      } else {
+        setMessage("TODO - handle creating new item in " + title)
+      }
       e.stopPropagation()
     }
     return {
@@ -99,7 +106,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       icon: (
         <PlusCircleOutlined
           style={{ cursor: "copy" }}
-          onClick={(e) => handleAdd(e, title)}
+          onClick={(e) => handleAdd(e, key, title)}
         />
       ),
       children: features
@@ -185,6 +192,36 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     [selection, features]
   )
 
+  const setLoadTrackResults = async (values: NewTrackProps) => {
+    setcreateTrackDialogVisible(false)
+    // props in NewTrackProps format to TrackProps format, where they have different type
+    const newValues = values as unknown as TrackProps
+    newValues.labelInterval = parseInt(values.labelInterval)
+    newValues.symbolInterval = parseInt(values.symbolInterval)
+    const newTrack = {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [],
+      },
+      properties: {
+        ...newValues,
+        dataType: TRACK_TYPE,
+        times: [],
+        courses: [],
+        speeds: [],
+      },
+    }
+    dispatch({
+      type: "featureCollection/featureAdded",
+      payload: newTrack,
+    })
+  }
+
+  const handleDialogCancel = () => {
+    setcreateTrackDialogVisible(false)
+  }
+
   return (
     <>
       <Modal
@@ -252,6 +289,13 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           treeData={model}
         />
       )}
+      <LoadTrackModel
+        visible={createTrackDialogVisible}
+        cancel={handleDialogCancel}
+        newTrack={setLoadTrackResults}
+        addToTrack={() => {}}
+        createTrackOnly={true}
+      />
     </>
   )
 }

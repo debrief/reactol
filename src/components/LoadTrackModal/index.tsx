@@ -20,12 +20,14 @@ import { AddTrackProps, NewTrackProps } from "../../types";
 import { defaultIntervals } from "../../helpers/timeIntervals";
 import "./index.css";
 import { symbolOptions } from "../../helpers/symbolTypes";
+import { useMemo } from "react";
 
 export interface LoadTrackModelProps {
   visible: boolean
   newTrack: (value: NewTrackProps) => void
   addToTrack: (trackId: string) => void
   cancel: () => void
+  createTrackOnly?: boolean
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
@@ -33,8 +35,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   cancel,
   newTrack,
   addToTrack,
+  createTrackOnly = false,
 }) => {
-  // collate a list of existing tracks, in case user wants to add data to existing track
   const features = useAppSelector((state) => state.featureCollection.features)
   const trackOptions = features
     .filter((feature) => feature.properties?.dataType === "track")
@@ -47,14 +49,11 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
 
-
   const onFinishAdd: FormProps<AddTrackProps>["onFinish"] = (id) => {
     addToTrack(id.trackId)
   }
 
   const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
-    // see if we have to conver the color to rgb string, check if
-    // values.color is an object with a color property
     if (typeof values.color === "object") {
       const colorValue = values.color as Color
       values.color = colorValue.toRgbString()
@@ -237,6 +236,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     },
   ]
 
+  const onlyShowCreate = useMemo(() => createTrackOnly || trackOptions.length === 0, [createTrackOnly, trackOptions])
+
   return (
     <Modal
       title=''
@@ -245,9 +246,9 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       onCancel={cancel}
       footer={[]}
       maskClosable={false}
-      destroyOnClose={true} // set to true, in order to re-generate track ids
+      destroyOnClose={true}
     >
-      <Tabs defaultActiveKey={trackOptions.length > 0 ? 'add' : 'create'} items={tabs}></Tabs>
+      <Tabs defaultActiveKey={(onlyShowCreate ? 'create' : 'add')} items={onlyShowCreate ? tabs.slice(1) : tabs}></Tabs>
     </Modal>
   )
 }
