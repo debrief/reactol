@@ -8,8 +8,7 @@ import {
   FilterOutlined,
   LockFilled,
   UnlockOutlined,
-  CheckCircleOutlined,
-  FilterFilled,
+  FilterFilled
 } from "@ant-design/icons"
 import React, { useEffect, useMemo, useState } from "react"
 import { format } from "date-fns"
@@ -53,7 +52,6 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
   const [interval, setInterval] = useState<number>(0)
-  const [iconState, setIconState] = useState<React.ReactNode>(<CopyOutlined />)
 
   useEffect(() => {
     try {
@@ -83,16 +81,6 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
     const newTime = { ...time, filterApplied: applied }
     setTime(newTime)
   }
-
-  const handleCopyMap = () => {
-    setIconState(<CheckCircleOutlined />)
-    copyMapToClipboard()
-
-    setTimeout(() => {
-      setIconState(<CopyOutlined />)
-    }, 2000)
-  };
-
 
   const doStep = (fwd: boolean, large: boolean) => {
     if (large) {
@@ -199,10 +187,10 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
         <Col span={4}>
           <Tooltip title={copyTooltip}>
             <Button
-              onClick={handleCopyMap}
+              onClick={copyMapToClipboard}
               title='Copy map to clipboard'
-              icon={iconState}
-              disabled={!viewportFrozen}
+              icon={<CopyOutlined />}
+              disabled={viewportFrozen}
             />
           </Tooltip>
         </Col>
