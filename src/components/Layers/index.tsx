@@ -80,7 +80,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<
     string[]
   >([NODE_TRACKS]) // Add state for expanded keys
-  const [createTrack, setCreateTrack] = useState(false)
   const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
 
   const clearSelection = () => {
@@ -95,7 +94,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   ): TreeDataNode => {
     const handleAdd = (e: React.MouseEvent, key: string, title: string) => {
       if (key === NODE_TRACKS) {
-        setCreateTrack(true)
         setcreateTrackDialogVisible(true)
       } else {
         setMessage("TODO - handle creating new item in " + title)
@@ -296,7 +294,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         cancel={handleDialogCancel}
         newTrack={setLoadTrackResults}
         addToTrack={() => {}}
-        createTrackOnly={createTrack}
+        createTrackOnly={true}
       />
     </>
   )
