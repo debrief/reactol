@@ -296,7 +296,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         cancel={handleDialogCancel}
         newTrack={setLoadTrackResults}
         addToTrack={() => {}}
-        createTrack={createTrack}
+        createTrackOnly={createTrack}
       />
     </>
   )

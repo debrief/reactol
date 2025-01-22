@@ -20,13 +20,14 @@ import { AddTrackProps, NewTrackProps } from "../../types";
 import { defaultIntervals } from "../../helpers/timeIntervals";
 import "./index.css";
 import { symbolOptions } from "../../helpers/symbolTypes";
+import { useMemo } from "react";
 
 export interface LoadTrackModelProps {
   visible: boolean
   newTrack: (value: NewTrackProps) => void
   addToTrack: (trackId: string) => void
   cancel: () => void
-  createTrack?: boolean
+  createTrackOnly?: boolean
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
@@ -34,7 +35,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   cancel,
   newTrack,
   addToTrack,
-  createTrack = false,
+  createTrackOnly = false,
 }) => {
   const features = useAppSelector((state) => state.featureCollection.features)
   const trackOptions = features
@@ -235,6 +236,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     },
   ]
 
+  const onlyShowCreate = useMemo(() => createTrackOnly || trackOptions.length === 0, [createTrackOnly, trackOptions])
+
   return (
     <Modal
       title=''
@@ -245,7 +248,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       maskClosable={false}
       destroyOnClose={true}
     >
-      <Tabs defaultActiveKey={createTrack ? 'create' : (trackOptions.length > 0 ? 'add' : 'create')} items={createTrack ? tabs.slice(1) : tabs}></Tabs>
+      <Tabs defaultActiveKey={(onlyShowCreate ? 'create' : 'add')} items={onlyShowCreate ? tabs.slice(1) : tabs}></Tabs>
     </Modal>
   )
 }
