@@ -13,7 +13,7 @@ import {
   TabsProps,
   Typography,
 } from "antd";
-import { Color } from "antd/es/color-picker";
+import { Color } from "antd/es.color-picker";
 import { presetColors } from "../../helpers/standardShades";
 import { useAppSelector } from "../../state/hooks";
 import { AddTrackProps, NewTrackProps } from "../../types";
@@ -26,6 +26,7 @@ export interface LoadTrackModelProps {
   newTrack: (value: NewTrackProps) => void
   addToTrack: (trackId: string) => void
   cancel: () => void
+  createTrack?: boolean
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
@@ -33,8 +34,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   cancel,
   newTrack,
   addToTrack,
+  createTrack = false,
 }) => {
-  // collate a list of existing tracks, in case user wants to add data to existing track
   const features = useAppSelector((state) => state.featureCollection.features)
   const trackOptions = features
     .filter((feature) => feature.properties?.dataType === "track")
@@ -47,14 +48,11 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
 
-
   const onFinishAdd: FormProps<AddTrackProps>["onFinish"] = (id) => {
     addToTrack(id.trackId)
   }
 
   const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
-    // see if we have to conver the color to rgb string, check if
-    // values.color is an object with a color property
     if (typeof values.color === "object") {
       const colorValue = values.color as Color
       values.color = colorValue.toRgbString()
@@ -245,9 +243,9 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       onCancel={cancel}
       footer={[]}
       maskClosable={false}
-      destroyOnClose={true} // set to true, in order to re-generate track ids
+      destroyOnClose={true}
     >
-      <Tabs defaultActiveKey={trackOptions.length > 0 ? 'add' : 'create'} items={tabs}></Tabs>
+      <Tabs defaultActiveKey={createTrack ? 'create' : (trackOptions.length > 0 ? 'add' : 'create')} items={createTrack ? tabs.slice(1) : tabs}></Tabs>
     </Modal>
   )
 }
