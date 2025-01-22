@@ -203,7 +203,7 @@ function App() {
                 url="tiles/{z}/{x}/{y}.png"
               />
               <Control prepend position='topleft'>
-                <div className='time-period' style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                <div className='time-period'>
                   {timePeriod}
                 </div>
               </Control>

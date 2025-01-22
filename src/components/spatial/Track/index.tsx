@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { useAppContext } from "../../../state/AppContext";
 import { CoordInstance, filterTrack } from "../../../helpers/filterTrack";
 import { TrackProps } from "../../../types";
+import './index.css';
 
 export interface TrackFeatureProps {
   feature: Feature 
@@ -76,13 +77,13 @@ const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
     <>
       { <Polyline key={'-line-' + itemId} eventHandlers={{click: onclick}} positions={trackCoords.map((val: CoordInstance) => val.pos)} weight={lineWeight} color={colorFor(feature)}/>}
       { trackCoords.length && <CircleMarker key={'-start-line-' + itemId} center={trackCoords[0].pos}  color={colorFor(feature)} radius={circleRadius}>
-        <Tooltip key={feature.id + '-start-name-' + isSelected} 
+        <Tooltip className={'track-name'} key={feature.id + '-start-name-' + isSelected} 
           direction='left' opacity={1} permanent>{feature.properties?.shortName}</Tooltip>
       </CircleMarker> }
       { trackCoords.filter((item) => item.labelVisible || item.symbolVisible).map((item: CoordInstance, index: number) => 
         <CircleMarker fillColor={colorFor(feature)} fill={isSelected} color={colorFor(feature)} fillOpacity={1} weight={lineWeight}  key={'-point-' + itemId + '-' + index} center={item.pos} 
           radius={item.symbolVisible ? circleRadius : 0} eventHandlers={{click: onclick}}>
-          {item.labelVisible && <Tooltip  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
+          {item.labelVisible && <Tooltip className="time-marker"  key={feature.id + '-tip-' + index} offset={[0, -20]} direction="center" opacity={1} permanent>
             {item.time}
           </Tooltip>}
         </CircleMarker> )}

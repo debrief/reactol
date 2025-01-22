@@ -4,6 +4,7 @@ import { CircleMarker, Tooltip } from 'react-leaflet';
 import { useMemo } from "react";
 import { useAppContext } from "../../../state/AppContext";
 import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
+import './index.css';
 
 export interface PointSymbolProps {
   feature: Feature<GPoint> 
@@ -44,7 +45,7 @@ export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => 
     <>
       { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={circleRadius} 
         fillColor={color} color={color} fill={true} fillOpacity={10} center={location} eventHandlers={{click: onclick}}>
-        <Tooltip key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
+        <Tooltip className='point-label' key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
           {name}
         </Tooltip>
       </CircleMarker>}
