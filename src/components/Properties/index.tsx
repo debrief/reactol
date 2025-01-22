@@ -16,6 +16,7 @@ const Properties: React.FC = () => {
   const { selection } = useAppContext()
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
+  const [formDirty, setFormDirty] = useState<boolean>(false)
   const allFeatures = useAppSelector(
     (state) => state.featureCollection.features
   )
@@ -29,12 +30,19 @@ const Properties: React.FC = () => {
 
   const onReset = useCallback(() => {
     setFeatureState(originalState)
+    setFormDirty(false)
   }, [originalState])
 
   const onSave = useCallback(() => {
     // update the feature
     dispatch({ type: 'featureCollection/featureUpdated', payload: featureState })
+    setFormDirty(false)
   }, [dispatch, featureState])
+
+  const updateFeatureState = (newFeature: Feature<Geometry, GeoJsonProperties>) => {
+    setFeatureState(newFeature)
+    setFormDirty(true)
+  }
 
   useEffect(() => {
     if (featureState) {
@@ -44,13 +52,13 @@ const Properties: React.FC = () => {
         const aProps = featureProps as CoreDataProps
         switch (aProps.dataType) {
         case REFERENCE_POINT_TYPE:
-          setPropertyForm(<CoreForm onReset={onReset} onSave={onSave}>
-            <PointForm onChange={setFeatureState} point={featureState as Feature<Point, PointProps>} />
+          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
+            <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, PointProps>} />
           </CoreForm>)
           break;
         case TRACK_TYPE:    
-          setPropertyForm(<CoreForm onReset={onReset} onSave={onSave}>
-            <TrackForm onChange={setFeatureState} track={featureState as Feature<LineString, TrackProps>} />
+          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
+            <TrackForm onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
           </CoreForm>)
           break;
         case ZONE_TYPE:
@@ -61,7 +69,7 @@ const Properties: React.FC = () => {
         }
       }
     }
-  },[featureState, onSave, onReset])
+  },[featureState, onSave, onReset, formDirty])
 
   useEffect(() => {
     if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
@@ -78,6 +86,7 @@ const Properties: React.FC = () => {
       if (selectedFeat) {
         setOriginalState(selectedFeat)  
         setFeatureState(selectedFeat)
+        setFormDirty(false)
       } else {
         setPropertyForm(<div>Feature not found</div>)
       }    
