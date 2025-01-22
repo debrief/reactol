@@ -190,7 +190,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
               onClick={copyMapToClipboard}
               title='Copy map to clipboard'
               icon={<CopyOutlined />}
-              disabled={viewportFrozen}
+              disabled={!viewportFrozen}
             />
           </Tooltip>
         </Col>
