@@ -13,7 +13,7 @@ import {
   TabsProps,
   Typography,
 } from "antd";
-import { Color } from "antd/es.color-picker";
+import { Color } from "antd/es/color-picker";
 import { presetColors } from "../../helpers/standardShades";
 import { useAppSelector } from "../../state/hooks";
 import { AddTrackProps, NewTrackProps } from "../../types";
