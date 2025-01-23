@@ -59,7 +59,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         return times.map((time: string, index: number) => {
           return {
             pos: [coords[index][1], coords[index][0]],
-            time: format(time, 'ddHHmm"Z"'),
+            time: format(time, 'ddHHmm\'Z\''),
             timeVisible: index % timeFreq === 0,
           }
         })
@@ -81,7 +81,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
   const lineWeight = 2
 
   const circleRadius = 3
-  
+
   /** in order for cosmetic changes to be reflected in the UI, we need to include styling
    * properties in the `key` for each leaflet element
    */
