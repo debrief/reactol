@@ -167,7 +167,7 @@ function App() {
     // Implement the logic to add position data to an existing track
     // You can use the trackId and values to update the existing track
     setIsDialogVisible(false)
-    window.alert('adding data to track:' + trackId)
+    console.log('adding data to track:' + trackId)
   }
 
   return (
