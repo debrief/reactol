@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "prepare": "husky install",
     "preview": "vite preview",
     "test": "jest",
     "storybook": "storybook dev -p 6006",
