@@ -13,7 +13,7 @@ import zones from './data/zones.ts'
 import points from './data/points.ts'
 import Map from './components/spatial/Map/index.tsx'
 import GraphModal from './components/GraphModal'
-import { useAppContext } from './state/AppContext.tsx'
+import { useAppContext } from './state/AppContext.ts'
 import { TileLayer } from 'react-leaflet'
 import { loadJson } from './helpers/loaders/loadJson.ts' // Import the load function
 import { loadOpRep } from './helpers/loaders/loadOpRep.ts' // Import the loadOpRep function
