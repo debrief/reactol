@@ -51,7 +51,7 @@ export type GraphDataset = { label: string,
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
   const allFeatures = useAppSelector(state => state.fColl.features)
-  const { selection } = useAppContext();
+  const { selection } = useAppContext()
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
   const [ticks, setTicks] = React.useState<number[]>([])
@@ -128,7 +128,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
   const options = [speedCalc, courseCalc, rangeCalc, bearingCalc]
  
-  const formatDate = (value: any): string => {
+  const formatDate = (value: string | number): string => {
     try {
       const date = new Date(value)
       return format(date, 'ddHHmm\'Z\'')
@@ -165,7 +165,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   }
 
   return (
-    // @ts-ignore */}
+    // @ts-expect-error Property 'initWidth' does not exist on type 'IntrinsicAttributes & ModalProps'.
     <ReactModal 
       initWidth={800} 
       initHeight={500} 
