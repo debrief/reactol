@@ -61,8 +61,8 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
 }
 
 const Map: React.FC<MapProps> = ({ children }) => {
-  const features = useAppSelector(state => state.featureCollection.features)
-  const { selection, setSelection, viewportFrozen } = useAppContext()
+  const features = useAppSelector(state => state.fColl.features)
+  const { selection, setSelection, viewportFrozen } = useAppContext();
   const mapRef = useRef<any>(null)
 
 

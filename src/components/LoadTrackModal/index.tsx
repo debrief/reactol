@@ -37,7 +37,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   addToTrack,
   createTrackOnly = false,
 }) => {
-  const features = useAppSelector((state) => state.featureCollection.features)
+  const features = useAppSelector((state) => state.fColl.features)
   const trackOptions = features
     .filter((feature) => feature.properties?.dataType === 'track')
     .map((feature) => ({

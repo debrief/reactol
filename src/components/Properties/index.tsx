@@ -18,7 +18,7 @@ const Properties: React.FC = () => {
   const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [formDirty, setFormDirty] = useState<boolean>(false)
   const allFeatures = useAppSelector(
-    (state) => state.featureCollection.features
+    (state) => state.fColl.features
   )
   const [propertyForm, setPropertyForm] = useState<ReactNode | null>(null)
   const dispatch = useAppDispatch()
@@ -35,7 +35,7 @@ const Properties: React.FC = () => {
 
   const onSave = useCallback(() => {
     // update the feature
-    dispatch({ type: 'featureCollection/featureUpdated', payload: featureState })
+    dispatch({ type: 'fColl/featureUpdated', payload: featureState })
     setFormDirty(false)
   }, [dispatch, featureState])
 

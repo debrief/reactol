@@ -12,10 +12,10 @@ import mockFeatures from '../../mock/features'
 const createMockStore = (features: FeatureCollection) =>
   configureStore({
     reducer: {
-      featureCollection: featuresReducer,
+      fColl: featuresReducer,
     },
     preloadedState: {
-      featureCollection:  features,
+      fColl:  features,
     },
   })
 

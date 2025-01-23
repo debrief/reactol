@@ -30,7 +30,7 @@ const featureToPoints = (feature: Feature): FeatureCollection<Point> => {
 
 const MouseCoordinates: React.FC = () => {
   const { selection } = useAppContext()
-  const features = useAppSelector(state => state.featureCollection.features)
+  const features = useAppSelector(state => state.fColl.features)
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0})
   const { viewportFrozen } = useAppContext()
 

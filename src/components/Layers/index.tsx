@@ -66,7 +66,7 @@ const ToolButton: React.FC<ToolProps> = ({
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const { selection, setSelection } = useAppContext()
-  const features = useAppSelector((state) => state.featureCollection.features)
+  const features = useAppSelector((state) => state.fColl.features)
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)
   )
@@ -152,7 +152,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
     const keys = justLeaves(checkedKeys as Key[])
     dispatch({
-      type: 'featureCollection/featureVisibilities',
+      type: 'fColl/featureVisibilities',
       payload: { ids: keys },
     })
   }
@@ -168,7 +168,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onDeleteClick = () => {
     dispatch({
-      type: 'featureCollection/featuresDeleted',
+      type: 'fColl/featuresDeleted',
       payload: { ids: selection },
     })
     setSelection([])
@@ -176,7 +176,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onDuplicateClick = () => {
     dispatch({
-      type: 'featureCollection/featuresDuplicated',
+      type: 'fColl/featuresDuplicated',
       payload: { ids: selection },
     })
   }
@@ -213,7 +213,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       },
     }
     dispatch({
-      type: 'featureCollection/featureAdded',
+      type: 'fColl/featureAdded',
       payload: newTrack,
     })
   }

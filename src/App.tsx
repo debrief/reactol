@@ -42,7 +42,7 @@ const FileHandlers: FileHandler[] = [
 ]
 
 function App() {
-  const features = useAppSelector(state => state.featureCollection.features)
+  const features = useAppSelector(state => state.fColl.features)
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
@@ -57,12 +57,12 @@ function App() {
       storeInitialised.current = true
       console.clear()
       // store initial data objects
-      dispatch({ type: 'featureCollection/storeCleared'})
-      dispatch({ type: 'featureCollection/featureAdded', payload: track })
-      dispatch({ type: 'featureCollection/featureAdded', payload: track2 })
-      dispatch({ type: 'featureCollection/featureAdded', payload: track3 })
-      dispatch({ type: 'featureCollection/featuresAdded', payload: zones })
-      dispatch({ type: 'featureCollection/featuresAdded', payload: points })
+      dispatch({ type: 'fColl/storeCleared'})
+      dispatch({ type: 'fColl/featureAdded', payload: track })
+      dispatch({ type: 'fColl/featureAdded', payload: track2 })
+      dispatch({ type: 'fColl/featureAdded', payload: track3 })
+      dispatch({ type: 'fColl/featuresAdded', payload: zones })
+      dispatch({ type: 'fColl/featuresAdded', payload: points })
     }
   }, [dispatch])
 

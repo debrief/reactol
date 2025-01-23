@@ -50,12 +50,8 @@ export type GraphDataset = { label: string,
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
-  if (!open) {
-    return null
-  }
-  const allFeatures = useAppSelector(state => state.featureCollection.features)
-  const { selection } = useAppContext()
-
+  const allFeatures = useAppSelector(state => state.fColl.features)
+  const { selection } = useAppContext();
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
   const [ticks, setTicks] = React.useState<number[]>([])
@@ -162,6 +158,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     setShowBaseWarning(trackId === '')
     setBaseTrack(trackId)
     setGraphEnabled(true)
+  }
+
+  if (!open) {
+    return null
   }
 
   return (

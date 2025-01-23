@@ -42,12 +42,12 @@ const TipButton: React.FC<{
 export const HomeControl: React.FC = () => {
   const map = useMap()
   const currentBounds = selectBounds(
-    useAppSelector((state) => state.featureCollection)
+    useAppSelector((state) => state.fColl)
   )
   const { viewportFrozen } = useAppContext()
 
   const doHome = useCallback(() => {
-    if (map) {
+    if (map && currentBounds) {
       map.flyToBounds(currentBounds)
     }
   }, [map, currentBounds])
