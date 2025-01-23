@@ -1,7 +1,7 @@
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { AppDispatch } from '../../state/store';
-import { TRACK_TYPE } from '../../constants';
-import { NewTrackProps, TrackProps } from '../../types';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import { AppDispatch } from '../../state/store'
+import { TRACK_TYPE } from '../../constants'
+import { NewTrackProps, TrackProps } from '../../types'
 
 interface OpRepData {
   dtg: string;
