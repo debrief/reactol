@@ -86,7 +86,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
       setData([])
       setWasOpen(false)
     }
-  },[open])
+  },[open, wasOpen])
 
   useEffect(() => {
     const trackItems: Array<BaseOptionType | DefaultOptionType> = selectedFeatures.map((feature) => {
@@ -95,7 +95,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     if (JSON.stringify(trackItems) !== JSON.stringify(tracks)) {
       setTracks(trackItems)
     }
-  },[selectedFeatures])
+  },[selectedFeatures, tracks])
 
   useEffect(() => {
     if (calculations.length === 0) {
@@ -117,7 +117,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         setData(flattened)  
       }
     }
-  }, [calculations, baseTrack, selectedFeatures])
+  }, [calculations, baseTrack, selectedFeatures, tracksEnabled])
 
 
   const onFinish: FormProps<GraphForm>['onFinish'] = (values) => {
