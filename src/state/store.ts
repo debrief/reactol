@@ -3,7 +3,7 @@ import featuresReducer from './geoFeaturesSlice'
 
 export const store = configureStore({
   reducer: {
-    featureCollection: featuresReducer
+    fColl: featuresReducer
   }
 })
 

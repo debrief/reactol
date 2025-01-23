@@ -53,7 +53,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   if (!open) {
     return null
   }
-  const allFeatures = useAppSelector(state => state.featureCollection.features)
+  const allFeatures = useAppSelector(state => state.fColl.features)
   const { selection } = useAppContext();
 
   const [calculations, setCalculations] = React.useState<Calculation[]>([])

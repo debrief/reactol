@@ -43,13 +43,13 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
     if (values.color) {
       dupe.color = (values.color as unknown as Color).toHexString()
     }
-    if (values.labelInterval) {
-      dupe.labelInterval = parseInt(values.labelInterval as unknown as string)
-    }
-    if (values.symbolInterval) {
-      dupe.symbolInterval = parseInt(values.symbolInterval as unknown as string)
-    }
     const updatedProps= {...state, ...dupe} as TrackProps
+    if (updatedProps.labelInterval) {
+      updatedProps.labelInterval = parseInt(updatedProps.labelInterval as unknown as string)
+    }
+    if (updatedProps.symbolInterval) {
+      updatedProps.symbolInterval = parseInt(updatedProps.symbolInterval as unknown as string)
+    }
     const res = {...track, properties: updatedProps}
     onChange(res)
   }
