@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import { loadJson } from '../loaders/loadJson'
 import featuresReducer from '../../state/geoFeaturesSlice'
 import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from 'geojson'
@@ -52,7 +52,7 @@ describe('load function', () => {
     expect(secondString.geometry.coordinates?.length).toBe(4)
 
     // add again, check it gets longer
-    const sampleCopy = _.cloneDeep(sampleData)
+    const sampleCopy = cloneDeep(sampleData)
     sampleCopy.features = [sampleCopy.features[1]]
     const justLineString = JSON.stringify(sampleCopy)
     const newExisting = store.getState() as FeatureCollection
