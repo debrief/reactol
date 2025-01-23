@@ -3,13 +3,13 @@ import { MapContainer, ScaleControl, useMap } from 'react-leaflet'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useAppSelector } from '../../../state/hooks'
 import { useAppContext } from '../../../state/AppContext'
 import { Point as DataPoint } from '../Point'
-import MouseCoordinates from '../MouseCoordinates'
 import { Graticule } from '../AutoGraticule'
 import { HomeControl } from '../../HomeControl'
+import MouseCoordinates from '../MouseCoordinates'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -62,9 +62,7 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
 
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.fColl.features)
-  const { selection, setSelection, viewportFrozen } = useAppContext();
-  const mapRef = useRef<any>(null)
-
+  const { selection, setSelection, viewportFrozen } = useAppContext()
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -91,7 +89,6 @@ const Map: React.FC<MapProps> = ({ children }) => {
         zoomControl={false}
         center={[35.505, -4.09]}
         zoom={8}
-        ref={mapRef}
       >
         <ViewportProperties frozen={viewportFrozen} />
         {children}
