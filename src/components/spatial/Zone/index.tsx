@@ -1,11 +1,11 @@
-import * as turf from "@turf/turf";
-import { Feature, Geometry, Polygon } from "geojson";
-import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
-import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet';
-import { useMemo } from "react";
-import { useAppContext } from "../../../state/AppContext";
-import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
-import './index.css';
+import * as turf from '@turf/turf'
+import { Feature, Geometry, Polygon } from 'geojson'
+import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
+import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
+import { useMemo } from 'react'
+import { useAppContext } from '../../../state/AppContext'
+import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
+import './index.css'
 
 export interface ZoneProps {
   feature: Feature<Polygon> 
@@ -19,7 +19,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
       return feat.properties.color || '#ff0'
     }
   }
-  return '#000';
+  return '#000'
 }
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {

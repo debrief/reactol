@@ -1,6 +1,6 @@
-import { Calculation, GraphDataset } from "../../components/GraphModal";
+import { Calculation, GraphDataset } from '../../components/GraphModal'
 import { Feature } from 'geojson'
-import { isTemporal } from "../trackCalculations";
+import { isTemporal } from '../trackCalculations'
 
 export const speedCalc: Calculation = {
   label: 'Speed',
@@ -17,7 +17,7 @@ export const speedCalc: Calculation = {
 
       return {label: name + ' Speed', color: feature.properties?.color || undefined, data: feature.properties?.times.map((time: number, index: number) => {
         return {date: new Date(time).getTime(), value: feature.properties?.speeds[index]}})}
-      })
-    }
+    })
   }
+}
 

@@ -1,11 +1,11 @@
-import { Feature, Point } from "geojson";
-import { Checkbox, ColorPicker, DatePicker, Form, Input } from "antd";
-import { Color } from "antd/es/color-picker";
-import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
-import { PointProps } from "../../types";
-import { presetColors } from "../../helpers/standardShades";
+import { Feature, Point } from 'geojson'
+import { Checkbox, ColorPicker, DatePicker, Form, Input } from 'antd'
+import { Color } from 'antd/es/color-picker'
+import { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
+import { PointProps } from '../../types'
+import { presetColors } from '../../helpers/standardShades'
 
 export interface PointFormProps {
   point: Feature<Point, PointProps>

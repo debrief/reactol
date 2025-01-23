@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BBox, Feature, FeatureCollection } from 'geojson';
-import * as turf from '@turf/turf';
-import { LatLngBounds } from 'leaflet';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { BBox, Feature, FeatureCollection } from 'geojson'
+import * as turf from '@turf/turf'
+import { LatLngBounds } from 'leaflet'
 
 const initialState: FeatureCollection = {
   type: 'FeatureCollection',
@@ -26,11 +26,11 @@ const cleanFeature = (feature: Feature): Feature => {
 }
 
 const updateBounds = (state: FeatureCollection): BBox | undefined => {
-  const visibleFeatures = state.features.filter(feature => feature.properties?.visible);
+  const visibleFeatures = state.features.filter(feature => feature.properties?.visible)
   if (visibleFeatures.length === 0) {
     return undefined
   } else {
-    return turf.bbox(turf.featureCollection(visibleFeatures)) as BBox;
+    return turf.bbox(turf.featureCollection(visibleFeatures)) as BBox
   }
 }
 
@@ -76,30 +76,30 @@ const featuresSlice = createSlice({
       state.bbox = updateBounds(state)
     },
     featuresDeleted(state, action: PayloadAction<{ ids: string[], }>) {
-      const { ids } = action.payload;
-      state.features = state.features.filter(feature => !ids.includes(feature.id as string));
-      state.bbox = updateBounds(state);
+      const { ids } = action.payload
+      state.features = state.features.filter(feature => !ids.includes(feature.id as string))
+      state.bbox = updateBounds(state)
     },
     featuresDuplicated(state, action: PayloadAction<{ ids: string[], }>) {
-      const { ids } = action.payload;
+      const { ids } = action.payload
       const newFeatures = state.features
         .filter(feature => ids.includes(feature.id as string))
         .map(feature => {
-          const newFeature = { ...feature, id: `f-${++counter}` };
-          newFeature.properties = { ...feature.properties, name: `Copy of ${feature.properties?.name || feature.id}` };
-          return newFeature;
-        });
-      state.features.push(...newFeatures);
-      state.bbox = updateBounds(state);
+          const newFeature = { ...feature, id: `f-${++counter}` }
+          newFeature.properties = { ...feature.properties, name: `Copy of ${feature.properties?.name || feature.id}` }
+          return newFeature
+        })
+      state.features.push(...newFeatures)
+      state.bbox = updateBounds(state)
     },
   }
 })
 
 // Selector to get bounds in Leaflet's LatLngBounds format
 export const selectBounds = (state: FeatureCollection): LatLngBounds => {
-  const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number];
-  return new LatLngBounds([minY, minX], [maxY, maxX]);
-};
+  const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number]
+  return new LatLngBounds([minY, minX], [maxY, maxX])
+}
 
 // Export the generated reducer function
 export default featuresSlice.reducer

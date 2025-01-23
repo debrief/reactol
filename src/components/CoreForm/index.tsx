@@ -1,4 +1,4 @@
-import { Button, Flex, Tooltip } from "antd";
+import { Button, Flex, Tooltip } from 'antd'
 
 export interface CoreFormProps {
   children: React.ReactNode;

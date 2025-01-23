@@ -12,15 +12,15 @@ import {
   Tabs,
   TabsProps,
   Typography,
-} from "antd";
-import { Color } from "antd/es/color-picker";
-import { presetColors } from "../../helpers/standardShades";
-import { useAppSelector } from "../../state/hooks";
-import { AddTrackProps, NewTrackProps } from "../../types";
-import { defaultIntervals } from "../../helpers/timeIntervals";
-import "./index.css";
-import { symbolOptions } from "../../helpers/symbolTypes";
-import { useMemo } from "react";
+} from 'antd'
+import { Color } from 'antd/es/color-picker'
+import { presetColors } from '../../helpers/standardShades'
+import { useAppSelector } from '../../state/hooks'
+import { AddTrackProps, NewTrackProps } from '../../types'
+import { defaultIntervals } from '../../helpers/timeIntervals'
+import './index.css'
+import { symbolOptions } from '../../helpers/symbolTypes'
+import { useMemo } from 'react'
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -39,7 +39,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
 }) => {
   const features = useAppSelector((state) => state.featureCollection.features)
   const trackOptions = features
-    .filter((feature) => feature.properties?.dataType === "track")
+    .filter((feature) => feature.properties?.dataType === 'track')
     .map((feature) => ({
       value: feature.id,
       label: feature.properties?.name || feature.id,
@@ -49,12 +49,12 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
 
-  const onFinishAdd: FormProps<AddTrackProps>["onFinish"] = (id) => {
+  const onFinishAdd: FormProps<AddTrackProps>['onFinish'] = (id) => {
     addToTrack(id.trackId)
   }
 
-  const onFinishCreate: FormProps<NewTrackProps>["onFinish"] = (values) => {
-    if (typeof values.color === "object") {
+  const onFinishCreate: FormProps<NewTrackProps>['onFinish'] = (values) => {
+    if (typeof values.color === 'object') {
       const colorValue = values.color as Color
       values.color = colorValue.toRgbString()
     }
@@ -70,10 +70,10 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     symbolInterval: '' + Number(defaultIntervals[4].value),
   }
 
-  const tabs: TabsProps["items"] = [
+  const tabs: TabsProps['items'] = [
     {
-      key: "add",
-      label: "Add to existing track",
+      key: 'add',
+      label: 'Add to existing track',
       children: (
         <Form
           name='addToTrack'
@@ -96,7 +96,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             rules={[
               {
                 required: true,
-                message: "Please indicate which track to add data to",
+                message: 'Please indicate which track to add data to',
               },
             ]}
           >
@@ -114,8 +114,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       ),
     },
     {
-      key: "create",
-      label: "Create new track",
+      key: 'create',
+      label: 'Create new track',
       children: (
         <Form
           name='createTrack'
@@ -134,7 +134,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             label='Name'
             name='name'
             style={itemStyle}
-            rules={[{ required: true, message: "Please enter track name!" }]}
+            rules={[{ required: true, message: 'Please enter track name!' }]}
           >
             <Input />
           </Form.Item>
@@ -145,7 +145,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             rules={[
               {
                 required: true,
-                message: "Please enter abbreviated track name!",
+                message: 'Please enter abbreviated track name!',
               },
             ]}
           >
@@ -158,7 +158,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             label='Year'
             name='year'
             style={itemStyle}
-            rules={[{ required: true, message: "Please enter Year for data" }]}
+            rules={[{ required: true, message: 'Please enter Year for data' }]}
           >
             <InputNumber min={2020} max={2040} changeOnWheel />
           </Form.Item>
@@ -167,7 +167,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             label='Month'
             name='month'
             style={itemStyle}
-            rules={[{ required: true, message: "Please enter Month for data" }]}
+            rules={[{ required: true, message: 'Please enter Month for data' }]}
           >
             <InputNumber min={1} max={12} changeOnWheel />
           </Form.Item>
@@ -179,7 +179,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             rules={[
               {
                 required: true,
-                message: "Please specify the environment for the track",
+                message: 'Please specify the environment for the track',
               },
             ]}
           >
@@ -190,7 +190,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             label='Colour'
             name='color'
             style={itemStyle}
-            rules={[{ required: true, message: "Please enter track color" }]}
+            rules={[{ required: true, message: 'Please enter track color' }]}
           >
             <ColorPicker
               presets={presetColors}

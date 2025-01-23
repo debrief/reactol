@@ -1,4 +1,4 @@
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "./constants"
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from './constants'
 
 export type CoreDataProps = {
   dataType: typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE
@@ -10,7 +10,7 @@ export type CoreDataProps = {
 export type TrackProps = CoreDataProps & {
   dataType: typeof TRACK_TYPE
   shortName: string
-  symbol: "air" | "nav" | "sub" | "lnd" | "unk"
+  symbol: 'air' | 'nav' | 'sub' | 'lnd' | 'unk'
   times: string[]
   courses?: number[]
   speeds?: number[]
@@ -29,7 +29,7 @@ export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime);
 
 export type PointProps = CorePointProps & (PointTime | PeriodTime);
 
-export type NewTrackProps = Omit<TrackProps, "times" | "courses" | "speeds" | "labelInterval" | "symbolInterval"> & {
+export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'labelInterval' | 'symbolInterval'> & {
   year: number
   month: number
   labelInterval: string
