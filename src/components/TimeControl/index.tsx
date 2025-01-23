@@ -75,6 +75,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
     } else {
       setTime({ ...time, start, end })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interval, start, end, time.filterApplied, setTime])
 
   const setFilterApplied = (applied: boolean) => {

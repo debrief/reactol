@@ -88,6 +88,7 @@ function App() {
         setTime({...time, filterApplied: false, start: 0, end: 0})
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [features, setTime])
 
   const antdTheme = {
