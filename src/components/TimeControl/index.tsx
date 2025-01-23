@@ -19,7 +19,7 @@ export interface TimeProps {
   bounds: [number, number] | null
 }
 
-export const StepOptions = [
+const StepOptions = [
   { value: '00h15m' },
   { value: '00h30m' },
   { value: '01h00m' },
