@@ -34,9 +34,7 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
       : true
   }, [feature, timeStart, timeEnd, filterApplied])
 
-  const lineWeight = useMemo(() => {
-    return 2 // isSelected ? 3 : 2
-  }, [isSelected])
+  const lineWeight = 2 
 
   const polygon = useMemo(() => {
     const onclick = (evt: LeafletMouseEvent) => {

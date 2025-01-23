@@ -78,14 +78,10 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
     )
   }
 
-  const lineWeight = useMemo(() => {
-    return 2 //  isSelected ? 3 : 2
-  }, [isSelected])
+  const lineWeight = 2
 
-  const circleRadius = useMemo(() => {
-    return 3 // isSelected ? 5 : 3
-  }, [isSelected])
-
+  const circleRadius = 3
+  
   /** in order for cosmetic changes to be reflected in the UI, we need to include styling
    * properties in the `key` for each leaflet element
    */
