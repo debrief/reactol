@@ -38,9 +38,7 @@ export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => 
 
   const name = feature.properties?.name || ''
 
-  const circleRadius = useMemo(() => {
-    return isSelected ? 8 : 4
-  }, [isSelected])
+  const circleRadius = 4
 
   const eventHandlers = {
     click: onclick,
@@ -50,8 +48,8 @@ export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => 
   
   return (
     <>
-      { isVisible && isSelected && <CircleMarker key={'shiny-' + feature.id + '-' + color} radius={4} 
-        fillColor={'#fff'} color={'#fff'} fill={true} fillOpacity={1} center={location} />}
+      { isVisible && isSelected && <CircleMarker key={'shiny-' + feature.id + '-' + color} radius={8} 
+        fillColor={'#fff'} color={'#fff'} fill={true} fillOpacity={0} center={location} />}
       { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={circleRadius} 
         fillColor={color} color={color} fill={true} fillOpacity={1} center={location} eventHandlers={eventHandlers}>
         <Tooltip className='point-label' key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
