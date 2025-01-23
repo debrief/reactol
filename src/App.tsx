@@ -88,7 +88,7 @@ function App() {
         setTime({...time, filterApplied: false, start: 0, end: 0})
       }
     }
-  }, [features])
+  }, [features, setTime])
 
   const antdTheme = {
     components: {
