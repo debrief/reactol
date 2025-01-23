@@ -105,5 +105,4 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
 
   const newFeature = convertToGeoJson(data, values)
   dispatch({ type: 'fColl/featureAdded', payload: newFeature })
-};
-
+}
