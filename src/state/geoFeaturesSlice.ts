@@ -100,7 +100,7 @@ export const selectBounds = (state: FeatureCollection): LatLngBounds | null => {
   if (!state.bbox) {
     return null
   } else {
-    const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number];
+    const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number]
     return new LatLngBounds([minY, minX], [maxY, maxX])
   }
 }
