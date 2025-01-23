@@ -29,7 +29,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-expressions': [
         'error',
         {
-          allowShortCircuit: true, // Հնարավոր է, սա պակասում էր
+          allowShortCircuit: true, // Maybe this was missing.
           allowTernary: true,
         },
       ],
