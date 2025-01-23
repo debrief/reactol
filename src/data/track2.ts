@@ -1,6 +1,6 @@
-import { Feature, LineString } from 'geojson';
-import { TRACK_TYPE } from '../constants';
-import { TrackProps } from '../types';
+import { Feature, LineString } from 'geojson'
+import { TRACK_TYPE } from '../constants'
+import { TrackProps } from '../types'
 
 const track: Feature<LineString, TrackProps> = {
   type: 'Feature',
@@ -7596,4 +7596,4 @@ const track: Feature<LineString, TrackProps> = {
 }
 
 
-export default track;
+export default track

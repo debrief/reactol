@@ -1,12 +1,12 @@
-import { Feature, LineString } from "geojson";
-import { Checkbox, ColorPicker, Flex, Form, Input, Select } from "antd";
-import { Color } from "antd/es/color-picker";
-import { useEffect, useState } from "react";
-import { TrackProps } from "../../types";
-import { presetColors } from "../../helpers/standardShades";
-import './index.css';
-import { defaultIntervals } from "../../helpers/timeIntervals";
-import { symbolOptions } from "../../helpers/symbolTypes";
+import { Feature, LineString } from 'geojson'
+import { Checkbox, ColorPicker, Flex, Form, Input, Select } from 'antd'
+import { Color } from 'antd/es/color-picker'
+import { useEffect, useState } from 'react'
+import { TrackProps } from '../../types'
+import { presetColors } from '../../helpers/standardShades'
+import './index.css'
+import { defaultIntervals } from '../../helpers/timeIntervals'
+import { symbolOptions } from '../../helpers/symbolTypes'
 
 export interface TrackFormProps {
   track: Feature<LineString, TrackProps>
@@ -100,7 +100,7 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           rules={[
             {
               required: true,
-              message: "Please specify the environment/symbol for the track",
+              message: 'Please specify the environment/symbol for the track',
             },
           ]}
         >

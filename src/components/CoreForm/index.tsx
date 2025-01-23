@@ -1,10 +1,10 @@
-import { Button, Flex, Tooltip } from "antd";
+import { Button, Flex, Tooltip } from 'antd'
 
 export interface CoreFormProps {
-  children: React.ReactNode;
-  onReset: () => void;
-  onSave: () => void;
-  formDirty?: boolean;
+  children: React.ReactNode
+  onReset: () => void
+  onSave: () => void
+  formDirty?: boolean
 }
 
 export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, formDirty}) => {

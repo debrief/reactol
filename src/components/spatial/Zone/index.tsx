@@ -1,11 +1,11 @@
-import * as turf from "@turf/turf";
-import { Feature, Geometry, Polygon } from "geojson";
-import { LatLngExpression, LeafletMouseEvent } from 'leaflet';
-import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet';
-import { useMemo } from "react";
-import { useAppContext } from "../../../state/AppContext";
-import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
-import './index.css';
+import * as turf from '@turf/turf'
+import { Feature, Geometry, Polygon } from 'geojson'
+import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
+import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
+import { useMemo } from 'react'
+import { useAppContext } from '../../../state/AppContext'
+import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
+import './index.css'
 
 export interface ZoneProps {
   feature: Feature<Polygon> 
@@ -19,7 +19,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
       return feat.properties.color || '#ff0'
     }
   }
-  return '#000';
+  return '#000'
 }
 
 const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
@@ -29,17 +29,16 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
 
   const isVisible = useMemo(() => {
     return filterApplied ? featureIsVisibleInPeriod(feature, timeStart, timeEnd) : true
-  }, [feature, timeStart, timeEnd])
-
-  const onclick = (evt: LeafletMouseEvent) => {
-    onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
-  }
+  }, [feature, timeStart, timeEnd, filterApplied])
 
   const lineWeight = useMemo(() => {
     return isSelected ? 4 : 2
   }, [isSelected])
 
   const polygon = useMemo(() => {
+    const onclick = (evt: LeafletMouseEvent) => {
+      onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
+    }
     const points = turf.featureCollection([turf.polygon((feature.geometry as Polygon).coordinates)])
     const centre = turf.center(points).geometry.coordinates.reverse() as LatLngExpression
     const trackCoords = (feature.geometry as Polygon).coordinates[0].map(item => [item[1], item[0]]) as LatLngExpression[]
@@ -49,7 +48,7 @@ const Zone: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
         {feature.properties?.name}
       </Tooltip>
     </ReactPolygon>  
-  }, [feature, isSelected, colorFor, lineWeight, onclick])
+  }, [feature, isSelected, lineWeight, onClickHandler])
 
   return (
     <>

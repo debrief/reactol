@@ -1,15 +1,15 @@
-import { Feature } from 'geojson';
-import { ZONE_TYPE } from '../constants';
+import { Feature } from 'geojson'
+import { ZONE_TYPE } from '../constants'
 
 const zones: Feature[] = [
   {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      name: "SAP 1-1",
-      color: "#F00",
+      name: 'SAP 1-1',
+      color: '#F00',
       dataType: ZONE_TYPE,
-      startTime: "2024-11-14T19:10:00.000Z",
-      endTime: "2024-11-15T04:10:00.000Z"
+      startTime: '2024-11-14T19:10:00.000Z',
+      endTime: '2024-11-15T04:10:00.000Z'
     },
     geometry: {
       coordinates: [
@@ -36,17 +36,17 @@ const zones: Feature[] = [
           ]
         ]
       ],
-      type: "Polygon"
+      type: 'Polygon'
     }
   },
   {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      name: "SAP 1-2",
-      color: "#F55",
+      name: 'SAP 1-2',
+      color: '#F55',
       dataType: ZONE_TYPE,
-      startTime: "2024-11-14T12:10:00.000Z",
-      endTime: "2024-11-15T09:10:00.000Z"
+      startTime: '2024-11-14T12:10:00.000Z',
+      endTime: '2024-11-15T09:10:00.000Z'
     },
     geometry: {
       coordinates: [
@@ -73,14 +73,14 @@ const zones: Feature[] = [
           ]
         ]
       ],
-      type: "Polygon"
+      type: 'Polygon'
     }
   },
   {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      name: "SAP 2",
-      color: "#0FF",
+      name: 'SAP 2',
+      color: '#0FF',
       dataType: ZONE_TYPE
     },
     geometry: {
@@ -108,14 +108,14 @@ const zones: Feature[] = [
           ]
         ]
       ],
-      type: "Polygon"
+      type: 'Polygon'
     }
   },
   {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      name: "SIR 1",
-      color: "#FF0",
+      name: 'SIR 1',
+      color: '#FF0',
       dataType: ZONE_TYPE
     },
     geometry: {
@@ -143,14 +143,14 @@ const zones: Feature[] = [
           ]
         ]
       ],
-      type: "Polygon"
+      type: 'Polygon'
     }
   },
   {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      name: "TRA 1",
-      color: "#F0F",
+      name: 'TRA 1',
+      color: '#F0F',
       dataType: ZONE_TYPE
     },
     geometry: {
@@ -190,7 +190,7 @@ const zones: Feature[] = [
           ]
         ]
       ],
-      type: "Polygon"
+      type: 'Polygon'
     }
   }
 ]

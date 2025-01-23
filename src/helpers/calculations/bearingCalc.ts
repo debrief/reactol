@@ -1,7 +1,7 @@
-import { Calculation, GraphDataset, GraphDatum } from "../../components/GraphModal";
-import { Feature, LineString, Position } from 'geojson';
-import { isTemporal } from "../trackCalculations";
-import * as turf from "@turf/turf";
+import { Calculation, GraphDataset, GraphDatum } from '../../components/GraphModal'
+import { Feature, LineString, Position } from 'geojson'
+import { isTemporal } from '../trackCalculations'
+import * as turf from '@turf/turf'
 
 
 /** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter
@@ -42,7 +42,7 @@ export const bearingCalc: Calculation = {
         // use turf to calculate distance between points
         const turfTarget = turf.point(targetPoint)
         const turfBase = turf.point(basePoint)
-        const relBearing = turf.bearing(turfTarget, turfBase);
+        const relBearing = turf.bearing(turfTarget, turfBase)
         const absBearing = relBearing < 0 ? relBearing + 360 : relBearing
         return {date: new Date(time).getTime(), value: absBearing}
       })

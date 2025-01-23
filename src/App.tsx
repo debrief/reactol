@@ -1,28 +1,28 @@
-import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd';
-import './App.css';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import Layers from './components/Layers';
-import Properties from './components/Properties';
-import TimeControl from './components/TimeControl';
-import { timeBoundsFor } from './helpers/timeBounds.ts';
-import { useAppDispatch, useAppSelector } from './state/hooks.ts';
-import track from './data/track1.ts';
-import track2 from './data/track2.ts';
-import track3 from './data/track3.ts';
-import zones from './data/zones.ts';
-import points from './data/points.ts';
-import Map from './components/spatial/Map/index.tsx';
-import GraphModal from './components/GraphModal';
-import { useAppContext } from './state/AppContext.tsx';
-import { TileLayer } from 'react-leaflet';
-import { loadJson } from './helpers/loaders/loadJson.ts'; // Import the load function
-import { loadOpRep } from './helpers/loaders/loadOpRep.ts'; // Import the loadOpRep function
-import { Feature, Geometry, GeoJsonProperties } from 'geojson';
-import Control from 'react-leaflet-custom-control';
-import toDTG from './helpers/toDTG.ts';
-import { AppDispatch } from './state/store.ts';
-import { LoadTrackModel } from './components/LoadTrackModal';
-import { NewTrackProps } from './types.ts';
+import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
+import './App.css'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import Layers from './components/Layers'
+import Properties from './components/Properties'
+import TimeControl from './components/TimeControl'
+import { timeBoundsFor } from './helpers/timeBounds.ts'
+import { useAppDispatch, useAppSelector } from './state/hooks.ts'
+import track from './data/track1.ts'
+import track2 from './data/track2.ts'
+import track3 from './data/track3.ts'
+import zones from './data/zones.ts'
+import points from './data/points.ts'
+import Map from './components/spatial/Map/index.tsx'
+import GraphModal from './components/GraphModal'
+import { useAppContext } from './state/AppContext.ts'
+import { TileLayer } from 'react-leaflet'
+import { loadJson } from './helpers/loaders/loadJson.ts' // Import the load function
+import { loadOpRep } from './helpers/loaders/loadOpRep.ts' // Import the loadOpRep function
+import { Feature, Geometry, GeoJsonProperties } from 'geojson'
+import Control from 'react-leaflet-custom-control'
+import toDTG from './helpers/toDTG.ts'
+import { AppDispatch } from './state/store.ts'
+import { LoadTrackModel } from './components/LoadTrackModal'
+import { NewTrackProps } from './types.ts'
 
 interface FileHandler {
   blobType: string
@@ -30,10 +30,10 @@ interface FileHandler {
 }
 
 export interface TimeState {
-  filterApplied: boolean;
-  start: number;
-  step: string;
-  end: number;
+  filterApplied: boolean
+  start: number
+  step: string
+  end: number
 }
 
 const FileHandlers: FileHandler[] = [
@@ -46,11 +46,11 @@ function App() {
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
-  const [isDragging, setIsDragging] = useState(false); // State to track if a file is being dragged
-  const [error, setError] = useState<string | null>(null); // State to track error messages
-  const { setTime, time } = useAppContext();
+  const [isDragging, setIsDragging] = useState(false) // State to track if a file is being dragged
+  const [error, setError] = useState<string | null>(null) // State to track error messages
+  const { setTime, time } = useAppContext()
 
-  const storeInitialised = useRef(false); 
+  const storeInitialised = useRef(false) 
 
   useEffect(() => {
     if (!storeInitialised.current) {
@@ -69,12 +69,12 @@ function App() {
 
   const timePeriod = useMemo(() => {
     if (time.start && time.end) {
-      const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`;
-      return formattedTimePeriod;  
+      const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`
+      return formattedTimePeriod  
     } else {
       return 'Pending'
     }
-  }, [time]);
+  }, [time])
 
   useEffect(() => {
     if (features && features.length) {
@@ -88,7 +88,8 @@ function App() {
         setTime({...time, filterApplied: false, start: 0, end: 0})
       }
     }
-  }, [features])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [features, setTime])
 
   const antdTheme = {
     components: {
@@ -103,71 +104,71 @@ function App() {
   }
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
+    event.preventDefault()
+    setIsDragging(true)
+  }
 
   const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+    setIsDragging(false)
+  }
 
   const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
+    event.preventDefault()
+    setIsDragging(false)
 
-    const files = event.dataTransfer.files;
+    const files = event.dataTransfer.files
 
     if (files.length > 1) {
       console.log('too many files error')
-      setError('Only one file can be loaded at a time');
+      setError('Only one file can be loaded at a time')
       return
     }
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      const handler = file && FileHandlers.find(handler => handler.blobType === file.type);
+      const handler = file && FileHandlers.find(handler => handler.blobType === file.type)
       if (handler) {
         try {
           if (file.type === 'text/plain') {
-            showDialog(file, handler);
+            showDialog(file, handler)
           } else {
-            handler.handle(await file.text(), features, dispatch);
+            handler.handle(await file.text(), features, dispatch)
           }
         } catch (e) {
           console.log('handler error', e)
-          setError('' + e); // Set error message
+          setError('' + e) // Set error message
         }
       }
     }
-  };
+  }
 
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
-  const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null);
+  const [isDialogVisible, setIsDialogVisible] = useState(false)
+  const [currentFile, setCurrentFile] = useState<File | null>(null)
+  const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null)
 
   const showDialog = (file: File, handler: FileHandler) => {
-    setCurrentFile(file);
-    setCurrentHandler(handler);
-    setIsDialogVisible(true);
-  };
+    setCurrentFile(file)
+    setCurrentHandler(handler)
+    setIsDialogVisible(true)
+  }
 
   const setLoadTrackResults = async (values: NewTrackProps) => {
-    setIsDialogVisible(false);
+    setIsDialogVisible(false)
     if (currentFile && currentHandler) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, values);
+      currentHandler.handle(await currentFile.text(), features, dispatch, values)
     }
-  };
+  }
 
   const handleDialogCancel = () => {
-    setIsDialogVisible(false);
-  };
+    setIsDialogVisible(false)
+  }
 
   const addToTrack = (trackId: string) => {
     // Implement the logic to add position data to an existing track
     // You can use the trackId and values to update the existing track
     setIsDialogVisible(false)
     window.alert('adding data to track:' + trackId)
-  };
+  }
 
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>

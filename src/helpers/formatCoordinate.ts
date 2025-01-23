@@ -10,25 +10,25 @@ export const formatCoordinate = (coordinate: number, isLat: boolean, allowShorte
   if (coordinate === 0) {
     return '0°'
   }
-  const toPadStr = (num: number) => ('' + num).padStart(2, '0');
-  const absolute = Math.abs(coordinate);
-  const degrees = Math.floor(absolute);
-  const minutesNotTruncated = (absolute - degrees) * 60;
-  const minutes = Math.floor(minutesNotTruncated);
-  const seconds = Math.floor(((minutesNotTruncated - minutes) * 60));
+  const toPadStr = (num: number) => ('' + num).padStart(2, '0')
+  const absolute = Math.abs(coordinate)
+  const degrees = Math.floor(absolute)
+  const minutesNotTruncated = (absolute - degrees) * 60
+  const minutes = Math.floor(minutesNotTruncated)
+  const seconds = Math.floor(((minutesNotTruncated - minutes) * 60))
   const direction = isLat
     ? coordinate >= 0
       ? 'N'
       : 'S'
     : coordinate >= 0
-    ? 'E'
-    : 'W';
+      ? 'E'
+      : 'W'
     
   if (allowShorten && minutes === 0 && seconds == 0) {
-    return `${toPadStr(degrees)}°${spaceChar}${direction}`;
+    return `${toPadStr(degrees)}°${spaceChar}${direction}`
   } else if (allowShorten && seconds === 0) {
-    return `${toPadStr(degrees)}°${toPadStr(minutes)}'${spaceChar}${direction}`;
+    return `${toPadStr(degrees)}°${toPadStr(minutes)}'${spaceChar}${direction}`
   } else {
-    return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}"${spaceChar}${direction}`;
+    return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}"${spaceChar}${direction}`
   }
-};
+}

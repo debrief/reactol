@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Col, Form, Row, Tooltip } from "antd"
+import { AutoComplete, Button, Col, Form, Row, Tooltip } from 'antd'
 import {
   CopyOutlined,
   StepBackwardOutlined,
@@ -9,33 +9,33 @@ import {
   LockFilled,
   UnlockOutlined,
   FilterFilled
-} from "@ant-design/icons"
-import React, { useEffect, useMemo, useState } from "react"
-import { format } from "date-fns"
-import { useAppContext } from "../../state/AppContext"
-import { TimeSupport } from "../../helpers/time-support"
+} from '@ant-design/icons'
+import React, { useEffect, useMemo, useState } from 'react'
+import { format } from 'date-fns'
+import { useAppContext } from '../../state/AppContext'
+import { TimeSupport } from '../../helpers/time-support'
 
 export interface TimeProps {
   bounds: [number, number] | null
 }
 
-export const StepOptions = [
-  { value: "00h15m" },
-  { value: "00h30m" },
-  { value: "01h00m" },
-  { value: "02h00m" },
-  { value: "03h00m" },
-  { value: "06h00m" },
+const StepOptions = [
+  { value: '00h15m' },
+  { value: '00h30m' },
+  { value: '01h00m' },
+  { value: '02h00m' },
+  { value: '03h00m' },
+  { value: '06h00m' },
 ]
 
-const pf = (val: number) => format(new Date(val), "MMM ddHHmm'Z'")
+const pf = (val: number) => format(new Date(val), 'MMM ddHHmm\'Z\'')
 
 const timeStr = (val: number | number[] | null, index?: number): string => {
   if (index !== undefined) {
     const arr = val as number[]
-    return val ? pf(arr[index]) : "000000Z"
+    return val ? pf(arr[index]) : '000000Z'
   } else {
-    return val ? pf(val as number) : "000000Z"
+    return val ? pf(val as number) : '000000Z'
   }
 }
 
@@ -58,7 +58,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
       const period = TimeSupport.parsePeriod(stepTxt)
       setInterval(period)
     } catch (err) {
-      console.log("Invalid time format:" + err)
+      console.log('Invalid time format:' + err)
     }
   }, [stepTxt, setInterval])
 
@@ -75,6 +75,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
     } else {
       setTime({ ...time, start, end })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interval, start, end, time.filterApplied, setTime])
 
   const setFilterApplied = (applied: boolean) => {
@@ -137,21 +138,21 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
 
   const copyTooltip = useMemo(() => {
     return viewportFrozen
-      ? "Copy snapshot of map to the clipboard"
-      : "Lock the viewport in order to take a snapshot of the map"
+      ? 'Copy snapshot of map to the clipboard'
+      : 'Lock the viewport in order to take a snapshot of the map'
   }, [viewportFrozen])
 
   const largeIcon = {
-    fontSize: "1.5em",
-    enabled: !time.filterApplied ? "disabled" : "enabled",
+    fontSize: '1.5em',
+    enabled: !time.filterApplied ? 'disabled' : 'enabled',
   }
-  const buttonStyle = { margin: "0 5px" }
+  const buttonStyle = { margin: '0 5px' }
 
   return (
     <>
-      {" "}
+      {' '}
       <Row>
-        <Col span={20} style={{ textAlign: "left" }}>
+        <Col span={20} style={{ textAlign: 'left' }}>
           <Tooltip
             mouseEnterDelay={0.8}
             title='Lock viewport to prevent accidental map movement'
@@ -159,7 +160,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
             <Button
               style={buttonStyle}
               color='primary'
-              variant={viewportFrozen ? "solid" : "outlined"}
+              variant={viewportFrozen ? 'solid' : 'outlined'}
               onClick={toggleFreezeViewport}
             >
               {viewportFrozen ? <LockFilled /> : <UnlockOutlined />}
@@ -169,15 +170,15 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
             mouseEnterDelay={0.8}
             title={
               bounds
-                ? "Enable time controls, to filter tracks by time"
-                : "No time data available"
+                ? 'Enable time controls, to filter tracks by time'
+                : 'No time data available'
             }
           >
             <Button
               style={buttonStyle}
               disabled={bounds === null}
               color='primary'
-              variant={time.filterApplied ? "solid" : "outlined"}
+              variant={time.filterApplied ? 'solid' : 'outlined'}
               onClick={() => setFilterApplied(!time.filterApplied)}
             >
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
@@ -198,8 +199,8 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
       <Form disabled={!time.filterApplied}>
         <table
           style={{
-            width: "100%",
-            backgroundColor: time.filterApplied ? "white" : "#f0f0f0",
+            width: '100%',
+            backgroundColor: time.filterApplied ? 'white' : '#f0f0f0',
           }}
         >
           <thead>
@@ -210,7 +211,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
             </tr>
           </thead>
           <tbody>
-            <tr style={{ fontFamily: "monospace" }}>
+            <tr style={{ fontFamily: 'monospace' }}>
               <td>{timeStr(time.start)}</td>
               <td>
                 <AutoComplete
@@ -224,7 +225,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
               </td>
               <td>{timeStr(time.end)}</td>
             </tr>
-            <tr style={{ fontFamily: "monospace" }}>
+            <tr style={{ fontFamily: 'monospace' }}>
               <td>
                 <TimeButton
                   tooltip='Jump to start'

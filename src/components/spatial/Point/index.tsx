@@ -1,10 +1,10 @@
-import { Feature, Position, Point as GPoint } from "geojson";
-import { LeafletMouseEvent } from 'leaflet';
-import { CircleMarker, Tooltip } from 'react-leaflet';
-import { useMemo } from "react";
-import { useAppContext } from "../../../state/AppContext";
-import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
-import './index.css';
+import { Feature, Position, Point as GPoint } from 'geojson'
+import { LeafletMouseEvent } from 'leaflet'
+import { CircleMarker, Tooltip } from 'react-leaflet'
+import { useMemo } from 'react'
+import { useAppContext } from '../../../state/AppContext'
+import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
+import './index.css'
 
 export interface PointSymbolProps {
   feature: Feature<GPoint> 
@@ -24,7 +24,7 @@ export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => 
   }, [feature])
 
   const color = useMemo(() => {
-    return feature.properties?.color || 'blue';
+    return feature.properties?.color || 'blue'
   }, [feature])
 
   const isVisible = useMemo(() => {
@@ -35,7 +35,7 @@ export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => 
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
-  const name = feature.properties?.name || '';
+  const name = feature.properties?.name || ''
 
   const circleRadius = useMemo(() => {
     return isSelected ? 8 : 4

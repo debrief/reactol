@@ -1,15 +1,15 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import { PointProps, TrackProps } from "../../types";
-import { useAppContext } from "../../state/AppContext";
-import { useAppDispatch, useAppSelector } from "../../state/hooks";
-import "./index.css";
-import { CoreDataProps } from "../../types";
-import { Feature, GeoJsonProperties, Geometry, LineString, Point } from "geojson";
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../constants";
-import { PointForm } from "../PointForm";
-import { CoreForm } from "../CoreForm";
-import { PropertiesViewer } from "./PropertiesViewer";
-import { TrackForm } from "../TrackForm";
+import React, { ReactNode, useCallback, useEffect, useState } from 'react'
+import { PointProps, TrackProps } from '../../types'
+import { useAppContext } from '../../state/AppContext'
+import { useAppDispatch, useAppSelector } from '../../state/hooks'
+import './index.css'
+import { CoreDataProps } from '../../types'
+import { Feature, GeoJsonProperties, Geometry, LineString, Point } from 'geojson'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { PointForm } from '../PointForm'
+import { CoreForm } from '../CoreForm'
+import { PropertiesViewer } from './PropertiesViewer'
+import { TrackForm } from '../TrackForm'
 
 
 const Properties: React.FC = () => {
@@ -55,15 +55,15 @@ const Properties: React.FC = () => {
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
             <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, PointProps>} />
           </CoreForm>)
-          break;
+          break
         case TRACK_TYPE:    
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
             <TrackForm onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
           </CoreForm>)
-          break;
+          break
         case ZONE_TYPE:
           setPropertyForm(<div>Zone form pending</div>)
-          break;
+          break
         default:
           setPropertyForm (<PropertiesViewer feature={featureState} />)
         }

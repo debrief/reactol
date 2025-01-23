@@ -1,12 +1,12 @@
-import { Feature, Geometry, LineString } from "geojson";
-import { LeafletMouseEvent } from 'leaflet';
-import { Polyline, CircleMarker, Tooltip } from 'react-leaflet';
-import { format } from "date-fns";
-import { useMemo } from "react";
-import { useAppContext } from "../../../state/AppContext";
-import { CoordInstance, filterTrack } from "../../../helpers/filterTrack";
-import { TrackProps } from "../../../types";
-import './index.css';
+import { Feature, Geometry, LineString } from 'geojson'
+import { LeafletMouseEvent } from 'leaflet'
+import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
+import { format } from 'date-fns'
+import { useMemo } from 'react'
+import { useAppContext } from '../../../state/AppContext'
+import { CoordInstance, filterTrack } from '../../../helpers/filterTrack'
+import { TrackProps } from '../../../types'
+import './index.css'
 
 export interface TrackFeatureProps {
   feature: Feature 
@@ -20,8 +20,8 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
       return feat.properties.color || '#ff0'
     }
   }
-  return '#000';
-};
+  return '#000'
+}
 
 const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
@@ -47,7 +47,7 @@ const Track: React.FC<TrackFeatureProps> = ({feature, onClickHandler}) => {
       const timeFreq = Math.floor(times.length / 20)
 
       if (times && times.length) {
-        return times.map((time: string, index: number) => {return {pos:[coords[index][1], coords[index][0]],time: format(time, "ddHHmm'Z'"), timeVisible: index % timeFreq === 0}})
+        return times.map((time: string, index: number) => {return {pos:[coords[index][1], coords[index][0]],time: format(time, 'ddHHmm\'Z\''), timeVisible: index % timeFreq === 0}})
       } else {
         return coords.map((coord: number[]) => {return {pos:[coord[1], coord[0]],time: ''}})
       }

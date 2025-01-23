@@ -1,7 +1,7 @@
-import { Position } from "geojson";
-import { LatLngExpression } from 'leaflet';
-import { format } from "date-fns";
-import dayjs from 'dayjs';
+import { Position } from 'geojson'
+import { LatLngExpression } from 'leaflet'
+import { format } from 'date-fns'
+import dayjs from 'dayjs'
 
 export interface CoordInstance {
   pos: LatLngExpression
@@ -32,7 +32,7 @@ export const filterTrack = (filterApplied: boolean, start: number, end: number, 
       symbolVisible = true
       lastSymbolTime = thisTime
     }
-    return {pos:[coords[index][1], coords[index][0]],time: format(times[index], "ddHHmm'Z'"), labelVisible, symbolVisible}
+    return {pos:[coords[index][1], coords[index][0]],time: format(times[index], 'ddHHmm\'Z\''), labelVisible, symbolVisible}
   })
   return res
 }
