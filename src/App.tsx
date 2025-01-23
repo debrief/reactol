@@ -30,10 +30,10 @@ interface FileHandler {
 }
 
 export interface TimeState {
-  filterApplied: boolean;
-  start: number;
-  step: string;
-  end: number;
+  filterApplied: boolean
+  start: number
+  step: string
+  end: number
 }
 
 const FileHandlers: FileHandler[] = [
