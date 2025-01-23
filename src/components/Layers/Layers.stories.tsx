@@ -1,7 +1,7 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 import { Provider } from 'react-redux'
-import { AppProvider } from '../../state/AppContext'
+import { AppProvider } from '../../state/AppProvider'
 import { configureStore } from '@reduxjs/toolkit'
 import Layers from '.././Layers'
 import featuresReducer from '../../state/geoFeaturesSlice'
