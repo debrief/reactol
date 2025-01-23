@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useAppContext } from '../../../state/AppContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
 import './index.css'
+import { mouseOut, mouseOver } from '../commonHandlers'
 
 export interface PointSymbolProps {
   feature: Feature<GPoint> 
@@ -41,10 +42,18 @@ export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => 
     return isSelected ? 8 : 4
   }, [isSelected])
 
+  const eventHandlers = {
+    click: onclick,
+    mouseover: mouseOver,
+    mouseout: (evt: LeafletMouseEvent) => mouseOut(evt, isSelected),
+  }
+  
   return (
     <>
+      { isVisible && isSelected && <CircleMarker key={'shiny-' + feature.id + '-' + color} radius={4} 
+        fillColor={'#fff'} color={'#fff'} fill={true} fillOpacity={1} center={location} />}
       { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={circleRadius} 
-        fillColor={color} color={color} fill={true} fillOpacity={10} center={location} eventHandlers={{click: onclick}}>
+        fillColor={color} color={color} fill={true} fillOpacity={1} center={location} eventHandlers={eventHandlers}>
         <Tooltip className='point-label' key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
           {name}
         </Tooltip>
