@@ -4,11 +4,11 @@ import { TRACK_TYPE } from '../../constants'
 import { NewTrackProps, TrackProps } from '../../types'
 
 interface OpRepData {
-  dtg: string;
-  position: string;
-  course: string;
-  speed: string;
-  depth?: string;
+  dtg: string
+  position: string
+  course: string
+  speed: string
+  depth?: string
 }
 
 const parseOpRepLine = (line: string): OpRepData | null => {

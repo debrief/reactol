@@ -19,15 +19,15 @@ export type TrackProps = CoreDataProps & {
 }
 
 // use types to ensure that either a centre time, or optional start/end times are used, but not both
-type PointTime =  {time: string, timeStart?: never, timeEnd?: never};
-type PeriodTime = {time?: never, timeStart?: string, timeEnd?: string};
+type PointTime =  {time: string, timeStart?: never, timeEnd?: never}
+type PeriodTime = {time?: never, timeStart?: string, timeEnd?: string}
 
 type CoreZoneProps = CoreDataProps & { dataType: typeof ZONE_TYPE }
 type CorePointProps = CoreDataProps & { dataType: typeof REFERENCE_POINT_TYPE }
 
-export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime);
+export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime)
 
-export type PointProps = CorePointProps & (PointTime | PeriodTime);
+export type PointProps = CorePointProps & (PointTime | PeriodTime)
 
 export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'labelInterval' | 'symbolInterval'> & {
   year: number
