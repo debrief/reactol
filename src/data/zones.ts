@@ -48,7 +48,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       color: '#F55',
       dataType: ZONE_TYPE,
       visible: true,
-      time: '2024-11-14T12:10:00.000Z'
+      time: '2024-11-14T18:10:00.000Z'
     },
     geometry: {
       coordinates: [
