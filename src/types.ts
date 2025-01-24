@@ -19,9 +19,9 @@ export type TrackProps = CoreDataProps & {
 }
 
 /** just a centre time if time provided, else start and end times */
-type TimeProps = {time?: string, timeEnd?: string} 
+export type TemporalShapeProps = {time?: string, timeEnd?: string} 
 
-export type CoreShapeProps = CoreDataProps & TimeProps
+export type CoreShapeProps = CoreDataProps & TemporalShapeProps
 
 export type ZoneProps = CoreShapeProps & { dataType: typeof ZONE_TYPE }
 export type PointProps = CoreShapeProps & { dataType: typeof REFERENCE_POINT_TYPE }
