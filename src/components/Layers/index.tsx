@@ -1,4 +1,4 @@
-import React, { Key, useEffect, useMemo, useState } from 'react'
+import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd'
 import type { GetProps, TreeDataNode } from 'antd'
 import './index.css'
@@ -11,11 +11,11 @@ import {
   ShrinkOutlined,
 } from '@ant-design/icons'
 import { Feature, Geometry, Point, Polygon } from 'geojson'
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { useAppContext } from '../../state/AppContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps } from '../../types'
+import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps, GroupProps } from '../../types'
 import { PointForm } from '../PointForm'
 
 interface LayerProps {
@@ -23,6 +23,66 @@ interface LayerProps {
 }
 
 type TreeProps = GetProps<typeof Tree>
+
+
+type FieldDataNode = {
+  title: string
+  key: string
+  children: FieldDataNode[]
+}
+
+const findChildrenOfType = (features: Feature[], dType: string): FieldDataNode[] => {
+  const items = features.filter((feature) => feature.properties?.dataType === dType)
+  return items.map((item) => ({
+    title: nameFor(item),
+    key: item.id as string,
+    children: []
+  }))
+}
+
+const findChildrenOfGroup = (features: Feature[]): FieldDataNode[] => {
+  const items = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE)
+  return items.map((item): FieldDataNode => {
+    const props = item.properties as GroupProps
+    const children = features.filter((feature) => props.units.includes(feature.id as string))
+    return {
+      title: nameFor(item),
+      key: item.id as string,
+      children: children.map((child): FieldDataNode => {
+        return {
+          title: nameFor(child) + child.id as string,
+          key: groupIdFor(item, child.id as string),
+          children: []
+        }
+      })
+    }
+  })
+}
+
+const groupIdFor = (parent: Feature, child?: string): string => {
+  return `${parent.id || 'unknown'}:${child || 'unknown'}`
+}
+
+const mapFunc = (
+  features: Feature[],
+  title: string,
+  key: string,
+  dType: string,
+  handleAdd: (e: React.MouseEvent, key: string, title: string) => void
+): TreeDataNode => {
+  const children = dType !== GROUP_TYPE ? findChildrenOfType(features, dType) : findChildrenOfGroup(features)
+  return {
+    title: title,
+    key: key,
+    icon: (
+      <PlusCircleOutlined
+        style={{ cursor: 'copy' }}
+        onClick={(e) => handleAdd(e, key, title)}
+      />
+    ),
+    children: children
+  }
+}
 
 const idFor = (feature: Feature): string => {
   return `${feature.id || 'unknown'}`
@@ -34,10 +94,6 @@ const nameFor = (feature: Feature): string => {
 
 const isChecked = (feature: Feature): string => {
   return feature.properties?.visible
-}
-
-const filterFor = (feature: Feature, dType: string): boolean => {
-  return feature.properties?.dataType === dType
 }
 
 interface ToolProps {
@@ -91,88 +147,89 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
-  const mapFunc = (
-    features: Feature[],
-    title: string,
-    key: string,
-    dType: string
-  ): TreeDataNode => {
-    const handleAdd = (e: React.MouseEvent, key: string, title: string) => {
-      if (key === NODE_TRACKS) {
-        setcreateTrackDialogVisible(true)
-      } else if (key === 'node-points') {
-        const point: Feature<Point, PointProps> = {
-          type: 'Feature',
-          properties: {
-            name: '',
-            dataType: REFERENCE_POINT_TYPE,
-            color: '#FF0000',
-            visible: true
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: []
-          }
-        }
-        setFormType('point')
-        setWorkingPoint(point)
-        setNewPoint(point)
-      } else if (key === 'node-zones') {
-        const zone: Feature<Polygon, ZoneProps> = {
-          type: 'Feature',
-          properties: {
-            name: '',
-            dataType: ZONE_TYPE,
-            color: '#FF0000',
-            visible: true
-          },
-          geometry: {
-            type: 'Polygon',
-            coordinates: []
-          }
-        }
-        setFormType('zone')
-        setWorkingPoint(zone)
-        setNewPoint(zone)
-      } else {
-        console.error('unknown key for create new item ' + key + ' for ' + title)
+  const addPoint = () => {
+    const point: Feature<Point, PointProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        dataType: REFERENCE_POINT_TYPE,
+        color: '#FF0000',
+        visible: true
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: []
       }
-      e.stopPropagation()
     }
-    return {
-      title: title,
-      key: key,
-      icon: (
-        <PlusCircleOutlined
-          style={{ cursor: 'copy' }}
-          onClick={(e) => handleAdd(e, key, title)}
-        />
-      ),
-      children: features
-        .filter((feature) => filterFor(feature, dType))
-        .map((item) => ({
-          title: nameFor(item),
-          key: idFor(item),
-          children: [],
-        })),
-    }
+    setFormType('point')
+    setWorkingPoint(point)
+    setNewPoint(point)
   }
+
+  const addZone = () => {
+    const zone: Feature<Polygon, ZoneProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        dataType: ZONE_TYPE,
+        color: '#FF0000',
+        visible: true
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: []
+      }
+    }
+    setFormType('zone')
+    setWorkingPoint(zone)
+    setNewPoint(zone)
+  }
+
+  const addGroup = () => {
+    setMessage('Adding group')
+  }
+
+  const handleAdd = useCallback( (e: React.MouseEvent, key: string, title: string) => {
+    if (key === NODE_TRACKS) {
+      setcreateTrackDialogVisible(true)
+    } else if (key === 'node-points') {
+      addPoint()
+    } else if (key === 'node-zones') {
+      addZone()
+    } else if (key === 'node-groups') {
+      addGroup()
+    } else {
+      console.error('unknown key for create new item ' + key + ' for ' + title)
+    }
+    e.stopPropagation()
+  }, [])
+
   useEffect(() => {
     const items: TreeDataNode[] = []
-    items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE))
-    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
-    items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
+    items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd))
     const modelData = items
     setModel(modelData)
     if (features) {
       const checked: string[] = features
         .filter((feature) => isChecked(feature))
         .map((feature) => idFor(feature))
+      // we also have to find group features, then create checked ids for their visible units
+      const groupFeatures = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE)
+      groupFeatures.forEach((groupFeature) => {
+        const props = groupFeature.properties as GroupProps
+        props.units.forEach((unitId) => {
+          if (checked.includes(unitId as string)) {
+            checked.push(groupIdFor(groupFeature, unitId as string))
+          }
+        })
+      }) 
+      console.table(checked)
       setCheckedKeys(checked)
-      // this would expand all top level items
-      // const expanded: string[] = items.map(item => item.key as string); // include top level keys
     }
-  }, [features])
+  }, [features, handleAdd])
 
   // filter out the branches, just leave the leaves
   const justLeaves = (ids: Key[]): Key[] => {
@@ -189,10 +246,20 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
     const keys = justLeaves(checkedKeys as Key[])
-    dispatch({
-      type: 'fColl/featureVisibilities',
-      payload: { ids: keys },
+    console.log('keys, checkedKeys', keys, checkedKeys)
+    // if it is the key for an item in a group, then we have to extract the feature id
+    const removeGroupBits = keys.map((key) => {
+      const colonIndex = (key as string).indexOf(':')
+      if (colonIndex === -1) return key
+      return (key as string).substring(colonIndex + 1)
     })
+    const action = {
+      type: 'fColl/featureVisibilities',
+      payload: { ids: removeGroupBits },
+    }
+    console.table(action.payload)
+    // check if the payload selection is different from the current selection
+    dispatch(action)
   }
 
   const temporalFeatureSelected = useMemo(
