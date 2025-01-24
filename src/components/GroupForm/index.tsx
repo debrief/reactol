@@ -1,6 +1,6 @@
 import { Feature, Point } from 'geojson'
 import { Button, Checkbox, Form, Input, Modal, Transfer } from 'antd'
-import { useState } from 'react'
+import { Key, useState } from 'react'
 import { GroupProps } from '../../types'
 import { useAppSelector } from '../../state/hooks'
 
@@ -23,25 +23,24 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
     description: f.properties?.dataType || 'Unknown type'
   }))
 
-  const handleFormChange = (targetKeys: string[], direction: 'left' | 'right', moveKeys: string[]) => {
-    console.log('handleFormChange', targetKeys, direction, moveKeys)
-    const newGroup = {
-      ...group,
-      properties: {
-        ...group.properties,
-        units: targetKeys
-      }
+  const handleFormChange = (values: Partial<GroupProps>) => {
+    const newVal = {...group, properties: {...group.properties}}
+    if (values.visible) {
+      newVal.properties.visible = values.visible as boolean
+    } else if (values.name) {
+      newVal.properties.name = values.name as string
+    } else if (values.units) {
+      newVal.properties.units = values.units as string[]
     }
-    onChange(newGroup)
+    onChange(newVal)
   }
 
-  const handleTransferChange = (targetKeys: string[], direction: 'left' | 'right', moveKeys: string[]): void => {
-    console.log('transfer', targetKeys, direction, moveKeys)
+  const handleTransferChange = (targetKeys: Key[]): void => {
     const newGroup = {
       ...group,
       properties: {
         ...group.properties,
-        units: targetKeys
+        units: targetKeys as string[]
       }
     }
     onChange(newGroup)
@@ -83,25 +82,27 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           style={itemStyle}
           valuePropName="checked"
         >
-          <Checkbox style={{alignItems: 'start'}} />
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Checkbox />
+          </div>
         </Form.Item>
 
         <Form.Item
           label="Units"
           style={itemStyle}
         >
-          <div style={{ marginBottom: 8, textAlign: 'left' }}>
-            {unitNames.length === 0 ? (
-              <span style={{ color: '#999' }}>No units selected</span>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                {unitNames.map((name, index) => (
-                  <div key={index}>{name}</div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div style={{ textAlign: 'left' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+            <div style={{ flex: 1 }}>
+              {unitNames.length === 0 ? (
+                <span style={{ color: '#999' }}>No units selected</span>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  {unitNames.map((name, index) => (
+                    <div key={index}>{name}</div>
+                  ))}
+                </div>
+              )}
+            </div>
             <Button size="small" onClick={() => setIsModalOpen(true)}>
               Edit Units
             </Button>
