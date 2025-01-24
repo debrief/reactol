@@ -23,6 +23,7 @@ import toDTG from './helpers/toDTG.ts'
 import { AppDispatch } from './state/store.ts'
 import { LoadTrackModel } from './components/LoadTrackModal'
 import { NewTrackProps } from './types.ts'
+import { GROUP_TYPE } from './constants.ts'
 
 interface FileHandler {
   blobType: string
@@ -38,7 +39,7 @@ export interface TimeState {
 
 const FileHandlers: FileHandler[] = [
   { blobType: 'application/json', handle: loadJson },
-  { blobType: 'text/plain', handle: loadOpRep } // Add the loadOpRep handler
+  { blobType: 'text/plain', handle: loadOpRep } 
 ]
 
 function App() {
@@ -46,8 +47,8 @@ function App() {
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
-  const [isDragging, setIsDragging] = useState(false) // State to track if a file is being dragged
-  const [error, setError] = useState<string | null>(null) // State to track error messages
+  const [isDragging, setIsDragging] = useState(false) 
+  const [error, setError] = useState<string | null>(null) 
   const { setTime, time } = useAppContext()
 
   const storeInitialised = useRef(false) 
@@ -58,14 +59,51 @@ function App() {
       console.clear()
       // store initial data objects
       dispatch({ type: 'fColl/storeCleared'})
+      
+      // Add tracks
       dispatch({ type: 'fColl/featureAdded', payload: track })
       dispatch({ type: 'fColl/featureAdded', payload: track2 })
       dispatch({ type: 'fColl/featureAdded', payload: track3 })
+      
+      // Add zones and points
       dispatch({ type: 'fColl/featuresAdded', payload: zones })
       dispatch({ type: 'fColl/featuresAdded', payload: points })
+
+      // Create track group
+      const trackGroup: Feature = {
+        type: 'Feature',
+        id: 'g-1',
+        properties: {
+          dataType: GROUP_TYPE,
+          name: 'Tracks Group',
+          visible: true,
+          units: [track.id, track3.id, zones[1].id, points[2].id]
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [] 
+        }
+      }
+      dispatch({ type: 'fColl/featureAdded', payload: trackGroup })
+
+      // Create zones/points group
+      const zonesPointsGroup: Feature = {
+        type: 'Feature',
+        id: 'g-2',
+        properties: {
+          dataType: GROUP_TYPE,
+          name: 'Zones & Points Group',
+          visible: true,
+          units: [track.id, zones[2].id, zones[0].id, points[0].id, points[1].id]
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [] 
+        }
+      }
+      dispatch({ type: 'fColl/featureAdded', payload: zonesPointsGroup })
     }
   }, [dispatch])
-
 
   const timePeriod = useMemo(() => {
     if (time.start && time.end) {
@@ -136,7 +174,7 @@ function App() {
           }
         } catch (e) {
           console.log('handler error', e)
-          setError('' + e) // Set error message
+          setError('' + e) 
         }
       }
     }
@@ -164,8 +202,6 @@ function App() {
   }
 
   const addToTrack = (trackId: string) => {
-    // Implement the logic to add position data to an existing track
-    // You can use the trackId and values to update the existing track
     setIsDialogVisible(false)
     console.log('adding data to track:' + trackId)
   }
@@ -176,7 +212,7 @@ function App() {
       <Modal title="Loading Error" open={!!error} onCancel={() => setError(null)} onOk={() => setError(null)}>
         <Alert type="error" description={error} />
       </Modal>
-      {error && <div className="error-modal">{error}</div>} {/* Error modal */}
+      {error && <div className="error-modal">{error}</div>} 
       <ConfigProvider theme={antdTheme}>
         <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
           <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>

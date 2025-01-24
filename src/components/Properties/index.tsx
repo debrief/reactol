@@ -1,14 +1,15 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
-import { CoreShapeProps, TrackProps } from '../../types'
+import { CoreShapeProps, TrackProps, GroupProps } from '../../types'
 import { useAppContext } from '../../state/AppContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
-import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { Feature, GeoJsonProperties, Geometry, LineString, Point } from 'geojson'
+import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { PointForm } from '../PointForm'
 import { CoreForm } from '../CoreForm'
 import { PropertiesViewer } from './PropertiesViewer'
 import { TrackForm } from '../TrackForm'
+import { GroupForm } from '../GroupForm'
 
 
 const Properties: React.FC = () => {
@@ -63,6 +64,11 @@ const Properties: React.FC = () => {
         case ZONE_TYPE:
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
             <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
+          </CoreForm>)
+          break
+        case GROUP_TYPE:
+          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
+            <GroupForm onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
           </CoreForm>)
           break
         default:
