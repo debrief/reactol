@@ -1,6 +1,6 @@
 import { Feature, Point } from 'geojson'
 import { Button, Checkbox, Form, Input, Modal, Transfer } from 'antd'
-import { Key, useState } from 'react'
+import { Key, useMemo, useState } from 'react'
 import { GroupProps } from '../../types'
 import { useAppSelector } from '../../state/hooks'
 
@@ -13,23 +13,28 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const features = useAppSelector(state => state.fColl.features)
   
-  // Get all features that could be added to the group
-  const allFeatures = features.filter(f => f.properties?.dataType !== 'group')
-  
-  // Create transfer data structure
-  const transferData = allFeatures.map(f => ({
-    key: f.id as string,
-    title: f.properties?.name || 'Unnamed',
-    description: f.properties?.dataType || 'Unknown type'
-  }))
+  const transferData = useMemo(() => {
+    // Get all features that could be added to the group
+    const nonGroupFeatures = features.filter(f => f.properties?.dataType !== 'group')
+    
+    // Create transfer data structure
+    const transferData = nonGroupFeatures.map(f => ({
+      key: f.id as string,
+      title: f.properties?.name || 'Unnamed',
+      description: f.properties?.dataType || 'Unknown type'
+    }))
+    return transferData
+  }, [features])
 
   const handleFormChange = (values: Partial<GroupProps>) => {
     const newVal = {...group, properties: {...group.properties}}
     if (values.visible) {
       newVal.properties.visible = values.visible as boolean
-    } else if (values.name) {
+    }
+    if (values.name) {
       newVal.properties.name = values.name as string
-    } else if (values.units) {
+    }
+    if (values.units) {
       newVal.properties.units = values.units as string[]
     }
     onChange(newVal)
@@ -67,7 +72,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
         onValuesChange={handleFormChange}
         size='small'
       >
-        <Form.Item
+        <Form.Item<GroupProps>
           label="Name"
           name="name"
           style={itemStyle}
@@ -76,7 +81,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           <Input />
         </Form.Item>
 
-        <Form.Item
+        <Form.Item<GroupProps>
           label="Visible"
           name="visible"
           style={itemStyle}
@@ -85,7 +90,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           <Checkbox />
         </Form.Item>
 
-        <Form.Item
+        <Form.Item<GroupProps>
           label="Units"
           style={itemStyle}
         >
@@ -109,7 +114,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
       </Form>
 
       <Modal
-        title="Edit Group Units"
+        title={`Edit Units in ${group.properties.name}`}
         open={isModalOpen}
         onOk={() => setIsModalOpen(false)}
         onCancel={() => setIsModalOpen(false)}
@@ -117,6 +122,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
       >
         <Transfer
           dataSource={transferData}
+          showSearch
           titles={['Available', 'Selected']}
           targetKeys={group.properties.units as string[]}
           onChange={handleTransferChange}
