@@ -3,7 +3,7 @@ import { CoreShapeProps, TrackProps } from '../../types'
 import { useAppContext } from '../../state/AppContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
-import { Feature, GeoJsonProperties, Geometry, LineString, Point } from 'geojson'
+import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { PointForm } from '../PointForm'
 import { CoreForm } from '../CoreForm'
@@ -52,7 +52,7 @@ const Properties: React.FC = () => {
         switch (aProps.dataType) {
         case REFERENCE_POINT_TYPE:
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, CoreShapeProps>} />
+            <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
           </CoreForm>)
           break
         case TRACK_TYPE:    
@@ -62,7 +62,7 @@ const Properties: React.FC = () => {
           break
         case ZONE_TYPE:
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, CoreShapeProps>} />
+            <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
           </CoreForm>)
           break
         default:
