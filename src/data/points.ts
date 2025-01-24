@@ -1,13 +1,15 @@
-import { Feature } from 'geojson'
+import { Feature, Geometry } from 'geojson'
 import { REFERENCE_POINT_TYPE } from '../constants'
+import { PointProps } from '../types'
 
-const points: Feature[] = [
+const points: Feature<Geometry, PointProps>[] = [
   {
     type: 'Feature',
     properties: {
       name: 'SONO 1-1',
       dataType: REFERENCE_POINT_TYPE,
       color: '#FF0000',
+      visible: true,
       time: '2024-11-14T19:10:00.000Z',
     },
     geometry: {
@@ -24,8 +26,9 @@ const points: Feature[] = [
       name: 'SONO 1-2',
       dataType: REFERENCE_POINT_TYPE,
       color: '#00FF00',
-      startTime: '2024-11-14T21:10:00.000Z',
-      endTime: '2024-11-15T02:10:00.000Z'
+      visible: true,
+      time: '2024-11-14T21:10:00.000Z',
+      timeEnd: '2024-11-15T02:10:00.000Z'
     },
     geometry: {
       coordinates: [
@@ -40,7 +43,8 @@ const points: Feature[] = [
     properties: {
       name: 'NEW SONO',
       dataType: REFERENCE_POINT_TYPE,
-      color: '#0000FF'
+      color: '#0000FF',
+      visible: true
     },
     geometry: {
       coordinates: [
@@ -55,7 +59,8 @@ const points: Feature[] = [
     properties: {
       name: 'POINT D-1',
       dataType: REFERENCE_POINT_TYPE,
-      color: '#FFFF00'
+      color: '#FFFF00',
+      visible: true
     },
     geometry: {
       coordinates: [

@@ -1,15 +1,17 @@
-import { Feature } from 'geojson'
+import { Feature, Geometry } from 'geojson'
 import { ZONE_TYPE } from '../constants'
+import { ZoneProps } from '../types'
 
-const zones: Feature[] = [
+const zones: Feature<Geometry, ZoneProps>[] = [
   {
     type: 'Feature',
     properties: {
       name: 'SAP 1-1',
       color: '#F00',
+      visible: true,
       dataType: ZONE_TYPE,
-      startTime: '2024-11-14T19:10:00.000Z',
-      endTime: '2024-11-15T04:10:00.000Z'
+      time: '2024-11-14T19:10:00.000Z',
+      timeEnd : '2024-11-15T04:10:00.000Z'
     },
     geometry: {
       coordinates: [
@@ -45,8 +47,8 @@ const zones: Feature[] = [
       name: 'SAP 1-2',
       color: '#F55',
       dataType: ZONE_TYPE,
-      startTime: '2024-11-14T12:10:00.000Z',
-      endTime: '2024-11-15T09:10:00.000Z'
+      visible: true,
+      time: '2024-11-14T12:10:00.000Z'
     },
     geometry: {
       coordinates: [
@@ -81,7 +83,8 @@ const zones: Feature[] = [
     properties: {
       name: 'SAP 2',
       color: '#0FF',
-      dataType: ZONE_TYPE
+      dataType: ZONE_TYPE,
+      visible: true
     },
     geometry: {
       coordinates: [
@@ -116,7 +119,8 @@ const zones: Feature[] = [
     properties: {
       name: 'SIR 1',
       color: '#FF0',
-      dataType: ZONE_TYPE
+      dataType: ZONE_TYPE,
+      visible: true
     },
     geometry: {
       coordinates: [
@@ -151,7 +155,8 @@ const zones: Feature[] = [
     properties: {
       name: 'TRA 1',
       color: '#F0F',
-      dataType: ZONE_TYPE
+      dataType: ZONE_TYPE,
+      visible: true
     },
     geometry: {
       coordinates: [
