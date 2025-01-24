@@ -18,16 +18,13 @@ export type TrackProps = CoreDataProps & {
   symbolInterval?: number
 }
 
-// use types to ensure that either a centre time, or optional start/end times are used, but not both
-type PointTime =  {time: string, timeStart?: never, timeEnd?: never}
-type PeriodTime = {time?: never, timeStart?: string, timeEnd?: string}
+/** just a centre time if time provided, else start and end times */
+type TimeProps = {time?: string, timeEnd?: string} 
 
-type CoreZoneProps = CoreDataProps & { dataType: typeof ZONE_TYPE }
-type CorePointProps = CoreDataProps & { dataType: typeof REFERENCE_POINT_TYPE }
+export type CoreShapeProps = CoreDataProps & TimeProps
 
-export type ZoneProps = CoreZoneProps | (PointTime | PeriodTime)
-
-export type PointProps = CorePointProps & (PointTime | PeriodTime)
+export type ZoneProps = CoreShapeProps & { dataType: typeof ZONE_TYPE }
+export type PointProps = CoreShapeProps & { dataType: typeof REFERENCE_POINT_TYPE }
 
 export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'labelInterval' | 'symbolInterval'> & {
   year: number
