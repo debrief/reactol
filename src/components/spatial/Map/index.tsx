@@ -1,6 +1,6 @@
 import { Feature, Point, Polygon } from 'geojson'
 import { MapContainer, ScaleControl, useMap } from 'react-leaflet'
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
+import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -19,7 +19,7 @@ interface MapProps {
   children: React.ReactNode;
 }
 
-const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void): React.ReactElement => {
+const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void): React.ReactElement | null => {
   switch(feature.properties?.dataType) {
   case TRACK_TYPE:
     return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler} /> 
@@ -27,6 +27,8 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
     return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
   case REFERENCE_POINT_TYPE:
     return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
+  case GROUP_TYPE:
+    return null  
   default:
     throw new Error('Unknown feature type:' + feature.properties?.dataType)
   }
@@ -80,7 +82,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
 
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
-    return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
+    return vis.map((feature: Feature) => featureFor(feature, onClickHandler)).filter(Boolean)
   }, [features, onClickHandler])
 
   return (

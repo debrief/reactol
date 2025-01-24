@@ -51,6 +51,8 @@ const MouseCoordinates: React.FC = () => {
       if (selection.length === 1) {
         const selectedFeature = features.find((feature) => feature.id === selection[0])
         if (selectedFeature) {
+          // check it isn't a non-spatial feature
+          if (selectedFeature.geometry.type === 'Point' && selectedFeature.geometry.coordinates.length === 0) return {rng: 0, brg: 0, subject: 'n/a'}
           const asPoints = featureToPoints(selectedFeature)
           const nearestPt = nearestPoint(turfMouse, asPoints)
           const bearing = bearingToAzimuth(turf.bearing(nearestPt, turfMouse))
