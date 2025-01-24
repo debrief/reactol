@@ -1,4 +1,4 @@
-import { Feature, Point } from 'geojson'
+import { Feature, Geometry } from 'geojson'
 import { Checkbox, ColorPicker, DatePicker, Form, Input } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
@@ -8,8 +8,8 @@ import { CoreShapeProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 
 export interface PointFormProps {
-  point: Feature<Point, CoreShapeProps>
-  onChange: (point: Feature<Point, CoreShapeProps>) => void
+  shape: Feature<Geometry, CoreShapeProps>
+  onChange: (shape: Feature<Geometry, CoreShapeProps>) => void
 }
 
 /** swap the time string a parameter of the expected type */
@@ -18,9 +18,9 @@ type FormTypeProps = Omit<CoreShapeProps, 'time' | 'timeEnd'> & {
   dTimeEnd: Dayjs
 }
 
-const convert = (point: Readonly<CoreShapeProps>): FormTypeProps=> {
-  const oldVal = point
-  const newVal = {...point} as FormTypeProps
+const convert = (shape: Readonly<CoreShapeProps>): FormTypeProps=> {
+  const oldVal = shape
+  const newVal = {...shape} as FormTypeProps
   if (oldVal.time) {
     newVal.dTime = dayjs(oldVal.time)
     delete (newVal as Partial<CoreShapeProps>).time
@@ -32,28 +32,28 @@ const convert = (point: Readonly<CoreShapeProps>): FormTypeProps=> {
   return newVal
 }
 
-const convertBack = (point: Readonly<FormTypeProps>): CoreShapeProps => {
-  const oldVal = point 
-  const newVal = {...point} as CoreShapeProps
-  if (point.dTime) {
+const convertBack = (shape: Readonly<FormTypeProps>): CoreShapeProps => {
+  const oldVal = shape
+  const newVal = {...shape} as CoreShapeProps
+  if (shape.dTime) {
     newVal.time = oldVal.dTime.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTime
   }
-  if (point.dTimeEnd) {
+  if (shape.dTimeEnd) {
     newVal.timeEnd = oldVal.dTimeEnd.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTimeEnd
   }
   return newVal
 }
 
-export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
+export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
 
   useEffect(() => {
-    if (point) {
-      setState(convert(point.properties))
+    if (shape) {
+      setState(convert(shape.properties))
     }
-  }, [point, setState])
+  }, [shape, setState])
 
   const localChange = (values: Partial<FormTypeProps>) => {
     if (values.color) {
@@ -61,7 +61,7 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
     }
     const updatedProps= {...state, ...values} as FormTypeProps
     const convertedProps = convertBack(updatedProps)
-    const res = {...point, properties: convertedProps}
+    const res = {...shape, properties: convertedProps}
     onChange(res)
   }
 
@@ -73,7 +73,7 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
 
   return (
     <Form
-      name='createTrack'
+      name='createShape'
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 16 }}
       style={{ maxWidth: 400 }}
