@@ -49,6 +49,8 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
       mouseover: mouseOver,
       mouseout: (evt: LeafletMouseEvent) => mouseOut(evt, isSelected),
     }
+    const coords = feature.geometry.coordinates
+    if (coords.length === 0 || coords[0].length === 0) return null
     const points = turf.featureCollection([
       turf.polygon((feature.geometry as Polygon).coordinates),
     ])
