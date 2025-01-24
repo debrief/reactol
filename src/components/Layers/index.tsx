@@ -8,6 +8,7 @@ import {
   DeleteOutlined,
   CopyOutlined,
   CloseCircleOutlined,
+  ShrinkOutlined,
 } from '@ant-design/icons'
 import { Feature } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
@@ -77,14 +78,14 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
-  const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<
-    string[]
-  >([NODE_TRACKS]) // Add state for expanded keys
   const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
   const clearSelection = () => {
     setSelection([])
   }
+
+  const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
   const mapFunc = (
     features: Feature[],
@@ -132,7 +133,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       setCheckedKeys(checked)
       // this would expand all top level items
       // const expanded: string[] = items.map(item => item.key as string); // include top level keys
-      setDefaultExpandedKeys([NODE_TRACKS])
     }
   }, [features])
 
@@ -221,7 +221,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const handleDialogCancel = () => {
     setcreateTrackDialogVisible(false)
   }
-
   return (
     <>
       <Modal
@@ -234,6 +233,40 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       </Modal>
       <div style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}>
         <Flex className='toolbar' gap='small' justify='end' wrap style={{ height: '1em' }}>
+          <Button.Group>
+            <ToolButton
+              onClick={() => setExpandedKeys([])}
+              icon={<ShrinkOutlined />}
+              title='Collapse All'
+              disabled={!isExpanded}
+            />
+            <ToolButton
+              onClick={clearSelection}
+              disabled={selection.length === 0}
+              icon={<CloseCircleOutlined />}
+              title={'Clear selection'}
+            />
+            <ToolButton
+              onClick={onDeleteClick}
+              disabled={selection.length === 0}
+              icon={<DeleteOutlined />}
+              title={
+                selection.length > 0
+                  ? 'Delete selected items'
+                  : 'Select items to enable delete'
+              }
+            />
+            <ToolButton
+              onClick={onDuplicateClick}
+              disabled={duplicateDisabled}
+              icon={<CopyOutlined />}
+              title={
+                selection.length > 0
+                  ? 'Duplicate selected items'
+                  : 'Select non-track items to enable duplicate'
+              }
+            />
+          </Button.Group>
           <ToolButton
             onClick={onGraphClick}
             disabled={!temporalFeatureSelected}
@@ -244,48 +277,24 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
                 : 'Select a time-related feature to enable graphs'
             }
           />
-          <ToolButton
-            onClick={clearSelection}
-            disabled={selection.length === 0}
-            icon={<CloseCircleOutlined />}
-            title={'Clear selection'}
-          />
-          <ToolButton
-            onClick={onDeleteClick}
-            disabled={selection.length === 0}
-            icon={<DeleteOutlined />}
-            title={
-              selection.length > 0
-                ? 'Delete selected items'
-                : 'Select items to enable delete'
-            }
-          />
-          <ToolButton
-            onClick={onDuplicateClick}
-            disabled={duplicateDisabled}
-            icon={<CopyOutlined />}
-            title={
-              selection.length > 0
-                ? 'Duplicate selected items'
-                : 'Select non-track items to enable duplicate'
-            }
-          />
         </Flex>
       </div>
-      {model.length && (
+      {model.length > 0 && (
         <Tree
           checkable
           showLine={true}
-          defaultExpandedKeys={defaultExpandedKeys} // Use expandedKeys state
           defaultSelectedKeys={[]}
           defaultCheckedKeys={[]}
           multiple={true}
           onSelect={onSelect}
-          autoExpandParent={true}
           onCheck={onCheck}
           showIcon={true}
           checkedKeys={checkedKeys}
           selectedKeys={selection || []}
+          expandedKeys={expandedKeys}
+          onExpand={(keys) => {
+            setExpandedKeys(keys as string[])
+          }}
           treeData={model}
         />
       )}
