@@ -9,12 +9,13 @@ import {
   CopyOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons'
-import { Feature } from 'geojson'
+import { Feature, Geometry, Point, Polygon } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { useAppContext } from '../../state/AppContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import { NewTrackProps, TrackProps } from '../../types'
+import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps } from '../../types'
+import { PointForm } from '../PointForm'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -81,6 +82,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     string[]
   >([NODE_TRACKS]) // Add state for expanded keys
   const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
+  const [newPoint, setNewPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
+  const [workingPoint, setWorkingPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
+  const [formType, setFormType] = useState<string>('')
 
   const clearSelection = () => {
     setSelection([])
@@ -95,8 +99,42 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     const handleAdd = (e: React.MouseEvent, key: string, title: string) => {
       if (key === NODE_TRACKS) {
         setcreateTrackDialogVisible(true)
+      } else if (key === 'node-points') {
+        const point: Feature<Point, PointProps> = {
+          type: 'Feature',
+          properties: {
+            name: '',
+            dataType: REFERENCE_POINT_TYPE,
+            color: '#FF0000',
+            visible: true
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: []
+          }
+        }
+        setFormType('point')
+        setWorkingPoint(point)
+        setNewPoint(point)
+      } else if (key === 'node-zones') {
+        const zone: Feature<Polygon, ZoneProps> = {
+          type: 'Feature',
+          properties: {
+            name: '',
+            dataType: ZONE_TYPE,
+            color: '#FF0000',
+            visible: true
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: []
+          }
+        }
+        setFormType('zone')
+        setWorkingPoint(zone)
+        setNewPoint(zone)
       } else {
-        setMessage('TODO - handle creating new item in ' + title)
+        console.error('unknown key for create new item ' + key + ' for ' + title)
       }
       e.stopPropagation()
     }
@@ -218,6 +256,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     })
   }
 
+  const handlePointSave = () => {
+    dispatch({ type: 'fColl/featureAdded', payload: workingPoint })
+    setNewPoint(null)
+    setWorkingPoint(null)
+  }
+
   const handleDialogCancel = () => {
     setcreateTrackDialogVisible(false)
   }
@@ -289,13 +333,26 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           treeData={model}
         />
       )}
-      <LoadTrackModel
-        visible={createTrackDialogVisible}
-        cancel={handleDialogCancel}
-        newTrack={setLoadTrackResults}
-        addToTrack={() => {}}
-        createTrackOnly={true}
-      />
+      {createTrackDialogVisible && (
+        <LoadTrackModel
+          visible={createTrackDialogVisible}
+          cancel={handleDialogCancel}
+          newTrack={setLoadTrackResults}
+          addToTrack={() => {}}
+          createTrackOnly={true}
+        />
+      )}
+      <Modal
+        title={'Create new '+ formType}
+        open={newPoint !== null}
+        onCancel={() => setNewPoint(null)}
+        onOk={handlePointSave}
+      >
+        <PointForm
+          point={newPoint as Feature<Point, CoreShapeProps>}
+          onChange={(point) => setWorkingPoint(point)}
+        />
+      </Modal>
     </>
   )
 }
