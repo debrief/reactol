@@ -75,7 +75,7 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
     <Form
       name='createTrack'
       labelCol={{ span: 6 }}
-      wrapperCol={{ span: 14 }}
+      wrapperCol={{ span: 16 }}
       style={{ maxWidth: 400 }}
       initialValues={state}
       autoComplete='off'
@@ -115,9 +115,10 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
         rules={[
           ({ getFieldValue }) => ({
             validator(_, value) {
-              return getFieldValue('dTime') < value
+              // if there is a value, check if it's after the dTime
+              return !value || getFieldValue('dTime') < value
                 ? Promise.resolve()
-                : Promise.reject(new Error('Time end must be after time!'))
+                : Promise.reject(new Error('Time-end must be after time!'))
             },
           }),
         ]}
