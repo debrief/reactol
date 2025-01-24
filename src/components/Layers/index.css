@@ -2,3 +2,16 @@ Tree {
   height: 100%;
   width: 100%;
 }
+
+/* Make tree more compact */
+.ant-tree .ant-tree-treenode {
+  padding-bottom: px !important;
+  padding-top: 2px !important;
+  height: 22px !important;
+}
+
+/* remove the whitespace around the node names */
+.ant-tree .ant-tree-checkbox+span {
+  padding-inline-start: 0px;
+  padding-inline-end: 2px;
+}
