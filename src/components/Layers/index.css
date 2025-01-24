@@ -2,3 +2,28 @@ Tree {
   height: 100%;
   width: 100%;
 }
+
+/* Make tree more compact */
+.ant-tree {
+  font-size: 12px !important;
+}
+
+.ant-tree .ant-tree-treenode {
+  padding-bottom: 2px !important;
+  padding-top: 2px !important;
+  height: 18px !important;
+}
+
+.ant-tree .ant-tree-node-content-wrapper {
+  padding-top: 4px !important;
+  line-height: 14px !important;
+}
+.ant-tree .ant-tree-checkbox {
+  margin-top: 6px !important;
+  line-height: 14px !important;
+}
+
+.ant-tree .ant-tree-node-content-wrapper {
+  padding-inline-start: 0px !important;
+  padding-inline-end: 0px !important;
+}
