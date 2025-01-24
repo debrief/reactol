@@ -4,35 +4,44 @@ import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
-import { PointProps } from '../../types'
+import { CoreShapeProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 
 export interface PointFormProps {
-  point: Feature<Point, PointProps>
-  onChange: (point: Feature<Point, PointProps>) => void
+  point: Feature<Point, CoreShapeProps>
+  onChange: (point: Feature<Point, CoreShapeProps>) => void
 }
 
 /** swap the time string a parameter of the expected type */
-type FormTypeProps = Omit<PointProps, 'time'> & {
+type FormTypeProps = Omit<CoreShapeProps, 'time' | 'timeEnd'> & {
   dTime: Dayjs
+  dTimeEnd: Dayjs
 }
 
-const convert = (point: Readonly<PointProps>): FormTypeProps=> {
+const convert = (point: Readonly<CoreShapeProps>): FormTypeProps=> {
   const oldVal = point
   const newVal = {...point} as FormTypeProps
   if (oldVal.time) {
     newVal.dTime = dayjs(oldVal.time)
-    delete (newVal as Partial<PointProps>).time
+    delete (newVal as Partial<CoreShapeProps>).time
+  }
+  if (oldVal.timeEnd) {
+    newVal.dTimeEnd = dayjs(oldVal.timeEnd)
+    delete (newVal as Partial<CoreShapeProps>).timeEnd
   }
   return newVal
 }
 
-const convertBack = (point: Readonly<FormTypeProps>): PointProps => {
+const convertBack = (point: Readonly<FormTypeProps>): CoreShapeProps => {
   const oldVal = point 
-  const newVal = {...point} as PointProps
+  const newVal = {...point} as CoreShapeProps
   if (point.dTime) {
     newVal.time = oldVal.dTime.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTime
+  }
+  if (point.dTimeEnd) {
+    newVal.timeEnd = oldVal.dTimeEnd.toISOString() 
+    delete (newVal as Partial<FormTypeProps>).dTimeEnd
   }
   return newVal
 }
@@ -66,7 +75,7 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
     <Form
       name='createTrack'
       labelCol={{ span: 6 }}
-      wrapperCol={{ span: 14 }}
+      wrapperCol={{ span: 16 }}
       style={{ maxWidth: 400 }}
       initialValues={state}
       autoComplete='off'
@@ -97,6 +106,23 @@ export const PointForm: React.FC<PointFormProps> = ({point, onChange}) => {
         label="Time"
         style={itemStyle}
         name='dTime'>
+        <DatePicker showTime format={'MMM DDHHmm'} />
+      </Form.Item>
+      <Form.Item<FormTypeProps>
+        label="Time end"
+        style={itemStyle}
+        // validate that dTimeEnd is after dTime
+        rules={[
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              // if there is a value, check if it's after the dTime
+              return !value || getFieldValue('dTime') < value
+                ? Promise.resolve()
+                : Promise.reject(new Error('Time-end must be after time!'))
+            },
+          }),
+        ]}
+        name='dTimeEnd'>
         <DatePicker showTime format={'MMM DDHHmm'} />
       </Form.Item>
     </Form>

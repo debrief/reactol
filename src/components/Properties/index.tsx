@@ -1,9 +1,8 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
-import { PointProps, TrackProps } from '../../types'
+import { CoreShapeProps, TrackProps } from '../../types'
 import { useAppContext } from '../../state/AppContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
-import { CoreDataProps } from '../../types'
 import { Feature, GeoJsonProperties, Geometry, LineString, Point } from 'geojson'
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { PointForm } from '../PointForm'
@@ -49,11 +48,11 @@ const Properties: React.FC = () => {
       // and the form
       const featureProps = featureState.properties
       if (featureProps?.dataType) {
-        const aProps = featureProps as CoreDataProps
+        const aProps = featureProps as CoreShapeProps
         switch (aProps.dataType) {
         case REFERENCE_POINT_TYPE:
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, PointProps>} />
+            <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, CoreShapeProps>} />
           </CoreForm>)
           break
         case TRACK_TYPE:    
@@ -62,7 +61,9 @@ const Properties: React.FC = () => {
           </CoreForm>)
           break
         case ZONE_TYPE:
-          setPropertyForm(<div>Zone form pending</div>)
+          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
+            <PointForm onChange={updateFeatureState} point={featureState as Feature<Point, CoreShapeProps>} />
+          </CoreForm>)
           break
         default:
           setPropertyForm (<PropertiesViewer feature={featureState} />)
