@@ -156,7 +156,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
               { item.labelVisible && (
                 <Tooltip
                   className='time-marker'
-                  key={feature.id + '-tip-' + index}
+                  key={itemId + '-tip-' + index}
                   offset={[0, -20]}
                   direction='center'
                   opacity={1}
