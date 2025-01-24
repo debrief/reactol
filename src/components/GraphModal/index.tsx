@@ -1,22 +1,22 @@
-import { Button, Flex, Form, FormProps, Layout, Select } from 'antd';
-import { Header, Content, Footer } from 'antd/es/layout/layout';
-import Sider from 'antd/es/layout/Sider';
-import ReactModal from 'react-modal-resizable-draggable';
-import { Typography } from 'antd';
-import { Feature } from 'geojson';
-import { speedCalc } from '../../helpers/calculations/speedCalc';
-import { useEffect } from 'react';
-import React from 'react';
-import { useAppContext } from '../../state/AppContext';
-import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory';
-import { format } from 'date-fns';
-import { BaseOptionType, DefaultOptionType } from 'antd/es/select';
-import { rangeCalc } from '../../helpers/calculations/rangeCalc';
-import { courseCalc } from '../../helpers/calculations/courseCalc';
-import { bearingCalc } from '../../helpers/calculations/bearingCalc';
-import { useAppSelector } from '../../state/hooks';
+import { Button, Flex, Form, FormProps, Layout, Select } from 'antd'
+import { Header, Content, Footer } from 'antd/es/layout/layout'
+import Sider from 'antd/es/layout/Sider'
+import ReactModal from 'react-modal-resizable-draggable'
+import { Typography } from 'antd'
+import { Feature } from 'geojson'
+import { speedCalc } from '../../helpers/calculations/speedCalc'
+import { useEffect } from 'react'
+import React from 'react'
+import { useAppContext } from '../../state/AppContext'
+import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory'
+import { format } from 'date-fns'
+import { BaseOptionType, DefaultOptionType } from 'antd/es/select'
+import { rangeCalc } from '../../helpers/calculations/rangeCalc'
+import { courseCalc } from '../../helpers/calculations/courseCalc'
+import { bearingCalc } from '../../helpers/calculations/bearingCalc'
+import { useAppSelector } from '../../state/hooks'
 
-const { Title, Text } = Typography;
+const { Title, Text } = Typography
 
 export interface GraphProps {
   open: boolean
@@ -28,7 +28,7 @@ const footerStyle: React.CSSProperties = {
   color: '#fff',
   backgroundColor: '#4096ff',
   padding: '10px'
-};
+}
 
 interface GraphForm {
   fields: string[]
@@ -50,12 +50,8 @@ export type GraphDataset = { label: string,
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
-  if (!open) {
-    return null
-  }
-  const allFeatures = useAppSelector(state => state.featureCollection.features)
-  const { selection } = useAppContext();
-
+  const allFeatures = useAppSelector(state => state.fColl.features)
+  const { selection } = useAppContext()
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
   const [ticks, setTicks] = React.useState<number[]>([])
@@ -90,7 +86,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
       setData([])
       setWasOpen(false)
     }
-  },[open])
+  },[open, wasOpen])
 
   useEffect(() => {
     const trackItems: Array<BaseOptionType | DefaultOptionType> = selectedFeatures.map((feature) => {
@@ -99,7 +95,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     if (JSON.stringify(trackItems) !== JSON.stringify(tracks)) {
       setTracks(trackItems)
     }
-  },[selectedFeatures])
+  },[selectedFeatures, tracks])
 
   useEffect(() => {
     if (calculations.length === 0) {
@@ -121,21 +117,21 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         setData(flattened)  
       }
     }
-  }, [calculations, baseTrack, selectedFeatures])
+  }, [calculations, baseTrack, selectedFeatures, tracksEnabled])
 
 
   const onFinish: FormProps<GraphForm>['onFinish'] = (values) => {
     setBaseTrack(values.baseTrack)
     const calcs = values.fields.map((field): Calculation | undefined=> options.find((opt) => opt.value === field))
     setCalculations(calcs.filter(calc => calc !== undefined) as Calculation[])
-  };
+  }
 
   const options = [speedCalc, courseCalc, rangeCalc, bearingCalc]
  
-  const formatDate = (value: any): string => {
+  const formatDate = (value: string | number): string => {
     try {
       const date = new Date(value)
-      return format(date, "ddHHmm'Z'")
+      return format(date, 'ddHHmm\'Z\'')
     } catch (e) {
       console.warn('trouble formatting this graph date', e)
       return 'n/A'
@@ -164,35 +160,39 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
     setGraphEnabled(true)
   }
 
+  if (!open) {
+    return null
+  }
+
   return (
-    // @ts-ignore */}
+    // @ts-expect-error Property 'initWidth' does not exist on type 'IntrinsicAttributes & ModalProps'.
     <ReactModal 
-    initWidth={800} 
-    initHeight={500} 
-    className={"my-modal-custom-class"}
-    onRequestClose={closeHandler} 
-    isOpen={open}>
+      initWidth={800} 
+      initHeight={500} 
+      className={'my-modal-custom-class'}
+      onRequestClose={closeHandler} 
+      isOpen={open}>
       <Layout style={{minHeight:'300px', height:'100%'}}>
         <Header>My Modal</Header>
         <Layout style={{height:'100%'}}>
           <Content>
-          <VictoryChart theme={VictoryTheme.clean}>
-          {/* <VictoryLegend itemsPerRow={2} x={125} y={20} data={legendLabels}/>  */}
-          { ticks.length && <VictoryAxis crossAxis label={'Time'} tickValues={ticks} tickFormat={formatDate} /> }
-          <VictoryAxis dependentAxis label={calculations.map(calc => calc.label).join(', ')} />
-          {/* <VictoryLine data={data1} />
+            <VictoryChart theme={VictoryTheme.clean}>
+              {/* <VictoryLegend itemsPerRow={2} x={125} y={20} data={legendLabels}/>  */}
+              { ticks.length && <VictoryAxis crossAxis label={'Time'} tickValues={ticks} tickFormat={formatDate} /> }
+              <VictoryAxis dependentAxis label={calculations.map(calc => calc.label).join(', ')} />
+              {/* <VictoryLine data={data1} />
           <VictoryLine data={data2} /> */}
-            <VictoryGroup>
-              { data.map((dataset, index) => <VictoryLine key={'line-' + index} 
-                    data={dataset.data} 
-                    style={{
-                      data: {
-                        stroke: dataset.color || undefined ,
-                        strokeWidth: 2,
-                      },
-                    }} x='date' y='value' />      )}
-            </VictoryGroup>
-          </VictoryChart>
+              <VictoryGroup>
+                { data.map((dataset, index) => <VictoryLine key={'line-' + index} 
+                  data={dataset.data} 
+                  style={{
+                    data: {
+                      stroke: dataset.color || undefined ,
+                      strokeWidth: 2,
+                    },
+                  }} x='date' y='value' />      )}
+              </VictoryGroup>
+            </VictoryChart>
           </Content>
           <Sider theme='light'>
             <Flex vertical>
@@ -232,7 +232,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
           </Flex>
         </Footer>
       </Layout>
-  </ReactModal>
+    </ReactModal>
   )
 }
 

@@ -9,17 +9,17 @@ export class TimeSupport {
    * @throws {Error} - If the period string is in an invalid format.
    */
   static parsePeriod(period: string): number {
-    const regex = /^(\d{2})h(\d{2})m$/;
-    const match = period.match(regex);
+    const regex = /^(\d{2})h(\d{2})m$/
+    const match = period.match(regex)
     if (!match) {
-      throw new Error("Invalid time format");
+      throw new Error('Invalid time format')
     }
-    const hours = parseInt(match[1], 10);
-    const minutes = parseInt(match[2], 10);
+    const hours = parseInt(match[1], 10)
+    const minutes = parseInt(match[2], 10)
     if (minutes >= 60) {
-      throw new Error("Invalid time format");
+      throw new Error('Invalid time format')
     }
-    return (hours * 60 + minutes) * 60 * 1000;
+    return (hours * 60 + minutes) * 60 * 1000
   }
 
   /**
@@ -29,9 +29,9 @@ export class TimeSupport {
    * @returns {Date} - The rounded down date-time.
    */
   static roundDown(date: Date, interval: number): Date {
-    const time = date.getTime();
-    const roundedTime = time - (time % interval);
-    return new Date(roundedTime);
+    const time = date.getTime()
+    const roundedTime = time - (time % interval)
+    return new Date(roundedTime)
   }
 
   /**
@@ -41,9 +41,9 @@ export class TimeSupport {
    * @returns {Date} - The rounded up date-time.
    */
   static roundUp(date: Date, interval: number): Date {
-    const time = date.getTime();
-    const roundedTime = time + (interval - (time % interval));
-    return new Date(roundedTime);
+    const time = date.getTime()
+    const roundedTime = time + (interval - (time % interval))
+    return new Date(roundedTime)
   }
 
   /**
@@ -53,8 +53,8 @@ export class TimeSupport {
    * @returns {Date} - The incremented date-time.
    */
   static increment(date: Date, interval: number): Date {
-    const time = date.getTime();
-    return new Date(time + interval);
+    const time = date.getTime()
+    return new Date(time + interval)
   }
 
   /**
@@ -64,7 +64,7 @@ export class TimeSupport {
    * @returns {Date} - The decremented date-time.
    */
   static decrement(date: Date, interval: number): Date {
-    const time = date.getTime();
-    return new Date(time - interval);
+    const time = date.getTime()
+    return new Date(time - interval)
   }
 }

@@ -23,7 +23,16 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      'semi': ['error', 'never'], // No trailing semi-colons
+      'quotes': ['error', 'single'], // Use single quotes as standard
       'indent': ['error', 2], // Enforce 2 space indents
+      '@typescript-eslint/no-unused-expressions': [
+        'error',
+        {
+          allowShortCircuit: true, // Maybe this was missing.
+          allowTernary: true,
+        },
+      ],
     },
   },
 )

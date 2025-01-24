@@ -1,15 +1,15 @@
-import { Feature, Point, Polygon } from "geojson";
-import { MapContainer, ScaleControl, useMap } from 'react-leaflet';
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../../constants";
-import Track from "../Track";
-import Zone from "../Zone";
-import { useCallback, useEffect, useMemo } from "react";
-import { useAppSelector } from "../../../state/hooks";
-import { useAppContext } from "../../../state/AppContext";
-import { Point as DataPoint } from "../Point";
-import MouseCoordinates from '../MouseCoordinates';
-import { Graticule } from "../AutoGraticule";
-import { HomeControl } from "../../HomeControl";
+import { Feature, Point, Polygon } from 'geojson'
+import { MapContainer, ScaleControl, useMap } from 'react-leaflet'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
+import Track from '../Track'
+import Zone from '../Zone'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useAppSelector } from '../../../state/hooks'
+import { useAppContext } from '../../../state/AppContext'
+import { Point as DataPoint } from '../Point'
+import { Graticule } from '../AutoGraticule'
+import { HomeControl } from '../../HomeControl'
+import MouseCoordinates from '../MouseCoordinates'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -35,8 +35,12 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
 /** helper component that freezer map viewport */
 const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
   const map = useMap()
+  const { setMapNode } = useAppContext()
+
   useEffect(() => {
+
     if (map) {
+      setMapNode(map.getContainer())
       if (frozen) {
         map.dragging.disable()
         map.scrollWheelZoom.disable()
@@ -52,28 +56,28 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
         map.boxZoom.enable()  
       }
     }
-  },[map, frozen])
+  },[map, frozen, setMapNode])
   return null
 }
 
 const Map: React.FC<MapProps> = ({ children }) => {
-  const features = useAppSelector(state => state.featureCollection.features)
-  const { selection, setSelection, viewportFrozen } = useAppContext();
+  const features = useAppSelector(state => state.fColl.features)
+  const { selection, setSelection, viewportFrozen } = useAppContext()
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
       // add/remove from selection
       if (selection.includes(id)) {
-        setSelection(selection.filter((selectedId) => selectedId !== id));
+        setSelection(selection.filter((selectedId) => selectedId !== id))
       } else {
-        setSelection([...selection, id]);
-      } 
+        setSelection([...selection, id])
+      }
     } else {
       // just select this item
-      setSelection([id]);
+      setSelection([id])
     }
   }, [selection, setSelection])
-  
+
   const visibleFeatures = useMemo(() => {
     const vis = features.filter(feature => isVisible(feature))
     return vis.map((feature: Feature) => featureFor(feature, onClickHandler))
@@ -81,8 +85,12 @@ const Map: React.FC<MapProps> = ({ children }) => {
 
   return (
     <>
-      <MapContainer zoomControl={false} center={[35.505, -4.09]} zoom={8}  >
-        <ViewportProperties frozen={viewportFrozen}/>
+      <MapContainer
+        zoomControl={false}
+        center={[35.505, -4.09]}
+        zoom={8}
+      >
+        <ViewportProperties frozen={viewportFrozen} />
         {children}
         { 
           visibleFeatures
@@ -94,7 +102,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
       </MapContainer>
 
     </>
-  );
-};
+  )
+}
 
 export default Map

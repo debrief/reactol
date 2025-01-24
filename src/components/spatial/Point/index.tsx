@@ -1,16 +1,18 @@
-import { Feature, Position, Point as GPoint } from "geojson";
-import { LeafletMouseEvent } from 'leaflet';
-import { CircleMarker, Tooltip } from 'react-leaflet';
-import { useMemo } from "react";
-import { useAppContext } from "../../../state/AppContext";
-import { featureIsVisibleInPeriod } from "../../../helpers/featureIsVisibleAtTime";
+import { Feature, Position, Point as GPoint } from 'geojson'
+import { LeafletMouseEvent } from 'leaflet'
+import { CircleMarker, Tooltip } from 'react-leaflet'
+import { useMemo } from 'react'
+import { useAppContext } from '../../../state/AppContext'
+import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
+import './index.css'
+import { mouseOut, mouseOver } from '../commonHandlers'
 
-export interface ZoneProps {
+export interface PointSymbolProps {
   feature: Feature<GPoint> 
   onClickHandler: {(id: string, modifier: boolean): void}
 }
 
-export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
+export const Point: React.FC<PointSymbolProps> = ({feature, onClickHandler}) => {
   const { selection, time } = useAppContext()
   const { start: timeStart, end: timeEnd, filterApplied } = time
   const isSelected = selection.includes(feature.id as string)
@@ -23,7 +25,7 @@ export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
   }, [feature])
 
   const color = useMemo(() => {
-    return feature.properties?.color || 'blue';
+    return feature.properties?.color || 'blue'
   }, [feature])
 
   const isVisible = useMemo(() => {
@@ -34,17 +36,23 @@ export const Point: React.FC<ZoneProps> = ({feature, onClickHandler}) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
   }
 
-  const name = feature.properties?.name || '';
+  const name = feature.properties?.name || ''
 
-  const circleRadius = useMemo(() => {
-    return isSelected ? 8 : 4
-  }, [isSelected])
+  const circleRadius = 4
 
+  const eventHandlers = {
+    click: onclick,
+    mouseover: mouseOver,
+    mouseout: (evt: LeafletMouseEvent) => mouseOut(evt, isSelected),
+  }
+  
   return (
     <>
+      { isVisible && isSelected && <CircleMarker key={'shiny-' + feature.id + '-' + color} radius={8} 
+        fillColor={'#fff'} color={'#fff'} fill={true} fillOpacity={0} center={location} />}
       { isVisible && <CircleMarker key={'point-' + feature.id + '-' + color} radius={circleRadius} 
-        fillColor={color} color={color} fill={true} fillOpacity={10} center={location} eventHandlers={{click: onclick}}>
-        <Tooltip key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
+        fillColor={color} color={color} fill={true} fillOpacity={1} center={location} eventHandlers={eventHandlers}>
+        <Tooltip className='point-label' key={feature.id + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
           {name}
         </Tooltip>
       </CircleMarker>}

@@ -1,18 +1,20 @@
-import React, { Key, useEffect, useMemo } from "react"
-import { Alert, Button, Flex, Modal, Tooltip, Tree } from "antd"
-import type { GetProps, TreeDataNode } from "antd"
-import "./index.css"
+import React, { Key, useEffect, useMemo, useState } from 'react'
+import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd'
+import type { GetProps, TreeDataNode } from 'antd'
+import './index.css'
 import {
   LineChartOutlined,
   PlusCircleOutlined,
   DeleteOutlined,
   CopyOutlined,
   CloseCircleOutlined,
-} from "@ant-design/icons"
-import { Feature } from "geojson"
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from "../../constants"
-import { useAppContext } from "../../state/AppContext"
-import { useAppSelector, useAppDispatch } from "../../state/hooks"
+} from '@ant-design/icons'
+import { Feature } from 'geojson'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { useAppContext } from '../../state/AppContext'
+import { useAppSelector, useAppDispatch } from '../../state/hooks'
+import { LoadTrackModel } from '../LoadTrackModal'
+import { NewTrackProps, TrackProps } from '../../types'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -21,7 +23,7 @@ interface LayerProps {
 type TreeProps = GetProps<typeof Tree>
 
 const idFor = (feature: Feature): string => {
-  return `${feature.id || "unknown"}`
+  return `${feature.id || 'unknown'}`
 }
 
 const nameFor = (feature: Feature): string => {
@@ -52,7 +54,7 @@ const ToolButton: React.FC<ToolProps> = ({
   return (
     <Tooltip title={title}>
       <Button
-        size={"small"}
+        size={'small'}
         onClick={onClick}
         disabled={disabled}
         type='primary'
@@ -64,20 +66,21 @@ const ToolButton: React.FC<ToolProps> = ({
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const { selection, setSelection } = useAppContext()
-  const features = useAppSelector((state) => state.featureCollection.features)
+  const features = useAppSelector((state) => state.fColl.features)
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)
   )
   const dispatch = useAppDispatch()
 
-  const NODE_TRACKS = "node-tracks"
+  const NODE_TRACKS = 'node-tracks'
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
-  const [message, setMessage] = React.useState<string>("")
+  const [message, setMessage] = React.useState<string>('')
   const [defaultExpandedKeys, setDefaultExpandedKeys] = React.useState<
     string[]
   >([NODE_TRACKS]) // Add state for expanded keys
+  const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
 
   const clearSelection = () => {
     setSelection([])
@@ -89,8 +92,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     key: string,
     dType: string
   ): TreeDataNode => {
-    const handleAdd = (e: React.MouseEvent, key: string) => {
-      setMessage("TODO - handle creating new item in " + key)
+    const handleAdd = (e: React.MouseEvent, key: string, title: string) => {
+      if (key === NODE_TRACKS) {
+        setcreateTrackDialogVisible(true)
+      } else {
+        setMessage('TODO - handle creating new item in ' + title)
+      }
       e.stopPropagation()
     }
     return {
@@ -98,8 +105,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       key: key,
       icon: (
         <PlusCircleOutlined
-          style={{ cursor: "copy" }}
-          onClick={(e) => handleAdd(e, title)}
+          style={{ cursor: 'copy' }}
+          onClick={(e) => handleAdd(e, key, title)}
         />
       ),
       children: features
@@ -113,9 +120,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
   useEffect(() => {
     const items: TreeDataNode[] = []
-    items.push(mapFunc(features, "Tracks", NODE_TRACKS, TRACK_TYPE))
-    items.push(mapFunc(features, "Zones", "node-zones", ZONE_TYPE))
-    items.push(mapFunc(features, "Points", "node-points", REFERENCE_POINT_TYPE))
+    items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE))
+    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE))
+    items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE))
     const modelData = items
     setModel(modelData)
     if (features) {
@@ -131,10 +138,10 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   // filter out the branches, just leave the leaves
   const justLeaves = (ids: Key[]): Key[] => {
-    return ids.filter((id) => !(id as string).startsWith("node-"))
+    return ids.filter((id) => !(id as string).startsWith('node-'))
   }
 
-  const onSelect: TreeProps["onSelect"] = (selectedKeys) => {
+  const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
     const payload = { selected: justLeaves(selectedKeys) as string[] }
     // check if the payload selection is different from the current selection
     if (JSON.stringify(payload.selected) !== JSON.stringify(selection)) {
@@ -142,10 +149,10 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     }
   }
 
-  const onCheck: TreeProps["onCheck"] = (checkedKeys) => {
+  const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
     const keys = justLeaves(checkedKeys as Key[])
     dispatch({
-      type: "featureCollection/featuresVisible",
+      type: 'fColl/featureVisibilities',
       payload: { ids: keys },
     })
   }
@@ -161,7 +168,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onDeleteClick = () => {
     dispatch({
-      type: "featureCollection/featuresDeleted",
+      type: 'fColl/featuresDeleted',
       payload: { ids: selection },
     })
     setSelection([])
@@ -169,7 +176,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onDuplicateClick = () => {
     dispatch({
-      type: "featureCollection/featuresDuplicated",
+      type: 'fColl/featuresDuplicated',
       payload: { ids: selection },
     })
   }
@@ -185,54 +192,86 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     [selection, features]
   )
 
+  const setLoadTrackResults = async (values: NewTrackProps) => {
+    setcreateTrackDialogVisible(false)
+    // props in NewTrackProps format to TrackProps format, where they have different type
+    const newValues = values as unknown as TrackProps
+    newValues.labelInterval = parseInt(values.labelInterval)
+    newValues.symbolInterval = parseInt(values.symbolInterval)
+    const newTrack = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [],
+      },
+      properties: {
+        ...newValues,
+        dataType: TRACK_TYPE,
+        times: [],
+        courses: [],
+        speeds: [],
+      },
+    }
+    dispatch({
+      type: 'fColl/featureAdded',
+      payload: newTrack,
+    })
+  }
+
+  const handleDialogCancel = () => {
+    setcreateTrackDialogVisible(false)
+  }
+
   return (
     <>
       <Modal
         title='Message'
-        visible={message !== ""}
-        onOk={() => setMessage("")}
-        onCancel={() => setMessage("")}
+        visible={message !== ''}
+        onOk={() => setMessage('')}
+        onCancel={() => setMessage('')}
       >
         <Alert type='info' description={message} />
       </Modal>
-      <Flex gap='small' justify='end' wrap style={{ height: "1em" }}>
-        <ToolButton
-          onClick={onGraphClick}
-          disabled={!temporalFeatureSelected}
-          icon={<LineChartOutlined />}
-          title={
-            temporalFeatureSelected
-              ? "View graph of selected features"
-              : "Select a time-related feature to enable graphs"
-          }
-        />
-        <ToolButton
-          onClick={clearSelection}
-          disabled={selection.length === 0}
-          icon={<CloseCircleOutlined />}
-          title={"Clear selection"}
-        />
-        <ToolButton
-          onClick={onDeleteClick}
-          disabled={selection.length === 0}
-          icon={<DeleteOutlined />}
-          title={
-            selection.length > 0
-              ? "Delete selected items"
-              : "Select items to enable delete"
-          }
-        />
-        <ToolButton
-          onClick={onDuplicateClick}
-          disabled={duplicateDisabled}
-          icon={<CopyOutlined />}
-          title={
-            selection.length > 0
-              ? "Duplicate selected items"
-              : "Select non-track items to enable duplicate"
-          }
-        />
-      </Flex>
+      <div style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}>
+        <Flex className='toolbar' gap='small' justify='end' wrap style={{ height: '1em' }}>
+          <ToolButton
+            onClick={onGraphClick}
+            disabled={!temporalFeatureSelected}
+            icon={<LineChartOutlined />}
+            title={
+              temporalFeatureSelected
+                ? 'View graph of selected features'
+                : 'Select a time-related feature to enable graphs'
+            }
+          />
+          <ToolButton
+            onClick={clearSelection}
+            disabled={selection.length === 0}
+            icon={<CloseCircleOutlined />}
+            title={'Clear selection'}
+          />
+          <ToolButton
+            onClick={onDeleteClick}
+            disabled={selection.length === 0}
+            icon={<DeleteOutlined />}
+            title={
+              selection.length > 0
+                ? 'Delete selected items'
+                : 'Select items to enable delete'
+            }
+          />
+          <ToolButton
+            onClick={onDuplicateClick}
+            disabled={duplicateDisabled}
+            icon={<CopyOutlined />}
+            title={
+              selection.length > 0
+                ? 'Duplicate selected items'
+                : 'Select non-track items to enable duplicate'
+            }
+          />
+        </Flex>
+      </div>
       {model.length && (
         <Tree
           checkable
@@ -250,6 +289,13 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           treeData={model}
         />
       )}
+      <LoadTrackModel
+        visible={createTrackDialogVisible}
+        cancel={handleDialogCancel}
+        newTrack={setLoadTrackResults}
+        addToTrack={() => {}}
+        createTrackOnly={true}
+      />
     </>
   )
 }

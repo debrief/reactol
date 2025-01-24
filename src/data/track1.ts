@@ -1,12 +1,17 @@
-import { Feature } from 'geojson';
-import { TRACK_TYPE } from '../constants';
+import { Feature, LineString } from 'geojson'
+import { TRACK_TYPE } from '../constants'
+import { TrackProps } from '../types'
 
-const track: Feature = {
+const track: Feature<LineString, TrackProps> = {
   type: 'Feature',
   properties: {
     dataType: TRACK_TYPE,
     color: '#F00',
     name: 'VAN GALEN',
+    shortName: 'VANG',
+    symbol: 'nav',
+    labelInterval: 2 * 60 * 60 * 1000,
+    symbolInterval: 30 * 60 * 1000,
     times: [
       '2024-11-14T16:16:53.662Z',
       '2024-11-14T16:17:53.662Z',
@@ -7585,7 +7590,7 @@ const track: Feature = {
         35.82
       ]
     ],
-    type: 'MultiPoint'
+    type: 'LineString'
   },
   id: 'f-1'
 }
@@ -7639,4 +7644,4 @@ const track: Feature = {
 // geom.coordinates = geom.coordinates || [];
 // geom.coordinates = resampleCoordinates(geom.coordinates, factor);
 // console.log(track)
-export default track;
+export default track

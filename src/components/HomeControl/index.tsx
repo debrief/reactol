@@ -1,26 +1,26 @@
-import { useCallback } from "react"
-import { useMap } from "react-leaflet"
-import { useAppSelector } from "../../state/hooks"
-import { selectBounds } from "../../state/geoFeaturesSlice"
-import { Button, Tooltip } from "antd"
+import { useCallback } from 'react'
+import { useMap } from 'react-leaflet'
+import { useAppSelector } from '../../state/hooks'
+import { selectBounds } from '../../state/geoFeaturesSlice'
+import { Button, Tooltip } from 'antd'
 import {
   ExpandOutlined,
   ZoomInOutlined,
   ZoomOutOutlined,
-} from "@ant-design/icons"
-import { useAppContext } from "../../state/AppContext"
+} from '@ant-design/icons'
+import { useAppContext } from '../../state/AppContext'
 
 const POSITION_CLASSES = {
-  bottomleft: "leaflet-bottom leaflet-left",
-  bottomright: "leaflet-bottom leaflet-right",
-  topleft: "leaflet-top leaflet-left",
-  topright: "leaflet-top leaflet-right",
+  bottomleft: 'leaflet-bottom leaflet-left',
+  bottomright: 'leaflet-bottom leaflet-right',
+  topleft: 'leaflet-top leaflet-left',
+  topright: 'leaflet-top leaflet-right',
 }
 
 const buttonStyle = {
-  display: "block",
-  margin: "4px",
-  padding: "6px",
+  display: 'block',
+  margin: '4px',
+  padding: '6px',
 }
 
 /** helper component providing a button with a tooltip */
@@ -42,12 +42,12 @@ const TipButton: React.FC<{
 export const HomeControl: React.FC = () => {
   const map = useMap()
   const currentBounds = selectBounds(
-    useAppSelector((state) => state.featureCollection)
+    useAppSelector((state) => state.fColl)
   )
   const { viewportFrozen } = useAppContext()
 
   const doHome = useCallback(() => {
-    if (map) {
+    if (map && currentBounds) {
       map.flyToBounds(currentBounds)
     }
   }, [map, currentBounds])
@@ -64,15 +64,15 @@ export const HomeControl: React.FC = () => {
     }
   }, [map])
 
-  const position = "topleft"
+  const position = 'topleft'
   const positionClass =
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright
 
   return (
-    <div style={{ paddingTop: "60px" }} className={positionClass}>
+    <div style={{ paddingTop: '60px' }} className={positionClass}>
       <div
         className='leaflet-control leaflet-bar'
-        style={{ display: viewportFrozen ? "none" : "block" }}
+        style={{ display: viewportFrozen ? 'none' : 'block' }}
       >
         <TipButton
           tooltip='Zoom in'
