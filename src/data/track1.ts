@@ -7595,53 +7595,53 @@ const track: Feature<LineString, TrackProps> = {
   id: 'f-1'
 }
 // const resampleData = (data: number[], factor: number) => {
-//   const resampled = [];
-//   for (let i = 0; i < data.length - 1; i++) {
-//     const step = (data[i + 1] - data[i]) / factor;
-//     for (let j = 0; j < factor; j++) {
-//       resampled.push(data[i] + step * j);
+//   const resampled = []
+//   for (let i = 0 i < data.length - 1 i++) {
+//     const step = (data[i + 1] - data[i]) / factor
+//     for (let j = 0 j < factor j++) {
+//       resampled.push(data[i] + step * j)
 //     }
 //   }
-//   resampled.push(data[data.length - 1]);
-//   return resampled;
-// };
+//   resampled.push(data[data.length - 1])
+//   return resampled
+// }
 
 // const resampleTimes = (times: string[], factor: number) => {
-//   const resampled = [];
-//   for (let i = 0; i < times.length - 1; i++) {
-//     const start = new Date(times[i]).getTime();
-//     const end = new Date(times[i + 1]).getTime();
-//     const step = (end - start) / factor;
-//     for (let j = 0; j < factor; j++) {
-//       resampled.push(new Date(start + step * j).toISOString());
+//   const resampled = []
+//   for (let i = 0 i < times.length - 1 i++) {
+//     const start = new Date(times[i]).getTime()
+//     const end = new Date(times[i + 1]).getTime()
+//     const step = (end - start) / factor
+//     for (let j = 0 j < factor j++) {
+//       resampled.push(new Date(start + step * j).toISOString())
 //     }
 //   }
-//   resampled.push(times[times.length - 1]);
-//   return resampled;
-// };
+//   resampled.push(times[times.length - 1])
+//   return resampled
+// }
 
-// const factor = 120; // 2 hours divided by 1 minute intervals
-// track.properties = track.properties || {};
-// track.properties.times = resampleTimes(track.properties?.times, factor);
-// track.properties.courses = resampleData(track.properties?.courses, factor);
-// track.properties.speeds = resampleData(track.properties?.speeds, factor);
+// const factor = 120 // 2 hours divided by 1 minute intervals
+// track.properties = track.properties || {}
+// track.properties.times = resampleTimes(track.properties?.times, factor)
+// track.properties.courses = resampleData(track.properties?.courses, factor)
+// track.properties.speeds = resampleData(track.properties?.speeds, factor)
 
 // const resampleCoordinates = (coordinates: number[][], factor: number) => {
-//   const resampled = [];
-//   for (let i = 0; i < coordinates.length - 1; i++) {
-//     const start = coordinates[i];
-//     const end = coordinates[i + 1];
-//     const step = [(end[0] - start[0]) / factor, (end[1] - start[1]) / factor];
-//     for (let j = 0; j < factor; j++) {
-//       resampled.push([start[0] + step[0] * j, start[1] + step[1] * j]);
+//   const resampled = []
+//   for (let i = 0 i < coordinates.length - 1 i++) {
+//     const start = coordinates[i]
+//     const end = coordinates[i + 1]
+//     const step = [(end[0] - start[0]) / factor, (end[1] - start[1]) / factor]
+//     for (let j = 0 j < factor j++) {
+//       resampled.push([start[0] + step[0] * j, start[1] + step[1] * j])
 //     }
 //   }
-//   resampled.push(coordinates[coordinates.length - 1]);
-//   return resampled;
-// };
+//   resampled.push(coordinates[coordinates.length - 1])
+//   return resampled
+// }
 
 // const geom = track.geometry as any
-// geom.coordinates = geom.coordinates || [];
-// geom.coordinates = resampleCoordinates(geom.coordinates, factor);
+// geom.coordinates = geom.coordinates || []
+// geom.coordinates = resampleCoordinates(geom.coordinates, factor)
 // console.log(track)
 export default track

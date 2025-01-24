@@ -14,7 +14,7 @@ export const isTemporal = (feature: Feature): boolean => {
 //   const courses = []
 //   const speeds = []
 
-//   for (let i = 0; i < coordinates.length - 1; i++) {
+//   for (let i = 0 i < coordinates.length - 1 i++) {
 //     const point1 = turf.point(coordinates[i])
 //     const point2 = turf.point(coordinates[i + 1])
 
