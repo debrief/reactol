@@ -29,7 +29,7 @@ export type GroupProps = {
   dataType: typeof GROUP_TYPE
   name: string
   visible: boolean
-  featureIds: string[]
+  units: Array<string | number>
 }
 
 export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'labelInterval' | 'symbolInterval'> & {
