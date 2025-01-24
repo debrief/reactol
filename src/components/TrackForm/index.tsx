@@ -91,7 +91,7 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           name={'visible'}
           style={itemStyle}
           valuePropName="checked" >
-          <Checkbox style={{alignItems: 'start'}}  />
+          <Checkbox />
         </Form.Item>
         <Form.Item<FormTypeProps>
           label='Symbol'
@@ -131,10 +131,9 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           name='color'
           style={itemStyle}
           rules={[{ required: true, message: 'color is required!' }]}>
-          <ColorPicker format='hex' trigger='click' presets={presetColors} />
+          <ColorPicker style={{marginLeft: 0}} format='hex' trigger='click' presets={presetColors} />
         </Form.Item>
       </Form>
     </>
   )
 }
-

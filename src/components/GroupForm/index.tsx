@@ -82,9 +82,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           style={itemStyle}
           valuePropName="checked"
         >
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <Checkbox />
-          </div>
+          <Checkbox />
         </Form.Item>
 
         <Form.Item
