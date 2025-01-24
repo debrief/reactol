@@ -346,14 +346,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         title={'Create new ' + formType}
         open={true}
         onCancel={() => setNewPoint(null)}
-        onOk={handlePointSave}
-      >
+        onOk={handlePointSave}>
         <PointForm
           shape={newPoint}
           onChange={(point) => setWorkingPoint(point)}
         />
-      </Modal>
-}
+      </Modal>}
     </>
   )
 }
