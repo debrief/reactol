@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useMap } from 'react-leaflet'
 import { useAppSelector } from '../../state/hooks'
 import { selectBounds } from '../../state/geoFeaturesSlice'
@@ -7,8 +7,10 @@ import {
   ExpandOutlined,
   ZoomInOutlined,
   ZoomOutOutlined,
+  RulerOutlined,
 } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
+import 'leaflet.polylinemeasure'
 
 const POSITION_CLASSES = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -45,6 +47,7 @@ export const HomeControl: React.FC = () => {
     useAppSelector((state) => state.fColl)
   )
   const { viewportFrozen } = useAppContext()
+  const [measureActive, setMeasureActive] = useState(false)
 
   const doHome = useCallback(() => {
     if (map && currentBounds) {
@@ -63,6 +66,29 @@ export const HomeControl: React.FC = () => {
       map.zoomOut()
     }
   }, [map])
+
+  const toggleMeasure = useCallback(() => {
+    if (map) {
+      if (measureActive) {
+        map.removeControl(map.pm)
+      } else {
+        map.pm.addControls({
+          position: 'topleft',
+          drawMarker: false,
+          drawPolygon: false,
+          drawPolyline: true,
+          drawCircle: false,
+          drawCircleMarker: false,
+          drawRectangle: false,
+          cutPolygon: false,
+          editMode: false,
+          dragMode: false,
+          removalMode: false,
+        })
+      }
+      setMeasureActive(!measureActive)
+    }
+  }, [map, measureActive])
 
   const position = 'topleft'
   const positionClass =
@@ -88,6 +114,11 @@ export const HomeControl: React.FC = () => {
           tooltip='Zoom out'
           onClick={zoomOut}
           icon={<ZoomOutOutlined />}
+        />
+        <TipButton
+          tooltip='Measure distance'
+          onClick={toggleMeasure}
+          icon={<RulerOutlined />}
         />
       </div>
     </div>
