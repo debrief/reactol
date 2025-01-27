@@ -106,6 +106,7 @@ export const HomeControl: React.FC = () => {
     }
   }, [map])
 
+
   useEffect(() => {
     if (map && measure.current) {
       if (viewportFrozen) {
