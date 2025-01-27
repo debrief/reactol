@@ -1290,9 +1290,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -4336,7 +4336,14 @@
   dependencies:
     "@types/node" "*"
 
-"@types/leaflet@^1.9.14":
+"@types/leaflet.polylinemeasure@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/leaflet.polylinemeasure/-/leaflet.polylinemeasure-1.0.4.tgz#479a17dc5b03a2bcfd7e983d5ade2cc9674a48fb"
+  integrity sha512-o8lWax8B44zYFhijFEqfjnIIh4eaYKPA4n50QlSk0pT1MEZYDVW0htz/7oAbTq129Kci6Q8DcufXx1uf+qIx3g==
+  dependencies:
+    "@types/leaflet" "*"
+
+"@types/leaflet@*", "@types/leaflet@^1.9.14":
   version "1.9.16"
   resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.9.16.tgz#3e3abc103e106523cde01625057e2294f332ec3b"
   integrity sha512-wzZoyySUxkgMZ0ihJ7IaUIblG8Rdc8AbbZKLneyn+QjYsj5q1QU7TEKYqwTr10BGSzY5LI7tJk9Ifo+mEjdFRw==
@@ -8120,6 +8127,11 @@ kleur@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
+
+leaflet.polylinemeasure@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/leaflet.polylinemeasure/-/leaflet.polylinemeasure-3.0.0.tgz#7d86322cf89b6832da1c8ec1e548ebd647c3e81d"
+  integrity sha512-PTTHz7NBJiWmNFetH8hb3leQNM15qoM9Xe7VDKh1Hyat/M+USqFYeoa0A0LAecsqsjUqA63Rzux4SivoyrSFkA==
 
 leaflet@^1.9.4:
   version "1.9.4"

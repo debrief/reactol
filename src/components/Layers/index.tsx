@@ -226,7 +226,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           }
         })
       }) 
-      console.table(checked)
       setCheckedKeys(checked)
     }
   }, [features, handleAdd])
@@ -257,7 +256,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       type: 'fColl/featureVisibilities',
       payload: { ids: removeGroupBits },
     }
-    console.table(action.payload)
     // check if the payload selection is different from the current selection
     dispatch(action)
   }
