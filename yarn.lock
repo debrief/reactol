@@ -1290,9 +1290,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -8121,6 +8121,15 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+leaflet.nauticscale@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/leaflet.nauticscale/-/leaflet.nauticscale-1.1.0.tgz#4ce92f46805c756eb31064d237401de8baf96839"
+  integrity sha512-kJqOVuY0bk3CjSWb1CUYsjXiM+W1K0TrlJmMjl/wVubKK2y0PZ+XxkIyD6cxVsKQGlJvLGMvrSqaYdj5LW1O1Q==
+
+"leaflet.nauticscale@github:wattnpapa/leaflet.nauticscale":
+  version "1.1.0"
+  resolved "https://codeload.github.com/wattnpapa/leaflet.nauticscale/tar.gz/2636f6725c6276192d4af562a59fd432530871f9"
+
 leaflet@^1.9.4:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
@@ -9771,6 +9780,13 @@ react-leaflet-custom-control@^1.4.0:
   integrity sha512-E5sM7avHdFApzXTW7GvdPbhgBonu3j0lr1/DzZWz9OMzGbnSTkYPhE0VIYHAyOBvUoZU/TWjtkyVPS68GyeDiw==
   dependencies:
     react-leaflet "^4.2.1"
+
+react-leaflet-nauticsale@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-leaflet-nauticsale/-/react-leaflet-nauticsale-1.1.0.tgz#ddf2a598a9895fb8b6cf250be5ae5179c9b09a1b"
+  integrity sha512-Qjf9n6YkwKQpY2R+JqmZNfrkwVE4DjuIrL2KbSElB7haXvE3cE2YLA0fDtUcdGJdE4zJJiXth2IpoHSkrTALHg==
+  dependencies:
+    leaflet.nauticscale "github:wattnpapa/leaflet.nauticscale"
 
 react-leaflet@^4.2.1:
   version "4.2.1"

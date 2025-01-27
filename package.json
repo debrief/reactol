@@ -33,11 +33,13 @@
     "dom-to-image": "^2.6.0",
     "electron-window-state": "^5.0.3",
     "leaflet": "^1.9.4",
+    "leaflet.nauticscale": "^1.1.0",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
     "react-leaflet-custom-control": "^1.4.0",
+    "react-leaflet-nauticsale": "^1.1.0",
     "react-modal-resizable-draggable": "^0.1.6",
     "react-redux": "^9.2.0",
     "victory": "^37.3.2"
