@@ -151,14 +151,17 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setSelection([])
   }
 
-  // const selectionWithGroups = useMemo(() => {
-  //   const groups = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE) as unknown as Feature<Geometry, GroupProps>[]
-  //   const groupsContainingSelected = groups.filter((group) => group.properties.units.some((unit : string | number) => selection.includes(unit as string)))
-  //   const groupIds = groupsContainingSelected.map((group) => group.id as string)
-  //   const fullList = selection.concat(groupIds)
-  //   console.log('groups', groupIds, fullList)
-  //   return fullList
-  // }, [selection, features])
+  const selectionWithGroups = useMemo(() => {
+    const fullList = [...selection]
+    const groups = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE) as unknown as Feature<Geometry, GroupProps>[]
+    selection.forEach((id : string) => {
+      // find the groups that include this feature id
+      const groupsContainingFeature = groups.filter((group) => group.properties.units.some((unit : string | number) => unit === id))
+      const groupIds = groupsContainingFeature.map((group) => group.id  + ':' + id as string)
+      fullList.push(...groupIds)
+    })
+    return fullList
+  }, [selection, features])
 
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
@@ -251,10 +254,24 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
+    const newKeysArr = selectedKeys as string[]
+
+    // diff the new keys from the checked keys, to see if items have been removed
+    const removedKeys = selection.filter((key) => !newKeysArr.includes(key))
+    if (removedKeys.length !== 0) {
+      console.log('removed keys', removedKeys)
+    } else {
+      // find which keys have been added
+      const addedKeys = newKeysArr.filter((key) => !selection.includes(key))
+      console.log('added keys', addedKeys)
+    }
+
+    console.log('onSelect', selectedKeys)
     const justNodes = justLeaves(selectedKeys)
     const cleanedIds = justNodes.map(cleanGroup)
     // de-dupe the cleaned ids
     const dedupedIds = [...new Set(cleanedIds)]
+    console.log('onSelect', selectedKeys, dedupedIds)
 
     // check if the payload selection is different from the current selection
     if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
@@ -434,7 +451,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           onCheck={onCheck}
           showIcon={true}
           checkedKeys={checkedKeys}
-          selectedKeys={selection || []}
+          selectedKeys={selectionWithGroups || []}
           expandedKeys={expandedKeys}
           onExpand={(keys) => {
             setExpandedKeys(keys as string[])
