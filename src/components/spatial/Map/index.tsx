@@ -1,5 +1,6 @@
 import { Feature, Point, Polygon } from 'geojson'
-import { MapContainer, ScaleControl, useMap } from 'react-leaflet'
+import { MapContainer, useMap } from 'react-leaflet'
+import ScaleNautic from 'react-leaflet-nauticsale'
 import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
@@ -98,7 +99,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
           visibleFeatures
         }
         <MouseCoordinates/>
-        <ScaleControl imperial={true} metric={false} position={'bottomleft'}/>
+        <ScaleNautic nautic={true} metric={false} imperial={false} />
         <Graticule/>
         <HomeControl/>
       </MapContainer>
