@@ -70,7 +70,7 @@ html, body, #root, .App, #map {
 .time-period {
   font-size: 2em;
   margin-left: 1.6em;
-  margin-top: 1.5em;
+  margin-top: 0.7em;
   text-shadow: 1px 1px 2px white;
   background-color: rgba(255, 255, 255, 0.5) 
 }
