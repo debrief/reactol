@@ -128,46 +128,45 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
           </Tooltip>
         </CircleMarker>
       )}
+      {isSelected &&trackCoords
+        .filter((item) => item.symbolVisible)
+        .map((item: CoordInstance, index: number) => (
+          <CircleMarker
+            fillColor={'#fff'}
+            fill={true}
+            color={'#fff'}
+            fillOpacity={1}
+            weight={4}
+            key={'-shiny-' + itemId + '-' + index}
+            center={item.pos}
+            radius={item.symbolVisible ? circleRadius : 0} />
+        ))}
       {trackCoords
         .filter((item) => item.labelVisible || item.symbolVisible)
         .map((item: CoordInstance, index: number) => (
-          <>
-            { isSelected &&
-              <CircleMarker
-                fillColor={'#fff'}
-                fill={true}
-                color={'#fff'}
-                fillOpacity={1}
-                weight={4}
-                key={'-shiny-' + itemId + '-' + index}
-                center={item.pos}
-                radius={item.symbolVisible ? circleRadius : 0} />
-            }
-            <CircleMarker
-              fillColor={colorFor(feature)}
-              fill={isSelected}
-              color={colorFor(feature)}
-              fillOpacity={1}
-              weight={lineWeight}
-              key={'-point-' + itemId + '-' + index}
-              center={item.pos}
-              radius={item.symbolVisible ? circleRadius : 0}
-              eventHandlers={eventHandlers}>
-              { item.labelVisible && (
-                <Tooltip
-                  className='time-marker'
-                  key={itemId + '-tip-' + index}
-                  offset={[0, -20]}
-                  direction='center'
-                  opacity={1}
-                  permanent
-                >
-                  {item.time}
-                </Tooltip>
-              )}
-            </CircleMarker>
-          </>
-
+          <CircleMarker
+            fillColor={colorFor(feature)}
+            fill={isSelected}
+            color={colorFor(feature)}
+            fillOpacity={1}
+            weight={lineWeight}
+            key={'-point-' + itemId + '-' + index}
+            center={item.pos}
+            radius={item.symbolVisible ? circleRadius : 0}
+            eventHandlers={eventHandlers}>
+            { item.labelVisible && (
+              <Tooltip
+                className='time-marker'
+                key={itemId + '-tip-' + index}
+                offset={[0, -20]}
+                direction='center'
+                opacity={1}
+                permanent
+              >
+                {item.time}
+              </Tooltip>
+            )}
+          </CircleMarker>
         ))}
     </>
   )
