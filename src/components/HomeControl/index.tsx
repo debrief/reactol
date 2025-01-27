@@ -62,7 +62,7 @@ export const HomeControl: React.FC = () => {
     useAppSelector((state) => state.fColl)
   )
   const { viewportFrozen } = useAppContext()
-  const measure = useRef<L.Control.PolylineMeasure | null>(null)
+  const measure = useRef<L.control.polylineMeasure | null>(null)
 
   const doHome = useCallback(() => {
     if (map && currentBounds) {
@@ -93,6 +93,7 @@ export const HomeControl: React.FC = () => {
         showUnitControl: true,
         unitControlUnits: ['kilometres', 'landmiles', 'nauticalmiles']
       }
+
       const ruler = L.control.polylineMeasure(options)
       ruler.addTo(map)
       measure.current = ruler
@@ -105,7 +106,6 @@ export const HomeControl: React.FC = () => {
       }
     }
   }, [map])
-
 
   useEffect(() => {
     if (map && measure.current) {
