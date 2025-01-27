@@ -27,6 +27,19 @@ const buttonStyle = {
   padding: '6px',
 }
 
+// TypeScript interface for polylineMeasure options.
+// note: we're extending the official types, since 
+// some fields are missing.
+interface PolylineMeasureOptions extends L.Control.PolylineMeasureOptions {
+  position: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
+  unit: 'kilometres' | 'landmiles' | 'nauticalmiles';
+  showBearings: boolean;
+  clearMeasurementsOnStop: boolean;
+  showClearControl: boolean;
+  showUnitControl: boolean;
+  unitControlUnits?: Array<'kilometres' | 'landmiles' | 'nauticalmiles'>;
+}
+
 /** helper component providing a button with a tooltip */
 const TipButton: React.FC<{
   tooltip: string
@@ -49,7 +62,7 @@ export const HomeControl: React.FC = () => {
     useAppSelector((state) => state.fColl)
   )
   const { viewportFrozen } = useAppContext()
-  const measure = useRef<L.control.polylineMeasure | null>(null)
+  const measure = useRef<L.Control.PolylineMeasure | null>(null)
 
   const doHome = useCallback(() => {
     if (map && currentBounds) {
@@ -71,25 +84,34 @@ export const HomeControl: React.FC = () => {
 
   useEffect(() => {
     if (map && !measure.current) {
-      const options = {
-        position:'bottomright', 
-        unit:'nauticalmiles', 
-        showBearings:false, 
+      const options: PolylineMeasureOptions = {
+        position: 'bottomright',
+        unit: 'nauticalmiles',
+        showBearings: false,
         clearMeasurementsOnStop: true,
         showClearControl: true,
-        showUnitControl: true}
+        showUnitControl: true,
+        unitControlUnits: ['kilometres', 'landmiles', 'nauticalmiles']
+      }
       const ruler = L.control.polylineMeasure(options)
       ruler.addTo(map)
       measure.current = ruler
+
+      return () => {
+        if (measure.current) {
+          map.removeControl(measure.current)
+          measure.current = null
+        }
+      }
     }
-  }, [map, measure])
+  }, [map])
 
   useEffect(() => {
     if (map && measure.current) {
       if (viewportFrozen) {
         map.removeControl(measure.current)
       } else {
-        measure.current.addTo (map)
+        measure.current.addTo(map)
       }
     }
   }, [map, measure, viewportFrozen])
