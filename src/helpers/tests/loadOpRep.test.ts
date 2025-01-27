@@ -18,7 +18,7 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `
     const existing: Feature<Geometry, GeoJsonProperties>[] = []
-    await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+    await loadOpRep(sampleOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-b', shortName:'bbb', symbol: 'air', color: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
     const state = store.getState() as FeatureCollection
@@ -102,7 +102,7 @@ describe('loadOpRep function', () => {
       271302Z/3731.35N–01643.81E/095/15.0/-//
     `
     const existing: Feature<Geometry, GeoJsonProperties>[] = []
-    await loadOpRep(validOpRepData, existing, store.dispatch, {year:2024, month:12, name:'name-a', shortName:'bbb', symbol: 'air', color: 
+    await loadOpRep(validOpRepData, existing, store.dispatch, {year:2023, month:11, name:'name-b', shortName:'bbb', symbol: 'air', color: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
     const state = store.getState() as FeatureCollection
