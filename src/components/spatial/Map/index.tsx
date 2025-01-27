@@ -90,6 +90,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     <>
       <MapContainer
         zoomControl={false}
+        attributionControl={false}
         center={[35.505, -4.09]}
         zoom={8}
       >
