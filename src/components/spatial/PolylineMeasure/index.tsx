@@ -20,7 +20,7 @@ interface PolylineMeasureOptions extends L.Control.PolylineMeasureOptions {
   unitControlUnits?: Array<'kilometres' | 'landmiles' | 'nauticalmiles'>;
 }
 
-/** helper component that freezer map viewport */
+/** helper component that freezes map viewport */
 export const PolylineMeasure: React.FC = () => {
   const map = useMap()
   const { viewportFrozen } = useAppContext()
