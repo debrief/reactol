@@ -31,6 +31,12 @@ type FieldDataNode = {
   children: FieldDataNode[]
 }
 
+const cleanGroup = (key: Key) => {
+  const colonIndex = (key as string).indexOf(':')
+  if (colonIndex === -1) return key
+  return (key as string).substring(colonIndex + 1)
+}
+
 const findChildrenOfType = (features: Feature[], dType: string): FieldDataNode[] => {
   const items = features.filter((feature) => feature.properties?.dataType === dType)
   return items.map((item) => ({
@@ -145,6 +151,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setSelection([])
   }
 
+  // const selectionWithGroups = useMemo(() => {
+  //   const groups = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE) as unknown as Feature<Geometry, GroupProps>[]
+  //   const groupsContainingSelected = groups.filter((group) => group.properties.units.some((unit : string | number) => selection.includes(unit as string)))
+  //   const groupIds = groupsContainingSelected.map((group) => group.id as string)
+  //   const fullList = selection.concat(groupIds)
+  //   console.log('groups', groupIds, fullList)
+  //   return fullList
+  // }, [selection, features])
+
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
   const addPoint = () => {
@@ -236,28 +251,48 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    const payload = { selected: justLeaves(selectedKeys) as string[] }
+    const justNodes = justLeaves(selectedKeys)
+    const cleanedIds = justNodes.map(cleanGroup)
+    // de-dupe the cleaned ids
+    const dedupedIds = [...new Set(cleanedIds)]
+
     // check if the payload selection is different from the current selection
-    if (JSON.stringify(payload.selected) !== JSON.stringify(selection)) {
-      setSelection(payload.selected)
+    if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
+      setSelection(dedupedIds as string[])
     }
   }
 
-  const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
-    const keys = justLeaves(checkedKeys as Key[])
-    console.log('keys, checkedKeys', keys, checkedKeys)
-    // if it is the key for an item in a group, then we have to extract the feature id
-    const removeGroupBits = keys.map((key) => {
-      const colonIndex = (key as string).indexOf(':')
-      if (colonIndex === -1) return key
-      return (key as string).substring(colonIndex + 1)
-    })
-    const action = {
-      type: 'fColl/featureVisibilities',
-      payload: { ids: removeGroupBits },
+  const onCheck: TreeProps['onCheck'] = (checked: Key[] | { checked: Key[]; halfChecked: Key[]; }) => {
+    const newKeysArr = checked as string[]
+
+    // diff the new keys from the checked keys, to see if items have been removed
+    const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
+    if (removedKeys.length !== 0) {
+      const cleanChecked: Key[] = checkedKeys.map(cleanGroup)
+      const cleanRemoved = removedKeys.map(cleanGroup)
+      const cleanedGroup = cleanChecked.filter((key) => !cleanRemoved.includes(key))
+      const keys = justLeaves(cleanedGroup as Key[])
+      // if it is the key for an item in a group, then we have to extract the feature id
+      const action = {
+        type: 'fColl/featureVisibilities',
+        payload: { ids: keys },
+      }
+      // check if the payload selection is different from the current selection
+      dispatch(action)
+    } else {
+      // see if any keys have been added
+      const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
+      if (addedKeys.length !== 0) {
+        const withNew = checkedKeys.concat(addedKeys)
+        const cleanKeys = withNew.map(cleanGroup)
+        const dedupedKeys = [...new Set(cleanKeys)]
+        const action = {
+          type: 'fColl/featureVisibilities',
+          payload: { ids: dedupedKeys },
+        }
+        dispatch(action)
+      }
     }
-    // check if the payload selection is different from the current selection
-    dispatch(action)
   }
 
   const temporalFeatureSelected = useMemo(
