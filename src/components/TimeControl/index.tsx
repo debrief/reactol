@@ -11,9 +11,9 @@ import {
   FilterFilled
 } from '@ant-design/icons'
 import React, { useEffect, useMemo, useState } from 'react'
-import { format } from 'date-fns'
 import { useAppContext } from '../../state/AppContext'
 import { TimeSupport } from '../../helpers/time-support'
+import { formatInTimeZone } from 'date-fns-tz'
 
 export interface TimeProps {
   bounds: [number, number] | null
@@ -28,7 +28,7 @@ const StepOptions = [
   { value: '06h00m' },
 ]
 
-const pf = (val: number) => format(new Date(val), 'MMM ddHHmm\'Z\'')
+const pf = (val: number) => formatInTimeZone(new Date(val), 'UTC', 'MMM ddHHmm\'Z\'')
 
 const timeStr = (val: number | number[] | null, index?: number): string => {
   if (index !== undefined) {
