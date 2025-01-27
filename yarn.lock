@@ -4336,7 +4336,14 @@
   dependencies:
     "@types/node" "*"
 
-"@types/leaflet@^1.9.14":
+"@types/leaflet.polylinemeasure@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/leaflet.polylinemeasure/-/leaflet.polylinemeasure-1.0.4.tgz#479a17dc5b03a2bcfd7e983d5ade2cc9674a48fb"
+  integrity sha512-o8lWax8B44zYFhijFEqfjnIIh4eaYKPA4n50QlSk0pT1MEZYDVW0htz/7oAbTq129Kci6Q8DcufXx1uf+qIx3g==
+  dependencies:
+    "@types/leaflet" "*"
+
+"@types/leaflet@*", "@types/leaflet@^1.9.14":
   version "1.9.16"
   resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.9.16.tgz#3e3abc103e106523cde01625057e2294f332ec3b"
   integrity sha512-wzZoyySUxkgMZ0ihJ7IaUIblG8Rdc8AbbZKLneyn+QjYsj5q1QU7TEKYqwTr10BGSzY5LI7tJk9Ifo+mEjdFRw==
