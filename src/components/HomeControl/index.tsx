@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 import { useAppSelector } from '../../state/hooks'
 import { selectBounds } from '../../state/geoFeaturesSlice'
@@ -6,11 +6,13 @@ import { Button, Tooltip } from 'antd'
 import {
   ExpandOutlined,
   ZoomInOutlined,
-  ZoomOutOutlined,
-  RulerOutlined,
+  ZoomOutOutlined
 } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
 import 'leaflet.polylinemeasure'
+import L from 'leaflet'
+import './Leaflet.PolylineMeasure.css'
+import './index.css'
 
 const POSITION_CLASSES = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -47,7 +49,8 @@ export const HomeControl: React.FC = () => {
     useAppSelector((state) => state.fColl)
   )
   const { viewportFrozen } = useAppContext()
-  const [measureActive, setMeasureActive] = useState(false)
+  const measure = useRef<L.control.polylineMeasure | null>(false) 
+
 
   const doHome = useCallback(() => {
     if (map && currentBounds) {
@@ -67,28 +70,31 @@ export const HomeControl: React.FC = () => {
     }
   }, [map])
 
-  const toggleMeasure = useCallback(() => {
-    if (map) {
-      if (measureActive) {
-        map.removeControl(map.pm)
-      } else {
-        map.pm.addControls({
-          position: 'topleft',
-          drawMarker: false,
-          drawPolygon: false,
-          drawPolyline: true,
-          drawCircle: false,
-          drawCircleMarker: false,
-          drawRectangle: false,
-          cutPolygon: false,
-          editMode: false,
-          dragMode: false,
-          removalMode: false,
-        })
-      }
-      setMeasureActive(!measureActive)
+  useEffect(() => {
+    if (map && !measure.current) {
+      const options = {
+        position:'bottomright', 
+        unit:'nauticalmiles', 
+        showBearings:false, 
+        clearMeasurementsOnStop: true, 
+        showClearControl: true, 
+        showUnitControl: true}
+      const ruler = L.control.polylineMeasure(options)
+      console.log('adding measure', ruler)
+      ruler.addTo(map)
+      measure.current = ruler
     }
-  }, [map, measureActive])
+  }, [map, measure])
+
+  useEffect(() => {
+    if (map && measure.current) {
+      if (viewportFrozen) {
+        map.removeControl(measure.current)
+      } else {
+        measure.current.addTo (map)
+      }
+    }
+  }, [map, measure, viewportFrozen])
 
   const position = 'topleft'
   const positionClass =
@@ -114,11 +120,6 @@ export const HomeControl: React.FC = () => {
           tooltip='Zoom out'
           onClick={zoomOut}
           icon={<ZoomOutOutlined />}
-        />
-        <TipButton
-          tooltip='Measure distance'
-          onClick={toggleMeasure}
-          icon={<RulerOutlined />}
         />
       </div>
     </div>
