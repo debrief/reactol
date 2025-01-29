@@ -11,6 +11,7 @@ import { Point as DataPoint } from '../Point'
 import { Graticule } from '../AutoGraticule'
 import { HomeControl } from '../../HomeControl'
 import MouseCoordinates from '../MouseCoordinates'
+import { PolylineMeasure } from '../PolylineMeasure'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -102,6 +103,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         <MouseCoordinates/>
         <ScaleNautic nautic={true} metric={false} imperial={false} />
         <Graticule/>
+        <PolylineMeasure/>
         <HomeControl/>
       </MapContainer>
 

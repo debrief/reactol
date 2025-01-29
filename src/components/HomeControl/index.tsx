@@ -9,10 +9,6 @@ import {
   ZoomOutOutlined
 } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
-import 'leaflet.polylinemeasure'
-import L from 'leaflet'
-import './Leaflet.PolylineMeasure.css'
-import './index.css'
 
 const POSITION_CLASSES = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -25,19 +21,6 @@ const buttonStyle = {
   display: 'block',
   margin: '4px',
   padding: '6px',
-}
-
-// TypeScript interface for polylineMeasure options.
-// note: we're extending the official types, since 
-// some fields are missing.
-interface PolylineMeasureOptions extends L.Control.PolylineMeasureOptions {
-  position: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
-  unit: 'kilometres' | 'landmiles' | 'nauticalmiles';
-  showBearings: boolean;
-  clearMeasurementsOnStop: boolean;
-  showClearControl: boolean;
-  showUnitControl: boolean;
-  unitControlUnits?: Array<'kilometres' | 'landmiles' | 'nauticalmiles'>;
 }
 
 /** helper component providing a button with a tooltip */
@@ -83,30 +66,6 @@ export const HomeControl: React.FC = () => {
   }, [map])
 
   useEffect(() => {
-    if (map && !measure.current) {
-      const options: PolylineMeasureOptions = {
-        position: 'bottomright',
-        unit: 'nauticalmiles',
-        showBearings: false,
-        clearMeasurementsOnStop: true,
-        showClearControl: true,
-        showUnitControl: true,
-        unitControlUnits: ['kilometres', 'landmiles', 'nauticalmiles']
-      }
-      const ruler = L.control.polylineMeasure(options)
-      ruler.addTo(map)
-      measure.current = ruler
-
-      return () => {
-        if (measure.current) {
-          map.removeControl(measure.current)
-          measure.current = null
-        }
-      }
-    }
-  }, [map])
-
-  useEffect(() => {
     if (map && measure.current) {
       if (viewportFrozen) {
         map.removeControl(measure.current)
@@ -121,10 +80,10 @@ export const HomeControl: React.FC = () => {
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright
 
   return (
-    <div style={{ paddingTop: '60px' }} className={positionClass}>
+    <div style={{ paddingTop: '15px' }} className={positionClass}>
       <div
         className='leaflet-control leaflet-bar'
-        style={{ display: viewportFrozen ? 'none' : 'block' }}
+        style={{ display: viewportFrozen ? 'none' : 'block', border: '0 solid black' }}
       >
         <TipButton
           tooltip='Zoom in'
