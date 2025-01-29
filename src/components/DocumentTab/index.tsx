@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import App from '../../App'
 
 interface DocumentTab {
   id: number
@@ -10,11 +11,13 @@ interface DocumentTab {
 const Documents = () => {
   const [tabs, setTabs] = useState<DocumentTab[]>([])
   const [activeTab, setActiveTab] = useState<number | null>(null)
+  const [tabApps, setTabApps] = useState<React.ReactElement[]>([])
 
   const createNewDocument = () => {
     const newTab: DocumentTab = { id: Date.now(), name: `Untitled ${tabs.length + 1}`, content: '{}', path: null }
     setTabs([...tabs, newTab])
     setActiveTab(newTab.id)
+    setTabApps([...tabApps, <App key={newTab.id} />])
   }
 
   const openExistingDocument = async () => {
@@ -61,14 +64,7 @@ const Documents = () => {
         ))}
       </div>
 
-      {activeTab !== null && (
-        <textarea
-          value={tabs.find(t => t.id === activeTab)?.content || ''}
-          onChange={(e) => {
-            setTabs(tabs.map(t => (t.id === activeTab ? { ...t, content: e.target.value } : t)))
-          }}
-        />
-      )}
+      {activeTab !== null && tabApps[activeTab] }
     </div>
   )
 }
