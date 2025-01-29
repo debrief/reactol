@@ -90,15 +90,17 @@ const Documents = () => {
           <Row>
             <Col span={24}>&nbsp;</Col>
           </Row>
-          <Row>
+          <Row align='middle' justify='start'>
             <Col span={12}>
-              <Image width={200} src='images/albatross-flying.png' />
+              <Image alt='Application logo - albatross flying' preview={false} width={200} src='images/albatross-flying.png' />
             </Col>
-            <Col span={12}>
+            <Col  span={12}>
               <Row>
+                <Col span={8}></Col>
                 <Col span={8}><Button onClick={createNewDocument} size='large' block type='primary'>New</Button></Col>
               </Row>
               <Row style={{paddingTop: '25px'}}>
+                <Col span={8}></Col>
                 <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
               </Row>
             </Col>
