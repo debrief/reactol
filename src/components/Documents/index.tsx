@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import App from '../../App'
 import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space, Input } from 'antd'
 import { ExclamationCircleFilled } from '@ant-design/icons'
@@ -9,7 +9,6 @@ const Documents = () => {
   const [tabToClose, setTabToClose] = useState<string | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleOk = () => {
     setIsModalVisible(false)
@@ -98,12 +97,6 @@ const Documents = () => {
     setTabToClose(null)
   }
 
-  useEffect(() => {
-    if (isModalVisible && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [isModalVisible])
-
   const operations = <Button type='primary' onClick={() => openExistingDocument()}>Open</Button>
 
   return (
@@ -124,7 +117,6 @@ const Documents = () => {
       >
         <Input
           placeholder="Enter document name"
-          ref={inputRef}
           value={documentName}
           onChange={handleNameChange}
         />
