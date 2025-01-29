@@ -22,6 +22,7 @@ const Documents = () => {
   }
 
   const handleCancel = () => {
+    setDocumentName('')
     setIsModalVisible(false)
   }
 
