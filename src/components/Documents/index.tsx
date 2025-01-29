@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import App from '../../App'
-import { Dropdown, Space, Tabs, TabsProps } from 'antd'
-import {
-  DownOutlined
-} from '@ant-design/icons'
+import { Button, Col, Dropdown, Image, Row, Space, Tabs, TabsProps, Typography } from 'antd'
+import { DownOutlined } from '@ant-design/icons'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
@@ -11,7 +9,11 @@ const Documents = () => {
 
   const createNewDocument = () => {
     console.log('create new document')
-    const newTab = { key: '' + Date.now(), label: `Untitled ${tabs.length + 1}`, children: <App/> }
+    const newTab = {
+      key: '' + Date.now(),
+      label: `Untitled ${tabs.length + 1}`,
+      children: <App />,
+    }
     setTabs([...tabs, newTab])
     setActiveTab(newTab.key)
   }
@@ -21,7 +23,11 @@ const Documents = () => {
     if (file) {
       // TODO give `App` a prop repsesenting the file content. It will
       // verify this is GeoJSON, and load it into the store.
-      const newTab = { key: '' + Date.now(), label: file.filePath.split('/').pop()!, children: <App/> }
+      const newTab = {
+        key: '' + Date.now(),
+        label: file.filePath.split('/').pop()!,
+        children: <App />,
+      }
       setTabs([...tabs, newTab])
       setActiveTab(newTab.key)
     }
@@ -52,29 +58,30 @@ const Documents = () => {
     setActiveTab(key)
   }
 
-  function onEdit(e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
+  function onEdit(
+    e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
     console.log('edit', e, action)
     switch (action) {
     case 'add':
       createNewDocument()
       break
-    case 'remove':     
-      setTabs(tabs.filter(t => t.key !== e))
+    case 'remove':
+      setTabs(tabs.filter((t) => t.key !== e))
       break
-    }    
+    }
   }
 
   const dropdownItems = [
     {
       key: '1',
       label: 'New',
-      onClick: () => createNewDocument()
+      onClick: () => createNewDocument(),
     },
     {
       key: '2',
       label: 'Open ...',
-      onClick: () => openExistingDocument()
-    }
+      onClick: () => openExistingDocument(),
+    },
   ]
 
   const operations = (
@@ -89,13 +96,38 @@ const Documents = () => {
 
   return (
     <div>
-      <Tabs tabBarExtraContent={operations} 
+      <Tabs
+        tabBarExtraContent={operations}
         type='editable-card'
         hideAdd={true}
         activeKey={activeTab}
-        onChange={onTabChange} items={tabs} 
-        onEdit={onEdit}/>
-        
+        onChange={onTabChange}
+        items={tabs}
+        onEdit={onEdit}
+      />
+      {tabs.length === 0 && (
+        <div style={{ paddingTop: '100px' }}>
+          <Row>
+            <Col span={24}><Typography.Title>Welcome to Albatross</Typography.Title></Col>
+          </Row>
+          <Row>
+            <Col span={24}>&nbsp;</Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <Image width={200} src='images/albatross-flying.png' />
+            </Col>
+            <Col span={12}>
+              <Row>
+                <Col span={8}><Button onClick={createNewDocument} size='large' block type='primary'>New</Button></Col>
+              </Row>
+              <Row style={{paddingTop: '25px'}}>
+                <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
+              </Row>
+            </Col>
+          </Row>
+        </div>
+      )}
     </div>
   )
 }
