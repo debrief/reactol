@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import App from '../../App'
-import { Button, Tabs, TabsProps } from 'antd'
+import { Dropdown, Space, Tabs, TabsProps } from 'antd'
+import {
+  DownOutlined
+} from '@ant-design/icons'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
@@ -24,7 +27,7 @@ const Documents = () => {
     }
   }
 
-  //const saveDocument = async () => {
+  // const saveDocument = async () => {
   // if (activeTab !== null) {
   //   const doc = tabs.find(t => t.id === activeTab)
   //   if (doc) {
@@ -43,13 +46,11 @@ const Documents = () => {
   //     setTabs(tabs.map(t => (t.id === activeTab ? { ...t, path: filePath, name: filePath.split('/').pop()! } : t)))
   //   }
   // }
-  //}
+  // }
 
   const onTabChange = (key: string) => {
     setActiveTab(key)
   }
-  
-  const operations = <Button onClick={openExistingDocument}>Open</Button>
 
   function onEdit(e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
     console.log('edit', e, action)
@@ -63,10 +64,34 @@ const Documents = () => {
     }    
   }
 
+  const dropdownItems = [
+    {
+      key: '1',
+      label: 'New',
+      onClick: () => createNewDocument()
+    },
+    {
+      key: '2',
+      label: 'Open ...',
+      onClick: () => openExistingDocument()
+    }
+  ]
+
+  const operations = (
+    <Dropdown menu={{ items: dropdownItems }}>
+      <a onClick={(e) => e.preventDefault()}>
+        <Space size='large'>
+          <DownOutlined />
+        </Space>
+      </a>
+    </Dropdown>
+  )
+
   return (
     <div>
       <Tabs tabBarExtraContent={operations} 
         type='editable-card'
+        hideAdd={true}
         activeKey={activeTab}
         onChange={onTabChange} items={tabs} 
         onEdit={onEdit}/>
