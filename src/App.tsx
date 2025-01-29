@@ -1,6 +1,7 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
 import './App.css'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Documents from './components/DocumentTab'
 import Layers from './components/Layers'
 import Properties from './components/Properties'
 import TimeControl from './components/TimeControl'
@@ -208,6 +209,7 @@ function App() {
 
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+      {window?.electron && <Documents /> } 
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
       <Modal title="Loading Error" open={!!error} onCancel={() => setError(null)} onOk={() => setError(null)}>
         <Alert type="error" description={error} />
