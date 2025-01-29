@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import App from '../../App'
-import { Button, Col, Image, Row, Tabs, TabsProps, Typography } from 'antd'
+import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space } from 'antd'
+import { ExclamationCircleFilled } from '@ant-design/icons'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
+  const [tabToClose, setTabToClose] = useState<string | null>(null)
 
   const createNewDocument = () => {
     console.log('create new document')
@@ -65,9 +67,22 @@ const Documents = () => {
       createNewDocument()
       break
     case 'remove':
-      setTabs(tabs.filter((t) => t.key !== e))
+      if (typeof e === 'string') {
+        setTabToClose(e)
+      }
       break
     }
+  }
+
+  const handleCloseConfirm = () => {
+    if (tabToClose) {
+      setTabs(tabs.filter((t) => t.key !== tabToClose))
+      setTabToClose(null)
+    }
+  }
+
+  const handleCloseCancel = () => {
+    setTabToClose(null)
   }
 
   const operations = <Button type='primary' onClick={() => openExistingDocument()}>Open</Button>
@@ -82,6 +97,19 @@ const Documents = () => {
         items={tabs}
         onEdit={onEdit}
       />
+      <Modal
+        title="Close Tab"
+        open={tabToClose !== null}
+        onOk={handleCloseConfirm}
+        onCancel={handleCloseCancel}
+        okText="Close"
+        cancelText="Cancel"
+      >
+        <Space>
+          <ExclamationCircleFilled style={{ color: '#faad14', fontSize: '22px' }} />
+          <p>Are you sure you want to close this tab?</p>
+        </Space>
+      </Modal>
       {tabs.length === 0 && (
         <div style={{ paddingTop: '100px' }}>
           <Row>
