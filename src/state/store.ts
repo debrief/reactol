@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import featuresReducer from './geoFeaturesSlice'
 
-export const store = configureStore({
+export const createStore = () => configureStore({
   reducer: {
     fColl: featuresReducer
   }
 })
+
+export const store = createStore()
 
 // Infer the type of `store`
 export type AppStore = typeof store
