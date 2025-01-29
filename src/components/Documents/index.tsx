@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import App from '../../App'
-import { Button, Col, Dropdown, Image, Row, Space, Tabs, TabsProps, Typography } from 'antd'
-import { DownOutlined } from '@ant-design/icons'
+import { Button, Col, Image, Row, Tabs, TabsProps, Typography } from 'antd'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
@@ -71,35 +70,13 @@ const Documents = () => {
     }
   }
 
-  const dropdownItems = [
-    {
-      key: '1',
-      label: 'New',
-      onClick: () => createNewDocument(),
-    },
-    {
-      key: '2',
-      label: 'Open ...',
-      onClick: () => openExistingDocument(),
-    },
-  ]
-
-  const operations = (
-    <Dropdown menu={{ items: dropdownItems }}>
-      <a onClick={(e) => e.preventDefault()}>
-        <Space size='large'>
-          <DownOutlined />
-        </Space>
-      </a>
-    </Dropdown>
-  )
+  const operations = <Button type='primary' onClick={() => openExistingDocument()}>Open</Button>
 
   return (
     <div>
       <Tabs
         tabBarExtraContent={operations}
         type='editable-card'
-        hideAdd={true}
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
