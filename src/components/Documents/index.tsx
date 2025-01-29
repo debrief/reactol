@@ -10,43 +10,23 @@ const Documents = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
 
-  const createNewDocument = () => {
-
-    const handleOk = () => {
-      setIsModalVisible(false)
-      const newTab = {
-        key: '' + Date.now(),
-        label: documentName,
-        children: <App />,
-      }
-      setTabs([...tabs, newTab])
-      setActiveTab(newTab.key)
+  const handleOk = () => {
+    setIsModalVisible(false)
+    const newTab = {
+      key: '' + Date.now(),
+      label: documentName,
+      children: <App />,
     }
+    setTabs([...tabs, newTab])
+    setActiveTab(newTab.key)
+  }
 
-    const handleCancel = () => {
-      setIsModalVisible(false)
-    }
+  const handleCancel = () => {
+    setIsModalVisible(false)
+  }
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setDocumentName(e.target.value)
-    }
-
-    setIsModalVisible(true)
-
-    return (
-      <Modal
-        title="Create New Document"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Input
-          placeholder="Enter document name"
-          value={documentName}
-          onChange={handleNameChange}
-        />
-      </Modal>
-    )
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDocumentName(e.target.value)
   }
 
   const openExistingDocument = async () => {
@@ -94,7 +74,7 @@ const Documents = () => {
     console.log('edit', e, action)
     switch (action) {
     case 'add':
-      createNewDocument()
+      setIsModalVisible(true)
       break
     case 'remove':
       if (typeof e === 'string') {
@@ -128,6 +108,18 @@ const Documents = () => {
         onEdit={onEdit}
       />
       <Modal
+        title="Create New Document"
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Input
+          placeholder="Enter document name"
+          value={documentName}
+          onChange={handleNameChange}
+        />
+      </Modal>
+      <Modal
         title="Close Tab"
         open={tabToClose !== null}
         onOk={handleCloseConfirm}
@@ -155,7 +147,7 @@ const Documents = () => {
             <Col span={12}>
               <Row>
                 <Col span={8}></Col>
-                <Col span={8}><Button onClick={createNewDocument} size='large' block type='primary'>New</Button></Col>
+                <Col span={8}><Button onClick={() => setIsModalVisible(true)} size='large' block type='primary'>New</Button></Col>
               </Row>
               <Row style={{ paddingTop: '25px' }}>
                 <Col span={8}></Col>
