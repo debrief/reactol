@@ -1,22 +1,52 @@
 import { useState } from 'react'
 import App from '../../App'
-import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space } from 'antd'
+import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space, Input } from 'antd'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
   const [tabToClose, setTabToClose] = useState<string | null>(null)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [documentName, setDocumentName] = useState('')
 
   const createNewDocument = () => {
-    console.log('create new document')
-    const newTab = {
-      key: '' + Date.now(),
-      label: `Untitled ${tabs.length + 1}`,
-      children: <App />,
+
+    const handleOk = () => {
+      setIsModalVisible(false)
+      const newTab = {
+        key: '' + Date.now(),
+        label: documentName,
+        children: <App />,
+      }
+      setTabs([...tabs, newTab])
+      setActiveTab(newTab.key)
     }
-    setTabs([...tabs, newTab])
-    setActiveTab(newTab.key)
+
+    const handleCancel = () => {
+      setIsModalVisible(false)
+    }
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDocumentName(e.target.value)
+    }
+
+    setIsModalVisible(true)
+
+    return (
+      <Modal
+        title="Create New Document"
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Input
+          placeholder="Enter document name"
+          value={documentName}
+          onChange={handleNameChange}
+        />
+      </Modal>
+    )
   }
 
   const openExistingDocument = async () => {
@@ -122,12 +152,12 @@ const Documents = () => {
             <Col span={12}>
               <Image alt='Application logo - albatross flying' preview={false} width={200} src='images/albatross-flying.png' />
             </Col>
-            <Col  span={12}>
+            <Col span={12}>
               <Row>
                 <Col span={8}></Col>
                 <Col span={8}><Button onClick={createNewDocument} size='large' block type='primary'>New</Button></Col>
               </Row>
-              <Row style={{paddingTop: '25px'}}>
+              <Row style={{ paddingTop: '25px' }}>
                 <Col span={8}></Col>
                 <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
               </Row>
