@@ -1,13 +1,13 @@
 import { Feature, Geometry, LineString } from 'geojson'
 import { LeafletMouseEvent } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
-import { format } from 'date-fns'
 import { useMemo } from 'react'
 import { useAppContext } from '../../../state/AppContext'
 import { CoordInstance, filterTrack } from '../../../helpers/filterTrack'
 import { TrackProps } from '../../../types'
 import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
+import { formatInTimeZone } from 'date-fns-tz'
 
 export interface TrackFeatureProps {
   feature: Feature
@@ -59,7 +59,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         return times.map((time: string, index: number) => {
           return {
             pos: [coords[index][1], coords[index][0]],
-            time: format(time, 'ddHHmm\'Z\''),
+            time: formatInTimeZone(time, 'UTC', 'ddHHmm\'Z\''),
             timeVisible: index % timeFreq === 0,
           }
         })

@@ -1,7 +1,7 @@
-import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 
 const toDTG = (date: Date): string => {
-  return format(date, 'MMM ddHHmm\'Z\'')
+  return formatInTimeZone(date, 'UTC', 'MMM ddHHmm\'Z\'')
 }
 
 export default toDTG
