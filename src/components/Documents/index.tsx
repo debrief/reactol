@@ -19,6 +19,7 @@ const Documents = () => {
     }
     setTabs([...tabs, newTab])
     setActiveTab(newTab.key)
+    setDocumentName('')
   }
 
   const handleCancel = () => {
