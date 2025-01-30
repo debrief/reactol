@@ -101,14 +101,14 @@ const Documents = () => {
 
   return (
     <div>
-      <Tabs
+      { tabs.length > 0 && <Tabs
         tabBarExtraContent={operations}
         type='editable-card'
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
         onEdit={onEdit}
-      />
+      />}
       <Modal
         title="Create New Document"
         open={isModalVisible}
@@ -119,6 +119,7 @@ const Documents = () => {
           placeholder="Enter document name"
           value={documentName}
           onChange={handleNameChange}
+          onPressEnter={handleOk}
         />
       </Modal>
       <Modal
