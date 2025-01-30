@@ -56,7 +56,7 @@ const findChildrenOfGroup = (features: Feature[]): FieldDataNode[] => {
       key: item.id as string,
       children: children.map((child): FieldDataNode => {
         return {
-          title: nameFor(child) + child.id as string,
+          title: nameFor(child),
           key: groupIdFor(item, child.id as string),
           children: []
         }
@@ -257,25 +257,27 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     const newKeysArr = selectedKeys as string[]
 
     // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = selection.filter((key) => !newKeysArr.includes(key))
-    if (removedKeys.length !== 0) {
-      console.log('removed keys', removedKeys)
+    const removedKeys = selectionWithGroups.filter((key) => !newKeysArr.includes(key))
+    if (removedKeys.length === 1) {
+      const key = removedKeys[0]
+      const childId = key.indexOf(':') ? key.substring(key.indexOf(':') + 1) : key
+      const trimmedList = selection.filter((id) => id !== childId)
+      // check if the payload selection is different from the current selection
+      if (JSON.stringify(trimmedList) !== JSON.stringify(selection)) {
+        setSelection(trimmedList as string[])
+      }
+      return      
     } else {
-      // find which keys have been added
-      const addedKeys = newKeysArr.filter((key) => !selection.includes(key))
-      console.log('added keys', addedKeys)
-    }
+      // keys have been added
+      const justNodes = justLeaves(selectedKeys)
+      const cleanedIds = justNodes.map(cleanGroup)
+      // de-dupe the cleaned ids
+      const dedupedIds = [...new Set(cleanedIds)]
 
-    console.log('onSelect', selectedKeys)
-    const justNodes = justLeaves(selectedKeys)
-    const cleanedIds = justNodes.map(cleanGroup)
-    // de-dupe the cleaned ids
-    const dedupedIds = [...new Set(cleanedIds)]
-    console.log('onSelect', selectedKeys, dedupedIds)
-
-    // check if the payload selection is different from the current selection
-    if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
-      setSelection(dedupedIds as string[])
+      // check if the payload selection is different from the current selection
+      if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
+        setSelection(dedupedIds as string[])
+      }
     }
   }
 
