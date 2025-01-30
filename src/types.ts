@@ -1,16 +1,22 @@
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE } from './constants'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE } from './constants'
+
+/** just a centre time if time provided, else start and end times */
+export type TemporalShapeProps = {time?: string, timeEnd?: string} 
 
 export type CoreDataProps = {
-  dataType: typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE | typeof GROUP_TYPE
+  dataType: typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE | typeof GROUP_TYPE | typeof BUOY_FIELD_TYPE
   name: string
   visible: boolean
   color: string
 }
 
-export type TrackProps = CoreDataProps & {
-  dataType: typeof TRACK_TYPE
+type CoreTrackPrps = CoreDataProps & {
   shortName: string
   symbol: 'air' | 'nav' | 'sub' | 'lnd' | 'unk'
+}
+
+export type TrackProps = CoreTrackPrps & {
+  dataType: typeof TRACK_TYPE
   times: string[]
   courses?: number[]
   speeds?: number[]
@@ -18,8 +24,10 @@ export type TrackProps = CoreDataProps & {
   symbolInterval?: number
 }
 
-/** just a centre time if time provided, else start and end times */
-export type TemporalShapeProps = {time?: string, timeEnd?: string} 
+export type BuoyFieldProps = CoreTrackPrps & TemporalShapeProps & {
+  dataType: typeof BUOY_FIELD_TYPE
+}
+  
 
 export type CoreShapeProps = CoreDataProps & TemporalShapeProps
 
