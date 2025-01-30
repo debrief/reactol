@@ -6,7 +6,9 @@
     "name": "Z12344",
     "shortName": "12344",
     "symbol": "nav",
-    "visible": true
+    "visible": true,
+    "time": "2024-11-14T19:10:00.000Z",
+    "timeEnd": "2024-11-15T04:10:00.000Z"
   },
   "geometry": {
     "type": "MultiPoint",

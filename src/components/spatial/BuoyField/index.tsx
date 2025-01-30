@@ -48,8 +48,6 @@ export const BuoyField: React.FC<BuoyFieldTypeProps> = ({feature, onClickHandler
     mouseout: (evt: LeafletMouseEvent) => mouseOut(evt, isSelected),
   }
 
-  console.log(locations)
-
   return (
     <>
       { isVisible && isSelected && locations &&  locations.length > 0 && locations.map((location: [number, number], index: number) => <CircleMarker key={'shiny-' + index + '-' + color} radius={8} 

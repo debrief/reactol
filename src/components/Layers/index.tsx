@@ -11,7 +11,7 @@ import {
   ShrinkOutlined,
 } from '@ant-design/icons'
 import { Feature, Geometry, Point, Polygon } from 'geojson'
-import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { useAppContext } from '../../state/AppContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
@@ -137,6 +137,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const dispatch = useAppDispatch()
 
   const NODE_TRACKS = 'node-tracks'
+  const NODE_FIELDS = 'node-fields'
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
@@ -225,6 +226,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   useEffect(() => {
     const items: TreeDataNode[] = []
     items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
     items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE, handleAdd))
     items.push(mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd))
