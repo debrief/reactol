@@ -9,12 +9,12 @@ import { useEffect } from 'react'
 import React from 'react'
 import { useAppContext } from '../../state/AppContext'
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory'
-import { format } from 'date-fns'
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { courseCalc } from '../../helpers/calculations/courseCalc'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { useAppSelector } from '../../state/hooks'
+import { formatInTimeZone } from 'date-fns-tz'
 
 const { Title, Text } = Typography
 
@@ -131,7 +131,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   const formatDate = (value: string | number): string => {
     try {
       const date = new Date(value)
-      return format(date, 'ddHHmm\'Z\'')
+      return formatInTimeZone(date, 'UTC', 'ddHHmm\'Z\'')
     } catch (e) {
       console.warn('trouble formatting this graph date', e)
       return 'n/A'

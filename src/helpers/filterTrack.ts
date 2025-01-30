@@ -1,6 +1,6 @@
 import { Position } from 'geojson'
 import { LatLngExpression } from 'leaflet'
-import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import dayjs from 'dayjs'
 
 export interface CoordInstance {
@@ -32,7 +32,8 @@ export const filterTrack = (filterApplied: boolean, start: number, end: number, 
       symbolVisible = true
       lastSymbolTime = thisTime
     }
-    return {pos:[coords[index][1], coords[index][0]],time: format(times[index], 'ddHHmm\'Z\''), labelVisible, symbolVisible}
+    const datestr = formatInTimeZone(times[index], 'UTC', 'ddHHmm\'Z\'')
+    return {pos:[coords[index][1], coords[index][0]],time: datestr, labelVisible, symbolVisible}
   })
   return res
 }
