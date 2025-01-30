@@ -1,0 +1,23 @@
+.ant-tabs-tab {
+  border: 1px solid #aaa !important;
+  background-color: rgba(0,0,0, 0.04) !important;
+}
+
+.ant-tabs-tab-active {
+  border: 2px solid #1677ff !important;
+  border-bottom: 0 !important;
+  background-color: transparent !important;
+}
+
+.ant-tabs-nav-add {
+  border: 0 !important;
+}
+
+.ant-tabs-nav-list {
+  padding-left: 10px !important;
+}
+
+.logo-image {
+  height: 30px;
+  width: 30px;
+}

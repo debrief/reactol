@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import App from '../../App'
-import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space, Input } from 'antd'
-import { ExclamationCircleFilled } from '@ant-design/icons'
+import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space, Input, Tooltip } from 'antd'
+import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
+import './index.css'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
@@ -97,7 +98,10 @@ const Documents = () => {
     setTabToClose(null)
   }
 
-  const operations = <Button type='primary' onClick={() => openExistingDocument()}>Open</Button>
+  const operations = {
+    left: <Image className='logo-image' alt='Application logo - albatross flying' preview={false} width={30} src='images/albatross-flying.png' />,
+    right: <Tooltip title='Open Existing Document' placement="bottom"><Button onClick={() => openExistingDocument()}>Open</Button></Tooltip>
+  }
 
   return (
     <div>
@@ -107,10 +111,12 @@ const Documents = () => {
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
+        addIcon={<Tooltip title='Create New Document' placement="bottom"><Button shape='circle' icon={<PlusOutlined />} /></Tooltip>}
+        removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
         onEdit={onEdit}
       />}
       <Modal
-        title="Create New Document"
+        title="Please provide a name for the document"
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -156,7 +162,16 @@ const Documents = () => {
                 <Col span={8}></Col>
                 <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
               </Row>
+              <Row style={{ paddingTop: '25px' }}>
+                <Col span={24}><Typography.Text type='secondary'>Open an existing document or create a new one</Typography.Text></Col>
+              </Row>
             </Col>
+          </Row>
+          <Row>
+            <Col span={24}>&nbsp;</Col>
+          </Row>
+          <Row>
+            <Col span={24}><Typography.Text type='secondary'>Background on the tool, who to contact for support</Typography.Text></Col>
           </Row>
         </div>
       )}
