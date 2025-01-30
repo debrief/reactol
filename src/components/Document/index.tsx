@@ -52,9 +52,9 @@ function Document() {
   const { setTime, time } = useAppContext()
 
   const storeInitialised = useRef(false) 
-
   useEffect(() => {
-    if (!storeInitialised.current) {
+
+    if (!storeInitialised.current && features.length === 0) {
       storeInitialised.current = true
       console.clear()
       // store initial data objects
@@ -103,7 +103,7 @@ function Document() {
       }
       dispatch({ type: 'fColl/featureAdded', payload: zonesPointsGroup })
     }
-  }, [dispatch])
+  }, [dispatch, features])
 
   const timePeriod = useMemo(() => {
     if (time.start && time.end) {

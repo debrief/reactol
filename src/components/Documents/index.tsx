@@ -3,6 +3,7 @@ import App from '../../App'
 import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space, Input, Tooltip } from 'antd'
 import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
 import './index.css'
+import { useAppDispatch } from '../../state/hooks'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
@@ -10,6 +11,7 @@ const Documents = () => {
   const [tabToClose, setTabToClose] = useState<string | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
+  const dispatch = useAppDispatch()
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
@@ -35,6 +37,7 @@ const Documents = () => {
   const openExistingDocument = async () => {
     const file = await window.electron.openFile()
     if (file) {
+      const features = file.content && JSON.parse(file?.content)
       // TODO give `App` a prop repsesenting the file content. It will
       // verify this is GeoJSON, and load it into the store.
       const newTab = {
@@ -42,6 +45,8 @@ const Documents = () => {
         label: file.filePath.split('/').pop()!,
         children: <App />,
       }
+
+      dispatch({ type: 'fColl/featuresUpdated', payload: features })
       setTabs([...tabs, newTab])
       setActiveTab(newTab.key)
     }
