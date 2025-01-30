@@ -8,11 +8,11 @@ const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
   const [tabToClose, setTabToClose] = useState<string | null>(null)
-  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
 
   const handleOk = () => {
-    setIsModalVisible(false)
+    setIsTabNameModalVisible(false)
     const newTab = {
       key: '' + Date.now(),
       label: documentName,
@@ -25,7 +25,7 @@ const Documents = () => {
 
   const handleCancel = () => {
     setDocumentName('')
-    setIsModalVisible(false)
+    setIsTabNameModalVisible(false)
   }
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,12 +72,11 @@ const Documents = () => {
     setActiveTab(key)
   }
 
-  function onEdit(
+  function onTabsEdit(
     e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
-    console.log('edit', e, action)
     switch (action) {
     case 'add':
-      setIsModalVisible(true)
+      setIsTabNameModalVisible(true)
       break
     case 'remove':
       if (typeof e === 'string') {
@@ -87,18 +86,18 @@ const Documents = () => {
     }
   }
 
-  const handleCloseConfirm = () => {
+  const handleCloseTabConfirm = () => {
     if (tabToClose) {
       setTabs(tabs.filter((t) => t.key !== tabToClose))
       setTabToClose(null)
     }
   }
 
-  const handleCloseCancel = () => {
+  const handleCloseTabCancel = () => {
     setTabToClose(null)
   }
 
-  const operations = {
+  const tabBarExtras = {
     left: <Image className='logo-image' alt='Application logo - albatross flying' preview={false} width={30} src='images/albatross-flying.png' />,
     right: <Tooltip title='Open Existing Document' placement="bottom"><Button onClick={() => openExistingDocument()}>Open</Button></Tooltip>
   }
@@ -106,18 +105,18 @@ const Documents = () => {
   return (
     <div>
       { tabs.length > 0 && <Tabs
-        tabBarExtraContent={operations}
+        tabBarExtraContent={tabBarExtras}
         type='editable-card'
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
         addIcon={<Tooltip title='Create New Document' placement="bottom"><Button shape='circle' icon={<PlusOutlined />} /></Tooltip>}
         removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
-        onEdit={onEdit}
+        onEdit={onTabsEdit}
       />}
       <Modal
         title="Please provide a name for the document"
-        open={isModalVisible}
+        open={isTabNameModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
       >
@@ -131,8 +130,8 @@ const Documents = () => {
       <Modal
         title="Close Tab"
         open={tabToClose !== null}
-        onOk={handleCloseConfirm}
-        onCancel={handleCloseCancel}
+        onOk={handleCloseTabConfirm}
+        onCancel={handleCloseTabCancel}
         okText="Close"
         cancelText="Cancel"
       >
@@ -142,7 +141,7 @@ const Documents = () => {
         </Space>
       </Modal>
       {tabs.length === 0 && (
-        <div style={{ paddingTop: '100px' }}>
+        <div style={{ paddingTop: '50px' }}>
           <Row>
             <Col span={24}><Typography.Title>Welcome to Albatross</Typography.Title></Col>
           </Row>
@@ -156,7 +155,7 @@ const Documents = () => {
             <Col span={12}>
               <Row>
                 <Col span={8}></Col>
-                <Col span={8}><Button onClick={() => setIsModalVisible(true)} size='large' block type='primary'>New</Button></Col>
+                <Col span={8}><Button onClick={() => setIsTabNameModalVisible(true)} size='large' block type='primary'>New</Button></Col>
               </Row>
               <Row style={{ paddingTop: '25px' }}>
                 <Col span={8}></Col>
@@ -171,7 +170,8 @@ const Documents = () => {
             <Col span={24}>&nbsp;</Col>
           </Row>
           <Row>
-            <Col span={24}><Typography.Text type='secondary'>Background on the tool, who to contact for support</Typography.Text></Col>
+            <Col span={6}>&nbsp;</Col>
+            <Col span={12}><Typography.Text type='secondary'>Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. </Typography.Text></Col>
           </Row>
         </div>
       )}
