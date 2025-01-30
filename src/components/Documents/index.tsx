@@ -153,6 +153,10 @@ const Documents = () => {
               <Image alt='Application logo - albatross flying' preview={false} width={200} src='images/albatross-flying.png' />
             </Col>
             <Col span={12}>
+              <Row style={{ paddingBottom: '12px' }}>
+                <Col span={6}>&nbsp;</Col>
+                <Col span={12}><Typography.Text type='secondary'>Open an existing document or create a new one</Typography.Text></Col>
+              </Row>
               <Row>
                 <Col span={8}></Col>
                 <Col span={8}><Button onClick={() => setIsTabNameModalVisible(true)} size='large' block type='primary'>New</Button></Col>
@@ -160,9 +164,6 @@ const Documents = () => {
               <Row style={{ paddingTop: '25px' }}>
                 <Col span={8}></Col>
                 <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
-              </Row>
-              <Row style={{ paddingTop: '25px' }}>
-                <Col span={24}><Typography.Text type='secondary'>Open an existing document or create a new one</Typography.Text></Col>
               </Row>
             </Col>
           </Row>
