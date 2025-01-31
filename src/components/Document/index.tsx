@@ -14,7 +14,6 @@ import { loadOpRep } from '../../helpers/loaders/loadOpRep'
 import toDTG from '../../helpers/toDTG'
 import Layers from '../Layers'
 import Properties from '../Properties'
-import TimeControl from '../TimeControl'
 import Map from '../spatial/Map'
 import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
@@ -24,6 +23,7 @@ import track3 from '../../data/track3'
 import zones from '../../data/zones'
 import points from '../../data/points'
 import './index.css'
+import ControlPanel from '../ControlPanel'
 
 interface FileHandler {
   blobType: string
@@ -218,7 +218,7 @@ function Document() {
             <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
               <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                 <Card title='Time Control'>
-                  <TimeControl bounds={timeBounds}/>
+                  <ControlPanel bounds={timeBounds}/>
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
