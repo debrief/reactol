@@ -5,6 +5,7 @@ import { PointProps } from '../types'
 const points: Feature<Geometry, PointProps>[] = [
   {
     type: 'Feature',
+    id: 'p-1',
     properties: {
       name: 'SONO 1-1',
       dataType: REFERENCE_POINT_TYPE,
@@ -22,6 +23,7 @@ const points: Feature<Geometry, PointProps>[] = [
   },
   {
     type: 'Feature',
+    id: 'p-2',
     properties: {
       name: 'SONO 1-2',
       dataType: REFERENCE_POINT_TYPE,
@@ -40,6 +42,7 @@ const points: Feature<Geometry, PointProps>[] = [
   },
   {
     type: 'Feature',
+    id: 'p-3',
     properties: {
       name: 'NEW SONO',
       dataType: REFERENCE_POINT_TYPE,
@@ -56,6 +59,7 @@ const points: Feature<Geometry, PointProps>[] = [
   },
   {
     type: 'Feature',
+    id: 'p-4',
     properties: {
       name: 'POINT D-1',
       dataType: REFERENCE_POINT_TYPE,

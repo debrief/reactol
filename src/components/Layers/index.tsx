@@ -10,13 +10,14 @@ import {
   CloseCircleOutlined,
   ShrinkOutlined,
 } from '@ant-design/icons'
-import { Feature, Geometry, Point, Polygon } from 'geojson'
-import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { Feature, Geometry, MultiPoint, Point, Polygon } from 'geojson'
+import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { useAppContext } from '../../state/AppContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps, GroupProps } from '../../types'
+import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps, GroupProps, BuoyFieldProps } from '../../types'
 import { PointForm } from '../PointForm'
+import { BuoyFieldForm } from '../BuoyFieldForm'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -29,6 +30,12 @@ type FieldDataNode = {
   title: string
   key: string
   children: FieldDataNode[]
+}
+
+const cleanGroup = (key: Key) => {
+  const colonIndex = (key as string).indexOf(':')
+  if (colonIndex === -1) return key
+  return (key as string).substring(colonIndex + 1)
 }
 
 const findChildrenOfType = (features: Feature[], dType: string): FieldDataNode[] => {
@@ -50,7 +57,7 @@ const findChildrenOfGroup = (features: Feature[]): FieldDataNode[] => {
       key: item.id as string,
       children: children.map((child): FieldDataNode => {
         return {
-          title: nameFor(child) + child.id as string,
+          title: nameFor(child),
           key: groupIdFor(item, child.id as string),
           children: []
         }
@@ -131,19 +138,34 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const dispatch = useAppDispatch()
 
   const NODE_TRACKS = 'node-tracks'
+  const NODE_FIELDS = 'node-fields'
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
   const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
   const [newPoint, setNewPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
+  const [newBuoyField, setNewBuoyField] = useState<Feature<MultiPoint, BuoyFieldProps> | null>(null)
   const [workingPoint, setWorkingPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
+  const [workingBuoyField, setWorkingBuoyField] = useState<Feature<Geometry, BuoyFieldProps> | null>(null)
   const [formType, setFormType] = useState<string>('')
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
   const clearSelection = () => {
     setSelection([])
   }
+
+  const selectionWithGroups = useMemo(() => {
+    const fullList = [...selection]
+    const groups = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE) as unknown as Feature<Geometry, GroupProps>[]
+    selection.forEach((id : string) => {
+      // find the groups that include this feature id
+      const groupsContainingFeature = groups.filter((group) => group.properties.units.some((unit : string | number) => unit === id))
+      const groupIds = groupsContainingFeature.map((group) => group.id  + ':' + id as string)
+      fullList.push(...groupIds)
+    })
+    return fullList
+  }, [selection, features])
 
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
@@ -185,6 +207,26 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewPoint(zone)
   }
 
+  const addBuoyField = () => {
+    const buoyField: Feature<MultiPoint, BuoyFieldProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        shortName: '',
+        symbol: 'air',
+        dataType: BUOY_FIELD_TYPE,
+        color: '#FF0000',
+        visible: true
+      },
+      geometry: {
+        type: 'MultiPoint',
+        coordinates: []
+      }
+    }
+    setWorkingBuoyField(buoyField)
+    setNewBuoyField(buoyField)
+  }
+
   const addGroup = () => {
     setMessage('Adding group')
   }
@@ -192,6 +234,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const handleAdd = useCallback( (e: React.MouseEvent, key: string, title: string) => {
     if (key === NODE_TRACKS) {
       setcreateTrackDialogVisible(true)
+    } else if (key === NODE_FIELDS) {
+      addBuoyField()
     } else if (key === 'node-points') {
       addPoint()
     } else if (key === 'node-zones') {
@@ -207,6 +251,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   useEffect(() => {
     const items: TreeDataNode[] = []
     items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
     items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE, handleAdd))
     items.push(mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd))
@@ -236,28 +281,64 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
-    const payload = { selected: justLeaves(selectedKeys) as string[] }
-    // check if the payload selection is different from the current selection
-    if (JSON.stringify(payload.selected) !== JSON.stringify(selection)) {
-      setSelection(payload.selected)
+    const newKeysArr = selectedKeys as string[]
+
+    // diff the new keys from the checked keys, to see if items have been removed
+    const removedKeys = selectionWithGroups.filter((key) => !newKeysArr.includes(key))
+    if (removedKeys.length === 1) {
+      const key = removedKeys[0]
+      const childId = key.indexOf(':') ? key.substring(key.indexOf(':') + 1) : key
+      const trimmedList = selection.filter((id) => id !== childId)
+      // check if the payload selection is different from the current selection
+      if (JSON.stringify(trimmedList) !== JSON.stringify(selection)) {
+        setSelection(trimmedList as string[])
+      }
+      return      
+    } else {
+      // keys have been added
+      const justNodes = justLeaves(selectedKeys)
+      const cleanedIds = justNodes.map(cleanGroup)
+      // de-dupe the cleaned ids
+      const dedupedIds = [...new Set(cleanedIds)]
+
+      // check if the payload selection is different from the current selection
+      if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
+        setSelection(dedupedIds as string[])
+      }
     }
   }
 
-  const onCheck: TreeProps['onCheck'] = (checkedKeys) => {
-    const keys = justLeaves(checkedKeys as Key[])
-    console.log('keys, checkedKeys', keys, checkedKeys)
-    // if it is the key for an item in a group, then we have to extract the feature id
-    const removeGroupBits = keys.map((key) => {
-      const colonIndex = (key as string).indexOf(':')
-      if (colonIndex === -1) return key
-      return (key as string).substring(colonIndex + 1)
-    })
-    const action = {
-      type: 'fColl/featureVisibilities',
-      payload: { ids: removeGroupBits },
+  const onCheck: TreeProps['onCheck'] = (checked: Key[] | { checked: Key[]; halfChecked: Key[]; }) => {
+    const newKeysArr = checked as string[]
+
+    // diff the new keys from the checked keys, to see if items have been removed
+    const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
+    if (removedKeys.length !== 0) {
+      const cleanChecked: Key[] = checkedKeys.map(cleanGroup)
+      const cleanRemoved = removedKeys.map(cleanGroup)
+      const cleanedGroup = cleanChecked.filter((key) => !cleanRemoved.includes(key))
+      const keys = justLeaves(cleanedGroup as Key[])
+      // if it is the key for an item in a group, then we have to extract the feature id
+      const action = {
+        type: 'fColl/featureVisibilities',
+        payload: { ids: keys },
+      }
+      // check if the payload selection is different from the current selection
+      dispatch(action)
+    } else {
+      // see if any keys have been added
+      const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
+      if (addedKeys.length !== 0) {
+        const withNew = checkedKeys.concat(addedKeys)
+        const cleanKeys = withNew.map(cleanGroup)
+        const dedupedKeys = [...new Set(cleanKeys)]
+        const action = {
+          type: 'fColl/featureVisibilities',
+          payload: { ids: dedupedKeys },
+        }
+        dispatch(action)
+      }
     }
-    // check if the payload selection is different from the current selection
-    dispatch(action)
   }
 
   const temporalFeatureSelected = useMemo(
@@ -326,6 +407,13 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewPoint(null)
     setWorkingPoint(null)
   }
+
+  const handleBuoyFieldSave = () => {
+    dispatch({ type: 'fColl/featureAdded', payload: workingBuoyField })
+    setNewBuoyField(null)
+    setWorkingBuoyField(null)
+  }
+
 
   const handleDialogCancel = () => {
     setcreateTrackDialogVisible(false)
@@ -399,7 +487,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           onCheck={onCheck}
           showIcon={true}
           checkedKeys={checkedKeys}
-          selectedKeys={selection || []}
+          selectedKeys={selectionWithGroups || []}
           expandedKeys={expandedKeys}
           onExpand={(keys) => {
             setExpandedKeys(keys as string[])
@@ -424,6 +512,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         <PointForm
           shape={newPoint}
           onChange={(point) => setWorkingPoint(point)}
+        />
+      </Modal>}
+      { newBuoyField && <Modal
+        title={'Create new buoy field'}
+        open={true}
+        onCancel={() => setNewBuoyField(null)}
+        onOk={handleBuoyFieldSave}>
+        <BuoyFieldForm
+          field={newBuoyField}
+          onChange={(point) => setWorkingBuoyField(point)}
         />
       </Modal>}
     </>

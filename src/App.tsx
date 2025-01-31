@@ -9,7 +9,6 @@ export type AppProps = {
   content?: string
 }
 
-
 function App({ content }: AppProps) {
   const [store] = useState(createStore(content))
   return (

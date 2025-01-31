@@ -4,6 +4,7 @@ import { ZoneProps } from '../types'
 
 const zones: Feature<Geometry, ZoneProps>[] = [
   {
+    id: 'z-1',
     type: 'Feature',
     properties: {
       name: 'SAP 1-1',
@@ -42,6 +43,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     }
   },
   {
+    id: 'z-2',
     type: 'Feature',
     properties: {
       name: 'SAP 1-2',
@@ -79,6 +81,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     }
   },
   {
+    id: 'z-3',
     type: 'Feature',
     properties: {
       name: 'SAP 2',
@@ -115,6 +118,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     }
   },
   {
+    id: 'z-4',
     type: 'Feature',
     properties: {
       name: 'SIR 1',
@@ -151,6 +155,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     }
   },
   {
+    id: 'z-5',
     type: 'Feature',
     properties: {
       name: 'TRA 1',

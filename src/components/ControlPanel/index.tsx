@@ -14,6 +14,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useAppContext } from '../../state/AppContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
+import { SampleDataLoader } from '../SampleDataLoader'
 
 export interface TimeProps {
   bounds: [number, number] | null
@@ -46,7 +47,7 @@ interface TimeButtonProps {
   large: boolean
 }
 
-const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
+const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useAppContext()
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
@@ -184,6 +185,7 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
+          <SampleDataLoader />
         </Col>
         <Col span={4}>
           <Tooltip title={copyTooltip}>
@@ -263,4 +265,4 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
   )
 }
 
-export default TimeControl
+export default ControlPanel
