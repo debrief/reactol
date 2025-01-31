@@ -84,7 +84,6 @@ const Documents = () => {
         path: file.filePath
       }
 
-      // dispatch({ type: 'fColl/featuresUpdated', payload: features })
       setTabs([...tabs, newTab])
       setActiveTab(newTab.key)
     }
