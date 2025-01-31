@@ -497,7 +497,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       )}
       {createTrackDialogVisible && (
         <LoadTrackModel
-          open={createTrackDialogVisible}
+          visible={createTrackDialogVisible}
           cancel={handleDialogCancel}
           newTrack={setLoadTrackResults}
           addToTrack={() => {}}
