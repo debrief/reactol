@@ -8,6 +8,7 @@ import track3 from '../../data/track3'
 import zones from '../../data/zones'
 import points from '../../data/points'
 import { GROUP_TYPE } from '../../constants'
+import field from '../../data/buoyfield1'
 
 type SampleItem = {
   name: string
@@ -19,6 +20,7 @@ const sampleItems: SampleItem[] = [
   { name: 'Track 1', data: [track1] },
   { name: 'Track 2', data: [track2] },
   { name: 'Track 3', data: [track3] },
+  { name: 'Buoy field', data: [field] },
   { name: 'Zones', data: zones },
   { name: 'Points', data: points },
 
@@ -37,7 +39,7 @@ export const SampleDataLoader: React.FC = () => {
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     if (e.key === 'Bulk selection') {
-      let data: Feature[] = [track1, track2, track3]
+      let data: Feature[] = [track1, track2, track3, field]
       data = data.concat(zones)
       data = data.concat(points)
 

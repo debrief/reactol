@@ -27,7 +27,7 @@ app.on('window-all-closed', () => {
 })
 
 ipcMain.handle('open-file', async () => {
-  const { filePaths } = await dialog.showOpenDialog({ filters: [{ name: 'GeoJSON', extensions: ['geojson', 'json'] }] })
+  const { filePaths } = await dialog.showOpenDialog({ title: 'Open existing document',  filters: [{ name: 'GeoJSON', extensions: ['geojson', 'json'] }] })
 
   if (filePaths.length > 0) {
     const content = fs.readFileSync(filePaths[0], 'utf-8')
@@ -52,7 +52,7 @@ ipcMain.handle('save-file', async (_, { filePath, content }) => {
 })
 
 ipcMain.handle('save-file-dialog', async () => {
-  const { filePath } = await dialog.showSaveDialog({
+  const { filePath } = await dialog.showSaveDialog({ title: 'Create new document',
     filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }]
   })
   return filePath ? { filePath } : null
