@@ -8,16 +8,19 @@ import {
   FilterOutlined,
   LockFilled,
   UnlockOutlined,
-  FilterFilled
+  FilterFilled,
+  SaveOutlined
 } from '@ant-design/icons'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppContext } from '../../state/AppContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
 import { SampleDataLoader } from '../SampleDataLoader'
+import { useAppSelector } from '../../state/hooks'
 
 export interface TimeProps {
   bounds: [number, number] | null
+  handleSave: () => void
 }
 
 const StepOptions = [
@@ -47,12 +50,19 @@ interface TimeButtonProps {
   large: boolean
 }
 
-const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
+const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useAppContext()
+  const features = useAppSelector(state => state.fColl.features)
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
   const [interval, setInterval] = useState<number>(0)
+  const [dirty, setDirty] = useState(false)
+
+
+  useEffect(() => {
+    setDirty(true)
+  }, [features])
 
   useEffect(() => {
     try {
@@ -149,6 +159,17 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
   }
   const buttonStyle = { margin: '0 5px' }
 
+  const localSave = useCallback(() => {
+    setDirty(false)
+    handleSave()
+  }, [handleSave])
+
+  const saveButton = useMemo(() => {
+    return <Tooltip placement='bottom' title={dirty ? 'Save changes' : 'Document unchanged'}>
+      <Button onClick={localSave} disabled={!dirty} variant='outlined' icon={<SaveOutlined/>}/>
+    </Tooltip>
+  }, [localSave, dirty])
+
   return (
     <>
       {' '}
@@ -186,6 +207,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
             </Button>
           </Tooltip>
           <SampleDataLoader />
+          {saveButton}
         </Col>
         <Col span={4}>
           <Tooltip title={copyTooltip}>
