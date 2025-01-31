@@ -76,7 +76,7 @@ const Documents = () => {
       const newTab: TabWithPath = {
         key: '' + Date.now(),
         label: file.filePath.split('/').pop()!,
-        children: <App content={file.content} />,
+        children: <App filePath={file.filePath} content={file.content} />,
         path: file.filePath
       }
 
@@ -85,27 +85,6 @@ const Documents = () => {
       setActiveTab(newTab.key)
     }
   }
-
-  // const saveDocument = async () => {
-  // if (activeTab !== null) {
-  //   const doc = tabs.find(t => t.id === activeTab)
-  //   if (doc) {
-  //     let filePath = doc.path
-
-  //     if (!filePath) {
-  //       const result = await window.electron.saveFileDialog()
-  //       if (result?.filePath) {
-  //         filePath = result.filePath
-  //       } else {
-  //         return
-  //       }
-  //     }
-
-  //     await window.electron.saveFile(filePath, doc.content)
-  //     setTabs(tabs.map(t => (t.id === activeTab ? { ...t, path: filePath, name: filePath.split('/').pop()! } : t)))
-  //   }
-  // }
-  // }
 
   const onTabChange = (key: string) => {
     setActiveTab(key)
