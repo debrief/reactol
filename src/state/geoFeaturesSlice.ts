@@ -11,7 +11,7 @@ const initialState: FeatureCollection = {
 
 let counter = 0
 
-const cleanFeature = (feature: Feature): Feature => {
+export const cleanFeature = (feature: Feature): Feature => {
   counter++
   if (!feature.id) {
     feature.id = `f-${counter}`

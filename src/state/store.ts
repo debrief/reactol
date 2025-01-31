@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import featuresReducer from './geoFeaturesSlice'
+import { FeatureCollection } from 'geojson'
 
-export const createStore = (content?: string) => configureStore({
+export const createStore = (content?: FeatureCollection) => configureStore({
   reducer: {
     fColl: featuresReducer
   },
   preloadedState: content ? {
-    fColl: JSON.parse(content)
+    fColl: content
   } : undefined
 })
 
