@@ -334,7 +334,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     <>
       <Modal
         title='Message'
-        visible={message !== ''}
+        open={message !== ''}
         onOk={() => setMessage('')}
         onCancel={() => setMessage('')}
       >
@@ -409,7 +409,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       )}
       {createTrackDialogVisible && (
         <LoadTrackModel
-          visible={createTrackDialogVisible}
+          open={createTrackDialogVisible}
           cancel={handleDialogCancel}
           newTrack={setLoadTrackResults}
           addToTrack={() => {}}
