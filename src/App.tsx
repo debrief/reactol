@@ -28,7 +28,7 @@ const toFeatureCollection = (content?: string) => {
   if (item.type === 'Feature') {
     return {
       type: 'FeatureCollection',
-      features: [cleanFeature(item)]
+      features: [cleanFeature([], item)]
     }
   }
   throw new Error('Unknown type: ' + item.type)
