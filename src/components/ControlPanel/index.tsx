@@ -14,6 +14,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useAppContext } from '../../state/AppContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
+import { SampleDataLoader } from '../SampleDataLoader'
 
 export interface TimeProps {
   bounds: [number, number] | null
@@ -184,6 +185,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
+          <SampleDataLoader />
         </Col>
         <Col span={4}>
           <Tooltip title={copyTooltip}>
