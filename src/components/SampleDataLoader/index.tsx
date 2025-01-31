@@ -41,8 +41,6 @@ export const SampleDataLoader: React.FC = () => {
       data = data.concat(zones)
       data = data.concat(points)
 
-      console.log('zones', zones)  
-
       // Create track group
       const trackGroup: Feature = {
         type: 'Feature',
@@ -59,7 +57,7 @@ export const SampleDataLoader: React.FC = () => {
         }
       }
       data.push(trackGroup)
-      console.log('trackGroup', trackGroup)
+
       // Create zones/points group
       const zonesPointsGroup: Feature = {
         type: 'Feature',
@@ -91,7 +89,7 @@ export const SampleDataLoader: React.FC = () => {
   }
 
   return (
-    <Dropdown menu={menuProps}>
+    <Dropdown trigger={['click']} menu={menuProps}>
       <Tooltip placement='right' title='Load Sample Data'>
         <Button style={{ margin: '0 px' }} color='primary' variant='outlined'>
           <Space>
