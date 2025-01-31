@@ -10,13 +10,14 @@ import {
   CloseCircleOutlined,
   ShrinkOutlined,
 } from '@ant-design/icons'
-import { Feature, Geometry, Point, Polygon } from 'geojson'
-import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { Feature, Geometry, MultiPoint, Point, Polygon } from 'geojson'
+import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { useAppContext } from '../../state/AppContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps, GroupProps } from '../../types'
+import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps, GroupProps, BuoyFieldProps } from '../../types'
 import { PointForm } from '../PointForm'
+import { BuoyFieldForm } from '../BuoyFieldForm'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -137,13 +138,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const dispatch = useAppDispatch()
 
   const NODE_TRACKS = 'node-tracks'
+  const NODE_FIELDS = 'node-fields'
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
   const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
   const [newPoint, setNewPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
+  const [newBuoyField, setNewBuoyField] = useState<Feature<MultiPoint, BuoyFieldProps> | null>(null)
   const [workingPoint, setWorkingPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
+  const [workingBuoyField, setWorkingBuoyField] = useState<Feature<Geometry, BuoyFieldProps> | null>(null)
   const [formType, setFormType] = useState<string>('')
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
@@ -203,6 +207,26 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewPoint(zone)
   }
 
+  const addBuoyField = () => {
+    const buoyField: Feature<MultiPoint, BuoyFieldProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        shortName: '',
+        symbol: 'air',
+        dataType: BUOY_FIELD_TYPE,
+        color: '#FF0000',
+        visible: true
+      },
+      geometry: {
+        type: 'MultiPoint',
+        coordinates: []
+      }
+    }
+    setWorkingBuoyField(buoyField)
+    setNewBuoyField(buoyField)
+  }
+
   const addGroup = () => {
     setMessage('Adding group')
   }
@@ -210,6 +234,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const handleAdd = useCallback( (e: React.MouseEvent, key: string, title: string) => {
     if (key === NODE_TRACKS) {
       setcreateTrackDialogVisible(true)
+    } else if (key === NODE_FIELDS) {
+      addBuoyField()
     } else if (key === 'node-points') {
       addPoint()
     } else if (key === 'node-zones') {
@@ -225,6 +251,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   useEffect(() => {
     const items: TreeDataNode[] = []
     items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
     items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE, handleAdd))
     items.push(mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd))
@@ -381,6 +408,13 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setWorkingPoint(null)
   }
 
+  const handleBuoyFieldSave = () => {
+    dispatch({ type: 'fColl/featureAdded', payload: workingBuoyField })
+    setNewBuoyField(null)
+    setWorkingBuoyField(null)
+  }
+
+
   const handleDialogCancel = () => {
     setcreateTrackDialogVisible(false)
   }
@@ -478,6 +512,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         <PointForm
           shape={newPoint}
           onChange={(point) => setWorkingPoint(point)}
+        />
+      </Modal>}
+      { newBuoyField && <Modal
+        title={'Create new buoy field'}
+        open={true}
+        onCancel={() => setNewBuoyField(null)}
+        onOk={handleBuoyFieldSave}>
+        <BuoyFieldForm
+          field={newBuoyField}
+          onChange={(point) => setWorkingBuoyField(point)}
         />
       </Modal>}
     </>

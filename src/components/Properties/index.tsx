@@ -1,15 +1,16 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
-import { CoreShapeProps, TrackProps, GroupProps } from '../../types'
+import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps } from '../../types'
 import { useAppContext } from '../../state/AppContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
-import { Feature, GeoJsonProperties, Geometry, LineString, Point } from 'geojson'
-import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint, Point } from 'geojson'
+import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { PointForm } from '../PointForm'
 import { CoreForm } from '../CoreForm'
 import { PropertiesViewer } from './PropertiesViewer'
 import { TrackForm } from '../TrackForm'
 import { GroupForm } from '../GroupForm'
+import { BuoyFieldForm } from '../BuoyFieldForm'
 
 
 const Properties: React.FC = () => {
@@ -59,6 +60,11 @@ const Properties: React.FC = () => {
         case TRACK_TYPE:    
           setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
             <TrackForm onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
+          </CoreForm>)
+          break
+        case BUOY_FIELD_TYPE:    
+          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
+            <BuoyFieldForm onChange={updateFeatureState} field={featureState as Feature<MultiPoint, BuoyFieldProps>} />
           </CoreForm>)
           break
         case ZONE_TYPE:

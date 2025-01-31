@@ -46,7 +46,7 @@ interface TimeButtonProps {
   large: boolean
 }
 
-const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
+const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useAppContext()
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
@@ -263,4 +263,4 @@ const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
   )
 }
 
-export default TimeControl
+export default ControlPanel

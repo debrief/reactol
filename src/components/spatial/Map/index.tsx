@@ -1,7 +1,7 @@
-import { Feature, Point, Polygon } from 'geojson'
+import { Feature, MultiPoint, Point, Polygon } from 'geojson'
 import { MapContainer, useMap } from 'react-leaflet'
 import ScaleNautic from 'react-leaflet-nauticsale'
-import { GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
+import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -12,6 +12,8 @@ import { Graticule } from '../AutoGraticule'
 import { HomeControl } from '../../HomeControl'
 import MouseCoordinates from '../MouseCoordinates'
 import { PolylineMeasure } from '../PolylineMeasure'
+import { BuoyField } from '../BuoyField'
+import { BuoyFieldProps } from '../../../types'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -29,6 +31,8 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
     return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
   case REFERENCE_POINT_TYPE:
     return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
+  case BUOY_FIELD_TYPE:
+    return <BuoyField key={feature.id} feature={feature as Feature<MultiPoint, BuoyFieldProps>} onClickHandler={onClickHandler} />
   case GROUP_TYPE:
     return null  
   default:

@@ -3,7 +3,7 @@ import './App.css'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Layers from './components/Layers'
 import Properties from './components/Properties'
-import TimeControl from './components/TimeControl'
+import ControlPanel from './components/ControlPanel'
 import { timeBoundsFor } from './helpers/timeBounds.ts'
 import { useAppDispatch, useAppSelector } from './state/hooks.ts'
 import track from './data/track1.ts'
@@ -219,7 +219,7 @@ function App() {
             <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
               <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                 <Card title='Control Panel'>
-                  <TimeControl bounds={timeBounds}/>
+                  <ControlPanel bounds={timeBounds}/>
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
