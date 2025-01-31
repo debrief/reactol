@@ -34,7 +34,9 @@ const Documents = () => {
   const handleNew = async () => {
     // are we an electron app?
     if (window.electron) {
-      const result = await window.electron.saveFileDialog()
+      const options = { title: 'New document', 
+        filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }] }
+      const result = await window.electron.saveFileDialog(options)
       if (result?.filePath) {
         const path = result.filePath
         const fileName = path.split('/').pop()!
@@ -113,7 +115,7 @@ const Documents = () => {
     e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
     switch (action) {
     case 'add':
-      setIsTabNameModalVisible(true)
+      handleNew()
       break
     case 'remove':
       if (typeof e === 'string') {
