@@ -1,12 +1,19 @@
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import App from '../../App'
-import { Button, Col, Image, Row, Tabs, TabsProps, Typography, Modal, Space, Input, Tooltip } from 'antd'
+import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip } from 'antd'
 import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
 import './index.css'
 import { useAppDispatch } from '../../state/hooks'
 
+type TabWithPath =  {
+  key: string
+  label: string
+  children: ReactNode
+  path: string
+} 
+
 const Documents = () => {
-  const [tabs, setTabs] = useState<NonNullable<TabsProps['items']>>([])
+  const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
   const [tabToClose, setTabToClose] = useState<string | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
@@ -15,14 +22,41 @@ const Documents = () => {
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
-    const newTab = {
+    const newTab: TabWithPath = {
       key: '' + Date.now(),
       label: documentName,
       children: <App />,
+      path: documentName
     }
     setTabs([...tabs, newTab])
     setActiveTab(newTab.key)
     setDocumentName('')
+  }
+
+  const handleNew = async () => {
+    // are we an electron app?
+    if (window.electron) {
+      const result = await window.electron.saveFileDialog()
+      if (result?.filePath) {
+        const path = result.filePath
+        const fileName = path.split('/').pop()!
+        const fileNameWithoutExtension = fileName.split('.')[0]
+        const newTab: TabWithPath = {
+          key: '' + Date.now(),
+          label: fileNameWithoutExtension,
+          children: <App />,
+          path: result?.filePath
+        }
+        setTabs([...tabs, newTab])
+        setActiveTab(newTab.key)
+      } else {
+        console.log('cancelled')
+        return
+      }
+    } else {
+      // conventional app - get doc name
+      setIsTabNameModalVisible(true)
+    }
   }
 
   const handleCancel = () => {
@@ -40,10 +74,11 @@ const Documents = () => {
       const features = file.content && JSON.parse(file?.content)
       // TODO give `App` a prop repsesenting the file content. It will
       // verify this is GeoJSON, and load it into the store.
-      const newTab = {
+      const newTab: TabWithPath = {
         key: '' + Date.now(),
         label: file.filePath.split('/').pop()!,
         children: <App />,
+        path: file.filePath
       }
 
       dispatch({ type: 'fColl/featuresUpdated', payload: features })
@@ -164,7 +199,7 @@ const Documents = () => {
               </Row>
               <Row>
                 <Col span={8}></Col>
-                <Col span={8}><Button onClick={() => setIsTabNameModalVisible(true)} size='large' block type='primary'>New</Button></Col>
+                <Col span={8}><Button onClick={handleNew} size='large' block type='primary'>New</Button></Col>
               </Row>
               <Row style={{ paddingTop: '25px' }}>
                 <Col span={8}></Col>
