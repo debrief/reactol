@@ -56,7 +56,6 @@ function Document() {
 
     if (!storeInitialised.current && features.length === 0) {
       storeInitialised.current = true
-      console.clear()
       // store initial data objects
       dispatch({ type: 'fColl/storeCleared'})
       
