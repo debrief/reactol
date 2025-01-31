@@ -1,7 +1,7 @@
 import { AppContext } from './AppContext'
 import domToImage from 'dom-to-image'
 import { useState, useCallback } from 'react'
-import { TimeState } from '../App'
+import { TimeState } from '../components/Document'
 
 interface Props {
   children: React.ReactNode;

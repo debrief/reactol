@@ -11,10 +11,13 @@ const initialState: FeatureCollection = {
 
 let counter = 0
 
-const cleanFeature = (feature: Feature): Feature => {
+export const cleanFeature = (existingIds: string[],feature: Feature): Feature => {
   counter++
   if (!feature.id) {
     feature.id = `f-${counter}`
+  }
+  while (existingIds.includes(feature.id as string)) {
+    feature.id = `f-${++counter}`
   }
   if (!feature.properties) {
     feature.properties = {}
@@ -34,6 +37,9 @@ const updateBounds = (state: FeatureCollection): BBox | undefined => {
   }
 }
 
+const getExistingIds = (features: Feature[]): string[] => {
+  return features.map(feature => feature.id as string)
+}
 
 // Create the slice and pass in the initial state
 const featuresSlice = createSlice({
@@ -45,12 +51,14 @@ const featuresSlice = createSlice({
       state.bbox = updateBounds(state)
     },
     featureAdded(state, action: PayloadAction<Feature>) {
-      const cleaned = cleanFeature(action.payload)
+      const existingIds = getExistingIds(state.features)
+      const cleaned = cleanFeature(existingIds,action.payload)
       state.features.push(cleaned)
       state.bbox = updateBounds(state)
     },
     featuresAdded(state, action: PayloadAction<Feature[]>) {
-      const cleaned = action.payload.map(cleanFeature)
+      const existingIds = getExistingIds(state.features)
+      const cleaned = action.payload.map((feature) => cleanFeature(existingIds,feature))
       state.features.push(...cleaned)
       state.bbox = updateBounds(state)
     },
@@ -60,7 +68,7 @@ const featuresSlice = createSlice({
       state.bbox = updateBounds(state)
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
-      const cleaned = action.payload.map(cleanFeature)
+      const cleaned = action.payload.map((feature) => cleanFeature([], feature))
       const removeUpdated = state.features.filter((feature) => !cleaned.find((f) => f.id === feature.id))
       state.features = removeUpdated.concat(cleaned)
       state.bbox = updateBounds(state)
