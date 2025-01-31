@@ -1,16 +1,11 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
 import './App.css'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Layers from './components/Layers'
 import Properties from './components/Properties'
 import ControlPanel from './components/ControlPanel'
 import { timeBoundsFor } from './helpers/timeBounds.ts'
 import { useAppDispatch, useAppSelector } from './state/hooks.ts'
-import track from './data/track1.ts'
-import track2 from './data/track2.ts'
-import track3 from './data/track3.ts'
-import zones from './data/zones.ts'
-import points from './data/points.ts'
 import Map from './components/spatial/Map/index.tsx'
 import GraphModal from './components/GraphModal'
 import { useAppContext } from './state/AppContext.ts'
@@ -23,7 +18,6 @@ import toDTG from './helpers/toDTG.ts'
 import { AppDispatch } from './state/store.ts'
 import { LoadTrackModel } from './components/LoadTrackModal'
 import { NewTrackProps } from './types.ts'
-import { GROUP_TYPE } from './constants.ts'
 
 interface FileHandler {
   blobType: string
@@ -50,60 +44,6 @@ function App() {
   const [isDragging, setIsDragging] = useState(false) 
   const [error, setError] = useState<string | null>(null) 
   const { setTime, time } = useAppContext()
-
-  const storeInitialised = useRef(false) 
-
-  useEffect(() => {
-    if (!storeInitialised.current) {
-      storeInitialised.current = true
-      console.clear()
-      // store initial data objects
-      dispatch({ type: 'fColl/storeCleared'})
-      
-      // Add tracks
-      dispatch({ type: 'fColl/featureAdded', payload: track })
-      dispatch({ type: 'fColl/featureAdded', payload: track2 })
-      dispatch({ type: 'fColl/featureAdded', payload: track3 })
-      
-      // Add zones and points
-      dispatch({ type: 'fColl/featuresAdded', payload: zones })
-      dispatch({ type: 'fColl/featuresAdded', payload: points })
-
-      // Create track group
-      const trackGroup: Feature = {
-        type: 'Feature',
-        id: 'g-1',
-        properties: {
-          dataType: GROUP_TYPE,
-          name: 'Tracks Group',
-          visible: true,
-          units: [track.id, track3.id, zones[1].id, points[2].id]
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [] 
-        }
-      }
-      dispatch({ type: 'fColl/featureAdded', payload: trackGroup })
-
-      // Create zones/points group
-      const zonesPointsGroup: Feature = {
-        type: 'Feature',
-        id: 'g-2',
-        properties: {
-          dataType: GROUP_TYPE,
-          name: 'Zones & Points Group',
-          visible: true,
-          units: [track.id, zones[2].id, zones[0].id, points[0].id, points[1].id]
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [] 
-        }
-      }
-      dispatch({ type: 'fColl/featureAdded', payload: zonesPointsGroup })
-    }
-  }, [dispatch])
 
   const timePeriod = useMemo(() => {
     if (time.start && time.end) {
