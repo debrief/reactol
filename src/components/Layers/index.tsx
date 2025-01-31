@@ -422,7 +422,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     <>
       <Modal
         title='Message'
-        visible={message !== ''}
+        open={message !== ''}
         onOk={() => setMessage('')}
         onCancel={() => setMessage('')}
       >

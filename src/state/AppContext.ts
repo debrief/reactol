@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react'
-import { TimeState } from '../App'
+import { TimeState } from '../components/Document'
 
 interface AppContextProps {
   selection: string[]
