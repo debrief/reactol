@@ -50,11 +50,11 @@ export const BuoyField: React.FC<BuoyFieldTypeProps> = ({feature, onClickHandler
 
   return (
     <>
-      { isVisible && isSelected && locations &&  locations.length > 0 && locations.map((location: [number, number], index: number) => <CircleMarker key={'shiny-' + index + '-' + color} radius={8} 
+      { isVisible && isSelected && locations &&  locations.length > 0 && locations.map((location: [number, number], index: number) => <CircleMarker key={'shiny-' + feature.id + '-' + index + '-' + color} radius={8} 
         fillColor={'#fff'} color={'#fff'} fill={true} fillOpacity={0} center={location} />)}
-      { isVisible && locations && locations.length > 0 && locations.map((location: [number, number], index: number) => <CircleMarker key={'point-' + index + '-' + color} radius={circleRadius} 
+      { isVisible && locations && locations.length > 0 && locations.map((location: [number, number], index: number) => <CircleMarker key={'point-' + feature.id + '-' + index + '-' + color} radius={circleRadius} 
         fillColor={color} color={color} fill={true} fillOpacity={1} center={location} eventHandlers={eventHandlers}>
-        { index === 0 && <Tooltip className='point-label' key={index + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
+        { index === 0 && <Tooltip className='point-label' key={feature.id + '-' + index + '-tip-'} offset={[0, -20]} direction='center' opacity={1} permanent>
           {name}
         </Tooltip>}
       </CircleMarker>)}
