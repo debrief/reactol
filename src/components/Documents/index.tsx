@@ -44,7 +44,7 @@ const Documents = () => {
         const newTab: TabWithPath = {
           key: '' + Date.now(),
           label: fileNameWithoutExtension,
-          children: <App />,
+          children: <App filePath={result?.filePath} />,
           path: result?.filePath
         }
         setTabs([...tabs, newTab])

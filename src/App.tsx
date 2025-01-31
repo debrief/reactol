@@ -7,14 +7,15 @@ import { useState } from 'react'
 
 export type AppProps = {
   content?: string
+  filePath?: string
 }
 
-function App({ content }: AppProps) {
+function App({ content, filePath }: AppProps) {
   const [store] = useState(createStore(content))
   return (
     <Provider store={store}>
       <AppProvider>
-        <Document />
+        <Document filePath={filePath} />
       </AppProvider>  
     </Provider>  
   )
