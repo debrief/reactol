@@ -1,7 +1,7 @@
 import { Feature, Position } from 'geojson'
 import { LeafletMouseEvent } from 'leaflet'
 import { CircleMarker, Tooltip } from 'react-leaflet'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useAppContext } from '../../../state/AppContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
 import './index.css'
@@ -34,19 +34,21 @@ export const BuoyField: React.FC<BuoyFieldTypeProps> = ({feature, onClickHandler
     return filterApplied ? featureIsVisibleInPeriod(feature, timeStart, timeEnd) : true
   }, [feature, timeStart, timeEnd, filterApplied])
 
-  const onclick = (evt: LeafletMouseEvent) => {
+  const onclick = useCallback((evt: LeafletMouseEvent) => {
     onClickHandler(feature.id as string, evt.originalEvent.altKey || evt.originalEvent.ctrlKey)
-  }
+  }, [onClickHandler, feature])
 
   const name = feature.properties?.name || ''
 
   const circleRadius = 4
 
-  const eventHandlers = {
-    click: onclick,
-    mouseover: mouseOver,
-    mouseout: (evt: LeafletMouseEvent) => mouseOut(evt, isSelected),
-  }
+  const eventHandlers =  useMemo(() => {
+    return {
+      click: onclick,
+      mouseover: mouseOver,
+      mouseout: (evt: LeafletMouseEvent) => mouseOut(evt, isSelected),
+    }
+  }, [isSelected, onclick])
 
   return (
     <>
