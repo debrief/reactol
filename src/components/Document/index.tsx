@@ -45,7 +45,12 @@ function Document({ filePath }: { filePath?: string }) {
   const [isDragging, setIsDragging] = useState(false) 
   const [error, setError] = useState<string | null>(null) 
   const { setTime, time } = useAppContext()
+  const [dirty, setDirty] = useState(false)
 
+  useEffect(() => {
+    setDirty(true)
+  }, [features])
+  
   const timePeriod = useMemo(() => {
     if (time.start && time.end) {
       const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`
@@ -156,7 +161,6 @@ function Document({ filePath }: { filePath?: string }) {
     }
   }, [filePath, storeContents])
 
-
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
@@ -170,7 +174,7 @@ function Document({ filePath }: { filePath?: string }) {
             <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
               <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                 <Card title='Time Control'>
-                  <ControlPanel handleSave={doSave} bounds={timeBounds}/>
+                  <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>

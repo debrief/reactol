@@ -11,6 +11,13 @@ type TabWithPath =  {
   path: string
 } 
 
+const fileNameFor = (filePath: string): string => {
+  const path = filePath
+  const fileName = path.split('/').pop()!
+  const fileNameWithoutExtension = fileName.split('.')[0]
+  return fileNameWithoutExtension
+}
+
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
@@ -38,12 +45,9 @@ const Documents = () => {
         filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }] }
       const result = await window.electron.saveFileDialog(options)
       if (result?.filePath) {
-        const path = result.filePath
-        const fileName = path.split('/').pop()!
-        const fileNameWithoutExtension = fileName.split('.')[0]
         const newTab: TabWithPath = {
           key: '' + Date.now(),
-          label: fileNameWithoutExtension,
+          label: fileNameFor(result?.filePath),
           children: <App filePath={result?.filePath} />,
           path: result?.filePath
         }
@@ -75,7 +79,7 @@ const Documents = () => {
       // verify this is GeoJSON, and load it into the store.
       const newTab: TabWithPath = {
         key: '' + Date.now(),
-        label: file.filePath.split('/').pop()!,
+        label: fileNameFor(file.filePath),
         children: <App filePath={file.filePath} content={file.content} />,
         path: file.filePath
       }
