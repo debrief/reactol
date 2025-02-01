@@ -66,7 +66,6 @@ export const PasteButton: React.FC = () => {
     }
 
     const handleFocus = () => {
-      console.log('handle focus')
       checkClipboard()
     }
 
