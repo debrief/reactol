@@ -1,7 +1,7 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 import { Provider } from 'react-redux'
-import { AppProvider } from '../../state/AppProvider'
+import { DocContextProvider } from '../../state/DocContextProvider'
 import { configureStore } from '@reduxjs/toolkit'
 import Layers from '.././Layers'
 import featuresReducer from '../../state/geoFeaturesSlice'
@@ -22,9 +22,9 @@ const createMockStore = (features: FeatureCollection) =>
 // Custom decorator to wrap Layers component with necessary providers
 const withProviders = (features: FeatureCollection) => (Story: React.ComponentType) => (
   <Provider store={createMockStore(features)}> 
-    <AppProvider>
+    <DocContextProvider>
       <Story />
-    </AppProvider>
+    </DocContextProvider>
   </Provider>
 )
 

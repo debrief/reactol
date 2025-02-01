@@ -8,7 +8,7 @@ import {
   ZoomInOutlined,
   ZoomOutOutlined
 } from '@ant-design/icons'
-import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 
 const POSITION_CLASSES = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -44,7 +44,7 @@ export const HomeControl: React.FC = () => {
   const currentBounds = selectBounds(
     useAppSelector((state) => state.fColl)
   )
-  const { viewportFrozen } = useAppContext()
+  const { viewportFrozen } = useDocContext()
   const measure = useRef<L.Control.PolylineMeasure | null>(null)
 
   const doHome = useCallback(() => {

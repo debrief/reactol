@@ -2,7 +2,7 @@ import { Feature, Geometry, LineString } from 'geojson'
 import { LeafletMouseEvent } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
 import { useMemo } from 'react'
-import { useAppContext } from '../../../state/AppContext'
+import { useDocContext } from '../../../state/DocContext'
 import { CoordInstance, filterTrack } from '../../../helpers/filterTrack'
 import { TrackProps } from '../../../types'
 import './index.css'
@@ -25,7 +25,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
 }
 
 const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
-  const { selection, time } = useAppContext()
+  const { selection, time } = useDocContext()
   const isSelected = selection.includes(feature.id as string)
 
   const trackCoords: CoordInstance[] = useMemo(() => {

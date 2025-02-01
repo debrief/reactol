@@ -2,7 +2,7 @@ import { Feature, Position } from 'geojson'
 import { LeafletMouseEvent } from 'leaflet'
 import { CircleMarker, Tooltip } from 'react-leaflet'
 import { useCallback, useMemo } from 'react'
-import { useAppContext } from '../../../state/AppContext'
+import { useDocContext } from '../../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
 import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
@@ -15,7 +15,7 @@ export interface BuoyFieldTypeProps {
 }
 
 export const BuoyField: React.FC<BuoyFieldTypeProps> = ({feature, onClickHandler}) => {
-  const { selection, time } = useAppContext()
+  const { selection, time } = useDocContext()
   const { start: timeStart, end: timeEnd, filterApplied } = time
   const isSelected = selection.includes(feature.id as string)
   

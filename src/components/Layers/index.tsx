@@ -17,7 +17,7 @@ import {
   TRACK_TYPE,
   ZONE_TYPE,
 } from '../../constants'
-import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
 import {
@@ -156,7 +156,7 @@ export const ToolButton: React.FC<ToolProps> = ({
 }
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
-  const { selection, setSelection } = useAppContext()
+  const { selection, setSelection } = useDocContext()
   const features = useAppSelector((state) => state.fColl.features)
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)

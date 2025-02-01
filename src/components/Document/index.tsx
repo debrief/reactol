@@ -4,7 +4,7 @@ import { TileLayer } from 'react-leaflet'
 import Control from 'react-leaflet-custom-control'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
-import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 import { AppDispatch } from '../../state/store'
 import { NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
@@ -44,13 +44,13 @@ function Document({ filePath }: { filePath?: string }) {
   const [graphOpen, setGraphOpen] = useState(false)
   const [isDragging, setIsDragging] = useState(false) 
   const [error, setError] = useState<string | null>(null) 
-  const { setTime, time } = useAppContext()
+  const { setTime, time } = useDocContext()
   const [dirty, setDirty] = useState(false)
 
   useEffect(() => {
     setDirty(true)
   }, [features])
-  
+
   const timePeriod = useMemo(() => {
     if (time.start && time.end) {
       const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`

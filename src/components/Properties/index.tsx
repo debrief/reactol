@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
 import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps } from '../../types'
-import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
 import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint, Point } from 'geojson'
@@ -14,7 +14,7 @@ import { BuoyFieldForm } from '../BuoyFieldForm'
 
 
 const Properties: React.FC = () => {
-  const { selection } = useAppContext()
+  const { selection } = useDocContext()
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [formDirty, setFormDirty] = useState<boolean>(false)

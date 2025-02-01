@@ -8,19 +8,15 @@ import {
   FilterOutlined,
   LockFilled,
   UnlockOutlined,
-  FilterFilled,
-  SaveOutlined
+  FilterFilled
 } from '@ant-design/icons'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDocContext } from '../../state/DocContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
-import { SampleDataLoader } from '../SampleDataLoader'
 
 export interface TimeProps {
   bounds: [number, number] | null
-  handleSave: () => void
-  isDirty: boolean
 }
 
 const StepOptions = [
@@ -50,7 +46,7 @@ interface TimeButtonProps {
   large: boolean
 }
 
-const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
+const TimeControl: React.FC<TimeProps> = ({ bounds }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useDocContext()
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
@@ -152,12 +148,6 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   }
   const buttonStyle = { margin: '0 5px' }
 
-  const saveButton = useMemo(() => {
-    return <Tooltip placement='bottom' title={isDirty ? 'Save changes' : 'Document unchanged'}>
-      <Button onClick={handleSave} disabled={!isDirty} variant='outlined' icon={<SaveOutlined/>}/>
-    </Tooltip>
-  }, [handleSave, isDirty])
-
   return (
     <>
       {' '}
@@ -194,8 +184,6 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <SampleDataLoader />
-          {saveButton}
         </Col>
         <Col span={4}>
           <Tooltip title={copyTooltip}>
@@ -275,4 +263,4 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   )
 }
 
-export default ControlPanel
+export default TimeControl

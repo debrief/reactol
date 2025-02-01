@@ -7,7 +7,7 @@ import { Feature } from 'geojson'
 import { speedCalc } from '../../helpers/calculations/speedCalc'
 import { useEffect } from 'react'
 import React from 'react'
-import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory'
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
@@ -51,7 +51,7 @@ export type GraphDataset = { label: string,
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
   const allFeatures = useAppSelector(state => state.fColl.features)
-  const { selection } = useAppContext()
+  const { selection } = useDocContext()
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
   const [ticks, setTicks] = React.useState<number[]>([])

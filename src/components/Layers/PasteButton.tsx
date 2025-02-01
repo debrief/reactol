@@ -3,6 +3,7 @@ import { ToolButton } from '.'
 import { Feature } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { DiffOutlined } from '@ant-design/icons'
+import { useAppContext } from '../../state/AppContext'
 
 const isValidGeoJSON = (text: string): boolean => {
   try {
@@ -29,8 +30,9 @@ const isValidGeoJSON = (text: string): boolean => {
 export const PasteButton: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
   const dispatch = useAppDispatch()
   const [pasteDisabled, setPasteDisabled] = useState(true)
+  const { clipboardUpdated } = useAppContext()
 
-  const checkClipboard = useCallback(  async () => {
+  const checkClipboard = useCallback(async () => {
     try {
       const text = await navigator.clipboard.readText()
       const isValid = isValidGeoJSON(text)
@@ -40,6 +42,10 @@ export const PasteButton: React.FC<{ setMessage: (message: string) => void }> = 
       setPasteDisabled(true)
     }
   }, [])
+
+  useEffect(() => {
+    checkClipboard()
+  }, [checkClipboard, clipboardUpdated])
 
   useEffect(() => {
     // Initial check

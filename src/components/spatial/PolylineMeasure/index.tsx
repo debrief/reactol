@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
-import { useAppContext } from '../../../state/AppContext'
+import { useDocContext } from '../../../state/DocContext'
 
 import 'leaflet.polylinemeasure'
 import L from 'leaflet'
@@ -23,7 +23,7 @@ interface PolylineMeasureOptions extends L.Control.PolylineMeasureOptions {
 /** helper component that freezes map viewport */
 export const PolylineMeasure: React.FC = () => {
   const map = useMap()
-  const { viewportFrozen } = useAppContext()
+  const { viewportFrozen } = useDocContext()
   const measure = useRef<L.Control.PolylineMeasure | null>(null)
 
   useEffect(() => {
