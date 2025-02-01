@@ -515,7 +515,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
               }
             />
             <CopyButton />
-            <PasteButton setMessage={setMessage} />
+            <PasteButton />
           </Button.Group>
           <ToolButton
             onClick={onGraphClick}
