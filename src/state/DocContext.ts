@@ -1,6 +1,12 @@
 import React, { createContext, useContext } from 'react'
 import { TimeState } from '../components/Document'
 
+export interface MessageStruct {
+  title: string
+  message: string
+  severity: 'success' | 'error' | 'warning' | 'info'
+}
+
 interface DocContextProps {
   selection: string[]
   setSelection: React.Dispatch<React.SetStateAction<string[]>>
@@ -10,6 +16,8 @@ interface DocContextProps {
   copyMapToClipboard: () => Promise<void>
   setMapNode: (node: HTMLElement | null) => void
   setViewportFrozen:React.Dispatch<React.SetStateAction<boolean>>
+  message: MessageStruct | null
+  setMessage: React.Dispatch<React.SetStateAction<MessageStruct | null>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)

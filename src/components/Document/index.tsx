@@ -42,9 +42,8 @@ function Document({ filePath }: { filePath?: string }) {
   const dispatch = useAppDispatch()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
-  const [isDragging, setIsDragging] = useState(false) 
-  const [error, setError] = useState<string | null>(null) 
-  const { setTime, time } = useDocContext()
+  const [isDragging, setIsDragging] = useState(false)
+  const { setTime, time, message, setMessage } = useDocContext()
   const [dirty, setDirty] = useState(false)
 
   useEffect(() => {
@@ -104,7 +103,7 @@ function Document({ filePath }: { filePath?: string }) {
 
     if (files.length > 1) {
       console.log('too many files error')
-      setError('Only one file can be loaded at a time')
+      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
       return
     }
 
@@ -120,7 +119,7 @@ function Document({ filePath }: { filePath?: string }) {
           }
         } catch (e) {
           console.log('handler error', e)
-          setError('' + e) 
+          setMessage({ title: 'Error', severity: 'error', message: 'Handling error: ' + e })
         }
       }
     }
@@ -164,10 +163,9 @@ function Document({ filePath }: { filePath?: string }) {
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
-      <Modal title="Loading Error" open={!!error} onCancel={() => setError(null)} onOk={() => setError(null)}>
-        <Alert type="error" description={error} />
-      </Modal>
-      {error && <div className="error-modal">{error}</div>} 
+      { !!message &&    <Modal title={message?.title} open={!!message} onCancel={() => setMessage(null)} okType='primary'  onOk={() => setMessage(null)}>
+        <Alert showIcon type={message?.severity} description={message?.message} />
+      </Modal> }
       <ConfigProvider theme={antdTheme}>
         <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
           <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>

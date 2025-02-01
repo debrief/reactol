@@ -4,6 +4,7 @@ import { Feature } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { DiffOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 
 const isValidGeoJSON = (text: string): boolean => {
   try {
@@ -27,10 +28,11 @@ const isValidGeoJSON = (text: string): boolean => {
   }
 }
 
-export const PasteButton: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
+export const PasteButton: React.FC = () => {
   const dispatch = useAppDispatch()
   const [pasteDisabled, setPasteDisabled] = useState(true)
   const { clipboardUpdated } = useAppContext()
+  const { setMessage } = useDocContext()
 
   const checkClipboard = useCallback(async () => {
     try {
@@ -38,10 +40,15 @@ export const PasteButton: React.FC<{ setMessage: (message: string) => void }> = 
       const isValid = isValidGeoJSON(text)
       setPasteDisabled(!isValid)
     } catch (error) {
-      console.warn('Failed to read clipboard', error)
-      setPasteDisabled(true)
+      if (('' + error).includes('Document is not focused')) {
+        // note: we get an error if dev-tools is open, ignore that error.
+      } else {
+        setMessage({ title: 'Error', severity: 'error', message: 'Failed to read clipboard: ' + error })
+        console.warn('Failed to read clipboard', error)
+        setPasteDisabled(true)
+      }
     }
-  }, [])
+  }, [setMessage])
 
   useEffect(() => {
     checkClipboard()
@@ -93,7 +100,7 @@ export const PasteButton: React.FC<{ setMessage: (message: string) => void }> = 
         payload: features,
       })
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Failed to paste GeoJSON data')
+      setMessage({ title: 'Error', severity: 'error', message: 'Paste error: ' + e })
       setPasteDisabled(true)
     }
   }

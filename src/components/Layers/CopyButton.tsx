@@ -9,11 +9,9 @@ import { ToolButton } from '.'
 import { useAppContext } from '../../state/AppContext'
 
 export const CopyButton: React.FC = () => {
-  const { selection } = useDocContext()
+  const { selection, setMessage } = useDocContext()
   const {clipboardUpdated, setClipboardUpdated} = useAppContext()
   const features = useAppSelector((state) => state.fColl.features)
-
-
 
   const copyDisabled = useMemo(
     () =>
@@ -35,7 +33,7 @@ export const CopyButton: React.FC = () => {
     navigator.clipboard.writeText(asStr).then(() => {
       setClipboardUpdated(!clipboardUpdated)
     }).catch((e) => {
-      console.warn('copy error', e)
+      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })
   }
 
