@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react'
 
+/** application-level context */
 interface AppContextProps {
   clipboardUpdated: boolean // toggle for each update
   setClipboardUpdated: React.Dispatch<React.SetStateAction<boolean>>
