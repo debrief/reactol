@@ -28,6 +28,21 @@ const featureToPoints = (feature: Feature): FeatureCollection<Point> => {
   }
 }
 
+const hasEmptyCoordinates = (feature: Feature): boolean => {
+  switch (feature.geometry.type) {
+  case 'Point':
+    return feature.geometry.coordinates.length === 0
+  case 'LineString':
+    return feature.geometry.coordinates.length === 0
+  case 'MultiPoint':
+    return feature.geometry.coordinates.length === 0
+  case 'Polygon':
+    return feature.geometry.coordinates.length === 0
+  default:
+    return true
+  }
+}
+
 const MouseCoordinates: React.FC = () => {
   const { selection } = useDocContext()
   const features = useAppSelector(state => state.fColl.features)
@@ -52,13 +67,16 @@ const MouseCoordinates: React.FC = () => {
         const selectedFeature = features.find((feature) => feature.id === selection[0])
         if (selectedFeature) {
           // check it isn't a non-spatial feature
-          if (selectedFeature.geometry.type === 'Point' && selectedFeature.geometry.coordinates.length === 0) return {rng: 0, brg: 0, subject: 'n/a'}
-          const asPoints = featureToPoints(selectedFeature)
-          const nearestPt = nearestPoint(turfMouse, asPoints)
-          const bearing = bearingToAzimuth(turf.bearing(nearestPt, turfMouse))
-          const pointPos = turf.point(nearestPt.geometry.coordinates)
-          const range = turf.distance(turfMouse, pointPos)
-          return {rng: range, brg: bearing, subject: selectedFeature.properties?.name || ''}
+          if (hasEmptyCoordinates(selectedFeature)) {
+            return {rng: 0, brg: 0, subject: 'n/a'} 
+          } else {
+            const asPoints = featureToPoints(selectedFeature)
+            const nearestPt = nearestPoint(turfMouse, asPoints)
+            const bearing = bearingToAzimuth(turf.bearing(nearestPt, turfMouse))
+            const pointPos = turf.point(nearestPt.geometry.coordinates)
+            const range = turf.distance(turfMouse, pointPos)
+            return {rng: range, brg: bearing, subject: selectedFeature.properties?.name || ''}  
+          } 
         }
       }
 
