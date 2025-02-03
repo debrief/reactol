@@ -103,6 +103,12 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
         <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
       <Form.Item<FormTypeProps>
+        label='Shape'
+        name={['specifics', 'shapeType']}
+        style={itemStyle} >
+        <Input disabled />
+      </Form.Item>
+      <Form.Item<FormTypeProps>
         label='Start'
         name='dTime'
         style={itemStyle}>
