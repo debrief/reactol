@@ -4,37 +4,37 @@ import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
-import { PointProps } from '../../types'
+import { ZoneProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 
-export interface PointFormProps {
-  shape: Feature<Geometry, PointProps>
-  onChange: (shape: Feature<Geometry, PointProps>) => void
+export interface ZoneFormProps {
+  shape: Feature<Geometry, ZoneProps>
+  onChange: (shape: Feature<Geometry, ZoneProps>) => void
 }
 
 /** swap the time string a parameter of the expected type */
-type FormTypeProps = Omit<PointProps, 'time' | 'timeEnd'> & {
+type FormTypeProps = Omit<ZoneProps, 'time' | 'timeEnd'> & {
   dTime: Dayjs
   dTimeEnd: Dayjs
 }
 
-const convert = (shape: Readonly<PointProps>): FormTypeProps=> {
+const convert = (shape: Readonly<ZoneProps>): FormTypeProps=> {
   const oldVal = shape
   const newVal = {...shape} as FormTypeProps
   if (oldVal.time) {
     newVal.dTime = dayjs(oldVal.time)
-    delete (newVal as Partial<PointProps>).time
+    delete (newVal as Partial<ZoneProps>).time
   }
   if (oldVal.timeEnd) {
     newVal.dTimeEnd = dayjs(oldVal.timeEnd)
-    delete (newVal as Partial<PointProps>).timeEnd
+    delete (newVal as Partial<ZoneProps>).timeEnd
   }
   return newVal
 }
 
-const convertBack = (shape: Readonly<FormTypeProps>): PointProps => {
+const convertBack = (shape: Readonly<FormTypeProps>): ZoneProps => {
   const oldVal = shape
-  const newVal = {...shape} as PointProps
+  const newVal = {...shape} as ZoneProps
   if (shape.dTime) {
     newVal.time = oldVal.dTime.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTime
@@ -46,7 +46,7 @@ const convertBack = (shape: Readonly<FormTypeProps>): PointProps => {
   return newVal
 }
 
-export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
+export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
         label='Name'
         name='name'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter track name!' }]}>
+        rules={[{ required: true, message: 'Please enter zone name!' }]}>
         <Input/>
       </Form.Item>
       <Form.Item<FormTypeProps>
@@ -103,29 +103,17 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
         <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Time"
-        style={itemStyle}
-        name='dTime'>
-        <DatePicker showTime format={'MMM DDHHmm'} />
+        label='Start'
+        name='dTime'
+        style={itemStyle}>
+        <DatePicker showTime />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Time end"
-        style={itemStyle}
-        // validate that dTimeEnd is after dTime
-        rules={[
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              // if there is a value, check if it's after the dTime
-              return !value || getFieldValue('dTime') < value
-                ? Promise.resolve()
-                : Promise.reject(new Error('Time-end must be after time!'))
-            },
-          }),
-        ]}
-        name='dTimeEnd'>
-        <DatePicker showTime format={'MMM DDHHmm'} />
+        label='End'
+        name='dTimeEnd'
+        style={itemStyle}>
+        <DatePicker showTime />
       </Form.Item>
     </Form>
   )
 }
-
