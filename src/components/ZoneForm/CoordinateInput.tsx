@@ -1,6 +1,6 @@
-import { Space } from 'antd'
 import { useEffect, useState, ChangeEvent } from 'react'
 import { MaskedInput } from 'antd-mask-input'
+import { Col, Row } from 'antd'
 
 interface CoordinateInputProps {
   value?: [number, number]
@@ -76,26 +76,33 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   const lngMask = '000°00\'00.00"E'  
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
-      <MaskedInput
-        mask={latMask}
-        value={latString}
-        placeholder='0'
-        maskOptions={{ lazy: true }}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => handleLatChange(e.target.value)}
-        definitions={{
-          'N': /[NS]/
-        }}
-      />
-      <MaskedInput  
-        mask={lngMask}
-        value={lngString}
-        maskOptions={{ lazy: false }}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => handleLngChange(e.target.value)}
-        definitions={{
-          'E': /[EW]/
-        }}
-      />
-    </Space>
+    <>
+      <Row>
+        <Col span={12}>
+          <MaskedInput
+            mask={latMask}
+            value={latString}
+            placeholder={latMask}
+            maskOptions={{ lazy: true, placeholderChar:'0' }}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => handleLatChange(e.target.value)}
+            definitions={{
+              'N': /[NS]/
+            }}/>
+        </Col>
+        <Col span={12}>
+          <MaskedInput  
+            mask={lngMask}
+            value={lngString}
+            placeholder={latMask}
+            
+            maskOptions={{ lazy: true, placeholderChar:'0' }}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => handleLngChange(e.target.value)}
+            definitions={{
+              'E': /[EW]/
+            }} />    
+        </Col>
+      </Row>
+    </>
+
   )
 }
