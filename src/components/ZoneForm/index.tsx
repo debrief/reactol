@@ -1,11 +1,13 @@
 import { Feature, Geometry } from 'geojson'
-import { Checkbox, ColorPicker, DatePicker, Form, Input } from 'antd'
+import { Checkbox, ColorPicker, DatePicker, Form, Input, Button } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { ZoneProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
+import { ZoneSpecificsModal } from './ZoneSpecificsModal'
+import { ZoneShapeProps } from '../../zoneShapeTypes'
 
 export interface ZoneFormProps {
   shape: Feature<Geometry, ZoneProps>
@@ -48,6 +50,7 @@ const convertBack = (shape: Readonly<FormTypeProps>): ZoneProps => {
 
 export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     if (shape) {
@@ -63,6 +66,20 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
     const convertedProps = convertBack(updatedProps)
     const res = {...shape, properties: convertedProps}
     onChange(res)
+  }
+
+  const handleSpecificsEdit = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleModalOk = (updatedSpecifics: ZoneShapeProps) => {
+    const res = {...shape, properties: {...shape.properties}, specifics: updatedSpecifics}
+    onChange(res)
+    setIsModalOpen(false)
+  }
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false)
   }
 
   if (!state) {
@@ -108,6 +125,11 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
         style={itemStyle} >
         <Input disabled />
       </Form.Item>
+      <Form.Item
+        label="Specifics"
+        style={itemStyle}>
+        <Button onClick={handleSpecificsEdit}>Edit</Button>
+      </Form.Item>
       <Form.Item<FormTypeProps>
         label='Start'
         name='dTime'
@@ -120,6 +142,12 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
         style={itemStyle}>
         <DatePicker showTime />
       </Form.Item>
+      <ZoneSpecificsModal
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        specifics={shape.properties.specifics}
+      />
     </Form>
   )
 }
