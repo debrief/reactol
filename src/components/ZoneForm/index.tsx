@@ -73,7 +73,7 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
 
   return (
     <Form
-      name='createShape'
+      name={'createShape-' + shape.id}
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 16 }}
       style={{ maxWidth: 400 }}
