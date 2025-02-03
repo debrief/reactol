@@ -6,25 +6,39 @@ import {
   LineChartOutlined,
   PlusCircleOutlined,
   DeleteOutlined,
-  CopyOutlined,
   CloseCircleOutlined,
   ShrinkOutlined,
 } from '@ant-design/icons'
 import { Feature, Geometry, MultiPoint, Point, Polygon } from 'geojson'
-import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
-import { useAppContext } from '../../state/AppContext'
+import {
+  BUOY_FIELD_TYPE,
+  GROUP_TYPE,
+  REFERENCE_POINT_TYPE,
+  TRACK_TYPE,
+  ZONE_TYPE,
+} from '../../constants'
+import { useDocContext } from '../../state/DocContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import { NewTrackProps, TrackProps, CoreShapeProps, ZoneProps, PointProps, GroupProps, BuoyFieldProps } from '../../types'
+import {
+  NewTrackProps,
+  TrackProps,
+  CoreShapeProps,
+  ZoneProps,
+  PointProps,
+  GroupProps,
+  BuoyFieldProps,
+} from '../../types'
 import { PointForm } from '../PointForm'
 import { BuoyFieldForm } from '../BuoyFieldForm'
+import { CopyButton } from './CopyButton'
+import { PasteButton } from './PasteButton'
 
 interface LayerProps {
   openGraph: { (): void }
 }
 
 type TreeProps = GetProps<typeof Tree>
-
 
 type FieldDataNode = {
   title: string
@@ -38,20 +52,29 @@ const cleanGroup = (key: Key) => {
   return (key as string).substring(colonIndex + 1)
 }
 
-const findChildrenOfType = (features: Feature[], dType: string): FieldDataNode[] => {
-  const items = features.filter((feature) => feature.properties?.dataType === dType)
+const findChildrenOfType = (
+  features: Feature[],
+  dType: string
+): FieldDataNode[] => {
+  const items = features.filter(
+    (feature) => feature.properties?.dataType === dType
+  )
   return items.map((item) => ({
     title: nameFor(item),
     key: item.id as string,
-    children: []
+    children: [],
   }))
 }
 
 const findChildrenOfGroup = (features: Feature[]): FieldDataNode[] => {
-  const items = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE)
+  const items = features.filter(
+    (feature) => feature.properties?.dataType === GROUP_TYPE
+  )
   return items.map((item): FieldDataNode => {
     const props = item.properties as GroupProps
-    const children = features.filter((feature) => props.units.includes(feature.id as string))
+    const children = features.filter((feature) =>
+      props.units.includes(feature.id as string)
+    )
     return {
       title: nameFor(item),
       key: item.id as string,
@@ -59,9 +82,9 @@ const findChildrenOfGroup = (features: Feature[]): FieldDataNode[] => {
         return {
           title: nameFor(child),
           key: groupIdFor(item, child.id as string),
-          children: []
+          children: [],
         }
-      })
+      }),
     }
   })
 }
@@ -77,7 +100,10 @@ const mapFunc = (
   dType: string,
   handleAdd: (e: React.MouseEvent, key: string, title: string) => void
 ): TreeDataNode => {
-  const children = dType !== GROUP_TYPE ? findChildrenOfType(features, dType) : findChildrenOfGroup(features)
+  const children =
+    dType !== GROUP_TYPE
+      ? findChildrenOfType(features, dType)
+      : findChildrenOfGroup(features)
   return {
     title: title,
     key: key,
@@ -87,7 +113,7 @@ const mapFunc = (
         onClick={(e) => handleAdd(e, key, title)}
       />
     ),
-    children: children
+    children: children,
   }
 }
 
@@ -110,7 +136,7 @@ interface ToolProps {
   disabled: boolean
 }
 
-const ToolButton: React.FC<ToolProps> = ({
+export const ToolButton: React.FC<ToolProps> = ({
   onClick,
   icon,
   title,
@@ -130,7 +156,7 @@ const ToolButton: React.FC<ToolProps> = ({
 }
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
-  const { selection, setSelection } = useAppContext()
+  const { selection, setSelection } = useDocContext()
   const features = useAppSelector((state) => state.fColl.features)
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)
@@ -143,11 +169,24 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
-  const [createTrackDialogVisible, setcreateTrackDialogVisible] = useState(false)
-  const [newPoint, setNewPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
-  const [newBuoyField, setNewBuoyField] = useState<Feature<MultiPoint, BuoyFieldProps> | null>(null)
-  const [workingPoint, setWorkingPoint] = useState<Feature<Geometry, CoreShapeProps> | null>(null)
-  const [workingBuoyField, setWorkingBuoyField] = useState<Feature<Geometry, BuoyFieldProps> | null>(null)
+  const [createTrackDialogVisible, setcreateTrackDialogVisible] =
+    useState(false)
+  const [newPoint, setNewPoint] = useState<Feature<
+    Geometry,
+    CoreShapeProps
+  > | null>(null)
+  const [newBuoyField, setNewBuoyField] = useState<Feature<
+    MultiPoint,
+    BuoyFieldProps
+  > | null>(null)
+  const [workingPoint, setWorkingPoint] = useState<Feature<
+    Geometry,
+    CoreShapeProps
+  > | null>(null)
+  const [workingBuoyField, setWorkingBuoyField] = useState<Feature<
+    Geometry,
+    BuoyFieldProps
+  > | null>(null)
   const [formType, setFormType] = useState<string>('')
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
@@ -157,11 +196,17 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const selectionWithGroups = useMemo(() => {
     const fullList = [...selection]
-    const groups = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE) as unknown as Feature<Geometry, GroupProps>[]
-    selection.forEach((id : string) => {
+    const groups = features.filter(
+      (feature) => feature.properties?.dataType === GROUP_TYPE
+    ) as unknown as Feature<Geometry, GroupProps>[]
+    selection.forEach((id: string) => {
       // find the groups that include this feature id
-      const groupsContainingFeature = groups.filter((group) => group.properties.units.some((unit : string | number) => unit === id))
-      const groupIds = groupsContainingFeature.map((group) => group.id  + ':' + id as string)
+      const groupsContainingFeature = groups.filter((group) =>
+        group.properties.units.some((unit: string | number) => unit === id)
+      )
+      const groupIds = groupsContainingFeature.map(
+        (group) => (group.id + ':' + id) as string
+      )
       fullList.push(...groupIds)
     })
     return fullList
@@ -176,12 +221,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         name: '',
         dataType: REFERENCE_POINT_TYPE,
         color: '#FF0000',
-        visible: true
+        visible: true,
       },
       geometry: {
         type: 'Point',
-        coordinates: []
-      }
+        coordinates: [],
+      },
     }
     setFormType('point')
     setWorkingPoint(point)
@@ -195,12 +240,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         name: '',
         dataType: ZONE_TYPE,
         color: '#FF0000',
-        visible: true
+        visible: true,
       },
       geometry: {
         type: 'Polygon',
-        coordinates: []
-      }
+        coordinates: [],
+      },
     }
     setFormType('zone')
     setWorkingPoint(zone)
@@ -216,12 +261,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         symbol: 'air',
         dataType: BUOY_FIELD_TYPE,
         color: '#FF0000',
-        visible: true
+        visible: true,
       },
       geometry: {
         type: 'MultiPoint',
-        coordinates: []
-      }
+        coordinates: [],
+      },
     }
     setWorkingBuoyField(buoyField)
     setNewBuoyField(buoyField)
@@ -231,30 +276,47 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setMessage('Adding group')
   }
 
-  const handleAdd = useCallback( (e: React.MouseEvent, key: string, title: string) => {
-    if (key === NODE_TRACKS) {
-      setcreateTrackDialogVisible(true)
-    } else if (key === NODE_FIELDS) {
-      addBuoyField()
-    } else if (key === 'node-points') {
-      addPoint()
-    } else if (key === 'node-zones') {
-      addZone()
-    } else if (key === 'node-groups') {
-      addGroup()
-    } else {
-      console.error('unknown key for create new item ' + key + ' for ' + title)
-    }
-    e.stopPropagation()
-  }, [])
+  const handleAdd = useCallback(
+    (e: React.MouseEvent, key: string, title: string) => {
+      if (key === NODE_TRACKS) {
+        setcreateTrackDialogVisible(true)
+      } else if (key === NODE_FIELDS) {
+        addBuoyField()
+      } else if (key === 'node-points') {
+        addPoint()
+      } else if (key === 'node-zones') {
+        addZone()
+      } else if (key === 'node-groups') {
+        addGroup()
+      } else {
+        console.error(
+          'unknown key for create new item ' + key + ' for ' + title
+        )
+      }
+      e.stopPropagation()
+    },
+    []
+  )
 
   useEffect(() => {
     const items: TreeDataNode[] = []
     items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE, handleAdd))
-    items.push(mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd))
+    items.push(
+      mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
+    )
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
-    items.push(mapFunc(features, 'Points', 'node-points', REFERENCE_POINT_TYPE, handleAdd))
-    items.push(mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd))
+    items.push(
+      mapFunc(
+        features,
+        'Points',
+        'node-points',
+        REFERENCE_POINT_TYPE,
+        handleAdd
+      )
+    )
+    items.push(
+      mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
+    )
     const modelData = items
     setModel(modelData)
     if (features) {
@@ -262,7 +324,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         .filter((feature) => isChecked(feature))
         .map((feature) => idFor(feature))
       // we also have to find group features, then create checked ids for their visible units
-      const groupFeatures = features.filter((feature) => feature.properties?.dataType === GROUP_TYPE)
+      const groupFeatures = features.filter(
+        (feature) => feature.properties?.dataType === GROUP_TYPE
+      )
       groupFeatures.forEach((groupFeature) => {
         const props = groupFeature.properties as GroupProps
         props.units.forEach((unitId) => {
@@ -270,7 +334,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
             checked.push(groupIdFor(groupFeature, unitId as string))
           }
         })
-      }) 
+      })
       setCheckedKeys(checked)
     }
   }, [features, handleAdd])
@@ -284,16 +348,20 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     const newKeysArr = selectedKeys as string[]
 
     // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = selectionWithGroups.filter((key) => !newKeysArr.includes(key))
+    const removedKeys = selectionWithGroups.filter(
+      (key) => !newKeysArr.includes(key)
+    )
     if (removedKeys.length === 1) {
       const key = removedKeys[0]
-      const childId = key.indexOf(':') ? key.substring(key.indexOf(':') + 1) : key
+      const childId = key.indexOf(':')
+        ? key.substring(key.indexOf(':') + 1)
+        : key
       const trimmedList = selection.filter((id) => id !== childId)
       // check if the payload selection is different from the current selection
       if (JSON.stringify(trimmedList) !== JSON.stringify(selection)) {
         setSelection(trimmedList as string[])
       }
-      return      
+      return
     } else {
       // keys have been added
       const justNodes = justLeaves(selectedKeys)
@@ -308,7 +376,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     }
   }
 
-  const onCheck: TreeProps['onCheck'] = (checked: Key[] | { checked: Key[]; halfChecked: Key[]; }) => {
+  const onCheck: TreeProps['onCheck'] = (
+    checked: Key[] | { checked: Key[]; halfChecked: Key[] }
+  ) => {
     const newKeysArr = checked as string[]
 
     // diff the new keys from the checked keys, to see if items have been removed
@@ -316,7 +386,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     if (removedKeys.length !== 0) {
       const cleanChecked: Key[] = checkedKeys.map(cleanGroup)
       const cleanRemoved = removedKeys.map(cleanGroup)
-      const cleanedGroup = cleanChecked.filter((key) => !cleanRemoved.includes(key))
+      const cleanedGroup = cleanChecked.filter(
+        (key) => !cleanRemoved.includes(key)
+      )
       const keys = justLeaves(cleanedGroup as Key[])
       // if it is the key for an item in a group, then we have to extract the feature id
       const action = {
@@ -358,24 +430,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setSelection([])
   }
 
-  const onDuplicateClick = () => {
-    dispatch({
-      type: 'fColl/featuresDuplicated',
-      payload: { ids: selection },
-    })
-  }
-
-  const duplicateDisabled = useMemo(
-    () =>
-      selection.length === 0 ||
-      !!selection.find(
-        (id) =>
-          features.find((feature) => feature.id === id)?.properties
-            ?.dataType === TRACK_TYPE
-      ),
-    [selection, features]
-  )
-
   const setLoadTrackResults = async (values: NewTrackProps) => {
     setcreateTrackDialogVisible(false)
     // props in NewTrackProps format to TrackProps format, where they have different type
@@ -414,7 +468,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setWorkingBuoyField(null)
   }
 
-
   const handleDialogCancel = () => {
     setcreateTrackDialogVisible(false)
   }
@@ -428,8 +481,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       >
         <Alert type='info' description={message} />
       </Modal>
-      <div style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}>
-        <Flex className='toolbar' gap='small' justify='end' wrap style={{ height: '1em' }}>
+      <div
+        style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}
+      >
+        <Flex
+          className='toolbar'
+          gap='small'
+          justify='end'
+          wrap
+          style={{ height: '1em' }}
+        >
           <Button.Group>
             <ToolButton
               onClick={() => setExpandedKeys([])}
@@ -453,16 +514,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
                   : 'Select items to enable delete'
               }
             />
-            <ToolButton
-              onClick={onDuplicateClick}
-              disabled={duplicateDisabled}
-              icon={<CopyOutlined />}
-              title={
-                selection.length > 0
-                  ? 'Duplicate selected items'
-                  : 'Select non-track items to enable duplicate'
-              }
-            />
+            <CopyButton />
+            <PasteButton />
           </Button.Group>
           <ToolButton
             onClick={onGraphClick}
@@ -504,26 +557,32 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           createTrackOnly={true}
         />
       )}
-      { newPoint && <Modal
-        title={'Create new ' + formType}
-        open={true}
-        onCancel={() => setNewPoint(null)}
-        onOk={handlePointSave}>
-        <PointForm
-          shape={newPoint}
-          onChange={(point) => setWorkingPoint(point)}
-        />
-      </Modal>}
-      { newBuoyField && <Modal
-        title={'Create new buoy field'}
-        open={true}
-        onCancel={() => setNewBuoyField(null)}
-        onOk={handleBuoyFieldSave}>
-        <BuoyFieldForm
-          field={newBuoyField}
-          onChange={(point) => setWorkingBuoyField(point)}
-        />
-      </Modal>}
+      {newPoint && (
+        <Modal
+          title={'Create new ' + formType}
+          open={true}
+          onCancel={() => setNewPoint(null)}
+          onOk={handlePointSave}
+        >
+          <PointForm
+            shape={newPoint}
+            onChange={(point) => setWorkingPoint(point)}
+          />
+        </Modal>
+      )}
+      {newBuoyField && (
+        <Modal
+          title={'Create new buoy field'}
+          open={true}
+          onCancel={() => setNewBuoyField(null)}
+          onOk={handleBuoyFieldSave}
+        >
+          <BuoyFieldForm
+            field={newBuoyField}
+            onChange={(point) => setWorkingBuoyField(point)}
+          />
+        </Modal>
+      )}
     </>
   )
 }

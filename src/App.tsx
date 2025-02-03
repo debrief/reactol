@@ -1,7 +1,7 @@
 import './App.css'
 import { Provider } from 'react-redux'
 import { createStore } from './state/store.ts'
-import { AppProvider } from './state/AppProvider.tsx'
+import { DocContextProvider } from './state/DocContextProvider.tsx'
 import Document from './components/Document/index.tsx'
 import { useState } from 'react'
 import { cleanFeature } from './state/geoFeaturesSlice.ts'
@@ -28,7 +28,7 @@ const toFeatureCollection = (content?: string) => {
   if (item.type === 'Feature') {
     return {
       type: 'FeatureCollection',
-      features: [cleanFeature(item)]
+      features: [cleanFeature([], item)]
     }
   }
   throw new Error('Unknown type: ' + item.type)
@@ -38,9 +38,9 @@ function App({ content, filePath }: AppProps) {
   const [store] = useState(createStore(toFeatureCollection(content)))
   return (
     <Provider store={store}>
-      <AppProvider>
+      <DocContextProvider>
         <Document filePath={filePath} />
-      </AppProvider>  
+      </DocContextProvider>  
     </Provider>  
   )
 }

@@ -3,7 +3,7 @@ import { Feature, Geometry, Polygon } from 'geojson'
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useMemo } from 'react'
-import { useAppContext } from '../../../state/AppContext'
+import { useDocContext } from '../../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
 import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
@@ -24,7 +24,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
 }
 
 const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
-  const { selection, time } = useAppContext()
+  const { selection, time } = useDocContext()
   const { start: timeStart, end: timeEnd, filterApplied } = time
   const isSelected = selection.includes(feature.id as string)
 

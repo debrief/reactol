@@ -6,7 +6,7 @@ import Track from '../Track'
 import Zone from '../Zone'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useAppSelector } from '../../../state/hooks'
-import { useAppContext } from '../../../state/AppContext'
+import { useDocContext } from '../../../state/DocContext'
 import { Point as DataPoint } from '../Point'
 import { Graticule } from '../AutoGraticule'
 import { HomeControl } from '../../HomeControl'
@@ -43,7 +43,7 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
 /** helper component that freezer map viewport */
 const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
   const map = useMap()
-  const { setMapNode } = useAppContext()
+  const { setMapNode } = useDocContext()
 
   useEffect(() => {
 
@@ -70,7 +70,7 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
 
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.fColl.features)
-  const { selection, setSelection, viewportFrozen } = useAppContext()
+  const { selection, setSelection, viewportFrozen } = useDocContext()
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
