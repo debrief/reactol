@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Col, Form, Row, Tooltip } from 'antd'
+import { AutoComplete, Button, Col, Dropdown, Form, Menu, Row, Tooltip } from 'antd'
 import {
   CopyOutlined,
   StepBackwardOutlined,
@@ -8,7 +8,8 @@ import {
   FilterOutlined,
   LockFilled,
   UnlockOutlined,
-  FilterFilled
+  FilterFilled,
+  PlusOutlined
 } from '@ant-design/icons'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useAppContext } from '../../state/AppContext'
@@ -149,6 +150,28 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
   }
   const buttonStyle = { margin: '0 5px' }
 
+  const zoneShapes = [
+    { key: 'rectangle', label: 'Rectangle' },
+    { key: 'polygon', label: 'Polygon' },
+    { key: 'circularRing', label: 'Circular Ring' },
+    { key: 'sectionCircularRing', label: 'Section of Circular Ring' },
+    { key: 'circularSector', label: 'Circular Sector' },
+    { key: 'circle', label: 'Circle' },
+  ]
+
+  const handleMenuClick = (e: any) => {
+    console.log('Selected shape:', e.key)
+    // Add logic to open the customised new zone form based on the selected shape
+  }
+
+  const menu = (
+    <Menu onClick={handleMenuClick}>
+      {zoneShapes.map(shape => (
+        <Menu.Item key={shape.key}>{shape.label}</Menu.Item>
+      ))}
+    </Menu>
+  )
+
   return (
     <>
       {' '}
@@ -196,6 +219,11 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds }) => {
               disabled={!viewportFrozen}
             />
           </Tooltip>
+          <Dropdown overlay={menu} trigger={['click']}>
+            <Button icon={<PlusOutlined />} style={{ marginLeft: 8 }}>
+              Add zone
+            </Button>
+          </Dropdown>
         </Col>
       </Row>
       <Form disabled={!time.filterApplied}>

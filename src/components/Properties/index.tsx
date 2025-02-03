@@ -12,7 +12,6 @@ import { TrackForm } from '../TrackForm'
 import { GroupForm } from '../GroupForm'
 import { BuoyFieldForm } from '../BuoyFieldForm'
 
-
 const Properties: React.FC = () => {
   const { selection } = useAppContext()
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
@@ -25,17 +24,12 @@ const Properties: React.FC = () => {
   const dispatch = useAppDispatch()
   const selectedFeatureIds = selection
 
-  // useEffect(() => {
-  //   console.log('Feature state changed in properties', featureState)
-  // }, [featureState])
-
   const onReset = useCallback(() => {
     setFeatureState(originalState)
     setFormDirty(false)
   }, [originalState])
 
   const onSave = useCallback(() => {
-    // update the feature
     dispatch({ type: 'fColl/featureUpdated', payload: featureState })
     setFormDirty(false)
   }, [dispatch, featureState])
@@ -47,7 +41,6 @@ const Properties: React.FC = () => {
 
   useEffect(() => {
     if (featureState) {
-      // and the form
       const featureProps = featureState.properties
       if (featureProps?.dataType) {
         const aProps = featureProps as CoreShapeProps

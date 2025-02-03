@@ -2,7 +2,7 @@ import * as turf from '@turf/turf'
 import { Feature, Geometry, Polygon } from 'geojson'
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useAppContext } from '../../../state/AppContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
 import './index.css'
@@ -95,7 +95,41 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
     )
   }, [feature, isSelected, lineWeight, onClickHandler])
 
-  return <>{isVisible && polygon}</>
+  const [drawing, setDrawing] = useState(false)
+  const [currentShape, setCurrentShape] = useState<LatLngExpression[]>([])
+
+  const handleMapClick = (e: LeafletMouseEvent) => {
+    if (!drawing) return
+
+    const newShape = [...currentShape, [e.latlng.lat, e.latlng.lng]]
+    setCurrentShape(newShape)
+  }
+
+  const handleMapDoubleClick = () => {
+    if (!drawing) return
+
+    // Finalize the shape
+    setDrawing(false)
+    // Add logic to save the shape to the state or backend
+  }
+
+  const startDrawing = () => {
+    setDrawing(true)
+    setCurrentShape([])
+  }
+
+  return (
+    <>
+      {isVisible && polygon}
+      {drawing && (
+        <ReactPolygon
+          positions={currentShape}
+          weight={lineWeight}
+          color={'#ff0'}
+        />
+      )}
+    </>
+  )
 }
 
 export default Zone
