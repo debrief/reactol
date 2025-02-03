@@ -9,25 +9,10 @@ import zones from '../../data/zones'
 import points from '../../data/points'
 import { GROUP_TYPE } from '../../constants'
 import field from '../../data/buoyfield1'
-
-type SampleItem = {
-  name: string
-  data: Feature[]
-}
-
-const sampleItems: SampleItem[] = [
-  { name: 'Bulk selection', data: [] },
-  { name: 'Track 1', data: [track1] },
-  { name: 'Track 2', data: [track2] },
-  { name: 'Track 3', data: [track3] },
-  { name: 'Buoy field', data: [field] },
-  { name: 'Zones', data: zones },
-  { name: 'Points', data: points },
-
-]
+import { SampleItem } from '../../data/sampleItems'
 
 /** component providing a `home` button which zooms out to show all visible data */
-export const SampleDataLoader: React.FC = () => {
+export const SampleDataLoader: React.FC<{ sampleItems: SampleItem[] }> = ({ sampleItems }) => {
 
   const dispatch = useAppDispatch()
 

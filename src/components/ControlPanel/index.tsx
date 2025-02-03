@@ -16,6 +16,7 @@ import { useDocContext } from '../../state/DocContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
 import { SampleDataLoader } from '../SampleDataLoader'
+import { sampleItems } from '../../data/sampleItems'
 
 export interface TimeProps {
   bounds: [number, number] | null
@@ -194,7 +195,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <SampleDataLoader />
+          <SampleDataLoader sampleItems={sampleItems} />
           {saveButton}
         </Col>
         <Col span={4}>
