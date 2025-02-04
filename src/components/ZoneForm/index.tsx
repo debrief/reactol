@@ -66,7 +66,7 @@ const generateCirclePoints = (
   const radiusDegrees = metersToDegreesAtLatitude(radiusM, origin[1])
   
   for (let i = 0; i <= numPoints; i++) {
-    const angle = (startAngle + i * angleStep) * (Math.PI / 180)
+    const angle = (90 - (startAngle + i * angleStep)) * (Math.PI / 180)
     const x = origin[0] + radiusDegrees * Math.cos(angle)
     const y = origin[1] + radiusDegrees * Math.sin(angle)
     points.push([x, y])
