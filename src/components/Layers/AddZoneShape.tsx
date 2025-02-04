@@ -4,7 +4,7 @@ import {
 } from '@ant-design/icons'
 import { CIRCLE_SHAPE, CIRCULAR_RING_SHAPE, CIRCULAR_SECTOR_SHAPE, POLYGON_SHAPE, RECTANGLE_SHAPE, SECTION_CIRCULAR_RING_SHAPE } from '../../constants'
 
-const zoneShapes = [
+export const ZoneShapes = [
   { key: RECTANGLE_SHAPE, label: 'Rectangle' },
   { key: POLYGON_SHAPE, label: 'Polygon' },
   { key: CIRCULAR_RING_SHAPE, label: 'Circular Ring' },
@@ -19,7 +19,7 @@ export interface AddZoneProps {
 
 export const AddZoneShape: React.FC<AddZoneProps> = ({ addZone }) => {
 
-  const items: MenuProps['items'] = zoneShapes.map((item) => ({
+  const items: MenuProps['items'] = ZoneShapes.map((item) => ({
     key: item.key,
     label: item.label
   }))

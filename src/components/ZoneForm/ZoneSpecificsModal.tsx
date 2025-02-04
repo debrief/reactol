@@ -9,6 +9,8 @@ import {
   SECTION_CIRCULAR_RING_SHAPE,
 } from '../../constants'
 import { CoordinateInput } from './CoordinateInput'
+import { useMemo } from 'react'
+import { ZoneShapes } from '../Layers/AddZoneShape'
 
 interface ZoneSpecificsModalProps {
   open: boolean
@@ -36,6 +38,10 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
       console.error('Validation failed:', error)
     }
   }
+
+  const shapeName = useMemo(() => {
+    return ZoneShapes.find((s) => s.key === specifics.shapeType)?.label
+  }, [specifics.shapeType])
 
   const renderFields = () => {
     switch (specifics.shapeType) {
@@ -220,7 +226,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
 
   return (
     <Modal
-      title='Edit Zone Specifics'
+      title={'Edit Zone - ' + shapeName}
       open={open}
       onOk={handleOk}
       onCancel={onCancel}
