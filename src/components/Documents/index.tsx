@@ -1,5 +1,6 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useRef, useEffect } from 'react'
 import App from '../../App'
+import type { InputRef } from 'antd'
 import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip } from 'antd'
 import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
 import './index.css'
@@ -24,6 +25,15 @@ const Documents = () => {
   const [tabToClose, setTabToClose] = useState<string | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
+  const inputRef = useRef<InputRef | null>(null)
+  
+  useEffect(() => {
+    if (isTabNameModalVisible) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 50)
+    }
+  }, [isTabNameModalVisible])
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
@@ -142,6 +152,7 @@ const Documents = () => {
         onCancel={handleCancel}
       >
         <Input
+          ref={inputRef}
           placeholder="Enter document name"
           value={documentName}
           onChange={handleNameChange}
