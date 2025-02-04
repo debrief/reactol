@@ -5,7 +5,7 @@ import { Feature, FeatureCollection, LineString, MultiPoint, Point, Polygon } fr
 import * as turf from '@turf/turf'
 import nearestPoint from '@turf/nearest-point'
 import './index.css'
-import { useAppContext } from '../../../state/AppContext'
+import { useDocContext } from '../../../state/DocContext'
 import { useAppSelector } from '../../../state/hooks'
 import { formatCoordinate } from '../../../helpers/formatCoordinate'
 
@@ -29,10 +29,10 @@ const featureToPoints = (feature: Feature): FeatureCollection<Point> => {
 }
 
 const MouseCoordinates: React.FC = () => {
-  const { selection } = useAppContext()
+  const { selection } = useDocContext()
   const features = useAppSelector(state => state.fColl.features)
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0})
-  const { viewportFrozen } = useAppContext()
+  const { viewportFrozen } = useDocContext()
 
   const map = useMap()
 

@@ -1,197 +1,47 @@
-import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
 import './App.css'
-import { useEffect, useMemo, useState } from 'react'
-import Layers from './components/Layers'
-import Properties from './components/Properties'
-import ControlPanel from './components/ControlPanel'
-import { timeBoundsFor } from './helpers/timeBounds.ts'
-import { useAppDispatch, useAppSelector } from './state/hooks.ts'
-import Map from './components/spatial/Map/index.tsx'
-import GraphModal from './components/GraphModal'
-import { useAppContext } from './state/AppContext.ts'
-import { TileLayer } from 'react-leaflet'
-import { loadJson } from './helpers/loaders/loadJson.ts' // Import the load function
-import { loadOpRep } from './helpers/loaders/loadOpRep.ts' // Import the loadOpRep function
-import { Feature, Geometry, GeoJsonProperties } from 'geojson'
-import Control from 'react-leaflet-custom-control'
-import toDTG from './helpers/toDTG.ts'
-import { AppDispatch } from './state/store.ts'
-import { LoadTrackModel } from './components/LoadTrackModal'
-import { NewTrackProps } from './types.ts'
+import { Provider } from 'react-redux'
+import { createStore } from './state/store.ts'
+import { DocContextProvider } from './state/DocContextProvider.tsx'
+import Document from './components/Document/index.tsx'
+import { useState } from 'react'
+import { cleanFeature } from './state/geoFeaturesSlice.ts'
 
-interface FileHandler {
-  blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => void
+export type AppProps = {
+  content?: string
+  filePath?: string
 }
 
-export interface TimeState {
-  filterApplied: boolean
-  start: number
-  step: string
-  end: number
+/** we will allow a feature collection or a single 
+ * feature to be loaded into the store
+ */
+const toFeatureCollection = (content?: string) => {
+  if (!content){
+    return {
+      type: 'FeatureCollection',
+      features: []
+    }
+  }
+  const item =JSON.parse(content)
+  if (item.type === 'FeatureCollection') {
+    return item
+  }
+  if (item.type === 'Feature') {
+    return {
+      type: 'FeatureCollection',
+      features: [cleanFeature([], item)]
+    }
+  }
+  throw new Error('Unknown type: ' + item.type)
 }
 
-const FileHandlers: FileHandler[] = [
-  { blobType: 'application/json', handle: loadJson },
-  { blobType: 'text/plain', handle: loadOpRep } 
-]
-
-function App() {
-  const features = useAppSelector(state => state.fColl.features)
-  const dispatch = useAppDispatch()
-  const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
-  const [graphOpen, setGraphOpen] = useState(false)
-  const [isDragging, setIsDragging] = useState(false) 
-  const [error, setError] = useState<string | null>(null) 
-  const { setTime, time } = useAppContext()
-
-  const timePeriod = useMemo(() => {
-    if (time.start && time.end) {
-      const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`
-      return formattedTimePeriod  
-    } else {
-      return 'Pending'
-    }
-  }, [time])
-
-  useEffect(() => {
-    if (features && features.length) {
-      const timeBoundsVal = timeBoundsFor(features)
-      if(timeBoundsVal) {
-        setTimeBounds(timeBoundsVal)
-        const timePayload = { filterApplied: false, start: timeBoundsVal[0], step: '00h30m', end: timeBoundsVal[1] }
-        setTime(timePayload)  
-      } else {
-        setTimeBounds(null)
-        setTime({...time, filterApplied: false, start: 0, end: 0})
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [features, setTime])
-
-  const antdTheme = {
-    components: {
-      Splitter: {
-        splitBarSize: 10,
-      },
-      Table: {
-        headerBg: '#555',
-        headerColor: '#fff'
-      }
-    }
-  }
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = () => {
-    setIsDragging(false)
-  }
-
-  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(false)
-
-    const files = event.dataTransfer.files
-
-    if (files.length > 1) {
-      console.log('too many files error')
-      setError('Only one file can be loaded at a time')
-      return
-    }
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const handler = file && FileHandlers.find(handler => handler.blobType === file.type)
-      if (handler) {
-        try {
-          if (file.type === 'text/plain') {
-            showDialog(file, handler)
-          } else {
-            handler.handle(await file.text(), features, dispatch)
-          }
-        } catch (e) {
-          console.log('handler error', e)
-          setError('' + e) 
-        }
-      }
-    }
-  }
-
-  const [isDialogVisible, setIsDialogVisible] = useState(false)
-  const [currentFile, setCurrentFile] = useState<File | null>(null)
-  const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null)
-
-  const showDialog = (file: File, handler: FileHandler) => {
-    setCurrentFile(file)
-    setCurrentHandler(handler)
-    setIsDialogVisible(true)
-  }
-
-  const setLoadTrackResults = async (values: NewTrackProps) => {
-    setIsDialogVisible(false)
-    if (currentFile && currentHandler) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, values)
-    }
-  }
-
-  const handleDialogCancel = () => {
-    setIsDialogVisible(false)
-  }
-
-  const addToTrack = (trackId: string) => {
-    setIsDialogVisible(false)
-    console.log('adding data to track:' + trackId)
-  }
-
+function App({ content, filePath }: AppProps) {
+  const [store] = useState(createStore(toFeatureCollection(content)))
   return (
-    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-      {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
-      <Modal title="Loading Error" open={!!error} onCancel={() => setError(null)} onOk={() => setError(null)}>
-        <Alert type="error" description={error} />
-      </Modal>
-      {error && <div className="error-modal">{error}</div>} 
-      <ConfigProvider theme={antdTheme}>
-        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-          <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-              <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
-                <Card title='Control Panel'>
-                  <ControlPanel bounds={timeBounds}/>
-                </Card>
-              </Splitter.Panel>
-              <Splitter.Panel>
-                <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { features && <Layers openGraph={() => setGraphOpen(true)} /> }
-                </Card>
-              </Splitter.Panel>
-              <Splitter.Panel>
-                <Card title='Detail'>
-                  <Properties />
-                </Card>
-              </Splitter.Panel>
-            </Splitter>
-          </Splitter.Panel>
-          <Splitter.Panel key='right'>
-            <Map>
-              <TileLayer maxNativeZoom={8} maxZoom={16}
-                url="tiles/{z}/{x}/{y}.png"
-              />
-              <Control prepend position='topleft'>
-                <div className='time-period'>
-                  {timePeriod}
-                </div>
-              </Control>
-            </Map>
-          </Splitter.Panel>
-        </Splitter>
-        <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
-      </ConfigProvider>
-      <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
-        newTrack={setLoadTrackResults} addToTrack={addToTrack} />
-    </div>
+    <Provider store={store}>
+      <DocContextProvider>
+        <Document filePath={filePath} />
+      </DocContextProvider>  
+    </Provider>  
   )
 }
 

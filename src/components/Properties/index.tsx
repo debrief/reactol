@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
 import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps } from '../../types'
-import { useAppContext } from '../../state/AppContext'
+import { useDocContext } from '../../state/DocContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
 import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint, Point } from 'geojson'
@@ -14,7 +14,7 @@ import { BuoyFieldForm } from '../BuoyFieldForm'
 
 
 const Properties: React.FC = () => {
-  const { selection } = useAppContext()
+  const { selection, setSelection } = useDocContext()
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [formDirty, setFormDirty] = useState<boolean>(false)
@@ -24,10 +24,6 @@ const Properties: React.FC = () => {
   const [propertyForm, setPropertyForm] = useState<ReactNode | null>(null)
   const dispatch = useAppDispatch()
   const selectedFeatureIds = selection
-
-  // useEffect(() => {
-  //   console.log('Feature state changed in properties', featureState)
-  // }, [featureState])
 
   const onReset = useCallback(() => {
     setFeatureState(originalState)
@@ -40,10 +36,33 @@ const Properties: React.FC = () => {
     setFormDirty(false)
   }, [dispatch, featureState])
 
-  const updateFeatureState = (newFeature: Feature<Geometry, GeoJsonProperties>) => {
+  const onDelete = useCallback(() => {
+    // update the feature
+    dispatch({ type: 'fColl/featuresDeleted', payload: { ids: [featureState?.id] } })
+    setSelection([])
+    setFormDirty(false)
+  }, [dispatch, featureState, setSelection])
+
+  const updateFeatureState = useCallback((newFeature: Feature<Geometry, GeoJsonProperties>) => {
     setFeatureState(newFeature)
     setFormDirty(true)
-  }
+  }, [setFeatureState, setFormDirty])
+
+  const customFormFor = useCallback((dataType: string, featureState: Feature): React.ReactElement => {
+    switch (dataType) {
+    case TRACK_TYPE:    
+      return <TrackForm onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
+    case BUOY_FIELD_TYPE:    
+      return <BuoyFieldForm onChange={updateFeatureState} field={featureState as Feature<MultiPoint, BuoyFieldProps>} />
+    case GROUP_TYPE:
+      return <GroupForm onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
+    case ZONE_TYPE:
+    case REFERENCE_POINT_TYPE:
+      return <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
+    default:
+      return <PropertiesViewer feature={featureState} />
+    }
+  }, [updateFeatureState])
 
   useEffect(() => {
     if (featureState) {
@@ -51,38 +70,12 @@ const Properties: React.FC = () => {
       const featureProps = featureState.properties
       if (featureProps?.dataType) {
         const aProps = featureProps as CoreShapeProps
-        switch (aProps.dataType) {
-        case REFERENCE_POINT_TYPE:
-          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
-          </CoreForm>)
-          break
-        case TRACK_TYPE:    
-          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <TrackForm onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
-          </CoreForm>)
-          break
-        case BUOY_FIELD_TYPE:    
-          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <BuoyFieldForm onChange={updateFeatureState} field={featureState as Feature<MultiPoint, BuoyFieldProps>} />
-          </CoreForm>)
-          break
-        case ZONE_TYPE:
-          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
-          </CoreForm>)
-          break
-        case GROUP_TYPE:
-          setPropertyForm(<CoreForm formDirty={formDirty} onReset={onReset} onSave={onSave}>
-            <GroupForm onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
-          </CoreForm>)
-          break
-        default:
-          setPropertyForm (<PropertiesViewer feature={featureState} />)
-        }
+        setPropertyForm(<CoreForm formDirty={formDirty} onDelete={onDelete} onReset={onReset} onSave={onSave}>
+          {customFormFor(aProps.dataType, featureState)}
+        </CoreForm>)
       }
     }
-  },[featureState, onSave, onReset, formDirty])
+  },[featureState, customFormFor, onSave, onDelete, onReset, formDirty])
 
   useEffect(() => {
     if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
