@@ -58,10 +58,8 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
       .center(points)
       .geometry.coordinates.reverse() as LatLngExpression
     const polyCoords = (feature.geometry as Polygon).coordinates
-    const numLines = polyCoords.length
     // our coordinates may be a single line (polygon, circle) or multiple lines (shape with a hole).
-    const trackCoords = numLines === 1 ? (polyCoords as unknown as Position[][]).map((line) => line.map((item): LatLngExpression => [item[1], item[0]])) : 
-      (polyCoords as unknown as Position[][]).map((line: Position[]) => line.map((item) => [item[1], item[0]] as LatLngExpression))
+    const trackCoords =  (polyCoords as unknown as Position[][]).map((line) => line.map((item): LatLngExpression => [item[1], item[0]])) 
     return (
       <>
         {isSelected && (
