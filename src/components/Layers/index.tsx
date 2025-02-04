@@ -9,7 +9,7 @@ import {
   CloseCircleOutlined,
   ShrinkOutlined,
 } from '@ant-design/icons'
-import { Feature, Geometry, MultiPoint, Point, Polygon } from 'geojson'
+import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
   BUOY_FIELD_TYPE,
   GROUP_TYPE,
@@ -34,7 +34,7 @@ import { BuoyFieldForm } from '../BuoyFieldForm'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
 import { AddZoneShape } from './AddZoneShape'
-import { zoneShapePropsFor } from '../../helpers/zoneShapePropsFor'
+import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { ZoneForm } from '../ZoneForm'
 
 interface LayerProps {
@@ -245,20 +245,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const addZone = (key: string): void => {
-    const zone: Feature<Polygon, ZoneProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: ZONE_TYPE,
-        specifics:  zoneShapePropsFor(key),
-        color: '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [],
-      },
-    }
+    const zone = zoneFeatureFor(key)
     setFormType('zone')
     setWorkingZone(zone)
     setNewZone(zone)

@@ -16,7 +16,8 @@ export type ZoneRectangleProps = CoreZoneShapeProps & {
 
 export type ZonePolygonProps = CoreZoneShapeProps & {
   shapeType: typeof POLYGON_SHAPE
-  points: [number, number][]
+  // note: we just use the coordinates object for the 
+  // points, so we don't need to store them here
 }
 
 export type ZoneCircularRingProps = CoreZoneShapeProps & {
