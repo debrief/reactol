@@ -1,8 +1,9 @@
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import App from '../../App'
-import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip } from 'antd'
+import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip } from 'antd'
 import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
+import { Layout, Model, TabNode } from 'flexlayout-react'
+import 'flexlayout-react/style/light.css'
 import './index.css'
 
 type TabWithPath =  {
@@ -26,6 +27,7 @@ const Documents = () => {
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
   const inputRef = useRef<InputRef | null>(null)
+  const layoutRef = useRef<Layout | null>(null)
   
   useEffect(() => {
     if (isTabNameModalVisible) {
@@ -133,17 +135,39 @@ const Documents = () => {
     right: <Tooltip title='Open Existing Document' placement="bottom"><Button onClick={() => openExistingDocument()}>Open</Button></Tooltip>
   }
 
+  const layoutModel = useMemo(() => {
+    const model = {
+      global: {},
+      layout: {
+        type: 'row',
+        children: [
+          {
+            type: 'tabset',
+            weight: 100,
+            children: tabs.map(tab => ({
+              type: 'tab',
+              name: tab.label,
+              component: tab.key,
+            })),
+          },
+        ],
+      },
+    }
+    return Model.fromJson(model)
+  }, [tabs])
+
+  const factory = (node: TabNode) => {
+    const component = node.getComponent()
+    const tab = tabs.find(tab => tab.key === component)
+    return tab ? tab.children : null
+  }
+
   return (
     <div>
-      { tabs.length > 0 && <Tabs
-        tabBarExtraContent={tabBarExtras}
-        type='editable-card'
-        activeKey={activeTab}
-        onChange={onTabChange}
-        items={tabs}
-        addIcon={<Tooltip title='Create New Document' placement="bottom"><Button shape='circle' icon={<PlusOutlined />} /></Tooltip>}
-        removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
-        onEdit={onTabsEdit}
+      { tabs.length > 0 && <Layout
+        ref={layoutRef}
+        model={layoutModel}
+        factory={factory}
       />}
       <Modal
         title="Please provide a name for the document"
