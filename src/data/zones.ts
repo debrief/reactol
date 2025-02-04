@@ -1,5 +1,5 @@
 import { Feature, Geometry } from 'geojson'
-import { CIRCLE_SHAPE, POLYGON_SHAPE, ZONE_TYPE } from '../constants'
+import { CIRCLE_SHAPE, POLYGON_SHAPE, RECTANGLE_SHAPE, ZONE_TYPE } from '../constants'
 import { ZoneProps } from '../types'
 
 const zones: Feature<Geometry, ZoneProps>[] = [
@@ -137,7 +137,11 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
-        shapeType: POLYGON_SHAPE
+        shapeType: RECTANGLE_SHAPE,
+        topLeft: [-4.952818128566975,
+          35.64425286391361],
+        bottomRight: [-4.325115749820583,
+          35.36124236611033]
       }
     },
     geometry: {
