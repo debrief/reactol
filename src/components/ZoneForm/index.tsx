@@ -8,7 +8,7 @@ import { ZoneProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 import { ZoneSpecificsModal } from './ZoneSpecificsModal'
 import { ZoneShapeProps } from '../../zoneShapeTypes'
-import { CIRCLE_SHAPE, CIRCULAR_RING_SHAPE, CIRCULAR_SECTOR_SHAPE, POLYGON_SHAPE, RECTANGLE_SHAPE, SECTION_CIRCULAR_RING_SHAPE } from '../../constants'
+import { generateShapeCoordinates } from '../../helpers/shapeGeneration'
 
 /** swap the time string a parameter of the expected type */
 type FormTypeProps = Omit<ZoneProps, 'time' | 'timeEnd'> & {
@@ -42,96 +42,6 @@ const convertBack = (shape: Readonly<FormTypeProps>): ZoneProps => {
     delete (newVal as Partial<FormTypeProps>).dTimeEnd
   }
   return newVal
-}
-
-// Generate points for a circle or arc
-const metersToDegreesAtLatitude = (meters: number, latitude: number): number => {
-  // Length of a degree of latitude is roughly constant at 111,319.9 meters
-  // Length of a degree of longitude varies with cosine of latitude
-  const latitudeDegrees = meters / 111319.9
-  const longitudeDegrees = meters / (111319.9 * Math.cos(latitude * Math.PI / 180))
-  // Return the larger value to ensure the circle isn't too small
-  return Math.max(latitudeDegrees, longitudeDegrees)
-}
-
-const generateCirclePoints = (
-  origin: [number, number],
-  radiusM: number,
-  startAngle = 0,
-  endAngle = 360,
-  numPoints = 12
-): Position[] => {
-  const points: Position[] = []
-  const angleStep = (endAngle - startAngle) / numPoints
-  const radiusDegrees = metersToDegreesAtLatitude(radiusM, origin[1])
-  
-  for (let i = 0; i <= numPoints; i++) {
-    const angle = (90 - (startAngle + i * angleStep)) * (Math.PI / 180)
-    const x = origin[0] + radiusDegrees * Math.cos(angle)
-    const y = origin[1] + radiusDegrees * Math.sin(angle)
-    points.push([x, y])
-  }
-  
-  // Close the shape by adding the first point again
-  if (endAngle - startAngle === 360) {
-    points.push([points[0][0], points[0][1]])
-  }
-  
-  return points
-}
-
-const generateShapeCoordinates = (specifics: ZoneShapeProps): Position[][] => {
-  switch (specifics.shapeType) {
-  case RECTANGLE_SHAPE: {
-    const { topLeft, bottomRight } = specifics
-    return [[
-      topLeft,
-      [bottomRight[0], topLeft[1]],
-      bottomRight,
-      [topLeft[0], bottomRight[1]],
-      topLeft // Close the polygon
-    ]]
-  }
-  
-  case CIRCLE_SHAPE: {
-    const { origin, radiusM } = specifics
-    return [generateCirclePoints(origin, radiusM)]
-  }
-  
-  case CIRCULAR_RING_SHAPE: {
-    const { origin, innerRadiusM, outerRadiusM } = specifics
-    // Create two circles - outer and inner (in reverse for proper polygon with hole)
-    const outerRing = generateCirclePoints(origin, outerRadiusM)
-    const innerRing = generateCirclePoints(origin, innerRadiusM).reverse()
-    return [outerRing, innerRing]
-  }
-  
-  case SECTION_CIRCULAR_RING_SHAPE: {
-    const { origin, innerRadiusM, outerRadiusM, startAngle, endAngle } = specifics
-    // Create the arc segments and connect them
-    const outerArc = generateCirclePoints(origin, outerRadiusM, startAngle, endAngle)
-    // Create the arc segments and connect them
-    const innerArc = generateCirclePoints(origin, innerRadiusM, endAngle, startAngle)
-    return [[
-      ...outerArc,
-      ...innerArc,
-      outerArc[0] // Close the polygon
-    ]]
-  }
-  
-  case CIRCULAR_SECTOR_SHAPE: {
-    const { origin, startAngle, endAngle, radiusM } = specifics
-    const arc = generateCirclePoints(origin, radiusM, startAngle, endAngle)
-    return [[
-      origin,
-      ...arc,
-      origin // Close the polygon
-    ]]
-  }
-  
-  default:
-    return []
-  }
 }
 
 export interface ZoneFormProps {
@@ -170,10 +80,7 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
 
   const handleModalOk = (updatedSpecifics: ZoneShapeProps, coordinates: Position[][]) => {
     // Use provided coordinates for polygon, generate for other shapes
-    const shapeCoordinates = updatedSpecifics.shapeType === POLYGON_SHAPE 
-      ? coordinates 
-      : generateShapeCoordinates(updatedSpecifics)
-
+    const shapeCoordinates = generateShapeCoordinates(updatedSpecifics, coordinates)
     const updatedGeometry: Polygon = { type: 'Polygon', coordinates: shapeCoordinates }
     const updatedProps = {...formProps, specifics: updatedSpecifics} as ZoneProps
     const res: Feature<Geometry, ZoneProps> = {...shape, type: 'Feature', geometry: updatedGeometry, properties: updatedProps }
