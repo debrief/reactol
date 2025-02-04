@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
-import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps } from '../../types'
+import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps, ZoneProps, PointProps } from '../../types'
 import { useDocContext } from '../../state/DocContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import './index.css'
@@ -11,6 +11,7 @@ import { PropertiesViewer } from './PropertiesViewer'
 import { TrackForm } from '../TrackForm'
 import { GroupForm } from '../GroupForm'
 import { BuoyFieldForm } from '../BuoyFieldForm'
+import { ZoneForm } from '../ZoneForm'
 
 
 const Properties: React.FC = () => {
@@ -57,8 +58,9 @@ const Properties: React.FC = () => {
     case GROUP_TYPE:
       return <GroupForm onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
     case ZONE_TYPE:
+      return <ZoneForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, ZoneProps>} />
     case REFERENCE_POINT_TYPE:
-      return <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, CoreShapeProps>} />
+      return <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, PointProps>} />
     default:
       return <PropertiesViewer feature={featureState} />
     }

@@ -4,37 +4,37 @@ import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
-import { CoreShapeProps } from '../../types'
+import { PointProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 
 export interface PointFormProps {
-  shape: Feature<Geometry, CoreShapeProps>
-  onChange: (shape: Feature<Geometry, CoreShapeProps>) => void
+  shape: Feature<Geometry, PointProps>
+  onChange: (shape: Feature<Geometry, PointProps>) => void
 }
 
 /** swap the time string a parameter of the expected type */
-type FormTypeProps = Omit<CoreShapeProps, 'time' | 'timeEnd'> & {
+type FormTypeProps = Omit<PointProps, 'time' | 'timeEnd'> & {
   dTime: Dayjs
   dTimeEnd: Dayjs
 }
 
-const convert = (shape: Readonly<CoreShapeProps>): FormTypeProps=> {
+const convert = (shape: Readonly<PointProps>): FormTypeProps=> {
   const oldVal = shape
   const newVal = {...shape} as FormTypeProps
   if (oldVal.time) {
     newVal.dTime = dayjs(oldVal.time)
-    delete (newVal as Partial<CoreShapeProps>).time
+    delete (newVal as Partial<PointProps>).time
   }
   if (oldVal.timeEnd) {
     newVal.dTimeEnd = dayjs(oldVal.timeEnd)
-    delete (newVal as Partial<CoreShapeProps>).timeEnd
+    delete (newVal as Partial<PointProps>).timeEnd
   }
   return newVal
 }
 
-const convertBack = (shape: Readonly<FormTypeProps>): CoreShapeProps => {
+const convertBack = (shape: Readonly<FormTypeProps>): PointProps => {
   const oldVal = shape
-  const newVal = {...shape} as CoreShapeProps
+  const newVal = {...shape} as PointProps
   if (shape.dTime) {
     newVal.time = oldVal.dTime.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTime

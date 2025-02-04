@@ -9,7 +9,7 @@ import {
   CloseCircleOutlined,
   ShrinkOutlined,
 } from '@ant-design/icons'
-import { Feature, Geometry, MultiPoint, Point, Polygon } from 'geojson'
+import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
   BUOY_FIELD_TYPE,
   GROUP_TYPE,
@@ -33,6 +33,9 @@ import { PointForm } from '../PointForm'
 import { BuoyFieldForm } from '../BuoyFieldForm'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
+import { AddZoneShape } from './AddZoneShape'
+import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
+import { ZoneForm } from '../ZoneForm'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -98,8 +101,13 @@ const mapFunc = (
   title: string,
   key: string,
   dType: string,
-  handleAdd: (e: React.MouseEvent, key: string, title: string) => void
+  handleAdd: (e: React.MouseEvent, key: string, title: string) => void,
+  button?: React.ReactNode
 ): TreeDataNode => {
+  const buttonToUse = button || <PlusCircleOutlined
+    style={{ cursor: 'copy' }}
+    onClick={(e) => handleAdd(e, key, title)} />
+
   const children =
     dType !== GROUP_TYPE
       ? findChildrenOfType(features, dType)
@@ -107,12 +115,7 @@ const mapFunc = (
   return {
     title: title,
     key: key,
-    icon: (
-      <PlusCircleOutlined
-        style={{ cursor: 'copy' }}
-        onClick={(e) => handleAdd(e, key, title)}
-      />
-    ),
+    icon: buttonToUse,
     children: children,
   }
 }
@@ -173,13 +176,21 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     useState(false)
   const [newPoint, setNewPoint] = useState<Feature<
     Geometry,
-    CoreShapeProps
+    PointProps
+  > | null>(null)
+  const [newZone, setNewZone] = useState<Feature<
+    Geometry,
+    ZoneProps
   > | null>(null)
   const [newBuoyField, setNewBuoyField] = useState<Feature<
     MultiPoint,
     BuoyFieldProps
   > | null>(null)
   const [workingPoint, setWorkingPoint] = useState<Feature<
+    Geometry,
+    CoreShapeProps
+  > | null>(null)
+  const [workingZone, setWorkingZone] = useState<Feature<
     Geometry,
     CoreShapeProps
   > | null>(null)
@@ -233,23 +244,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewPoint(point)
   }
 
-  const addZone = () => {
-    const zone: Feature<Polygon, ZoneProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: ZONE_TYPE,
-        color: '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [],
-      },
-    }
+  const addZone = (key: string): void => {
+    const zone = zoneFeatureFor(key)
     setFormType('zone')
-    setWorkingPoint(zone)
-    setNewPoint(zone)
+    setWorkingZone(zone)
+    setNewZone(zone)
   }
 
   const addBuoyField = () => {
@@ -285,7 +284,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       } else if (key === 'node-points') {
         addPoint()
       } else if (key === 'node-zones') {
-        addZone()
+        // ok, skip this
+        return
       } else if (key === 'node-groups') {
         addGroup()
       } else {
@@ -304,7 +304,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     items.push(
       mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
     )
-    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd, 
+      <AddZoneShape addZone={addZone} />))
     items.push(
       mapFunc(
         features,
@@ -462,6 +463,12 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setWorkingPoint(null)
   }
 
+  const handleZoneSave = () => {
+    dispatch({ type: 'fColl/featureAdded', payload: workingZone })
+    setNewZone(null)
+    setWorkingZone(null)
+  }
+  
   const handleBuoyFieldSave = () => {
     dispatch({ type: 'fColl/featureAdded', payload: workingBuoyField })
     setNewBuoyField(null)
@@ -567,6 +574,19 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           <PointForm
             shape={newPoint}
             onChange={(point) => setWorkingPoint(point)}
+          />
+        </Modal>
+      )}
+      {newZone && (
+        <Modal
+          title={'Create new ' + formType}
+          open={true}
+          onCancel={() => setNewZone(null)}
+          onOk={handleZoneSave}
+        >
+          <ZoneForm
+            shape={newZone}
+            onChange={(zone) => setWorkingZone(zone)}
           />
         </Modal>
       )}

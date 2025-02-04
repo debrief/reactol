@@ -1,5 +1,5 @@
 import { Feature, Geometry } from 'geojson'
-import { ZONE_TYPE } from '../constants'
+import { CIRCLE_SHAPE, POLYGON_SHAPE, RECTANGLE_SHAPE, ZONE_TYPE } from '../constants'
 import { ZoneProps } from '../types'
 
 const zones: Feature<Geometry, ZoneProps>[] = [
@@ -12,7 +12,12 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       visible: true,
       dataType: ZONE_TYPE,
       time: '2024-11-14T19:10:00.000Z',
-      timeEnd : '2024-11-15T04:10:00.000Z'
+      timeEnd : '2024-11-15T04:10:00.000Z',
+      specifics:{
+        shapeType: CIRCLE_SHAPE,
+        origin: [-4.334814, 36.596182],
+        radiusM: 1100
+      }
     },
     geometry: {
       coordinates: [
@@ -50,7 +55,10 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       color: '#F55',
       dataType: ZONE_TYPE,
       visible: true,
-      time: '2024-11-14T18:10:00.000Z'
+      time: '2024-11-14T18:10:00.000Z',
+      specifics:{
+        shapeType: POLYGON_SHAPE
+      }
     },
     geometry: {
       coordinates: [
@@ -87,7 +95,10 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       name: 'SAP 2',
       color: '#0FF',
       dataType: ZONE_TYPE,
-      visible: true
+      visible: true,
+      specifics:{
+        shapeType: POLYGON_SHAPE
+      }
     },
     geometry: {
       coordinates: [
@@ -124,7 +135,14 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       name: 'SIR 1',
       color: '#FF0',
       dataType: ZONE_TYPE,
-      visible: true
+      visible: true,
+      specifics:{
+        shapeType: RECTANGLE_SHAPE,
+        topLeft: [-4.952818128566975,
+          35.64425286391361],
+        bottomRight: [-4.325115749820583,
+          35.36124236611033]
+      }
     },
     geometry: {
       coordinates: [
@@ -161,7 +179,10 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       name: 'TRA 1',
       color: '#F0F',
       dataType: ZONE_TYPE,
-      visible: true
+      visible: true,
+      specifics:{
+        shapeType: POLYGON_SHAPE
+      }
     },
     geometry: {
       coordinates: [

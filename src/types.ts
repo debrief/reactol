@@ -1,4 +1,5 @@
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE } from './constants'
+import { ZoneShapeProps } from './zoneShapeTypes.ts'
 
 /** just a centre time if time provided, else start and end times */
 export type TemporalShapeProps = {time?: string, timeEnd?: string} 
@@ -31,7 +32,10 @@ export type BuoyFieldProps = CoreTrackPrps & TemporalShapeProps & {
 
 export type CoreShapeProps = CoreDataProps & TemporalShapeProps
 
-export type ZoneProps = CoreShapeProps & { dataType: typeof ZONE_TYPE }
+
+export type ZoneProps = CoreShapeProps & { dataType: typeof ZONE_TYPE
+  specifics: ZoneShapeProps
+ }
 export type PointProps = CoreShapeProps & { dataType: typeof REFERENCE_POINT_TYPE }
 export type GroupProps = {
   dataType: typeof GROUP_TYPE
@@ -50,3 +54,4 @@ export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'l
 export type AddTrackProps = {
   trackId: string
 }
+
