@@ -76,8 +76,6 @@ const generateCirclePoints = (
   if (endAngle - startAngle === 360) {
     points.push([points[0][0], points[0][1]])
   }
-
-  console.log('generated points', points)
   
   return points
 }
@@ -144,6 +142,7 @@ export interface ZoneFormProps {
 export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [formProps, setFormProps] = useState<ZoneProps | null>(shape.properties)
 
   useEffect(() => {
     if (shape) {
@@ -157,6 +156,10 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
     }
     const updatedProps= {...state, ...values} as FormTypeProps
     const convertedProps = convertBack(updatedProps)
+    const combinedProps = ({...formProps, ...convertedProps})
+    // store the updated form props, so when the modal form closes,
+    // the handler can collate all data.
+    setFormProps(combinedProps)
     const res = {...shape, properties: convertedProps}
     onChange(res)
   }
@@ -171,10 +174,8 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
       ? coordinates 
       : generateShapeCoordinates(updatedSpecifics)
 
-    console.log('coords', shapeCoordinates)
-
     const updatedGeometry: Polygon = { type: 'Polygon', coordinates: shapeCoordinates }
-    const updatedProps = {...shape.properties, specifics: updatedSpecifics}
+    const updatedProps = {...formProps, specifics: updatedSpecifics} as ZoneProps
     const res: Feature<Geometry, ZoneProps> = {...shape, type: 'Feature', geometry: updatedGeometry, properties: updatedProps }
     onChange(res)
     setIsModalOpen(false)

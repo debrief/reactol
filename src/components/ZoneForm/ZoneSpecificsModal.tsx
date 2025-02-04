@@ -34,7 +34,6 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
   )
 
   const handleOk = async () => {
-
     try {
       const values = await form.validateFields()
       const coords: Position[][] = specifics.shapeType === POLYGON_SHAPE ? [polygonCoordinates] : []
