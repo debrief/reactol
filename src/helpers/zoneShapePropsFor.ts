@@ -8,8 +8,8 @@ const zoneShapePropsFor = (shapeType: string): ZoneShapeProps => {
   case RECTANGLE_SHAPE:
     return {
       shapeType: RECTANGLE_SHAPE,
-      topLeft: [22, 33],
-      bottomRight: [33, 44],
+      topLeft: [0, 0],
+      bottomRight: [0, 0],
     } as ZoneRectangleProps  
   case POLYGON_SHAPE:
     return {
@@ -18,29 +18,30 @@ const zoneShapePropsFor = (shapeType: string): ZoneShapeProps => {
   case CIRCULAR_RING_SHAPE:
     return {
       shapeType: CIRCULAR_RING_SHAPE,
-      origin: [22, 33],
-      innerRadiusM: 44,
-      outerRadiusM: 55,
+      origin: [0, 0],
+      innerRadiusM: 1000,
+      outerRadiusM: 5000,
     }
   case SECTION_CIRCULAR_RING_SHAPE:
     return {
       shapeType: SECTION_CIRCULAR_RING_SHAPE,
-      origin: [22, 33],
-      innerRadiusM: 44,
-      outerRadiusM: 55,
-      startAngle: 66, 
-      endAngle: 77}
+      origin: [0, 0],
+      innerRadiusM: 1000,
+      outerRadiusM: 5000,
+      startAngle: 0, 
+      endAngle: 90}
   case CIRCULAR_SECTOR_SHAPE:
     return {
       shapeType: CIRCULAR_SECTOR_SHAPE,
-      origin: [22, 33],
-      startAngle: 66, 
-      endAngle: 77}
+      origin: [0, 0],
+      radiusM: 5000,
+      startAngle: 0, 
+      endAngle: 90}
   case CIRCLE_SHAPE:
     return {
       shapeType: CIRCLE_SHAPE,
-      origin: [22, 33],
-      radiusM: 44}     
+      origin: [0, 0],
+      radiusM: 5000}     
   default:
     throw new Error(`Unknown shape type: ${shapeType}`)  
   }
