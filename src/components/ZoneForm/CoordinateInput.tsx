@@ -77,19 +77,24 @@ const parseDMSString = (dmsString: string, isLatitude: boolean): number | null =
 export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChange }) => {
   const [latString, setLatString] = useState<string>(decimalToDMSString(value?.[0] || 0, true))
   const [lngString, setLngString] = useState<string>(decimalToDMSString(value?.[1] || 0, false))
+  const [latError, setLatError] = useState<boolean>(false)
+  const [lngError, setLngError] = useState<boolean>(false)
 
   useEffect(() => {
     if (value) {
       setLatString(decimalToDMSString(value[0], true))
       setLngString(decimalToDMSString(value[1], false))
+      setLatError(false)
+      setLngError(false)
     }
   }, [value])
 
   const handleLatChange = (newLatString: string) => {
     const decimal = parseDMSString(newLatString, true)
     console.log('lat', newLatString, decimal)
+    setLatString(newLatString)
+    setLatError(decimal === null)
     if (decimal !== null) {
-      setLatString(newLatString)
       onChange?.([decimal, value?.[1] || 0])
     }
   }
@@ -98,6 +103,7 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
     console.log('lng', newLngString)
     setLngString(newLngString)
     const decimal = parseDMSString(newLngString, false)
+    setLngError(decimal === null)
     if (decimal !== null) {
       onChange?.([value?.[0] || 0, decimal])
     }
@@ -108,17 +114,29 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   const lngMask = '999°99\'99.99"a'
   const lngPlaceholder = '000°00\'00.00"E'
 
+  const errorStyle = {
+    color: '#ff4d4f',
+    fontSize: '14px',
+    lineHeight: '1.5715',
+    marginTop: '4px'
+  }
+
   return (
     <>
-      <Row>
+      <Row gutter={[16, 0]}>
         <Col span={12}>
-          <InputMask mask={latMask} defaultValue={latString} placeholder={latPlaceholder} onChange={(e) => handleLatChange(e.target.value)}/>
+          <div>
+            <InputMask mask={latMask} defaultValue={latString} placeholder={latPlaceholder} onChange={(e) => handleLatChange(e.target.value)}/>
+            {latError && <div style={errorStyle}>Invalid latitude format</div>}
+          </div>
         </Col>
         <Col span={12}>
-          <InputMask mask={lngMask} defaultValue={lngString} placeholder={lngPlaceholder} onChange={(e) => handleLngChange(e.target.value)}/>
+          <div>
+            <InputMask mask={lngMask} defaultValue={lngString} placeholder={lngPlaceholder} onChange={(e) => handleLngChange(e.target.value)}/>
+            {lngError && <div style={errorStyle}>Invalid longitude format</div>}
+          </div>
         </Col>
       </Row>
     </>
-
   )
 }
