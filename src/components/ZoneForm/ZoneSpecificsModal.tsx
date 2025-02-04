@@ -1,4 +1,4 @@
-import { Modal, Form, InputNumber, Row, Col } from 'antd'
+import { Modal, Form, InputNumber, Row, Col, Button } from 'antd'
 import { Position } from 'geojson'
 import { ZoneShapeProps } from '../../zoneShapeTypes'
 import {
@@ -10,7 +10,7 @@ import {
   SECTION_CIRCULAR_RING_SHAPE,
 } from '../../constants'
 import { CoordinateInput } from './CoordinateInput'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ZoneShapes } from '../Layers/zoneShapeConstants'
 
 interface ZoneSpecificsModalProps {
@@ -29,6 +29,9 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
   coordinates,
 }) => {
   const [form] = Form.useForm()
+  const [polygonCoordinates, setPolygonCoordinates] = useState<Position[]>(
+    coordinates?.[0] || []
+  )
 
   console.log('coordinates', coordinates)
 
@@ -38,6 +41,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
       onOk({
         ...specifics,
         ...values,
+        coordinates: specifics.shapeType === POLYGON_SHAPE ? [polygonCoordinates] : coordinates,
       })
     } catch (error) {
       console.error('Validation failed:', error)
@@ -47,6 +51,22 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
   const shapeName = useMemo(() => {
     return ZoneShapes.find((s) => s.key === specifics.shapeType)?.label
   }, [specifics.shapeType])
+
+  const handleAddCoordinate = () => {
+    setPolygonCoordinates([...polygonCoordinates, [0, 0]])
+  }
+
+  const handleDeleteCoordinate = (index: number) => {
+    const newCoordinates = [...polygonCoordinates]
+    newCoordinates.splice(index, 1)
+    setPolygonCoordinates(newCoordinates)
+  }
+
+  const handleCoordinateChange = (index: number, value: [number, number]) => {
+    const newCoordinates = [...polygonCoordinates]
+    newCoordinates[index] = value
+    setPolygonCoordinates(newCoordinates)
+  }
 
   const renderFields = () => {
     switch (specifics.shapeType) {
@@ -212,17 +232,27 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
       )
     case POLYGON_SHAPE:
       return (
-        <Row>
-          <Col span={24}>
-            <Form.Item
-              label='Points'
-              name='points'
-              rules={[{ required: true }]}
-            >
-              <InputNumber style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-        </Row>
+        <div style={{ marginBottom: 16 }}>
+          <h4>Polygon Coordinates</h4>
+          {polygonCoordinates.map((coord, index) => (
+            <Row key={index} gutter={[16, 16]} style={{ marginBottom: 8 }}>
+              <Col span={20}>
+                <CoordinateInput
+                  value={coord as [number, number]}
+                  onChange={(value) => handleCoordinateChange(index, value)}
+                />
+              </Col>
+              <Col span={4}>
+                <Button danger onClick={() => handleDeleteCoordinate(index)}>
+                  Delete
+                </Button>
+              </Col>
+            </Row>
+          ))}
+          <Button type="dashed" onClick={handleAddCoordinate} style={{ width: '100%' }}>
+            Add Coordinate
+          </Button>
+        </div>
       )
     default:
       return null
