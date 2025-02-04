@@ -105,7 +105,6 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
 
   const handleLatChange = (newLatString: string) => {
     const result = parseDMSString(newLatString, true)
-    console.log('lat', newLatString, result)
     setLatString(newLatString)
     if (typeof result === 'string') {
       setLatError(true)
@@ -116,7 +115,6 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   }
 
   const handleLngChange = (newLngString: string) => {
-    console.log('lng', newLngString)
     setLngString(newLngString)
     const result = parseDMSString(newLngString, false)
     if (typeof result === 'string') {
