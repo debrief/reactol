@@ -10,7 +10,7 @@ interface CoordinateInputProps {
 
 export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChange }) => {
   const handleChange = (newValue: number, isLatitude: boolean) => {
-    const result: [number, number] = isLatitude ? [newValue, value?.[1] || 0] :[value?.[0] || 0, newValue]
+    const result: [number, number] = isLatitude ? [value?.[0] || 0, newValue] : [newValue, value?.[1] || 0]
     onChange && onChange(result)
   }
 
@@ -22,10 +22,10 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
     <>
       <Row gutter={[16, 0]}>
         <Col span={12}>
-          <CoordinateElementInput value={value?.[0] || 0} onChange={handleChange} isLatitude/>
+          <CoordinateElementInput value={value?.[1] || 0} onChange={handleChange} isLatitude/>
         </Col>
         <Col span={12}>
-          <CoordinateElementInput value={value?.[1] || 0} onChange={handleChange} isLatitude={false}/>
+          <CoordinateElementInput value={value?.[0] || 0} onChange={handleChange} isLatitude={false}/>
         </Col>
       </Row>
     </>

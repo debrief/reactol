@@ -85,10 +85,7 @@ const generateCirclePoints = (
 const generateShapeCoordinates = (specifics: ZoneShapeProps): Position[][] => {
   switch (specifics.shapeType) {
   case RECTANGLE_SHAPE: {
-    let { topLeft, bottomRight } = specifics
-    // reverse the coords in the corners
-    topLeft = [topLeft[1], topLeft[0]]
-    bottomRight = [bottomRight[1], bottomRight[0]]
+    const { topLeft, bottomRight } = specifics
     return [[
       topLeft,
       [bottomRight[0], topLeft[1]],
@@ -100,29 +97,23 @@ const generateShapeCoordinates = (specifics: ZoneShapeProps): Position[][] => {
   
   case CIRCLE_SHAPE: {
     const { origin, radiusM } = specifics
-    // swap the origin coords
-    const fixedOrigin: [number, number] = [origin[1], origin[0]]
-    return [generateCirclePoints(fixedOrigin, radiusM)]
+    return [generateCirclePoints(origin, radiusM)]
   }
   
   case CIRCULAR_RING_SHAPE: {
     const { origin, innerRadiusM, outerRadiusM } = specifics
-    // swap the origin coords
-    const fixedOrigin: [number, number] = [origin[1], origin[0]]
     // Create two circles - outer and inner (in reverse for proper polygon with hole)
-    const outerRing = generateCirclePoints(fixedOrigin, outerRadiusM)
-    const innerRing = generateCirclePoints(fixedOrigin, innerRadiusM).reverse()
+    const outerRing = generateCirclePoints(origin, outerRadiusM)
+    const innerRing = generateCirclePoints(origin, innerRadiusM).reverse()
     return [outerRing, innerRing]
   }
   
   case SECTION_CIRCULAR_RING_SHAPE: {
     const { origin, innerRadiusM, outerRadiusM, startAngle, endAngle } = specifics
-    // swap the origin coords
-    const fixedOrigin: [number, number] = [origin[1], origin[0]]
     // Create the arc segments and connect them
-    const outerArc = generateCirclePoints(fixedOrigin, outerRadiusM, startAngle, endAngle)
+    const outerArc = generateCirclePoints(origin, outerRadiusM, startAngle, endAngle)
     // Create the arc segments and connect them
-    const innerArc = generateCirclePoints(fixedOrigin, innerRadiusM, endAngle, startAngle)
+    const innerArc = generateCirclePoints(origin, innerRadiusM, endAngle, startAngle)
     return [[
       ...outerArc,
       ...innerArc,
@@ -132,12 +123,11 @@ const generateShapeCoordinates = (specifics: ZoneShapeProps): Position[][] => {
   
   case CIRCULAR_SECTOR_SHAPE: {
     const { origin, startAngle, endAngle, radiusM } = specifics
-    const switchedOrigin: [number, number] = [origin[1], origin[0]]
-    const arc = generateCirclePoints(switchedOrigin, radiusM, startAngle, endAngle)
+    const arc = generateCirclePoints(origin, radiusM, startAngle, endAngle)
     return [[
-      switchedOrigin,
+      origin,
       ...arc,
-      switchedOrigin // Close the polygon
+      origin // Close the polygon
     ]]
   }
   
