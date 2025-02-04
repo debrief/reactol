@@ -10,7 +10,7 @@ import {
 } from '../../constants'
 import { CoordinateInput } from './CoordinateInput'
 import { useMemo } from 'react'
-import { ZoneShapes } from '../Layers/AddZoneShape'
+import { ZoneShapes } from '../Layers/zoneShapeConstants'
 
 interface ZoneSpecificsModalProps {
   open: boolean

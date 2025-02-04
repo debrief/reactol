@@ -49,12 +49,13 @@ const decimalToDMSString = (decimal: number, isLatitude: boolean): string => {
 }
 
 // Parse DMS string to decimal degrees
-const parseDMSString = (dmsString: string, isLatitude: boolean): number | null => {
+const parseDMSString = (dmsString: string, isLatitude: boolean): number | string => {
   const expression = isLatitude ? /^(\d{2})°(\d{2})'(\d{2}\.\d{2})"([NS])$/ : 
     /^(\d{3})°(\d{2})'(\d{2}\.\d{2})"([EW])$/
   const match = dmsString.match(expression)
-  console.log('parse', dmsString, match)
-  if (!match) return null
+  if (!match) {
+    return `Invalid format. Expected format: ${isLatitude ? 'DD°MM\'SS.SS"N/S' : 'DDD°MM\'SS.SS"E/W'}`
+  }
 
   const [, degreesStr, minutesStr, secondsStr, hemisphere] = match
   const degrees = parseInt(degreesStr, 10)
@@ -62,15 +63,28 @@ const parseDMSString = (dmsString: string, isLatitude: boolean): number | null =
   const seconds = parseFloat(secondsStr)
 
   // check for valid hemisphere value
-  if (hemisphere !== 'N' && hemisphere !== 'S' && hemisphere !== 'E' && hemisphere !== 'W') return null
+  if (hemisphere !== 'N' && hemisphere !== 'S' && hemisphere !== 'E' && hemisphere !== 'W') {
+    return `Invalid hemisphere value: ${hemisphere}. Must be ${isLatitude ? 'N or S' : 'E or W'}`
+  }
 
-  if (minutes >= 60 || seconds >= 60) return null
-  if ((hemisphere === 'N' || hemisphere === 'S') && degrees > 90) return null
-  if ((hemisphere === 'E' || hemisphere === 'W') && degrees > 180) return null
+  if (minutes >= 60) {
+    return `Invalid minutes value: ${minutes}. Must be less than 60`
+  }
+  
+  if (seconds >= 60) {
+    return `Invalid seconds value: ${seconds}. Must be less than 60`
+  }
+
+  if (isLatitude && degrees > 90) {
+    return `Invalid degrees value: ${degrees}. Latitude must be between 0 and 90 degrees`
+  }
+
+  if (!isLatitude && degrees > 180) {
+    return `Invalid degrees value: ${degrees}. Longitude must be between 0 and 180 degrees`
+  }
 
   const decimal = degrees + minutes / 60 + seconds / 3600
   const multiplier = (hemisphere === 'S' || hemisphere === 'W') ? -1 : 1
-  console.log('res', degrees, minutes, seconds, decimal * multiplier) 
   return decimal * multiplier
 }
 
@@ -90,22 +104,26 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   }, [value])
 
   const handleLatChange = (newLatString: string) => {
-    const decimal = parseDMSString(newLatString, true)
-    console.log('lat', newLatString, decimal)
+    const result = parseDMSString(newLatString, true)
+    console.log('lat', newLatString, result)
     setLatString(newLatString)
-    setLatError(decimal === null)
-    if (decimal !== null) {
-      onChange?.([decimal, value?.[1] || 0])
+    if (typeof result === 'string') {
+      setLatError(true)
+    } else {
+      setLatError(false)
+      onChange?.([result, value?.[1] || 0])
     }
   }
 
   const handleLngChange = (newLngString: string) => {
     console.log('lng', newLngString)
     setLngString(newLngString)
-    const decimal = parseDMSString(newLngString, false)
-    setLngError(decimal === null)
-    if (decimal !== null) {
-      onChange?.([value?.[0] || 0, decimal])
+    const result = parseDMSString(newLngString, false)
+    if (typeof result === 'string') {
+      setLngError(true)
+    } else {
+      setLngError(false)
+      onChange?.([value?.[0] || 0, result])
     }
   }
 
@@ -117,7 +135,7 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   const errorStyle = {
     color: '#ff4d4f',
     fontSize: '14px',
-    lineHeight: '1.5715',
+    lineHeight: '1.0715',
     marginTop: '4px'
   }
 
@@ -127,13 +145,13 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
         <Col span={12}>
           <div>
             <InputMask mask={latMask} defaultValue={latString} placeholder={latPlaceholder} onChange={(e) => handleLatChange(e.target.value)}/>
-            {latError && <div style={errorStyle}>Invalid latitude format</div>}
+            {latError && <div style={errorStyle}>{parseDMSString(latString, true)}</div>}
           </div>
         </Col>
         <Col span={12}>
           <div>
             <InputMask mask={lngMask} defaultValue={lngString} placeholder={lngPlaceholder} onChange={(e) => handleLngChange(e.target.value)}/>
-            {lngError && <div style={errorStyle}>Invalid longitude format</div>}
+            {lngError && <div style={errorStyle}>{parseDMSString(lngString, false)}</div>}
           </div>
         </Col>
       </Row>
