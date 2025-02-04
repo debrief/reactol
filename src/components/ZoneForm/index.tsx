@@ -1,7 +1,7 @@
 import { Feature, Geometry, Polygon, Position } from 'geojson'
 import { Checkbox, ColorPicker, DatePicker, Form, Input, Button } from 'antd'
 import { Color } from 'antd/es/color-picker'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { ZoneProps } from '../../types'
@@ -9,6 +9,7 @@ import { presetColors } from '../../helpers/standardShades'
 import { ZoneSpecificsModal } from './ZoneSpecificsModal'
 import { ZoneShapeProps } from '../../zoneShapeTypes'
 import { generateShapeCoordinates } from '../../helpers/shapeGeneration'
+import { ZoneShapes } from '../Layers/zoneShapeConstants'
 
 /** swap the time string a parameter of the expected type */
 type FormTypeProps = Omit<ZoneProps, 'time' | 'timeEnd'> & {
@@ -59,6 +60,11 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
       setState(convert(shape.properties))
     }
   }, [shape, setState])
+
+  const shapeName = useMemo(() => {
+    return ZoneShapes.find((s) => s.key === state?.specifics?.shapeType)?.label
+  }, [state?.specifics?.shapeType])
+
 
   const localChange = (values: Partial<FormTypeProps>) => {
     if (values.color) {
@@ -129,16 +135,10 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
         rules={[{ required: true, message: 'color is required!' }]}>
         <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
-      <Form.Item<FormTypeProps>
-        label='Shape'
-        name={['specifics', 'shapeType']}
-        style={itemStyle} >
-        <Input disabled />
-      </Form.Item>
       <Form.Item
-        label="Specifics"
+        label="Shape"
         style={itemStyle}>
-        <Button onClick={handleSpecificsEdit}>Edit</Button>
+        <Button onClick={handleSpecificsEdit}>Edit {shapeName}</Button>
       </Form.Item>
       <Form.Item<FormTypeProps>
         label='Start'
