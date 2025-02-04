@@ -1,11 +1,35 @@
-import { useEffect, useState, ChangeEvent } from 'react'
-import { MaskedInput } from 'antd-mask-input'
+import { ChangeEventHandler, useEffect, useState } from 'react'
 import { Col, Row } from 'antd'
+import ReactInputMask from 'react-input-mask'
 
 interface CoordinateInputProps {
   value?: [number, number]
   onChange?: (value: [number, number]) => void
 }
+
+interface MaskProps {
+  mask: string,
+  placeholder?: string,
+  maskChar?: string,
+  alwaysShowMask?: boolean,
+  value?: string
+  defaultValue?: string
+  onChange?: ChangeEventHandler<HTMLInputElement>
+};
+
+export const InputMask: React.FC<MaskProps> = ({ mask, maskChar, alwaysShowMask, value, defaultValue, onChange }) => {
+  return (
+    <ReactInputMask
+      mask={mask}
+      value={value}
+      defaultValue={defaultValue}
+      maskChar={maskChar}
+      alwaysShowMask={alwaysShowMask}
+      onChange={onChange}
+    />
+  )
+}
+
 
 // Convert decimal degrees to DMS string
 const decimalToDMSString = (decimal: number, isLatitude: boolean): string => {
@@ -19,14 +43,17 @@ const decimalToDMSString = (decimal: number, isLatitude: boolean): string => {
     ? decimal >= 0 ? 'N' : 'S'
     : decimal >= 0 ? 'E' : 'W'
 
-  return `${degrees.toString().padStart(2, '0')}°${minutes.toString().padStart(2, '0')}'${seconds.toFixed(2).padStart(5, '0')}"${hemisphere}`
+  const paddingLength = isLatitude ? 2 : 3
+
+  return `${degrees.toString().padStart(paddingLength, '0')}°${minutes.toString().padStart(2, '0')}'${seconds.toFixed(2).padStart(5, '0')}"${hemisphere}`
 }
 
 // Parse DMS string to decimal degrees
 const parseDMSString = (dmsString: string, isLatitude: boolean): number | null => {
-  const expression = isLatitude ? /^\d{2}°\d{2}'\d{2}\.\d{2}"[NSEW]$/ : 
-    /^\d{3}°\d{2}'\d{2}\.\d{2}"[EW]$/
+  const expression = isLatitude ? /^(\d{2})°(\d{2})'(\d{2}\.\d{2})"([NS])$/ : 
+    /^(\d{3})°(\d{2})'(\d{2}\.\d{2})"([EW])$/
   const match = dmsString.match(expression)
+  console.log('parse', dmsString, match)
   if (!match) return null
 
   const [, degreesStr, minutesStr, secondsStr, hemisphere] = match
@@ -34,12 +61,16 @@ const parseDMSString = (dmsString: string, isLatitude: boolean): number | null =
   const minutes = parseInt(minutesStr, 10)
   const seconds = parseFloat(secondsStr)
 
+  // check for valid hemisphere value
+  if (hemisphere !== 'N' && hemisphere !== 'S' && hemisphere !== 'E' && hemisphere !== 'W') return null
+
   if (minutes >= 60 || seconds >= 60) return null
   if ((hemisphere === 'N' || hemisphere === 'S') && degrees > 90) return null
   if ((hemisphere === 'E' || hemisphere === 'W') && degrees > 180) return null
 
   const decimal = degrees + minutes / 60 + seconds / 3600
   const multiplier = (hemisphere === 'S' || hemisphere === 'W') ? -1 : 1
+  console.log('res', degrees, minutes, seconds, decimal * multiplier) 
   return decimal * multiplier
 }
 
@@ -55,10 +86,10 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   }, [value])
 
   const handleLatChange = (newLatString: string) => {
-    console.log('lat', newLatString)
-    setLatString(newLatString)
     const decimal = parseDMSString(newLatString, true)
+    console.log('lat', newLatString, decimal)
     if (decimal !== null) {
+      setLatString(newLatString)
       onChange?.([decimal, value?.[1] || 0])
     }
   }
@@ -72,34 +103,19 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
     }
   }
 
-  const latMask = '00°00\'00.00"N'
-  const lngMask = '000°00\'00.00"E'  
+  const latMask = '99°99\'99.99"a'
+  const latPlaceholder = '00°00\'00.00"N'
+  const lngMask = '999°99\'99.99"a'
+  const lngPlaceholder = '000°00\'00.00"E'
 
   return (
     <>
       <Row>
         <Col span={12}>
-          <MaskedInput
-            mask={latMask}
-            value={latString}
-            placeholder={latMask}
-            maskOptions={{ lazy: true, placeholderChar:'0' }}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => handleLatChange(e.target.value)}
-            definitions={{
-              'N': /[NS]/
-            }}/>
+          <InputMask mask={latMask} defaultValue={latString} placeholder={latPlaceholder} onChange={(e) => handleLatChange(e.target.value)}/>
         </Col>
         <Col span={12}>
-          <MaskedInput  
-            mask={lngMask}
-            value={lngString}
-            placeholder={latMask}
-            
-            maskOptions={{ lazy: true, placeholderChar:'0' }}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => handleLngChange(e.target.value)}
-            definitions={{
-              'E': /[EW]/
-            }} />    
+          <InputMask mask={lngMask} defaultValue={lngString} placeholder={lngPlaceholder} onChange={(e) => handleLngChange(e.target.value)}/>
         </Col>
       </Row>
     </>

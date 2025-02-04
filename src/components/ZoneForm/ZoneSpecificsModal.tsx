@@ -225,6 +225,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
       onOk={handleOk}
       onCancel={onCancel}
       width={600}
+      destroyOnClose
     >
       <Form
         form={form}
