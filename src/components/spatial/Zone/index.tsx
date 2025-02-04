@@ -1,5 +1,5 @@
 import * as turf from '@turf/turf'
-import { Feature, Geometry, Polygon } from 'geojson'
+import { Feature, Geometry, Polygon, Position } from 'geojson'
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
 import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useMemo } from 'react'
@@ -57,9 +57,11 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
     const centre = turf
       .center(points)
       .geometry.coordinates.reverse() as LatLngExpression
-    const trackCoords = (feature.geometry as Polygon).coordinates[0].map(
-      (item) => [item[1], item[0]]
-    ) as LatLngExpression[]
+    const polyCoords = (feature.geometry as Polygon).coordinates
+    const numLines = polyCoords.length
+    // our coordinates may be a single line (polygon, circle) or multiple lines (shape with a hole).
+    const trackCoords = numLines === 1 ? (polyCoords as unknown as Position[][]).map((line) => line.map((item): LatLngExpression => [item[1], item[0]])) : 
+      (polyCoords as unknown as Position[][]).map((line: Position[]) => line.map((item) => [item[1], item[0]] as LatLngExpression))
     return (
       <>
         {isSelected && (

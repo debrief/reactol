@@ -41,6 +41,7 @@ export type ZoneCircularSectorProps = CoreZoneShapeProps & {
   origin: [number, number]
   startAngle: number
   endAngle: number
+  radiusM: number
 }
 
 export type ZoneCircleProps = CoreZoneShapeProps & {

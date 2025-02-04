@@ -15,7 +15,7 @@ import { ZoneShapes } from '../Layers/zoneShapeConstants'
 
 interface ZoneSpecificsModalProps {
   open: boolean
-  onOk: (specifics: ZoneShapeProps) => void
+  onOk: (specifics: ZoneShapeProps, coordinates: Position[][]) => void
   onCancel: () => void
   specifics: ZoneShapeProps
   coordinates?: Position[][]
@@ -33,16 +33,13 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
     coordinates?.[0] || []
   )
 
-  console.log('coordinates', coordinates)
-
   const handleOk = async () => {
+
     try {
       const values = await form.validateFields()
-      onOk({
-        ...specifics,
-        ...values,
-        coordinates: specifics.shapeType === POLYGON_SHAPE ? [polygonCoordinates] : coordinates,
-      })
+      const coords: Position[][] = specifics.shapeType === POLYGON_SHAPE ? [polygonCoordinates] : []
+      const resultsSpecifics = {...specifics, ...values}
+      onOk(resultsSpecifics, coords)
     } catch (error) {
       console.error('Validation failed:', error)
     }
@@ -51,22 +48,6 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
   const shapeName = useMemo(() => {
     return ZoneShapes.find((s) => s.key === specifics.shapeType)?.label
   }, [specifics.shapeType])
-
-  const handleAddCoordinate = () => {
-    setPolygonCoordinates([...polygonCoordinates, [0, 0]])
-  }
-
-  const handleDeleteCoordinate = (index: number) => {
-    const newCoordinates = [...polygonCoordinates]
-    newCoordinates.splice(index, 1)
-    setPolygonCoordinates(newCoordinates)
-  }
-
-  const handleCoordinateChange = (index: number, value: [number, number]) => {
-    const newCoordinates = [...polygonCoordinates]
-    newCoordinates[index] = value
-    setPolygonCoordinates(newCoordinates)
-  }
 
   const renderFields = () => {
     switch (specifics.shapeType) {
@@ -228,9 +209,35 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
               <InputNumber style={{ width: '100%' }} />
             </Form.Item>
           </Col>
+          <Col span={12}>
+            <Form.Item<ZoneCircularSectorProps>
+              label='Radius (m)'
+              name='radiusM'
+              rules={[{ required: true }]}
+            >
+              <InputNumber style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
         </Row>
       )
-    case POLYGON_SHAPE:
+    case POLYGON_SHAPE: {
+
+      const handleAddCoordinate = () => {
+        setPolygonCoordinates([...polygonCoordinates, [0, 0]])
+      }
+
+      const handleDeleteCoordinate = (index: number) => {
+        const newCoordinates = [...polygonCoordinates]
+        newCoordinates.splice(index, 1)
+        setPolygonCoordinates(newCoordinates)
+      }
+
+      const handleCoordinateChange = (index: number, value: [number, number]) => {
+        const newCoordinates = [...polygonCoordinates]
+        newCoordinates[index] = value
+        setPolygonCoordinates(newCoordinates)
+      }
+
       return (
         <div style={{ marginBottom: 16 }}>
           <h4>Polygon Coordinates</h4>
@@ -254,6 +261,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
           </Button>
         </div>
       )
+    }
     default:
       return null
     }
