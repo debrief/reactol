@@ -1,4 +1,5 @@
 import { Modal, Form, InputNumber, Row, Col } from 'antd'
+import { Position } from 'geojson'
 import { ZoneShapeProps } from '../../zoneShapeTypes'
 import {
   CIRCLE_SHAPE,
@@ -17,6 +18,7 @@ interface ZoneSpecificsModalProps {
   onOk: (specifics: ZoneShapeProps) => void
   onCancel: () => void
   specifics: ZoneShapeProps
+  coordinates?: Position[][]
 }
 
 export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
@@ -24,8 +26,11 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
   onOk,
   onCancel,
   specifics,
+  coordinates,
 }) => {
   const [form] = Form.useForm()
+
+  console.log('coordinates', coordinates)
 
   const handleOk = async () => {
     try {

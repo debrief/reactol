@@ -1,4 +1,4 @@
-import { Feature, Geometry } from 'geojson'
+import { Feature, Geometry, Polygon } from 'geojson'
 import { Checkbox, ColorPicker, DatePicker, Form, Input, Button } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
@@ -147,6 +147,7 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
         onOk={handleModalOk}
         onCancel={handleModalCancel}
         specifics={shape.properties.specifics}
+        coordinates={(shape.geometry as Polygon).coordinates}
       />
     </Form>
   )
