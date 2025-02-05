@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react'
 import { TimeState } from '../components/Document'
+import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 
 export interface MessageStruct {
   title: string
@@ -11,6 +12,8 @@ export interface MessageStruct {
 interface DocContextProps {
   selection: string[]
   setSelection: React.Dispatch<React.SetStateAction<string[]>>
+  newFeature: Feature<Geometry, GeoJsonProperties> | null
+  setNewFeature: React.Dispatch<React.SetStateAction<Feature<Geometry, GeoJsonProperties> | null>>
   time: TimeState
   setTime: React.Dispatch<React.SetStateAction<TimeState>>
   viewportFrozen: boolean

@@ -9,7 +9,7 @@ import {
   CloseCircleOutlined,
   ShrinkOutlined,
 } from '@ant-design/icons'
-import { Feature, Geometry, MultiPoint, Point, Polygon } from 'geojson'
+import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
   BUOY_FIELD_TYPE,
   GROUP_TYPE,
@@ -23,16 +23,14 @@ import { LoadTrackModel } from '../LoadTrackModal'
 import {
   NewTrackProps,
   TrackProps,
-  CoreShapeProps,
-  ZoneProps,
   PointProps,
   GroupProps,
   BuoyFieldProps,
 } from '../../types'
-import { PointForm } from '../PointForm'
-import { BuoyFieldForm } from '../BuoyFieldForm'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
+import { AddZoneShape } from './AddZoneShape'
+import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -98,8 +96,13 @@ const mapFunc = (
   title: string,
   key: string,
   dType: string,
-  handleAdd: (e: React.MouseEvent, key: string, title: string) => void
+  handleAdd: (e: React.MouseEvent, key: string, title: string) => void,
+  button?: React.ReactNode
 ): TreeDataNode => {
+  const buttonToUse = button || <PlusCircleOutlined
+    style={{ cursor: 'copy' }}
+    onClick={(e) => handleAdd(e, key, title)} />
+
   const children =
     dType !== GROUP_TYPE
       ? findChildrenOfType(features, dType)
@@ -107,12 +110,7 @@ const mapFunc = (
   return {
     title: title,
     key: key,
-    icon: (
-      <PlusCircleOutlined
-        style={{ cursor: 'copy' }}
-        onClick={(e) => handleAdd(e, key, title)}
-      />
-    ),
+    icon: buttonToUse,
     children: children,
   }
 }
@@ -156,7 +154,7 @@ export const ToolButton: React.FC<ToolProps> = ({
 }
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
-  const { selection, setSelection } = useDocContext()
+  const { selection, setSelection, setNewFeature } = useDocContext()
   const features = useAppSelector((state) => state.fColl.features)
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)
@@ -171,23 +169,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const [message, setMessage] = React.useState<string>('')
   const [createTrackDialogVisible, setcreateTrackDialogVisible] =
     useState(false)
-  const [newPoint, setNewPoint] = useState<Feature<
-    Geometry,
-    CoreShapeProps
-  > | null>(null)
-  const [newBuoyField, setNewBuoyField] = useState<Feature<
-    MultiPoint,
-    BuoyFieldProps
-  > | null>(null)
-  const [workingPoint, setWorkingPoint] = useState<Feature<
-    Geometry,
-    CoreShapeProps
-  > | null>(null)
-  const [workingBuoyField, setWorkingBuoyField] = useState<Feature<
-    Geometry,
-    BuoyFieldProps
-  > | null>(null)
-  const [formType, setFormType] = useState<string>('')
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
   const clearSelection = () => {
@@ -214,6 +195,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
+  const localSetNewFeature = useCallback((feature: Feature) => {
+    setSelection([])
+    setNewFeature(feature)
+  }, [setNewFeature, setSelection])
+
   const addPoint = () => {
     const point: Feature<Point, PointProps> = {
       type: 'Feature',
@@ -228,29 +214,13 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         coordinates: [],
       },
     }
-    setFormType('point')
-    setWorkingPoint(point)
-    setNewPoint(point)
+    localSetNewFeature(point)
   }
 
-  const addZone = () => {
-    const zone: Feature<Polygon, ZoneProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: ZONE_TYPE,
-        color: '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [],
-      },
-    }
-    setFormType('zone')
-    setWorkingPoint(zone)
-    setNewPoint(zone)
-  }
+  const addZone = useCallback((key: string): void => {
+    const zone = zoneFeatureFor(key)
+    localSetNewFeature(zone)
+  }, [localSetNewFeature])
 
   const addBuoyField = () => {
     const buoyField: Feature<MultiPoint, BuoyFieldProps> = {
@@ -268,12 +238,24 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         coordinates: [],
       },
     }
-    setWorkingBuoyField(buoyField)
-    setNewBuoyField(buoyField)
+    localSetNewFeature(buoyField)
   }
 
   const addGroup = () => {
-    setMessage('Adding group')
+    const group: Feature<Geometry, GroupProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        dataType: GROUP_TYPE,
+        units: [],
+        visible: true,
+      },
+      geometry: {
+        type: 'GeometryCollection',
+        geometries: [],
+      },
+    }
+    localSetNewFeature(group)
   }
 
   const handleAdd = useCallback(
@@ -285,7 +267,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       } else if (key === 'node-points') {
         addPoint()
       } else if (key === 'node-zones') {
-        addZone()
+        throw new Error('This method not responsible for adding zones')
       } else if (key === 'node-groups') {
         addGroup()
       } else {
@@ -304,7 +286,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     items.push(
       mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
     )
-    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd))
+    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd, 
+      <AddZoneShape addZone={addZone} />))
     items.push(
       mapFunc(
         features,
@@ -337,7 +320,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       })
       setCheckedKeys(checked)
     }
-  }, [features, handleAdd])
+  }, [features, handleAdd, addZone])
 
   // filter out the branches, just leave the leaves
   const justLeaves = (ids: Key[]): Key[] => {
@@ -456,18 +439,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     })
   }
 
-  const handlePointSave = () => {
-    dispatch({ type: 'fColl/featureAdded', payload: workingPoint })
-    setNewPoint(null)
-    setWorkingPoint(null)
-  }
-
-  const handleBuoyFieldSave = () => {
-    dispatch({ type: 'fColl/featureAdded', payload: workingBuoyField })
-    setNewBuoyField(null)
-    setWorkingBuoyField(null)
-  }
-
   const handleDialogCancel = () => {
     setcreateTrackDialogVisible(false)
   }
@@ -557,34 +528,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           createTrackOnly={true}
         />
       )}
-      {newPoint && (
-        <Modal
-          title={'Create new ' + formType}
-          open={true}
-          onCancel={() => setNewPoint(null)}
-          onOk={handlePointSave}
-        >
-          <PointForm
-            shape={newPoint}
-            onChange={(point) => setWorkingPoint(point)}
-          />
-        </Modal>
-      )}
-      {newBuoyField && (
-        <Modal
-          title={'Create new buoy field'}
-          open={true}
-          onCancel={() => setNewBuoyField(null)}
-          onOk={handleBuoyFieldSave}
-        >
-          <BuoyFieldForm
-            field={newBuoyField}
-            onChange={(point) => setWorkingBuoyField(point)}
-          />
-        </Modal>
-      )}
     </>
   )
 }
 
 export default Layers
+

@@ -35,6 +35,10 @@ export const PasteButton: React.FC = () => {
   const { setMessage } = useDocContext()
 
   const checkClipboard = useCallback(async () => {
+    // only bother checking clipboard if it has been used
+    if (clipboardUpdated === null) {
+      return
+    }
     try {
       const text = await navigator.clipboard.readText()
       const isValid = isValidGeoJSON(text)
@@ -48,7 +52,7 @@ export const PasteButton: React.FC = () => {
         setPasteDisabled(true)
       }
     }
-  }, [setMessage])
+  }, [setMessage, clipboardUpdated])
 
   useEffect(() => {
     checkClipboard()

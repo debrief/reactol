@@ -36,6 +36,7 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
   case GROUP_TYPE:
     return null  
   default:
+    console.log('Unknown feature type:',feature)
     throw new Error('Unknown feature type:' + feature.properties?.dataType)
   }
 }
