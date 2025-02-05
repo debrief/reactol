@@ -1,4 +1,4 @@
-import { ReactNode, useState, useRef, useEffect } from 'react'
+import { ReactNode, useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
 import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
@@ -37,6 +37,75 @@ const Documents = () => {
       }, 50)
     }
   }, [isTabNameModalVisible])
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false)
+    setIsDraggingPlus(false)
+  }, [setIsDragging, setIsDraggingPlus])
+
+  const handleDrop = useCallback( async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsDragging(false)
+    setIsDraggingPlus(false)
+
+    const files = event.dataTransfer.files
+
+    if (files.length > 1) {
+      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
+      return
+    }
+
+    const file = files[0]
+    
+    // Check file extension
+    const fileName = file.name.toLowerCase()
+    if (!fileName.endsWith('.json') && !fileName.endsWith('.geojson')) {
+      setMessage({ title: 'Error', severity: 'warning', message: 'Only .json and .geojson files are supported' })
+      return
+    }
+    
+    try {
+      const content = await file.text()
+      // Validate that the content is valid JSON
+      try {
+        const data = JSON.parse(content)
+        if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
+          throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
+        }
+        const newTab: TabWithPath = {
+          key: '' + Date.now(),
+          label: file.name.split('.')[0],
+          children: <App content={content} />,
+          path: file.name
+        }
+        setTabs([...tabs, newTab])
+        setActiveTab(newTab.key)
+      } catch (e) {
+        setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
+        return
+      }
+
+    } catch (e) {
+      console.error('Error handling file:', e)
+      setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
+    }
+  }, [setMessage, tabs])
+
+  const createDocumentButton = useMemo(() => {
+    const handleDragOverPlus = (event: React.DragEvent<HTMLDivElement>) => {
+      console.log('over plus')
+      // Only prevent default and show indicator if it's a file being dragged
+      if (event.dataTransfer.types.includes('Files')) {
+        event.preventDefault()
+        setIsDraggingPlus(true)
+      }
+    }
+    const normalStyle = { color: 'black', backgroundColor: 'white' }
+    const reverseStyle = { color: 'white', backgroundColor: 'black' }
+    return <Tooltip title='Create New Document' placement="bottom">
+      <Button shape='circle' icon={<PlusOutlined />} style={isDraggingPlus ? reverseStyle : normalStyle} variant={isDraggingPlus ? 'outlined' : 'solid'} onDragOver={handleDragOverPlus} onDragLeave={handleDragLeave} onDrop={handleDrop}  />
+    </Tooltip>
+  }, [isDraggingPlus, handleDragLeave, handleDrop])
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
@@ -179,68 +248,7 @@ const Documents = () => {
     }
   }
 
-  const handleDragOverPlus = (event: React.DragEvent<HTMLDivElement>) => {
-    console.log('over plus')
-    // Only prevent default and show indicator if it's a file being dragged
-    if (event.dataTransfer.types.includes('Files')) {
-      event.preventDefault()
-      setIsDraggingPlus(true)
-    }
-  }
 
-  const handleDragLeave = () => {
-    console.log('leave')
-    setIsDragging(false)
-    setIsDraggingPlus(false)
-  }
-
-  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(false)
-    setIsDraggingPlus(false)
-
-    const files = event.dataTransfer.files
-
-    if (files.length > 1) {
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
-      return
-    }
-
-    const file = files[0]
-    
-    // Check file extension
-    const fileName = file.name.toLowerCase()
-    if (!fileName.endsWith('.json') && !fileName.endsWith('.geojson')) {
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only .json and .geojson files are supported' })
-      return
-    }
-    
-    try {
-      const content = await file.text()
-      // Validate that the content is valid JSON
-      try {
-        const data = JSON.parse(content)
-        if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
-          throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
-        }
-        const newTab: TabWithPath = {
-          key: '' + Date.now(),
-          label: file.name.split('.')[0],
-          children: <App content={content} />,
-          path: file.name
-        }
-        setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
-      } catch (e) {
-        setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
-        return
-      }
-
-    } catch (e) {
-      console.error('Error handling file:', e)
-      setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
-    }
-  }
 
   return (
     <div>
@@ -262,9 +270,7 @@ const Documents = () => {
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
-        addIcon={<Tooltip title='Create New Document' placement="bottom">
-          <Button shape='circle' icon={<PlusOutlined />} variant={isDraggingPlus ? 'outlined' : 'solid'} onDragOver={handleDragOverPlus} onDragLeave={handleDragLeave} onDrop={handleDrop}  />
-        </Tooltip>}
+        addIcon={createDocumentButton}
         removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
         onEdit={onTabsEdit}
       />}
