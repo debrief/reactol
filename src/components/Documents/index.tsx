@@ -83,19 +83,53 @@ const Documents = () => {
   }
 
   const openExistingDocument = async () => {
-    const file = await window.electron.openFile()
-    if (file) {
-      // TODO give `App` a prop repsesenting the file content. It will
-      // verify this is GeoJSON, and load it into the store.
-      const newTab: TabWithPath = {
-        key: '' + Date.now(),
-        label: fileNameFor(file.filePath),
-        children: <App filePath={file.filePath} content={file.content} />,
-        path: file.filePath
+    if (window.electron) {
+      const file = await window.electron.openFile()
+      if (file) {
+        const newTab: TabWithPath = {
+          key: '' + Date.now(),
+          label: fileNameFor(file.filePath),
+          children: <App filePath={file.filePath} content={file.content} />,
+          path: file.filePath
+        }
+        setTabs([...tabs, newTab])
+        setActiveTab(newTab.key)
+      }
+    } else {
+      // allow local files to be loaded into browser session
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.geojson,.json'
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) return
+
+        try {
+          const content = await file.text()
+          const data = JSON.parse(content)
+          
+          if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
+            throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
+          }
+
+          const newTab: TabWithPath = {
+            key: '' + Date.now(),
+            label: file.name.split('.')[0],
+            children: <App content={content} />,
+            path: file.name
+          }
+          setTabs([...tabs, newTab])
+          setActiveTab(newTab.key)
+        } catch (error) {
+          Modal.error({
+            title: 'Invalid File',
+            content: 'Problem loading file: ' + error,
+          })
+        }
       }
 
-      setTabs([...tabs, newTab])
-      setActiveTab(newTab.key)
+      input.click()
     }
   }
 
