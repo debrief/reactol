@@ -208,6 +208,11 @@ const Documents = () => {
     if (tabToClose) {
       setTabs(tabs.filter((t) => t.key !== tabToClose))
       setTabToClose(null)
+      // select another tab if this tab was selected
+      if (tabToClose === activeTab) {
+        const newTab = tabs.length > 0 ? tabs[tabs.length - 1].key : undefined
+        setActiveTab(newTab)
+      }
     }
   }
 
