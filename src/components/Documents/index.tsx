@@ -26,6 +26,7 @@ const Documents = () => {
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
   const [isDragging, setIsDragging] = useState(false)
+  const [isDraggingPlus, setIsDraggingPlus] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
   
@@ -170,6 +171,7 @@ const Documents = () => {
   }
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    console.log('over')
     // Only prevent default and show indicator if it's a file being dragged
     if (event.dataTransfer.types.includes('Files')) {
       event.preventDefault()
@@ -177,13 +179,25 @@ const Documents = () => {
     }
   }
 
+  const handleDragOverPlus = (event: React.DragEvent<HTMLDivElement>) => {
+    console.log('over plus')
+    // Only prevent default and show indicator if it's a file being dragged
+    if (event.dataTransfer.types.includes('Files')) {
+      event.preventDefault()
+      setIsDraggingPlus(true)
+    }
+  }
+
   const handleDragLeave = () => {
+    console.log('leave')
     setIsDragging(false)
+    setIsDraggingPlus(false)
   }
 
   const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     setIsDragging(false)
+    setIsDraggingPlus(false)
 
     const files = event.dataTransfer.files
 
@@ -248,7 +262,9 @@ const Documents = () => {
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
-        addIcon={<Tooltip title='Create New Document' placement="bottom"><Button shape='circle' icon={<PlusOutlined />} /></Tooltip>}
+        addIcon={<Tooltip title='Create New Document' placement="bottom">
+          <Button shape='circle' icon={<PlusOutlined />} variant={isDraggingPlus ? 'outlined' : 'solid'} onDragOver={handleDragOverPlus} onDragLeave={handleDragLeave} onDrop={handleDrop}  />
+        </Tooltip>}
         removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
         onEdit={onTabsEdit}
       />}
