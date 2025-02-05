@@ -232,7 +232,7 @@ const Documents = () => {
         setTabs([...tabs, newTab])
         setActiveTab(newTab.key)
       } catch (e) {
-        setMessage({ title: 'Error', severity: 'error', message: 'Invalid JSON file format ' + e })
+        setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
         return
       }
 
