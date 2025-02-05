@@ -15,7 +15,7 @@ import { ZoneForm } from '../ZoneForm'
 
 
 const Properties: React.FC = () => {
-  const { selection, setSelection } = useDocContext()
+  const { selection, setSelection, newFeature, setNewFeature } = useDocContext()
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [formDirty, setFormDirty] = useState<boolean>(false)
@@ -32,10 +32,16 @@ const Properties: React.FC = () => {
   }, [originalState])
 
   const onSave = useCallback(() => {
-    // update the feature
-    dispatch({ type: 'fColl/featureUpdated', payload: featureState })
+    if (newFeature) {
+      // store the new feature
+      dispatch({ type: 'fColl/featureAdded', payload: featureState })
+      setNewFeature(null)
+    } else {
+      // update the feature
+      dispatch({ type: 'fColl/featureUpdated', payload: featureState })
+    }
     setFormDirty(false)
-  }, [dispatch, featureState])
+  }, [dispatch, featureState, newFeature, setNewFeature])
 
   const onDelete = useCallback(() => {
     // update the feature
@@ -50,21 +56,28 @@ const Properties: React.FC = () => {
   }, [setFeatureState, setFormDirty])
 
   const customFormFor = useCallback((dataType: string, featureState: Feature): React.ReactElement => {
+    const key = featureState.id
     switch (dataType) {
     case TRACK_TYPE:    
-      return <TrackForm onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
+      return <TrackForm key={key} onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
     case BUOY_FIELD_TYPE:    
-      return <BuoyFieldForm onChange={updateFeatureState} field={featureState as Feature<MultiPoint, BuoyFieldProps>} />
+      return <BuoyFieldForm key={key} onChange={updateFeatureState} field={featureState as Feature<MultiPoint, BuoyFieldProps>} />
     case GROUP_TYPE:
-      return <GroupForm onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
+      return <GroupForm key={key} onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
     case ZONE_TYPE:
-      return <ZoneForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, ZoneProps>} />
+      return <ZoneForm key={key} onChange={updateFeatureState} shape={featureState as Feature<Geometry, ZoneProps>} />
     case REFERENCE_POINT_TYPE:
-      return <PointForm onChange={updateFeatureState} shape={featureState as Feature<Geometry, PointProps>} />
+      return <PointForm key={key} onChange={updateFeatureState} shape={featureState as Feature<Geometry, PointProps>} />
     default:
-      return <PropertiesViewer feature={featureState} />
+      return <PropertiesViewer key={key} feature={featureState} />
     }
   }, [updateFeatureState])
+
+  const onCancelCreate = useCallback(() => {
+    setNewFeature(null)
+    setFeatureState(null)
+    setFormDirty(false)
+  }, [setNewFeature, setFeatureState, setFormDirty])
 
   useEffect(() => {
     if (featureState) {
@@ -72,34 +85,42 @@ const Properties: React.FC = () => {
       const featureProps = featureState.properties
       if (featureProps?.dataType) {
         const aProps = featureProps as CoreShapeProps
-        setPropertyForm(<CoreForm formDirty={formDirty} onDelete={onDelete} onReset={onReset} onSave={onSave}>
+        setPropertyForm(<CoreForm onCancel={onCancelCreate} isCreate={newFeature !== null} formDirty={formDirty} onDelete={onDelete} onReset={onReset} onSave={onSave}>
           {customFormFor(aProps.dataType, featureState)}
         </CoreForm>)
       }
     }
-  },[featureState, customFormFor, onSave, onDelete, onReset, formDirty])
+  },[featureState, customFormFor, onSave, newFeature, onCancelCreate, onDelete, onReset, formDirty])
 
   useEffect(() => {
-    if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
-      setPropertyForm(<div>No feature selected</div>)
-      setOriginalState(null)
+    if (newFeature) {
       setFeatureState(null)
-    } else if (selectedFeatureIds && selectedFeatureIds.length > 1) {
-      setPropertyForm(<div>Multiple features selected</div>)
-      setOriginalState(null)
-      setFeatureState(null)
+      setFeatureState(newFeature)
+      setOriginalState(newFeature)
+      setFormDirty(false)
     } else {
-      const selectedFeatureId = selectedFeatureIds[0]
-      const selectedFeat = allFeatures.find((feature) => feature.id === selectedFeatureId)
-      if (selectedFeat) {
-        setOriginalState(selectedFeat)  
-        setFeatureState(selectedFeat)
-        setFormDirty(false)
+      if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
+        setPropertyForm(<div>No feature selected</div>)
+        setOriginalState(null)
+        setFeatureState(null)
+      } else if (selectedFeatureIds && selectedFeatureIds.length > 1) {
+        setPropertyForm(<div>Multiple features selected</div>)
+        setOriginalState(null)
+        setFeatureState(null)
       } else {
-        setPropertyForm(<div>Feature not found</div>)
-      }    
+        const selectedFeatureId = selectedFeatureIds[0]
+        const selectedFeat = allFeatures.find((feature) => feature.id === selectedFeatureId)
+        if (selectedFeat) {
+          setOriginalState(selectedFeat)  
+          setFeatureState(selectedFeat)
+          setFormDirty(false)
+        } else {
+          setPropertyForm(<div>Feature not found</div>)
+        }    
+      }
+  
     }
-  },[selectedFeatureIds, allFeatures])
+  },[selectedFeatureIds, allFeatures, newFeature, setFeatureState, setOriginalState, setPropertyForm])
 
   return propertyForm
 }
