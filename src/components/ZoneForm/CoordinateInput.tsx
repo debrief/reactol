@@ -22,10 +22,10 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
     <>
       <Row gutter={[16, 0]}>
         <Col span={12}>
-          <CoordinateElementInput value={value?.[1] || 0} onChange={handleChange} isLatitude/>
+          <CoordinateElementInput style={{width: '90px'}} value={value?.[1] || 0} onChange={handleChange} isLatitude/>
         </Col>
         <Col span={12}>
-          <CoordinateElementInput value={value?.[0] || 0} onChange={handleChange} isLatitude={false}/>
+          <CoordinateElementInput style={{width: '100px'}} value={value?.[0] || 0} onChange={handleChange} isLatitude={false}/>
         </Col>
       </Row>
     </>
