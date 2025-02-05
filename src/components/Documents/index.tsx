@@ -229,7 +229,7 @@ const Documents = () => {
   }
 
   return (
-    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+    <div>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
       {!!message && (
         <Modal 
@@ -280,7 +280,7 @@ const Documents = () => {
         </Space>
       </Modal>
       {tabs.length === 0 && (
-        <div style={{ paddingTop: '50px' }}>
+        <div style={{ paddingTop: '50px' }} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
           <Row>
             <Col span={24}><Typography.Title>Welcome to Albatross</Typography.Title></Col>
           </Row>
