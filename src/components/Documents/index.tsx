@@ -1,4 +1,4 @@
-import { ReactNode, useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { ReactNode, useState, useRef, useEffect, useCallback } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
 import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
@@ -26,7 +26,6 @@ const Documents = () => {
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
   const [isDragging, setIsDragging] = useState(false)
-  const [isDraggingPlus, setIsDraggingPlus] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
   
@@ -40,13 +39,11 @@ const Documents = () => {
 
   const handleDragLeave = useCallback(() => {
     setIsDragging(false)
-    setIsDraggingPlus(false)
-  }, [setIsDragging, setIsDraggingPlus])
+  }, [setIsDragging])
 
   const handleDrop = useCallback( async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     setIsDragging(false)
-    setIsDraggingPlus(false)
 
     const files = event.dataTransfer.files
 
@@ -90,22 +87,6 @@ const Documents = () => {
       setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
     }
   }, [setMessage, tabs])
-
-  const createDocumentButton = useMemo(() => {
-    const handleDragOverPlus = (event: React.DragEvent<HTMLDivElement>) => {
-      console.log('over plus')
-      // Only prevent default and show indicator if it's a file being dragged
-      if (event.dataTransfer.types.includes('Files')) {
-        event.preventDefault()
-        setIsDraggingPlus(true)
-      }
-    }
-    const normalStyle = { color: 'black', backgroundColor: 'white' }
-    const reverseStyle = { color: 'white', backgroundColor: 'black' }
-    return <Tooltip title='Create New Document' placement="bottom">
-      <Button shape='circle' icon={<PlusOutlined />} style={isDraggingPlus ? reverseStyle : normalStyle} variant={isDraggingPlus ? 'outlined' : 'solid'} onDragOver={handleDragOverPlus} onDragLeave={handleDragLeave} onDrop={handleDrop}  />
-    </Tooltip>
-  }, [isDraggingPlus, handleDragLeave, handleDrop])
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
@@ -270,7 +251,9 @@ const Documents = () => {
         activeKey={activeTab}
         onChange={onTabChange}
         items={tabs}
-        addIcon={createDocumentButton}
+        addIcon={<Tooltip title='Create New Document' placement="bottom">
+          <Button shape='circle' icon={<PlusOutlined />} />
+        </Tooltip>}
         removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
         onEdit={onTabsEdit}
       />}
