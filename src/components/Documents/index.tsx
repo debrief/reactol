@@ -1,7 +1,7 @@
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip } from 'antd'
+import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
 import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
 import './index.css'
 
@@ -25,6 +25,8 @@ const Documents = () => {
   const [tabToClose, setTabToClose] = useState<string | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
+  const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
   
   useEffect(() => {
@@ -167,8 +169,79 @@ const Documents = () => {
     right: <Tooltip title='Open Existing Document' placement="bottom"><Button onClick={() => openExistingDocument()}>Open</Button></Tooltip>
   }
 
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    // Only prevent default and show indicator if it's a file being dragged
+    if (event.dataTransfer.types.includes('Files')) {
+      event.preventDefault()
+      setIsDragging(true)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setIsDragging(false)
+
+    const files = event.dataTransfer.files
+
+    if (files.length > 1) {
+      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
+      return
+    }
+
+    const file = files[0]
+    
+    // Check file extension
+    const fileName = file.name.toLowerCase()
+    if (!fileName.endsWith('.json') && !fileName.endsWith('.geojson')) {
+      setMessage({ title: 'Error', severity: 'warning', message: 'Only .json and .geojson files are supported' })
+      return
+    }
+    
+    try {
+      const content = await file.text()
+      // Validate that the content is valid JSON
+      try {
+        const data = JSON.parse(content)
+        if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
+          throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
+        }
+        const newTab: TabWithPath = {
+          key: '' + Date.now(),
+          label: file.name.split('.')[0],
+          children: <App content={content} />,
+          path: file.name
+        }
+        setTabs([...tabs, newTab])
+        setActiveTab(newTab.key)
+      } catch (e) {
+        setMessage({ title: 'Error', severity: 'error', message: 'Invalid JSON file format ' + e })
+        return
+      }
+
+    } catch (e) {
+      console.error('Error handling file:', e)
+      setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
+    }
+  }
+
   return (
-    <div>
+    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+      {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
+      {!!message && (
+        <Modal 
+          title={message?.title} 
+          open={!!message} 
+          onCancel={() => setMessage(null)} 
+          okType='primary' 
+          onOk={() => setMessage(null)}
+        >
+          <Alert showIcon type={message?.severity} description={message?.message} />
+        </Modal>
+      )}
       { tabs.length > 0 && <Tabs
         tabBarExtraContent={tabBarExtras}
         type='editable-card'
