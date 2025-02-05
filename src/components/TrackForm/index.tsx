@@ -21,7 +21,7 @@ type FormTypeProps = Omit<TrackProps, 'labelInterval' | 'symbolInterval'> & {
 
 export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
-
+  const [form] = Form.useForm()
   useEffect(() => {
     if (track) {
       const props = track.properties as TrackProps
@@ -35,8 +35,9 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
         dest.symbolInterval = props.symbolInterval.toString()
       }
       setState(dupe)
+      form.setFieldsValue(dupe)
     }
-  }, [track, setState])
+  }, [track, setState, form])
 
   const localChange = (values: Partial<FormTypeProps>) => {
     const dupe = {...values} as unknown as TrackProps
@@ -63,6 +64,7 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
   return (
     <>
       <Form
+        form={form}
         name='trackPropertiesForm'
         className="propertiesForm"
         labelCol={{ span: 7 }}
