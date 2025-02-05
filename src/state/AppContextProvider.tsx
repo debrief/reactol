@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const AppContextProvider: React.FC<Props> = ({ children }) => {
-  const [clipboardUpdated, setClipboardUpdated] = useState(false)
+  const [clipboardUpdated, setClipboardUpdated] = useState<boolean | null>(null)
 
   return (
     <AppContext.Provider value={{ clipboardUpdated, setClipboardUpdated }}>

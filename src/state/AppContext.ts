@@ -2,8 +2,8 @@ import React, { createContext, useContext } from 'react'
 
 /** application-level context */
 interface AppContextProps {
-  clipboardUpdated: boolean // toggle for each update
-  setClipboardUpdated: React.Dispatch<React.SetStateAction<boolean>>
+  clipboardUpdated: boolean | null // toggle for each update
+  setClipboardUpdated: React.Dispatch<React.SetStateAction<boolean | null>> // null means un-used
 }
 
 export const AppContext = createContext<AppContextProps | undefined>(undefined)
