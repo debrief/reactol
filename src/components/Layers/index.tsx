@@ -200,7 +200,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewFeature(feature)
   }, [setNewFeature, setSelection])
 
-  const addPoint = () => {
+  const addPoint = useCallback(() => {
     const point: Feature<Point, PointProps> = {
       type: 'Feature',
       properties: {
@@ -215,14 +215,14 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       },
     }
     localSetNewFeature(point)
-  }
+  }, [localSetNewFeature])
 
   const addZone = useCallback((key: string): void => {
     const zone = zoneFeatureFor(key)
     localSetNewFeature(zone)
   }, [localSetNewFeature])
 
-  const addBuoyField = () => {
+  const addBuoyField = useCallback(() => {
     const buoyField: Feature<MultiPoint, BuoyFieldProps> = {
       type: 'Feature',
       properties: {
@@ -239,9 +239,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       },
     }
     localSetNewFeature(buoyField)
-  }
+  }, [localSetNewFeature])
 
-  const addGroup = () => {
+  const addGroup = useCallback(() => {
     const group: Feature<Geometry, GroupProps> = {
       type: 'Feature',
       properties: {
@@ -256,7 +256,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       },
     }
     localSetNewFeature(group)
-  }
+  }, [localSetNewFeature])
 
   const handleAdd = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {
@@ -276,9 +276,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         )
       }
       e.stopPropagation()
-    },
-    []
-  )
+    }, [addGroup, addBuoyField, addPoint]) 
 
   useEffect(() => {
     const items: TreeDataNode[] = []
