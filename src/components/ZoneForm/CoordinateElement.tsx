@@ -10,12 +10,14 @@ interface MaskProps {
   value?: string
   defaultValue?: string
   onChange?: ChangeEventHandler<HTMLInputElement>
+  style?: React.CSSProperties
 };
 
-const InputMask: React.FC<MaskProps> = ({ mask, maskChar, alwaysShowMask, value, defaultValue, onChange }) => {
+const InputMask: React.FC<MaskProps> = ({ mask, maskChar, alwaysShowMask, value, defaultValue, onChange, style }) => {
   return (
     <ReactInputMask
       mask={mask}
+      style={style}
       value={value}
       defaultValue={defaultValue}
       maskChar={maskChar}
@@ -86,10 +88,10 @@ interface CoordinateElementProps {
   value: number
   onChange: (value: number, isLatitude: boolean) => void
   isLatitude: boolean
-
+  style?: React.CSSProperties
 }
 
-export const CoordinateElementInput: React.FC<CoordinateElementProps> = ({ value, onChange , isLatitude}) => {
+export const CoordinateElementInput: React.FC<CoordinateElementProps> = ({ value, onChange , isLatitude, style}) => {
   const [valueString, setValueString] = useState<string>(decimalToDMSString(value || 0, isLatitude))
   const [error, setError] = useState<string | null>(null)
 
@@ -120,7 +122,7 @@ export const CoordinateElementInput: React.FC<CoordinateElementProps> = ({ value
   }
 
   return <div>
-    <InputMask mask={mask} defaultValue={valueString} placeholder={placeholder} onChange={(e) => handleChange(e.target.value)}/>
+    <InputMask style={style} mask={mask} defaultValue={valueString} placeholder={placeholder} onChange={(e) => handleChange(e.target.value)}/>
     {error && <div style={errorStyle}>{error}</div>}
   </div>
 

@@ -1,4 +1,4 @@
-import { Feature, Geometry } from 'geojson'
+import { Feature, Geometry, Point, Position } from 'geojson'
 import { Checkbox, ColorPicker, DatePicker, Form, Input } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { PointProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
+import { CoordinateInput } from '../ZoneForm/CoordinateInput'
 
 export interface PointFormProps {
   shape: Feature<Geometry, PointProps>
@@ -16,11 +17,17 @@ export interface PointFormProps {
 type FormTypeProps = Omit<PointProps, 'time' | 'timeEnd'> & {
   dTime: Dayjs
   dTimeEnd: Dayjs
+  position: Position
 }
 
-const convert = (shape: Readonly<PointProps>): FormTypeProps=> {
-  const oldVal = shape
-  const newVal = {...shape} as FormTypeProps
+type CompositeProps = {
+  props: PointProps
+  position: Position
+}
+
+const convert = (shape: Readonly<CompositeProps>): FormTypeProps=> {
+  const oldVal = shape.props
+  const newVal = {...shape.props} as FormTypeProps
   if (oldVal.time) {
     newVal.dTime = dayjs(oldVal.time)
     delete (newVal as Partial<PointProps>).time
@@ -29,10 +36,13 @@ const convert = (shape: Readonly<PointProps>): FormTypeProps=> {
     newVal.dTimeEnd = dayjs(oldVal.timeEnd)
     delete (newVal as Partial<PointProps>).timeEnd
   }
+  if (shape.position) {
+    newVal.position = shape.position
+  }
   return newVal
 }
 
-const convertBack = (shape: Readonly<FormTypeProps>): PointProps => {
+const convertBack = (shape: Readonly<FormTypeProps>): CompositeProps => {
   const oldVal = shape
   const newVal = {...shape} as PointProps
   if (shape.dTime) {
@@ -43,7 +53,8 @@ const convertBack = (shape: Readonly<FormTypeProps>): PointProps => {
     newVal.timeEnd = oldVal.dTimeEnd.toISOString() 
     delete (newVal as Partial<FormTypeProps>).dTimeEnd
   }
-  return newVal
+  const position = shape.position
+  return {props: newVal, position}
 }
 
 export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
@@ -51,7 +62,7 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
 
   useEffect(() => {
     if (shape) {
-      setState(convert(shape.properties))
+      setState(convert({props: shape.properties, position: (shape.geometry as Point).coordinates}))
     }
   }, [shape, setState])
 
@@ -60,8 +71,8 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
       values.color = (values.color as unknown as Color).toHexString()
     }
     const updatedProps= {...state, ...values} as FormTypeProps
-    const convertedProps = convertBack(updatedProps)
-    const res = {...shape, properties: convertedProps}
+    const converted = convertBack(updatedProps)
+    const res: Feature<Geometry, PointProps> = {...shape, properties: converted.props, geometry: {type: 'Point', coordinates: converted.position}}
     onChange(res)
   }
 
@@ -94,6 +105,13 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
         style={itemStyle}
         valuePropName="checked" >
         <Checkbox style={{alignItems: 'start'}}  />
+      </Form.Item>
+      <Form.Item<FormTypeProps>
+        label='Position'
+        name='position'
+        style={itemStyle}
+        rules={[{ required: true }]} >
+        <CoordinateInput />
       </Form.Item>
       <Form.Item<FormTypeProps>
         label="Color"
