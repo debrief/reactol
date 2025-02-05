@@ -1,8 +1,3 @@
-.labelInterval .ant-form-item-label label, .labelSymbol .ant-form-item-label label,
-.labelInterval .ant-select-selection-item, .labelSymbol .ant-select-selection-item,
-div.ant-select-item-option, .ant-select-arrow {
-  font-size: 9px !important;
-}
 
 .propertiesForm .ant-form-item label,
 .propertiesForm .ant-form-item-control-input,

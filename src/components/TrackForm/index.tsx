@@ -23,7 +23,7 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
   const [form] = Form.useForm()
   useEffect(() => {
-    if (track) {
+    if (track && form) {
       const props = track.properties as TrackProps
       const dupe = {...track.properties} as unknown as FormTypeProps
       // convert the intervals to strings
