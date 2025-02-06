@@ -5,6 +5,6 @@ export const ZoneShapes = [
   { key: POLYGON_SHAPE, label: 'Polygon' },
   { key: CIRCULAR_RING_SHAPE, label: 'Circular Ring' },
   { key: SECTION_CIRCULAR_RING_SHAPE, label: 'Section of Circular Ring' },
-  { key: CIRCULAR_SECTOR_SHAPE, label: 'Circular Sector' },
   { key: CIRCLE_SHAPE, label: 'Circle' },
+  { key: CIRCULAR_SECTOR_SHAPE, label: 'Circular Sector' }
 ]

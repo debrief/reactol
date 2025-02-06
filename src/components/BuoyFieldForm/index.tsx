@@ -5,14 +5,12 @@ import {
   DatePicker,
   Form,
   Input,
-  Select,
 } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
 import { BuoyFieldProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 import './index.css'
-import { symbolOptions } from '../../helpers/symbolTypes'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 
@@ -120,19 +118,6 @@ export const BuoyFieldForm: React.FC<FieldFormProps> = ({
           valuePropName='checked'
         >
           <Checkbox />
-        </Form.Item>
-        <Form.Item<FormTypeProps>
-          label='Symbol'
-          name='symbol'
-          style={itemStyle}
-          rules={[
-            {
-              required: true,
-              message: 'Please specify the environment/symbol for the track',
-            },
-          ]}
-        >
-          <Select options={symbolOptions} />
         </Form.Item>
         <Form.Item<FormTypeProps>
           label='Color'

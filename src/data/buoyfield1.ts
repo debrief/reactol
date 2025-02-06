@@ -9,7 +9,6 @@ const field: Feature<MultiPoint, BuoyFieldProps> = {
     color: '#FF0',
     name: 'Z12344',
     shortName: '12344',
-    symbol: 'nav',
     visible: true
   },
   geometry: {

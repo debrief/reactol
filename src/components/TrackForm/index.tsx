@@ -96,8 +96,8 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           <Checkbox />
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Symbol'
-          name='symbol'
+          label='Environment'
+          name='env'
           style={itemStyle}
           rules={[
             {
@@ -106,7 +106,17 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
             },
           ]}
         >
-          <Select options={symbolOptions} />
+          <Select
+            options={symbolOptions}
+            optionLabelProp="label"
+            labelInValue
+            optionRender={(option) => (
+              <Flex align="center" gap={8}>
+                {option.data.icon}
+                {option.data.label}
+              </Flex>
+            )}
+          />
         </Form.Item>
         <Form.Item<FormTypeProps>
           style={itemStyle}

@@ -9,7 +9,7 @@ const track: Feature<LineString, TrackProps> = {
     color: '#00F',
     name: 'VAN AMSTEL',
     shortName: 'VANA',
-    symbol: 'sub',
+    env: 'sub',
     labelInterval: 2 * 60 * 60 * 1000,
     symbolInterval: 30 * 60 * 1000,
     times: [

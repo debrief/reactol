@@ -3,6 +3,16 @@ import { Button, Checkbox, Form, Input, Modal, Transfer } from 'antd'
 import { Key, useMemo, useState } from 'react'
 import { GroupProps } from '../../types'
 import { useAppSelector } from '../../state/hooks'
+import { getFeatureIcon } from '../../helpers/getFeatureIcon'
+
+interface TransferData {
+  key: string
+  title: string
+  description: string
+  type: string
+  color?: string
+  env?: string
+}
 
 export interface GroupFormProps {
   group: Feature<Point, GroupProps>
@@ -13,18 +23,23 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const features = useAppSelector(state => state.fColl.features)
   
-  const transferData = useMemo(() => {
-    // Get all features that could be added to the group
-    const nonGroupFeatures = features.filter(f => f.properties?.dataType !== 'group')
-    
-    // Create transfer data structure
-    const transferData = nonGroupFeatures.map(f => ({
+  const nonGroupFeatures = useMemo(() => features.filter(f => f.properties?.dataType !== 'group'), [features])
+
+  const transferData = useMemo<TransferData[]>(() => {
+    return nonGroupFeatures.map(f => ({
       key: f.id as string,
       title: f.properties?.name || 'Unnamed',
-      description: f.properties?.dataType || 'Unknown type'
+      description: f.properties?.dataType || 'Unknown type',
+      type: f.properties?.dataType,
+      color: f.properties?.color,
+      env: f.properties?.env
     }))
-    return transferData
-  }, [features])
+  }, [nonGroupFeatures])
+
+  const selectedUnits = useMemo(() => {
+    const selectedIds = group.properties.units as string[] || []
+    return transferData.filter(item => selectedIds.includes(item.key))
+  }, [transferData, group.properties.units])
 
   const handleFormChange = (values: Partial<GroupProps>) => {
     const newVal = {...group, properties: {...group.properties}}
@@ -50,14 +65,6 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
     }
     onChange(newGroup)
   }
-
-  // Get names of current units for display
-  const unitNames = group.properties.units
-    .map(id => {
-      const feature = features.find(f => f.id === id)
-      return feature?.properties?.name || 'Unknown'
-    })
-    .filter(Boolean)
 
   const itemStyle = { marginBottom: '0.5em' }
 
@@ -96,12 +103,15 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
         >
           <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
-              {unitNames.length === 0 ? (
+              {selectedUnits.length === 0 ? (
                 <span style={{ color: '#999' }}>No units selected</span>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                  {unitNames.map((name, index) => (
-                    <div key={index}>{name}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                  {selectedUnits.map((unit) => (
+                    <div key={unit.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {getFeatureIcon({ dataType: unit.type, color: unit.color, environment: unit.env })}
+                      {unit.title}
+                    </div>
                   ))}
                 </div>
               )}
@@ -126,7 +136,12 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           titles={['Available', 'Selected']}
           targetKeys={group.properties.units as string[]}
           onChange={handleTransferChange}
-          render={item => item.title}
+          render={(item: TransferData) => (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {getFeatureIcon({ dataType: item.type, color: item.color, environment: item.env })}
+              {item.title}
+            </span>
+          )}
           listStyle={{
             width: 300,
             height: 400,
