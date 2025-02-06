@@ -72,6 +72,22 @@ export const SampleDataLoader: React.FC = () => {
           coordinates: [] 
         }
       })
+
+      data.push({
+        type: 'Feature',
+        id: 'g-3',
+        properties: {
+          dataType: GROUP_TYPE,
+          name: 'Central Group',
+          visible: true,
+          units: [field.id, zones[0].id, points[0].id, points[1].id]
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [] 
+        }
+      })
+
       dispatch({ type: 'fColl/featuresAdded', payload: data })
     } else {
       const data = sampleItems.find(i => i.name === e.key)?.data
