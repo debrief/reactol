@@ -107,7 +107,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
                   {selectedUnits.map((unit) => (
                     <div key={unit.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {getFeatureIcon({ type: unit.type, color: unit.color })}
+                      {getFeatureIcon({ dataType: unit.type, color: unit.color })}
                       {unit.title}
                     </div>
                   ))}
@@ -136,7 +136,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           onChange={handleTransferChange}
           render={(item: TransferData) => (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {getFeatureIcon({ type: item.type, color: item.color })}
+              {getFeatureIcon({ dataType: item.type, color: item.color })}
               {item.title}
             </span>
           )}

@@ -110,7 +110,7 @@ const getIcon = (feature: Feature | undefined,
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
   const color = feature.properties?.color
-  return getFeatureIcon({ type: dataType, color }) || <FolderOutlined />
+  return getFeatureIcon({ dataType, color }) || <FolderOutlined />
 }
 
 const mapFunc = (
