@@ -3,8 +3,7 @@ import { Button, Checkbox, Form, Input, Modal, Transfer } from 'antd'
 import { Key, useMemo, useState } from 'react'
 import { GroupProps } from '../../types'
 import { useAppSelector } from '../../state/hooks'
-import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon } from '../Layers/NodeIcons'
-import { TRACK_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE } from '../../constants'
+import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 
 interface TransferData {
   key: string
@@ -108,10 +107,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
                   {selectedUnits.map((unit) => (
                     <div key={unit.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {unit.type === TRACK_TYPE && <TrackIcon color={unit.color} />}
-                      {unit.type === BUOY_FIELD_TYPE && <BuoyFieldIcon color={unit.color} />}
-                      {unit.type === ZONE_TYPE && <ZoneIcon color={unit.color} />}
-                      {unit.type === REFERENCE_POINT_TYPE && <PointIcon color={unit.color} />}
+                      {getFeatureIcon({ type: unit.type, color: unit.color })}
                       {unit.title}
                     </div>
                   ))}
@@ -140,10 +136,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           onChange={handleTransferChange}
           render={(item: TransferData) => (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {item.type === TRACK_TYPE && <TrackIcon color={item.color} />}
-              {item.type === BUOY_FIELD_TYPE && <BuoyFieldIcon color={item.color} />}
-              {item.type === ZONE_TYPE && <ZoneIcon color={item.color} />}
-              {item.type === REFERENCE_POINT_TYPE && <PointIcon color={item.color} />}
+              {getFeatureIcon({ type: item.type, color: item.color })}
               {item.title}
             </span>
           )}

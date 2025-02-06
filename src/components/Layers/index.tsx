@@ -32,7 +32,7 @@ import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
 import { AddZoneShape } from './AddZoneShape'
 import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
-import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon, GroupIcon } from './NodeIcons'
+import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { noop } from 'lodash'
 
 interface LayerProps {
@@ -110,20 +110,7 @@ const getIcon = (feature: Feature | undefined,
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
   const color = feature.properties?.color
-  switch (dataType) {
-  case TRACK_TYPE:
-    return <TrackIcon color={color} />
-  case BUOY_FIELD_TYPE:
-    return <BuoyFieldIcon color={color} />
-  case ZONE_TYPE:
-    return <ZoneIcon color={color} />
-  case REFERENCE_POINT_TYPE:
-    return <PointIcon color={color} />
-  case GROUP_TYPE:
-    return <GroupIcon color={color} />
-  default:
-    return <FolderOutlined />
-  }
+  return getFeatureIcon({ type: dataType, color }) || <FolderOutlined />
 }
 
 const mapFunc = (
