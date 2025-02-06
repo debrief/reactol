@@ -85,8 +85,8 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
   return (
     <Form
       name='createShape'
-      labelCol={{ span: 6 }}
-      wrapperCol={{ span: 16 }}
+      labelCol={{ flex: '80px' }}
+      wrapperCol={{ flex: 'auto' }}
       style={{ maxWidth: 400 }}
       initialValues={state}
       autoComplete='off'
