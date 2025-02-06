@@ -69,7 +69,7 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
     name: values.name,
     shortName: values.shortName,
     visible: true,
-    symbol: values.symbol,
+    env: values.env,
     times,
     courses,
     speeds,
@@ -89,7 +89,7 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
 
 export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => {
 
-  if (!values || !values.year || !values.month || !values.name || !values.shortName || !values.symbol || !values.color) {
+  if (!values || !values.year || !values.month || !values.name || !values.shortName || !values.env || !values.color) {
     return
   }
 

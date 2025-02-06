@@ -97,7 +97,7 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
         </Form.Item>
         <Form.Item<FormTypeProps>
           label='Environment'
-          name='symbol'
+          name='env'
           style={itemStyle}
           rules={[
             {
