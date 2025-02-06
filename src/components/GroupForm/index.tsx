@@ -3,6 +3,8 @@ import { Button, Checkbox, Form, Input, Modal, Transfer } from 'antd'
 import { Key, useMemo, useState } from 'react'
 import { GroupProps } from '../../types'
 import { useAppSelector } from '../../state/hooks'
+import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon } from '../Layers/NodeIcons'
+import { TRACK_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE } from '../../constants'
 
 export interface GroupFormProps {
   group: Feature<Point, GroupProps>
@@ -21,7 +23,9 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
     const transferData = nonGroupFeatures.map(f => ({
       key: f.id as string,
       title: f.properties?.name || 'Unnamed',
-      description: f.properties?.dataType || 'Unknown type'
+      description: f.properties?.dataType || 'Unknown type',
+      type: f.properties?.dataType,
+      color: f.properties?.color
     }))
     return transferData
   }, [features])
@@ -126,7 +130,15 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           titles={['Available', 'Selected']}
           targetKeys={group.properties.units as string[]}
           onChange={handleTransferChange}
-          render={item => item.title}
+          render={item => (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {item.type === TRACK_TYPE && <TrackIcon color={item.color} />}
+              {item.type === BUOY_FIELD_TYPE && <BuoyFieldIcon color={item.color} />}
+              {item.type === ZONE_TYPE && <ZoneIcon color={item.color} />}
+              {item.type === REFERENCE_POINT_TYPE && <PointIcon color={item.color} />}
+              {item.title}
+            </span>
+          )}
           listStyle={{
             width: 300,
             height: 400,

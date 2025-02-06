@@ -109,17 +109,18 @@ const getIcon = (feature: Feature | undefined,
 
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
+  const color = feature.properties?.color
   switch (dataType) {
   case TRACK_TYPE:
-    return <TrackIcon />
+    return <TrackIcon color={color} />
   case BUOY_FIELD_TYPE:
-    return <BuoyFieldIcon />
+    return <BuoyFieldIcon color={color} />
   case ZONE_TYPE:
-    return <ZoneIcon />
+    return <ZoneIcon color={color} />
   case REFERENCE_POINT_TYPE:
-    return <PointIcon />
+    return <PointIcon color={color} />
   case GROUP_TYPE:
-    return <GroupIcon />
+    return <GroupIcon color={color} />
   default:
     return <FolderOutlined />
   }
