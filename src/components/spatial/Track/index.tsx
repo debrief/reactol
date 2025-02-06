@@ -9,6 +9,9 @@ import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
 import { divIcon } from 'leaflet'
 
+const ENVIRONMENT_ICON_SCALE = 2.5 // Scaling factor for environment icons
+const BASE_ICON_SIZE = 16 // Base size of the SVG viewBox
+
 export interface TrackFeatureProps {
   feature: Feature
   onClickHandler: { (id: string, modifier: boolean): void }
@@ -153,36 +156,33 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
             className: 'environment-icon-marker',
             html: (() => {
               const env = (feature.properties as TrackProps).env
+              const size = BASE_ICON_SIZE * ENVIRONMENT_ICON_SCALE
               const color = (feature.properties as TrackProps).color
-              switch (env) {
-              case 'air':
-                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 9C4 6.79086 5.79086 5 8 5C10.2091 5 12 6.79086 12 9" stroke="#fff" stroke-width="1.5" fill="none"/>
-                  <circle cx="8" cy="10" r="1" fill="${color}"/>
-                </svg>`
-              case 'nav':
-                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>
-                  <circle cx="8" cy="8" r="1" fill="${color}"/>
-                </svg>`
-              case 'sub':
-                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 7C4 9.20914 5.79086 11 8 11C10.2091 11 12 9.20914 12 7" stroke="${color}" stroke-width="1.5" fill="none"/>
-                  <circle cx="8" cy="6" r="1" fill="${color}"/>
-                </svg>`
-              case 'lnd':
-                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 12L8 5L12 12H4Z" stroke="${color}" stroke-width="1.5" fill="none"/>
-                </svg>`
-              default:
-                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>
-                  <circle cx="8" cy="8" r="1" fill="${color}"/>
-                </svg>`
-              }
+              const svgContent = (() => {
+                switch (env) {
+                case 'air':
+                  return `<path d="M4 9C4 6.79086 5.79086 5 8 5C10.2091 5 12 6.79086 12 9" stroke="${color}" stroke-width="1.5" fill="none"/>
+                    <circle cx="8" cy="10" r="1" fill="${color}"/>`
+                case 'nav':
+                  return `<circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>
+                    <circle cx="8" cy="8" r="1" fill="${color}"/>`
+                case 'sub':
+                  return `<path d="M4 7C4 9.20914 5.79086 11 8 11C10.2091 11 12 9.20914 12 7" stroke="${color}" stroke-width="1.5" fill="none"/>
+                    <circle cx="8" cy="6" r="1" fill="${color}"/>`
+                case 'lnd':
+                  return `<path d="M4 12L8 5L12 12H4Z" stroke="${color}" stroke-width="1.5" fill="none"/>`
+                default:
+                  return `<circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>`
+                }
+              })()
+              return `<div style="width: ${size}px; height: ${size}px;">
+                <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  ${svgContent}
+                </svg>
+              </div>`
             })(),
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
+            iconSize: [BASE_ICON_SIZE * ENVIRONMENT_ICON_SCALE, BASE_ICON_SIZE * ENVIRONMENT_ICON_SCALE],
+            iconAnchor: [BASE_ICON_SIZE * ENVIRONMENT_ICON_SCALE / 2, BASE_ICON_SIZE * ENVIRONMENT_ICON_SCALE / 2]
           })}
         >
           <Tooltip
