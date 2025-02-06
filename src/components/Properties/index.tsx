@@ -85,7 +85,7 @@ const Properties: React.FC = () => {
       const featureProps = featureState.properties
       if (featureProps?.dataType) {
         const aProps = featureProps as CoreShapeProps
-        setPropertyForm(<CoreForm onCancel={onCancelCreate} isCreate={newFeature !== null} formDirty={formDirty} onDelete={onDelete} onReset={onReset} onSave={onSave}>
+        setPropertyForm(<CoreForm className="core-form-animated" onCancel={onCancelCreate} isCreate={newFeature !== null} formDirty={formDirty} onDelete={onDelete} onReset={onReset} onSave={onSave}>
           {customFormFor(aProps.dataType, featureState)}
         </CoreForm>)
       }
