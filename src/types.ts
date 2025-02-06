@@ -11,9 +11,11 @@ export type CoreDataProps = {
   color: string
 }
 
+export type EnvOptions = 'air' | 'nav' | 'sub' | 'lnd' | 'unk'
+
 type CoreTrackPrps = CoreDataProps & {
   shortName: string
-  symbol: 'air' | 'nav' | 'sub' | 'lnd' | 'unk'
+  env: EnvOptions
 }
 
 export type TrackProps = CoreTrackPrps & {
@@ -25,7 +27,7 @@ export type TrackProps = CoreTrackPrps & {
   symbolInterval?: number
 }
 
-export type BuoyFieldProps = CoreTrackPrps & TemporalShapeProps & {
+export type BuoyFieldProps = Omit<CoreTrackPrps, 'env'> & TemporalShapeProps & {
   dataType: typeof BUOY_FIELD_TYPE
 }
   
@@ -54,4 +56,3 @@ export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'l
 export type AddTrackProps = {
   trackId: string
 }
-

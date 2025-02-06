@@ -11,6 +11,7 @@ interface TransferData {
   description: string
   type: string
   color?: string
+  env?: string
 }
 
 export interface GroupFormProps {
@@ -30,7 +31,8 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
       title: f.properties?.name || 'Unnamed',
       description: f.properties?.dataType || 'Unknown type',
       type: f.properties?.dataType,
-      color: f.properties?.color
+      color: f.properties?.color,
+      env: f.properties?.env
     }))
   }, [nonGroupFeatures])
 
@@ -107,7 +109,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
                   {selectedUnits.map((unit) => (
                     <div key={unit.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {getFeatureIcon({ dataType: unit.type, color: unit.color })}
+                      {getFeatureIcon({ dataType: unit.type, color: unit.color, environment: unit.env })}
                       {unit.title}
                     </div>
                   ))}
@@ -136,7 +138,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           onChange={handleTransferChange}
           render={(item: TransferData) => (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {getFeatureIcon({ dataType: item.type, color: item.color })}
+              {getFeatureIcon({ dataType: item.type, color: item.color, environment: item.env })}
               {item.title}
             </span>
           )}

@@ -5,7 +5,7 @@
     "color": "#FF0",
     "name": "Z12344",
     "shortName": "12344",
-    "symbol": "nav",
+    "env": "nav",
     "visible": true,
     "time": "2024-11-14T19:10:00.000Z",
     "timeEnd": "2024-11-15T04:10:00.000Z"

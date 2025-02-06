@@ -5,12 +5,13 @@ import { TRACK_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE, GROUP_TYP
 interface GetFeatureIconProps {
   dataType: string
   color?: string
+  environment?: string
 }
 
-export const getFeatureIcon = ({ dataType, color }: GetFeatureIconProps): React.ReactNode => {
+export const getFeatureIcon = ({ dataType, color, environment }: GetFeatureIconProps): React.ReactNode => {
   switch (dataType) {
   case TRACK_TYPE:
-    return <TrackIcon color={color} />
+    return <TrackIcon color={color} environment={environment} />
   case BUOY_FIELD_TYPE:
     return <BuoyFieldIcon color={color} />
   case ZONE_TYPE:

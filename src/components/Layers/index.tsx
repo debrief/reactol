@@ -110,7 +110,8 @@ const getIcon = (feature: Feature | undefined,
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
   const color = feature.properties?.color
-  return getFeatureIcon({ dataType, color }) || <FolderOutlined />
+  const environment = feature.properties?.env
+  return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
 }
 
 const mapFunc = (
@@ -268,7 +269,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       properties: {
         name: '',
         shortName: '',
-        symbol: 'air',
         dataType: BUOY_FIELD_TYPE,
         color: '#FF0000',
         visible: true,

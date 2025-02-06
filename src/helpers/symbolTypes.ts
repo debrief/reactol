@@ -1,7 +1,8 @@
-import { getEnvironmentIcon } from '../components/EnvironmentIcons'
+import { getEnvironmentIcon } from '../components/EnvironmentIcons/getEnvironmentIcon'
+import { EnvOptions } from '../types'
 
 type SymbolsType = {
-  value: 'air' | 'nav' | 'sub' | 'lnd' | 'unk'
+  value: EnvOptions
   label: string
   icon: React.ReactNode
 }

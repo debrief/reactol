@@ -94,19 +94,3 @@ export const UnknownIcon: React.FC<EnvironmentIconProps> = ({ color = 'currentCo
   </svg>
 )
 
-// Map of environment types to their respective icons
-export const getEnvironmentIcon = (type: string, color?: string) => {
-  switch (type) {
-  case 'air':
-    return <AirIcon color={color} />
-  case 'nav':
-    return <SurfaceIcon color={color} />
-  case 'sub':
-    return <SubsurfaceIcon color={color} />
-  case 'lnd':
-    return <LandIcon color={color} />
-  case 'unk':
-  default:
-    return <UnknownIcon color={color} />
-  }
-}

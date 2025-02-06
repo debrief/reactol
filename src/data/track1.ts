@@ -9,7 +9,7 @@ const track: Feature<LineString, TrackProps> = {
     color: '#F00',
     name: 'VAN GALEN',
     shortName: 'VANG',
-    symbol: 'nav',
+    env: 'nav',
     labelInterval: 2 * 60 * 60 * 1000,
     symbolInterval: 30 * 60 * 1000,
     times: [

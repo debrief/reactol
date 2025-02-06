@@ -1,17 +1,28 @@
+import React from 'react'
+import { getEnvironmentIcon } from '../EnvironmentIcons/getEnvironmentIcon'
+
 interface IconProps {
   color?: string;
+  environment?: string;
 }
 
-export const TrackIcon: React.FC<IconProps> = ({ color }) => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Hull */}
-    <path d="M2 10L4 12H12L14 10V8H2V10Z" fill={color || 'currentColor'} />
-    {/* Bridge/Superstructure */}
-    <path d="M6 8V5H10V8" fill={color || 'currentColor'} />
-    {/* Outline */}
-    <path d="M2 8V10L4 12H12L14 10V8M6 8V5H10V8" stroke={color || 'currentColor'} strokeWidth="1.5" strokeLinejoin="round"/>
-  </svg>
-)
+export const TrackIcon: React.FC<IconProps> = ({ color, environment }) => {
+  if (environment) {
+    const EnvironmentIcon = getEnvironmentIcon(environment, color)
+    return EnvironmentIcon
+  }
+
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Hull */}
+      <path d="M2 10L4 12H12L14 10V8H2V10Z" fill={color || 'currentColor'} />
+      {/* Bridge/Superstructure */}
+      <path d="M6 8V5H10V8" fill={color || 'currentColor'} />
+      {/* Outline */}
+      <path d="M2 8V10L4 12H12L14 10V8M6 8V5H10V8" stroke={color || 'currentColor'} strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  )
+}
 
 export const BuoyFieldIcon: React.FC<IconProps> = ({ color }) => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
