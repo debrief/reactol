@@ -109,7 +109,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         weight={lineWeight}
         color={color}
       />
-      {isSelected &&trackCoords
+      {isSelected && trackCoords
         .filter((item) => item.symbolVisible)
         .map((item: CoordInstance, index: number) => (
           <CircleMarker
