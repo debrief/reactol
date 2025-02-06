@@ -170,7 +170,8 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
                   return `<path d="M4 7C4 9.20914 5.79086 11 8 11C10.2091 11 12 9.20914 12 7" stroke="${color}" stroke-width="1.5" fill="none"/>
                     <circle cx="8" cy="6" r="1" fill="${color}"/>`
                 case 'lnd':
-                  return `<path d="M4 12L8 5L12 12H4Z" stroke="${color}" stroke-width="1.5" fill="none"/>`
+                  return `<circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>
+                    <path d="M8 5V11M5 8H11" stroke="${color}" stroke-width="1.5"/>`
                 default:
                   return `<circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>`
                 }
