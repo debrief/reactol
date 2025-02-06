@@ -8,6 +8,7 @@ import {
   DeleteOutlined,
   CloseCircleOutlined,
   ShrinkOutlined,
+  FolderOutlined,
 } from '@ant-design/icons'
 import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
@@ -31,6 +32,8 @@ import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
 import { AddZoneShape } from './AddZoneShape'
 import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
+import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon, GroupIcon } from './NodeIcons'
+import { noop } from 'lodash'
 
 interface LayerProps {
   openGraph: { (): void }
@@ -64,22 +67,24 @@ const findChildrenOfType = (
   }))
 }
 
-const findChildrenOfGroup = (features: Feature[]): FieldDataNode[] => {
+const findChildrenOfGroup = (features: Feature[]): TreeDataNode[] => {
   const items = features.filter(
     (feature) => feature.properties?.dataType === GROUP_TYPE
   )
-  return items.map((item): FieldDataNode => {
+  return items.map((item): TreeDataNode => {
     const props = item.properties as GroupProps
     const children = features.filter((feature) =>
       props.units.includes(feature.id as string)
     )
+    const childFeatures = children.map(child => features.find(f => idFor(f) === child.id)) as Feature[]
     return {
       title: nameFor(item),
       key: item.id as string,
-      children: children.map((child): FieldDataNode => {
+      children: childFeatures.map((child: Feature): TreeDataNode => {
         return {
           title: nameFor(child),
           key: groupIdFor(item, child.id as string),
+          icon: getIcon(child, groupIdFor(item, child.id as string), nameFor(child), noop, undefined),
           children: [],
         }
       }),
@@ -91,6 +96,35 @@ const groupIdFor = (parent: Feature, child?: string): string => {
   return `${parent.id || 'unknown'}:${child || 'unknown'}`
 }
 
+const getIcon = (feature: Feature | undefined, 
+  key:string, title: string,
+  handleAdd: (e: React.MouseEvent, key: string, title: string) => void, button?: React.ReactNode) => {
+  // If no feature is provided, this is a parent node - show plus icon
+  if (!feature) {
+    return button || <PlusCircleOutlined
+      style={{ cursor: 'copy' }}
+      onClick={(e) => handleAdd(e, key, title)}
+    />
+  }
+
+  // For leaf nodes, show type-specific icon based on dataType
+  const dataType = feature.properties?.dataType
+  switch (dataType) {
+  case TRACK_TYPE:
+    return <TrackIcon />
+  case BUOY_FIELD_TYPE:
+    return <BuoyFieldIcon />
+  case ZONE_TYPE:
+    return <ZoneIcon />
+  case REFERENCE_POINT_TYPE:
+    return <PointIcon />
+  case GROUP_TYPE:
+    return <GroupIcon />
+  default:
+    return <FolderOutlined />
+  }
+}
+
 const mapFunc = (
   features: Feature[],
   title: string,
@@ -99,19 +133,37 @@ const mapFunc = (
   handleAdd: (e: React.MouseEvent, key: string, title: string) => void,
   button?: React.ReactNode
 ): TreeDataNode => {
-  const buttonToUse = button || <PlusCircleOutlined
-    style={{ cursor: 'copy' }}
-    onClick={(e) => handleAdd(e, key, title)} />
 
-  const children =
-    dType !== GROUP_TYPE
-      ? findChildrenOfType(features, dType)
-      : findChildrenOfGroup(features)
+  const children = features
+    ? dType === GROUP_TYPE
+      ? findChildrenOfGroup(features).map(child => {
+        // For group children, we need to find the actual feature they reference
+        const referencedFeature = features.find(f => idFor(f) === child.key)
+        // and the child units of this group
+        return {
+          ...child,
+          icon: getIcon(referencedFeature, child.key as string, child.title as string, handleAdd, button),
+        }
+      })
+      : findChildrenOfType(features, dType).map(child => {
+        // Find the corresponding feature for this child
+        const feature = features.find(f => idFor(f) === child.key)
+        return {
+          ...child,
+          icon: getIcon(feature, child.key, child.title, handleAdd, button),
+        }
+      })
+    : []
+
   return {
-    title: title,
-    key: key,
-    icon: buttonToUse,
-    children: children,
+    title: (
+      <span>
+        {title}
+      </span>
+    ),
+    key,
+    icon: getIcon(undefined, key, title, handleAdd, button), // Parent node gets plus icon
+    children,
   }
 }
 
@@ -531,4 +583,3 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 }
 
 export default Layers
-
