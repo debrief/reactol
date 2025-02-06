@@ -109,7 +109,6 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           <Select
             options={symbolOptions}
             optionLabelProp="label"
-            labelInValue
             optionRender={(option) => (
               <Flex align="center" gap={8}>
                 {option.data.icon}
