@@ -1,3 +1,19 @@
 .time-marker, .track-name {
   text-shadow: 1px 1px 2px white;
+  text-align: center;
+}
+
+.leaflet-tooltip-bottom:before {
+  content: ''!important;
+  border: 0 !important;
+}
+
+.environment-icon-marker {
+  background: none !important;
+  border: none;
+}
+
+.environment-icon-marker svg {
+  width: 24px;
+  height: 24px;
 }

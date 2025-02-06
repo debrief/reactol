@@ -1,13 +1,13 @@
 import { Feature, Geometry, LineString } from 'geojson'
 import { LeafletMouseEvent } from 'leaflet'
-import { Polyline, CircleMarker, Tooltip } from 'react-leaflet'
+import { Polyline, CircleMarker, Tooltip, Marker } from 'react-leaflet'
 import { useMemo } from 'react'
 import { useDocContext } from '../../../state/DocContext'
 import { CoordInstance, filterTrack } from '../../../helpers/filterTrack'
 import { TrackProps } from '../../../types'
 import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
-import { formatInTimeZone } from 'date-fns-tz'
+import { divIcon } from 'leaflet'
 
 export interface TrackFeatureProps {
   feature: Feature
@@ -51,25 +51,21 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         })
       }
       return validCoords
-    } else {
-      const times = feature.properties?.times
-      const timeFreq = Math.floor(times.length / 20)
-
-      if (times && times.length) {
-        return times.map((time: string, index: number) => {
-          return {
-            pos: [coords[index][1], coords[index][0]],
-            time: formatInTimeZone(time, 'UTC', 'ddHHmm\'Z\''),
-            timeVisible: index % timeFreq === 0,
-          }
-        })
-      } else {
-        return coords.map((coord: number[]) => {
-          return { pos: [coord[1], coord[0]], time: '' }
-        })
-      }
     }
+    return []
   }, [feature, time])
+
+  const currentLocation = useMemo(() => {
+    return trackCoords.length > 0 ? trackCoords[trackCoords.length - 1] : null
+  }, [trackCoords])
+
+  const currentTime = useMemo(() => {
+    if (trackCoords.length === 0) return null
+    const time = trackCoords[trackCoords.length - 1].time
+    return time
+  }, [trackCoords])
+
+  const color = colorFor(feature)
 
   const onclick = (evt: LeafletMouseEvent) => {
     onClickHandler(
@@ -108,26 +104,8 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         eventHandlers={eventHandlers}
         positions={trackCoords.map((val: CoordInstance) => val.pos)}
         weight={lineWeight}
-        color={colorFor(feature)}
+        color={color}
       />
-      {trackCoords.length && (
-        <CircleMarker
-          key={'-start-line-' + itemId}
-          center={trackCoords[0].pos}
-          color={colorFor(feature)}
-          radius={circleRadius}
-        >
-          <Tooltip
-            className={'track-name'}
-            key={feature.id + '-start-name-' + isSelected}
-            direction='left'
-            opacity={1}
-            permanent
-          >
-            {feature.properties?.shortName}
-          </Tooltip>
-        </CircleMarker>
-      )}
       {isSelected &&trackCoords
         .filter((item) => item.symbolVisible)
         .map((item: CoordInstance, index: number) => (
@@ -145,9 +123,9 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         .filter((item) => item.labelVisible || item.symbolVisible)
         .map((item: CoordInstance, index: number) => (
           <CircleMarker
-            fillColor={colorFor(feature)}
+            fillColor={color}
             fill={isSelected}
-            color={colorFor(feature)}
+            color={color}
             fillOpacity={1}
             weight={lineWeight}
             key={'-point-' + itemId + '-' + index}
@@ -168,6 +146,57 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
             )}
           </CircleMarker>
         ))}
+      {currentLocation && (
+        <Marker
+          position={currentLocation.pos}
+          icon={divIcon({
+            className: 'environment-icon-marker',
+            html: (() => {
+              const env = (feature.properties as TrackProps).env
+              const color = (feature.properties as TrackProps).color
+              switch (env) {
+              case 'air':
+                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 9C4 6.79086 5.79086 5 8 5C10.2091 5 12 6.79086 12 9" stroke="#fff" stroke-width="1.5" fill="none"/>
+                  <circle cx="8" cy="10" r="1" fill="${color}"/>
+                </svg>`
+              case 'nav':
+                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>
+                  <circle cx="8" cy="8" r="1" fill="${color}"/>
+                </svg>`
+              case 'sub':
+                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 7C4 9.20914 5.79086 11 8 11C10.2091 11 12 9.20914 12 7" stroke="${color}" stroke-width="1.5" fill="none"/>
+                  <circle cx="8" cy="6" r="1" fill="${color}"/>
+                </svg>`
+              case 'lnd':
+                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 12L8 5L12 12H4Z" stroke="${color}" stroke-width="1.5" fill="none"/>
+                </svg>`
+              default:
+                return `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="8" r="4" stroke="${color}" stroke-width="1.5" fill="none"/>
+                  <circle cx="8" cy="8" r="1" fill="${color}"/>
+                </svg>`
+              }
+            })(),
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          })}
+        >
+          <Tooltip
+            className={'track-name'}
+            key={feature.id + '-track-name-' + isSelected}
+            direction='bottom'
+            opacity={1}
+            permanent>
+            {feature.properties?.shortName}<br/>
+            {currentTime}
+          </Tooltip>
+
+        </Marker>
+      )}
     </>
   )
 }
