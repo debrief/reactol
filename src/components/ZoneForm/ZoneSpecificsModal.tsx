@@ -45,11 +45,11 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
   }
 
   const shapeName = useMemo(() => {
-    return ZoneShapes.find((s) => s.key === specifics.shapeType)?.label
-  }, [specifics.shapeType])
+    return ZoneShapes.find((s) => s.key === specifics?.shapeType)?.label
+  }, [specifics?.shapeType])
 
   const renderFields = () => {
-    switch (specifics.shapeType) {
+    switch (specifics?.shapeType) {
     case RECTANGLE_SHAPE:
       return (
         <Row gutter={16}>

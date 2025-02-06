@@ -1,3 +1,4 @@
+import React, { useState, useCallback } from 'react'
 import { Button, Col, Flex, Row, Tooltip } from 'antd'
 
 export interface CoreFormProps {
@@ -8,24 +9,43 @@ export interface CoreFormProps {
   onCancel: () => void
   formDirty?: boolean
   isCreate: boolean
+  className?: string
 }
 
-export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave,  onDelete, onCancel, formDirty, isCreate}) => {
+export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, onDelete, onCancel, formDirty, isCreate, className}) => {
+  const [isExiting, setIsExiting] = useState(false)
+
+  const handleExit = useCallback((callback: () => void) => {
+    setIsExiting(true)
+    setTimeout(() => {
+      setIsExiting(false)
+      callback()
+    }, 700) // Match the animation duration
+  }, [])
+
+  const handleCancel = useCallback(() => {
+    handleExit(onCancel)
+  }, [handleExit, onCancel])
+
+  const handleDelete = useCallback(() => {
+    handleExit(onDelete)
+  }, [handleExit, onDelete])
+
   return (
-    <div style={{marginTop: '5px'}}>
+    <div style={{marginTop: '5px'}} className={`${className || ''} ${isExiting ? 'exit' : ''}`}>
       {children}
       <Row>
         <Col span={8}>
           <Tooltip title='Delete feature' placement="top">
             <Flex gap='small' justify='start' wrap style={{height: '1em', borderTop: '2px solid #ccc', paddingTop: '5px'}}>
-              <Button danger type='primary' disabled={isCreate} size='small' onClick={onDelete}>Delete</Button>
+              <Button danger type='primary' disabled={isCreate} size='small' onClick={handleDelete}>Delete</Button>
             </Flex>
           </Tooltip>
         </Col>
         <Col span={16}>
           <Flex gap='small' justify='end' wrap style={{height: '1em', borderTop: '2px solid #ccc', paddingTop: '5px'}}>
             { isCreate && <Tooltip title='Cancel new feature creation' placement="top">
-              <Button disabled={false} size='small' onClick={onCancel}>Cancel</Button>
+              <Button disabled={false} size='small' onClick={handleCancel}>Cancel</Button>
             </Tooltip> }
             { !isCreate && <Tooltip title='Reset changes for this feature' placement="top">
               <Button disabled={!formDirty} size='small' onClick={onReset}>Reset</Button>
