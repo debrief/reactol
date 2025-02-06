@@ -6,6 +6,14 @@ import { useAppSelector } from '../../state/hooks'
 import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon } from '../Layers/NodeIcons'
 import { TRACK_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE } from '../../constants'
 
+interface TransferData {
+  key: string
+  title: string
+  description: string
+  type: string
+  color?: string
+}
+
 export interface GroupFormProps {
   group: Feature<Point, GroupProps>
   onChange: (group: Feature<Point, GroupProps>) => void
@@ -15,20 +23,22 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const features = useAppSelector(state => state.fColl.features)
   
-  const transferData = useMemo(() => {
-    // Get all features that could be added to the group
-    const nonGroupFeatures = features.filter(f => f.properties?.dataType !== 'group')
-    
-    // Create transfer data structure
-    const transferData = nonGroupFeatures.map(f => ({
+  const nonGroupFeatures = useMemo(() => features.filter(f => f.properties?.dataType !== 'group'), [features])
+
+  const transferData = useMemo<TransferData[]>(() => {
+    return nonGroupFeatures.map(f => ({
       key: f.id as string,
       title: f.properties?.name || 'Unnamed',
       description: f.properties?.dataType || 'Unknown type',
       type: f.properties?.dataType,
       color: f.properties?.color
     }))
-    return transferData
-  }, [features])
+  }, [nonGroupFeatures])
+
+  const selectedUnits = useMemo(() => {
+    const selectedIds = group.properties.units as string[] || []
+    return transferData.filter(item => selectedIds.includes(item.key))
+  }, [transferData, group.properties.units])
 
   const handleFormChange = (values: Partial<GroupProps>) => {
     const newVal = {...group, properties: {...group.properties}}
@@ -54,14 +64,6 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
     }
     onChange(newGroup)
   }
-
-  // Get names of current units for display
-  const unitNames = group.properties.units
-    .map(id => {
-      const feature = features.find(f => f.id === id)
-      return feature?.properties?.name || 'Unknown'
-    })
-    .filter(Boolean)
 
   const itemStyle = { marginBottom: '0.5em' }
 
@@ -100,12 +102,18 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
         >
           <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
-              {unitNames.length === 0 ? (
+              {selectedUnits.length === 0 ? (
                 <span style={{ color: '#999' }}>No units selected</span>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                  {unitNames.map((name, index) => (
-                    <div key={index}>{name}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                  {selectedUnits.map((unit) => (
+                    <div key={unit.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {unit.type === TRACK_TYPE && <TrackIcon color={unit.color} />}
+                      {unit.type === BUOY_FIELD_TYPE && <BuoyFieldIcon color={unit.color} />}
+                      {unit.type === ZONE_TYPE && <ZoneIcon color={unit.color} />}
+                      {unit.type === REFERENCE_POINT_TYPE && <PointIcon color={unit.color} />}
+                      {unit.title}
+                    </div>
                   ))}
                 </div>
               )}
@@ -130,7 +138,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
           titles={['Available', 'Selected']}
           targetKeys={group.properties.units as string[]}
           onChange={handleTransferChange}
-          render={item => (
+          render={(item: TransferData) => (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {item.type === TRACK_TYPE && <TrackIcon color={item.color} />}
               {item.type === BUOY_FIELD_TYPE && <BuoyFieldIcon color={item.color} />}
