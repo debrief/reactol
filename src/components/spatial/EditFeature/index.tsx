@@ -1,7 +1,7 @@
 import { FeatureGroup } from 'react-leaflet'
 import { GeomanControls } from 'react-leaflet-geoman-v2'
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-import { Point } from 'geojson'
+import { Feature, Point } from 'geojson'
 import { useDocContext } from '../../../state/DocContext'
 import { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
@@ -12,7 +12,7 @@ import { useAppDispatch } from '../../../state/hooks'
 
 /** helper component provides the map graticule */
 export const EditFeature: React.FC = () => {
-  const { mapEditableFeature} = useDocContext()
+  const { editableMapFeature} = useDocContext()
   const [drawOptions, setDrawOptions] = useState<PM.ToolbarOptions>({})
   const [globalOptions, setGlobalOptions] = useState<PM.GlobalOptions>({})
   const [editLayer, setEditLayer] = useState<Layer | undefined>(undefined)
@@ -46,8 +46,12 @@ export const EditFeature: React.FC = () => {
   }
 
   useEffect(() => {
+    if (editableMapFeature === null) return
+
+    const feature = editableMapFeature.feature as Feature
+
     // create a layer for the activites
-    const layerToEdit = L.geoJSON(mapEditableFeature)
+    const layerToEdit = L.geoJSON(feature)
     layerToEdit.addTo(map)
 
     // listen for when the layer has been edited
@@ -57,9 +61,9 @@ export const EditFeature: React.FC = () => {
       const result = e.layer as unknown as {_latlng : L.LatLng}
       const latLng = result._latlng
       console.log('edit 3', latLng)
-      if (mapEditableFeature && mapEditableFeature.geometry.type === 'Point') {
+      if (feature.geometry.type === 'Point') {
         const newCoords = [latLng.lng, latLng.lat]
-        const geom = { ... mapEditableFeature.geometry, coordinates: newCoords } as Point
+        const geom = { ... feature.geometry, coordinates: newCoords } as Point
         const action = {
           type: 'fColl/featureUpdated',
           payload: geom
@@ -105,7 +109,7 @@ export const EditFeature: React.FC = () => {
     // return () => {    
     //   map.removeLayer(layerToEdit)
     // }
-  }, [map, mapEditableFeature])
+  }, [map, editableMapFeature, dispatch])
 
   const cleanUp = (): void => {
     if (map) {

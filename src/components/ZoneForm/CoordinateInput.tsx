@@ -1,7 +1,7 @@
 import { Button, Col, Row, Switch } from 'antd'
 import { CoordinateElementInput } from './CoordinateElement'
 import { useMemo, useState } from 'react'
-import { Feature, Point } from 'geojson'
+import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson'
 import { useDocContext } from '../../state/DocContext'
 
 interface CoordinateInputProps {
@@ -14,7 +14,7 @@ const longWidth = 85
 
 export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChange }) => {
   const [shortFormat, setShortFormat] = useState<boolean>(true)
-  const { setMapEditableFeature } = useDocContext()
+  const { setEditableMapFeature } = useDocContext()
 
   const fieldWidth = useMemo(() => shortFormat ? shortWidth : longWidth, [shortFormat])
   
@@ -39,7 +39,9 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
         coordinates: value
       }
     }
-    setMapEditableFeature(point)
+    setEditableMapFeature({feature: point, onChange: (value: Feature<Geometry, GeoJsonProperties>) => {
+      console.log('point changed', value)
+    }})
   }
 
   const littlePadding = {
