@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "^2.18.3",
+    "@react-leaflet/core": "^3.0.0",
     "@reduxjs/toolkit": "^2.3.0",
     "@turf/helpers": "^7.1.0",
     "@turf/length": "^7.1.0",
@@ -40,8 +41,8 @@
     "leaflet.nauticscale": "^1.1.0",
     "leaflet.polylinemeasure": "^3.0.0",
     "lodash": "^4.17.21",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
     "react-input-mask": "^2.0.4",
     "react-leaflet": "^5.0.0",
