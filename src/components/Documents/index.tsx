@@ -259,7 +259,7 @@ const Documents = () => {
         addIcon={<Tooltip title='Create New Document' placement="bottom">
           <PlusOutlined />
         </Tooltip>}
-        removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
+        removeIcon={<Tooltip title='Close Document' placement="bottom"><CloseOutlined/></Tooltip>}
         onEdit={onTabsEdit}
       />}
       <Modal
@@ -270,8 +270,8 @@ const Documents = () => {
       >
         <Input
           ref={inputRef}
-          placeholder="Enter document name"
-          value={documentName}
+          defaultValue={'pending'}
+          value={'pending'}
           onChange={handleNameChange}
           onPressEnter={handleOk}
         />
