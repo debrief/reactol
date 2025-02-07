@@ -81,7 +81,6 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
   }
 
   const itemStyle = { marginBottom: '0.5em' }
-
   return (
     <Form
       name='createShape'

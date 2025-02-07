@@ -1,6 +1,6 @@
 // eslint-disable-next-line quotes
 import { ChangeEventHandler, useState, useEffect } from "react"
-import ReactInputMask from 'react-input-mask'
+import ReactInputMask from '@mona-health/react-input-mask'
 
 interface MaskProps {
   mask: string,
