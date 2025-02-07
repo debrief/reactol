@@ -20,7 +20,7 @@ const InputMask: React.FC<MaskProps> = ({ mask, maskChar, alwaysShowMask, value,
       style={style}
       value={value}
       defaultValue={defaultValue}
-      maskChar={maskChar}
+      maskchar={maskChar}
       alwaysShowMask={alwaysShowMask}
       onChange={onChange}
     />
