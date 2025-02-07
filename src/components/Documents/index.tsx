@@ -257,7 +257,7 @@ const Documents = () => {
         onChange={onTabChange}
         items={tabs}
         addIcon={<Tooltip title='Create New Document' placement="bottom">
-          <Button shape='circle' icon={<PlusOutlined />} />
+          <PlusOutlined />
         </Tooltip>}
         removeIcon={<Tooltip title='Close Document' placement="bottom"><Button size='small' variant='text' type='text' icon={<CloseOutlined />} /></Tooltip>}
         onEdit={onTabsEdit}
