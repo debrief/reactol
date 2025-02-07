@@ -16,6 +16,7 @@ import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
+import points from '../../data/points'
 
 interface FileHandler {
   blobType: string
@@ -47,6 +48,13 @@ function Document({ filePath }: { filePath?: string }) {
   useEffect(() => {
     setDirty(true)
   }, [features])
+
+  useEffect(() => {
+    console.log('points', points)
+    // (temporarily) load bulk selection
+    dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(points)) })
+
+  }, [dispatch])
 
   useEffect(() => {
     if (features && features.length) {
