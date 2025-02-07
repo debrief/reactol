@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { useDocContext } from '../../../state/DocContext'
 import { useAppSelector } from '../../../state/hooks'
-
+import { FeatureGroup } from 'react-leaflet'
+import { GeomanControls } from 'react-leaflet-geoman-v2'
 
 /** helper component provides the map graticule */
 export const EditFeature: React.FC = () => {
@@ -17,6 +18,27 @@ export const EditFeature: React.FC = () => {
     }
   }, [features, selection])
 
+  const handleCreate = (e: unknown) => {
+    console.log('handleCreate', e)
+  }
+
+  const handleChange = (e: unknown) => {
+    console.log('handleChange', e)
+  }
+
   console.log('selectedFeature', selectedFeature)
-  return null
+  return <FeatureGroup>
+    <GeomanControls
+      options={{
+        position: 'topleft',
+        drawText: false,
+      }}
+      globalOptions={{
+        continueDrawing: true,
+        editable: false,
+      }}
+      onCreate={handleCreate}
+      onChange={handleChange}
+    />
+  </FeatureGroup>
 }
