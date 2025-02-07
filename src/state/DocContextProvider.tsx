@@ -15,6 +15,7 @@ export const DocContextProvider: React.FC<Props> = ({ children }) => {
   const [mapNode, setMapNode] = useState<HTMLElement | null>(null)
   const [message, setMessage] = useState<MessageStruct | null>(null)
   const [newFeature, setNewFeature] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
+  const [mapEditableFeature, setMapEditableFeature] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
 
   const copyMapToClipboard = useCallback(async () => {
     if (!mapNode) {
@@ -34,7 +35,7 @@ export const DocContextProvider: React.FC<Props> = ({ children }) => {
   }, [mapNode])
 
   return (
-    <DocContext.Provider value={{ selection, setMapNode, setSelection, time, setTime, viewportFrozen, copyMapToClipboard, setViewportFrozen, message, setMessage, newFeature, setNewFeature }}>
+    <DocContext.Provider value={{ selection, setMapNode, setSelection, time, setTime, viewportFrozen, copyMapToClipboard, setViewportFrozen, message, setMessage, newFeature, setNewFeature, mapEditableFeature, setMapEditableFeature }}>
       {children}
     </DocContext.Provider>
   )

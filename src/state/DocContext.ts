@@ -22,6 +22,8 @@ interface DocContextProps {
   setMessage: React.Dispatch<React.SetStateAction<MessageStruct | null>>
   copyMapToClipboard: () => Promise<void>
   setMapNode: (node: HTMLElement | null) => void
+  mapEditableFeature: Feature<Geometry, GeoJsonProperties> | null
+  setMapEditableFeature: React.Dispatch<React.SetStateAction<Feature<Geometry, GeoJsonProperties> | null>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)
