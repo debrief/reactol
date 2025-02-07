@@ -20,14 +20,18 @@ export type ZonePolygonProps = CoreZoneShapeProps & {
   // points, so we don't need to store them here
 }
 
-export type ZoneCircularRingProps = CoreZoneShapeProps & {
+export type CoreCircularProps = CoreZoneShapeProps & {
+  origin: [number, number]
+}
+
+export type ZoneCircularRingProps = CoreCircularProps & {
   shapeType: typeof CIRCULAR_RING_SHAPE
   origin: [number, number]
   innerRadiusM: number 
   outerRadiusM: number 
 }
 
-export type ZoneSectionCircularRingProps = CoreZoneShapeProps & {
+export type ZoneSectionCircularRingProps = CoreCircularProps & {
   shapeType: typeof SECTION_CIRCULAR_RING_SHAPE
   origin: [number, number]
   innerRadiusM: number 
@@ -36,7 +40,7 @@ export type ZoneSectionCircularRingProps = CoreZoneShapeProps & {
   endAngle: number
 }
 
-export type ZoneCircularSectorProps = CoreZoneShapeProps & {
+export type ZoneCircularSectorProps = CoreCircularProps & {
   shapeType: typeof CIRCULAR_SECTOR_SHAPE
   origin: [number, number]
   startAngle: number
@@ -44,7 +48,7 @@ export type ZoneCircularSectorProps = CoreZoneShapeProps & {
   radiusM: number
 }
 
-export type ZoneCircleProps = CoreZoneShapeProps & {
+export type ZoneCircleProps = CoreCircularProps & {
   shapeType: typeof CIRCLE_SHAPE
   origin: [number, number]
   radiusM: number

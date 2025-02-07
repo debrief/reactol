@@ -8,6 +8,40 @@ import { useMap } from 'react-leaflet'
 import L, { Layer, PM } from 'leaflet'
 import { useAppDispatch } from '../../../state/hooks'
 
+const editHandler = (e: {layer: L.Layer}, feature: Feature, onChange: (feature: Feature) => void) => {
+  console.log('editHandler', e)
+  const result = e.layer as unknown as {_latlng : L.LatLng}
+  const latLng = result._latlng
+  switch (feature.geometry.type) {
+  case 'Point':
+  {
+    const newCoords = [latLng.lng, latLng.lat]
+    const geom = { ... feature.geometry, coordinates: newCoords } as Point
+    const res = { ... feature, geometry: geom}
+    onChange(res)
+    break
+  }
+  case 'MultiPoint':
+  {
+    const data = e.layer as unknown as { _latlngs: L.LatLng[] }
+    const reversed = data._latlngs.map((l: L.LatLng) => [l.lng, l.lat])
+    const geom = { ... feature.geometry, coordinates: reversed }
+    const res = { ... feature, geometry: geom} 
+    onChange(res)
+    break
+  }
+  case 'Polygon':
+  { 
+    const data = e.layer as unknown as { _latlngs: L.LatLng[][] }
+    const reversed = data._latlngs.map((l: L.LatLng[]) => l.map(ll => [ll.lng, ll.lat]))
+    const geom = { ... feature.geometry, coordinates: reversed }
+    const res = { ... feature, geometry: geom}
+    onChange(res)
+    break
+  }
+  default: 
+    console.log('unknown feature type', feature)
+  }}
 
 /** helper component provides the map graticule */
 export const EditFeature: React.FC = () => {
@@ -18,8 +52,6 @@ export const EditFeature: React.FC = () => {
   const dispatch = useAppDispatch()
 
   const map = useMap()
-
-  console.log('editableMapFeature', editableMapFeature)  
 
   useEffect(() => {
     if (editableMapFeature === null && editLayer) {
@@ -42,20 +74,7 @@ export const EditFeature: React.FC = () => {
     layerToEdit.addTo(map)
 
     // listen for when the layer has been edited
-    const editHandler: PM.EditEventHandler = (e: {
-      layer: L.Layer;
-    }) => {
-      const result = e.layer as unknown as {_latlng : L.LatLng}
-      const latLng = result._latlng
-      console.log('edit 3', latLng)
-      if (feature.geometry.type === 'Point') {
-        const newCoords = [latLng.lng, latLng.lat]
-        const geom = { ... feature.geometry, coordinates: newCoords } as Point
-        const res = { ... feature, geometry: geom}
-        editableMapFeature.onChange(res)
-      }
-    }
-    layerToEdit.on('pm:edit', editHandler)
+    layerToEdit.on('pm:edit', (l) => editHandler(l, feature, editableMapFeature.onChange))
 
     const globalOpts: PM.GlobalOptions = {
       layerGroup: layerToEdit,

@@ -22,6 +22,11 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
     setEditableMapFeature(null)
   }, [onSave, setEditableMapFeature])
 
+  const localOnReset = useCallback(() => {
+    onReset()
+    setEditableMapFeature(null)
+  }, [onReset, setEditableMapFeature])
+
   const handleExit = useCallback((callback: () => void) => {
     setEditableMapFeature(null)
     setIsExiting(true)
@@ -63,7 +68,7 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
               <Button disabled={false} size='small' onClick={handleCancel}>Cancel</Button>
             </Tooltip> }
             { !isCreate && <Tooltip title='Reset changes for this feature' placement="top">
-              <Button disabled={!formDirty} size='small' onClick={onReset}>Reset</Button>
+              <Button disabled={!formDirty} size='small' onClick={localOnReset}>Reset</Button>
             </Tooltip> }
             <Tooltip title='Save edits' placement="top">
               <Button type='primary' disabled={!formDirty} size='small' onClick={localOnSave}>{isCreate ? 'Create' : 'Save'}</Button>

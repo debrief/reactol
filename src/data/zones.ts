@@ -16,7 +16,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       specifics:{
         shapeType: CIRCLE_SHAPE,
         origin: [-4.334814, 36.596182],
-        radiusM: 1100
+        radiusM: 110000
       }
     },
     geometry: {

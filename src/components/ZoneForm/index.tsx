@@ -1,4 +1,4 @@
-import { Feature, Geometry, Polygon, Position } from 'geojson'
+import { Feature, GeoJsonProperties, Geometry, MultiPoint, Point, Polygon, Position } from 'geojson'
 import { Checkbox, ColorPicker, DatePicker, Form, Input, Button } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useMemo, useState } from 'react'
@@ -7,9 +7,12 @@ import type { Dayjs } from 'dayjs'
 import { ZoneProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 import { ZoneSpecificsModal } from './ZoneSpecificsModal'
-import { ZoneShapeProps } from '../../zoneShapeTypes'
+import { CoreCircularProps, ZoneRectangleProps, ZoneShapeProps } from '../../zoneShapeTypes'
 import { generateShapeCoordinates } from '../../helpers/shapeGeneration'
 import { ZoneShapes } from '../Layers/zoneShapeConstants'
+import { EditOnMapButton } from '../CoreForm/EditOnMapButton'
+import { CIRCLE_SHAPE, CIRCULAR_RING_SHAPE, CIRCULAR_SECTOR_SHAPE, POLYGON_SHAPE, RECTANGLE_SHAPE, SECTION_CIRCULAR_RING_SHAPE } from '../../constants'
+import { useDocContext } from '../../state/DocContext'
 
 /** swap the time string a parameter of the expected type */
 type FormTypeProps = Omit<ZoneProps, 'time' | 'timeEnd'> & {
@@ -45,6 +48,61 @@ const convertBack = (shape: Readonly<FormTypeProps>): ZoneProps => {
   return newVal
 }
 
+const featureForShape = (feature: Feature<Geometry, ZoneProps>): Feature<Geometry, GeoJsonProperties> => {
+  const shapeType = feature.properties?.specifics?.shapeType
+  switch(shapeType) {
+  case CIRCLE_SHAPE:
+  case CIRCULAR_RING_SHAPE:
+  case CIRCULAR_SECTOR_SHAPE:
+  case SECTION_CIRCULAR_RING_SHAPE:  
+  {
+    const origin = (feature.properties.specifics as CoreCircularProps).origin
+    const res: Feature<Point, GeoJsonProperties> = {
+      type: 'Feature',
+      id: 'temp',
+      properties: {},
+      geometry: {
+        type: 'Point',
+        coordinates: origin
+      }
+    }  
+    return res
+  }
+  case POLYGON_SHAPE:
+  {
+    const poly = feature.geometry as Polygon
+    const res: Feature<Polygon, GeoJsonProperties> = {
+      type: 'Feature',
+      id: 'temp',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: poly.coordinates
+      }
+    }  
+    return res 
+  }
+  case RECTANGLE_SHAPE:
+  {
+    const specifics = feature.properties.specifics as ZoneRectangleProps
+    const tl = specifics.topLeft
+    const br = specifics.bottomRight
+    const res: Feature<MultiPoint, GeoJsonProperties> = {
+      type: 'Feature',
+      id: 'temp',
+      properties: {},
+      geometry: {
+        type: 'MultiPoint',
+        coordinates: [tl, br]
+      }
+    }  
+    return res 
+  }
+  default:
+    return feature
+  }
+}
+
 export interface ZoneFormProps {
   shape: Feature<Geometry, ZoneProps>
   onChange: (shape: Feature<Geometry, ZoneProps>) => void
@@ -54,6 +112,7 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formProps, setFormProps] = useState<ZoneProps | null>(shape.properties)
+  const { setEditableMapFeature } = useDocContext()
 
   useEffect(() => {
     if (shape) {
@@ -65,6 +124,48 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
     return ZoneShapes.find((s) => s.key === state?.specifics?.shapeType)?.label
   }, [state?.specifics?.shapeType])
 
+  const mapEdit = () => {
+    console.clear()
+    // create a feature for this shape type
+    const mapFeature = featureForShape(shape)
+    setEditableMapFeature({feature: mapFeature, onChange: (value: Feature<Geometry, GeoJsonProperties>) => {
+      console.log('zone map feature changed', value)
+      const shapeType = shape.properties.specifics?.shapeType
+      switch(shapeType) {
+      case CIRCLE_SHAPE:
+      case CIRCULAR_RING_SHAPE:
+      case CIRCULAR_SECTOR_SHAPE:
+      case SECTION_CIRCULAR_RING_SHAPE:  
+      {
+        const point = value.geometry as Point
+        const newCoords = point.coordinates as [number, number] 
+        const updatedSpecifics = { ...shape.properties.specifics, origin: newCoords } 
+        const zoneProps = { ...shape.properties, specifics: updatedSpecifics }
+        setFormProps(zoneProps)
+        handleModalOk(updatedSpecifics, [])
+        return     
+      }
+      case POLYGON_SHAPE:
+      {
+        const poly = value.geometry as Polygon
+        handleModalOk(shape.properties.specifics, poly.coordinates)
+        return
+      }
+      case RECTANGLE_SHAPE:
+      {
+        const multiPoint = value.geometry as MultiPoint
+        const newCoords = multiPoint.coordinates as [[number, number], [number, number]]
+        const updatedSpecifics: ZoneRectangleProps = { ...shape.properties.specifics, topLeft: newCoords[0], bottomRight: newCoords[1] }
+        const zoneProps = { ...shape.properties, specifics: updatedSpecifics }
+        setFormProps(zoneProps)
+        handleModalOk(updatedSpecifics, [])
+        return
+      }
+      default:
+        return value
+      }
+    }})
+  }
 
   const localChange = (values: Partial<FormTypeProps>) => {
     if (values.color) {
@@ -139,6 +240,7 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
         label="Shape"
         style={itemStyle}>
         <Button onClick={handleSpecificsEdit}>Edit {shapeName}</Button>
+        <EditOnMapButton onEdit={mapEdit} />
       </Form.Item>
       <Form.Item<FormTypeProps>
         label='Start'
