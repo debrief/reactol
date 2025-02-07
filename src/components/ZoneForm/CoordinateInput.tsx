@@ -1,6 +1,8 @@
-import { Col, Row, Switch } from 'antd'
+import { Button, Col, Row, Switch } from 'antd'
 import { CoordinateElementInput } from './CoordinateElement'
 import { useMemo, useState } from 'react'
+import { Feature, Point } from 'geojson'
+import { useDocContext } from '../../state/DocContext'
 
 interface CoordinateInputProps {
   value?: [number, number]
@@ -12,6 +14,7 @@ const longWidth = 85
 
 export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChange }) => {
   const [shortFormat, setShortFormat] = useState<boolean>(true)
+  const { setMapEditableFeature } = useDocContext()
 
   const fieldWidth = useMemo(() => shortFormat ? shortWidth : longWidth, [shortFormat])
   
@@ -22,7 +25,21 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
 
   if (!value) {
     return null
-  }  
+  }
+
+  const mapEdit = () => {
+    // push coords to map
+    const point: Feature<Point> = {
+      type: 'Feature',
+      id: 'temp',
+      properties: {},
+      geometry: {
+        type: 'Point',
+        coordinates: value
+      }
+    }
+    setMapEditableFeature(point)
+  }
 
   const littlePadding = {
     padding:2
@@ -30,7 +47,7 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
 
   return (
     <>
-      <Row gutter={[16, 8]} align="middle">
+      <Row gutter={[16, 8]} align='middle'>
         <Col span={shortWidth} style={littlePadding}>
           <CoordinateElementInput 
             style={{width: `${fieldWidth}px`,padding:2}} 
@@ -57,6 +74,11 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
             checkedChildren="DM"
             unCheckedChildren="DMS"
           />
+        </Col>
+        <Col span={'30px'}>
+          <Button size="small" style={{width:'100%'}} onClick={mapEdit}>
+            Edit
+          </Button>
         </Col>
       </Row>
     </>
