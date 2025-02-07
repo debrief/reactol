@@ -1,6 +1,6 @@
 import { Button, Col, Row, Switch } from 'antd'
 import { CoordinateElementInput } from './CoordinateElement'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson'
 import { useDocContext } from '../../state/DocContext'
 
@@ -22,6 +22,13 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
     const result: [number, number] = isLatitude ? [value?.[0] || 0, newValue] : [newValue, value?.[1] || 0]
     onChange && onChange(result)
   }
+  
+  // Cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      setEditableMapFeature(null)
+    }
+  }, [setEditableMapFeature])
 
   if (!value) {
     return null

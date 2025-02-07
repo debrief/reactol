@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Button, Col, Flex, Row, Tooltip } from 'antd'
 import { useDocContext } from '../../state/DocContext'
 
@@ -17,23 +17,34 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
   const [isExiting, setIsExiting] = useState(false)
   const { setEditableMapFeature } = useDocContext()
 
+  const localOnSave = useCallback(() => {
+    onSave()
+    setEditableMapFeature(null)
+  }, [onSave, setEditableMapFeature])
+
   const handleExit = useCallback((callback: () => void) => {
+    setEditableMapFeature(null)
     setIsExiting(true)
     setTimeout(() => {
       setIsExiting(false)
       callback()
     }, 700) // Match the animation duration
-  }, [])
+  }, [setEditableMapFeature, setIsExiting])
 
   const handleCancel = useCallback(() => {
     handleExit(onCancel)
-    setEditableMapFeature(null)
   }, [handleExit, onCancel])
 
   const handleDelete = useCallback(() => {
     handleExit(onDelete)
-    setEditableMapFeature(null)
   }, [handleExit, onDelete])
+
+  // Cleanup when component is unmounted
+  useEffect(() => {
+    return () => {
+      setEditableMapFeature(null)
+    }
+  }, [setEditableMapFeature])
 
   return (
     <div style={{marginTop: '5px'}} className={`${className || ''} ${isExiting ? 'exit' : ''}`}>
@@ -55,7 +66,7 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
               <Button disabled={!formDirty} size='small' onClick={onReset}>Reset</Button>
             </Tooltip> }
             <Tooltip title='Save edits' placement="top">
-              <Button type='primary' disabled={!formDirty} size='small' onClick={onSave}>{isCreate ? 'Create' : 'Save'}</Button>
+              <Button type='primary' disabled={!formDirty} size='small' onClick={localOnSave}>{isCreate ? 'Create' : 'Save'}</Button>
             </Tooltip>
           </Flex> 
         </Col>

@@ -60,6 +60,13 @@ const convertBack = (shape: Readonly<FormTypeProps>): CompositeProps => {
 export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
   const [state, setState] = useState<FormTypeProps | null>(null)
 
+  // Cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      setState(null)
+    }
+  }, [])
+
   useEffect(() => {
     if (shape) {
       setState(convert({props: shape.properties, position: (shape.geometry as Point).coordinates}))

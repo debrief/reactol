@@ -6,7 +6,6 @@ import { useDocContext } from '../../../state/DocContext'
 import { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 import L, { Layer, PM } from 'leaflet'
-import Item from 'antd/es/list/Item'
 import { useAppDispatch } from '../../../state/hooks'
 
 
@@ -20,38 +19,19 @@ export const EditFeature: React.FC = () => {
 
   const map = useMap()
 
+  console.log('editableMapFeature', editableMapFeature)  
 
-  // const handleCreate = (e: unknown) => {
-  //   console.log('handleCreate', e)
-  // }
+  useEffect(() => {
+    if (editableMapFeature === null && editLayer) {
+      editLayer.remove()
+      setEditLayer(undefined)
+      map.pm.disableDraw()
+    }
+  }, [editLayer, editableMapFeature, map.pm])
 
-  // const handleChange = (e: unknown) => {
-  //   console.log('handleChange', e)
-  // }
-
-  const saveDrawing = (): void => {
-    console.log('doing save ')
-    // // push the data item
-    // const asAny = editLayer as unknown as Layer
-    // // layers is a dictionary
-    // const layers = asAny._layers as Record<string, unknown>
-    // if (!layers) {
-    //   console.warn('layers object not constructed as expected')
-    //   return
-    // } else {
-    //   // TODO: convert coords
-    // }
-    // clean up
-    cleanUp()
-  }
 
   useEffect(() => {
     if (editableMapFeature === null) {
-      if (editLayer) {
-        console.log('clearing edit layer')
-        editLayer.remove()
-        setEditLayer(undefined)
-      }
       return
     }
 
@@ -74,8 +54,6 @@ export const EditFeature: React.FC = () => {
         const res = { ... feature, geometry: geom}
         editableMapFeature.onChange(res)
       }
-
-
     }
     layerToEdit.on('pm:edit', editHandler)
 
@@ -115,35 +93,9 @@ export const EditFeature: React.FC = () => {
     }
   }, [map, editableMapFeature, dispatch])
 
-  const cleanUp = (): void => {
-    if (map) {
-      if (editLayer) {
-        // editLayer.remove()
-        setEditLayer(undefined)
-      }
-      map.pm.disableDraw()
-      // // also ditch the lines
-      // const layers = map.pm.getGeomanDrawLayers()
-      // if (layers.length) {
-      //   layers.forEach((layer: Layer) => layer.remove())
-      // }
-    }
-  }
-
-  const cancelDrawing = (): void => {
-    cleanUp()
-    // saved(undefined)
-  }
-
   return <FeatureGroup>
     <> {(editLayer) &&
       <>
-        <div className='leaflet-top leaflet-left'>
-          <div className='leaflet-control'>
-            <Item onClick={cancelDrawing}><div>Cancel</div></Item>
-            <Item onClick={saveDrawing}><div>Save</div></Item>
-          </div>
-        </div>
         <GeomanControls
           options={drawOptions}
           globalOptions={globalOptions}
