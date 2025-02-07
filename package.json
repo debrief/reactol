@@ -2,6 +2,7 @@
   "name": "react-geo-trial",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "productName": "react-geo-trial",
   "license": "MIT",
   "description": "My Electron application description",
