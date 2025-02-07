@@ -21,6 +21,7 @@
     "publish-electron": "electron-forge publish"
   },
   "dependencies": {
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@geoman-io/leaflet-geoman-free": "^2.18.3",
     "@mona-health/react-input-mask": "^3.0.3",
     "@react-leaflet/core": "^3.0.0",
