@@ -89,6 +89,7 @@ const MapControls: React.FC<{
       <Graticule/>
       <PolylineMeasure/>
       <HomeControl/>
+      <EditFeature/>
     </>
   )
 }

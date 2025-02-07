@@ -1,7 +1,6 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { TileLayer } from 'react-leaflet'
-import Control from 'react-leaflet-custom-control'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
@@ -10,7 +9,6 @@ import { NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
 import { loadJson } from '../../helpers/loaders/loadJson'
 import { loadOpRep } from '../../helpers/loaders/loadOpRep'
-import toDTG from '../../helpers/toDTG'
 import Layers from '../Layers'
 import Properties from '../Properties'
 import Map from '../spatial/Map'
@@ -49,15 +47,6 @@ function Document({ filePath }: { filePath?: string }) {
   useEffect(() => {
     setDirty(true)
   }, [features])
-
-  const timePeriod = useMemo(() => {
-    if (time.start && time.end) {
-      const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`
-      return formattedTimePeriod  
-    } else {
-      return 'Pending'
-    }
-  }, [time])
 
   useEffect(() => {
     if (features && features.length) {
@@ -192,11 +181,6 @@ function Document({ filePath }: { filePath?: string }) {
               <TileLayer maxNativeZoom={8} maxZoom={16}
                 url="tiles/{z}/{x}/{y}.png"
               />
-              <Control prepend position='topleft'>
-                <div className='time-period'>
-                  {timePeriod}
-                </div>
-              </Control>
             </Map>
           </Splitter.Panel>
         </Splitter>
