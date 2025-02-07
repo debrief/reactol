@@ -28,6 +28,7 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
   }
 
   const mapEdit = () => {
+    console.clear()
     // push coords to map
     const point: Feature<Point> = {
       type: 'Feature',

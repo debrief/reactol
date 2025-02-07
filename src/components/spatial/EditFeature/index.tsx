@@ -1,11 +1,13 @@
 import { FeatureGroup } from 'react-leaflet'
 import { GeomanControls } from 'react-leaflet-geoman-v2'
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
+import { Point } from 'geojson'
 import { useDocContext } from '../../../state/DocContext'
 import { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 import L, { Layer, PM } from 'leaflet'
 import Item from 'antd/es/list/Item'
+import { useAppDispatch } from '../../../state/hooks'
 
 
 /** helper component provides the map graticule */
@@ -14,6 +16,7 @@ export const EditFeature: React.FC = () => {
   const [drawOptions, setDrawOptions] = useState<PM.ToolbarOptions>({})
   const [globalOptions, setGlobalOptions] = useState<PM.GlobalOptions>({})
   const [editLayer, setEditLayer] = useState<Layer | undefined>(undefined)
+  const dispatch = useAppDispatch()
 
   const map = useMap()
 
@@ -48,9 +51,25 @@ export const EditFeature: React.FC = () => {
     layerToEdit.addTo(map)
 
     // listen for when the layer has been edited
-    layerToEdit.on('pm:edit', (e) => {
-      console.log('edit', e)
-    })
+    const editHandler: PM.EditEventHandler = (e: {
+      layer: L.Layer;
+    }) => {
+      const result = e.layer as unknown as {_latlng : L.LatLng}
+      const latLng = result._latlng
+      console.log('edit 3', latLng)
+      if (mapEditableFeature && mapEditableFeature.geometry.type === 'Point') {
+        const newCoords = [latLng.lng, latLng.lat]
+        const geom = { ... mapEditableFeature.geometry, coordinates: newCoords } as Point
+        const action = {
+          type: 'fColl/featureUpdated',
+          payload: geom
+        }
+        dispatch(action)
+      }
+
+
+    }
+    layerToEdit.on('pm:edit', editHandler)
 
     const globalOpts: PM.GlobalOptions = {
       layerGroup: layerToEdit,
@@ -91,11 +110,11 @@ export const EditFeature: React.FC = () => {
   const cleanUp = (): void => {
     if (map) {
       if (editLayer) {
-        editLayer.remove()
+        // editLayer.remove()
         setEditLayer(undefined)
       }
       map.pm.disableDraw()
-      // also ditch the lines
+      // // also ditch the lines
       // const layers = map.pm.getGeomanDrawLayers()
       // if (layers.length) {
       //   layers.forEach((layer: Layer) => layer.remove())
