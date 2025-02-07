@@ -40,6 +40,12 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
       }
     }
     setEditableMapFeature({feature: point, onChange: (value: Feature<Geometry, GeoJsonProperties>) => {
+      if (value.geometry.type !== 'Point') {
+        console.warn('Point form should only receive point updates')
+      } else {
+        const geom = value.geometry.coordinates as [number, number]
+        onChange && onChange(geom)
+      }
       console.log('point changed', value)
     }})
   }

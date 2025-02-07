@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { Button, Col, Flex, Row, Tooltip } from 'antd'
+import { useDocContext } from '../../state/DocContext'
 
 export interface CoreFormProps {
   children: React.ReactNode
@@ -14,6 +15,7 @@ export interface CoreFormProps {
 
 export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, onDelete, onCancel, formDirty, isCreate, className}) => {
   const [isExiting, setIsExiting] = useState(false)
+  const { setEditableMapFeature } = useDocContext()
 
   const handleExit = useCallback((callback: () => void) => {
     setIsExiting(true)
@@ -25,10 +27,12 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
 
   const handleCancel = useCallback(() => {
     handleExit(onCancel)
+    setEditableMapFeature(null)
   }, [handleExit, onCancel])
 
   const handleDelete = useCallback(() => {
     handleExit(onDelete)
+    setEditableMapFeature(null)
   }, [handleExit, onDelete])
 
   return (

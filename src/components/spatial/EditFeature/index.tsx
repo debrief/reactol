@@ -46,7 +46,14 @@ export const EditFeature: React.FC = () => {
   }
 
   useEffect(() => {
-    if (editableMapFeature === null) return
+    if (editableMapFeature === null) {
+      if (editLayer) {
+        console.log('clearing edit layer')
+        editLayer.remove()
+        setEditLayer(undefined)
+      }
+      return
+    }
 
     const feature = editableMapFeature.feature as Feature
 
@@ -64,11 +71,8 @@ export const EditFeature: React.FC = () => {
       if (feature.geometry.type === 'Point') {
         const newCoords = [latLng.lng, latLng.lat]
         const geom = { ... feature.geometry, coordinates: newCoords } as Point
-        const action = {
-          type: 'fColl/featureUpdated',
-          payload: geom
-        }
-        dispatch(action)
+        const res = { ... feature, geometry: geom}
+        editableMapFeature.onChange(res)
       }
 
 
@@ -106,9 +110,9 @@ export const EditFeature: React.FC = () => {
 
     setEditLayer(layerToEdit)
 
-    // return () => {    
-    //   map.removeLayer(layerToEdit)
-    // }
+    return () => {    
+      map.removeLayer(layerToEdit)
+    }
   }, [map, editableMapFeature, dispatch])
 
   const cleanUp = (): void => {
