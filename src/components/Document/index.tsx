@@ -1,5 +1,5 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { TileLayer } from 'react-leaflet'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
@@ -44,17 +44,20 @@ function Document({ filePath }: { filePath?: string }) {
   const [isDragging, setIsDragging] = useState(false)
   const { setTime, time, message, setMessage } = useDocContext()
   const [dirty, setDirty] = useState(false)
+  const loadedRef = useRef<boolean>(false)
 
   useEffect(() => {
     setDirty(true)
   }, [features])
 
   useEffect(() => {
-    console.log('points', zones)
-    // (temporarily) load bulk selection
-    dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(zones)) })
+    if (!loadedRef.current) {
+      loadedRef.current = true
+      // (temporarily) load bulk selection
+      dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(zones)) })
+    }
 
-  }, [dispatch])
+  }, [dispatch, loadedRef])
 
   useEffect(() => {
     if (features && features.length) {
