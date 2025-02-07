@@ -5,11 +5,10 @@ import { Feature, Point } from 'geojson'
 import { useDocContext } from '../../../state/DocContext'
 import { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
-import L, { Layer, PM } from 'leaflet'
+import L, { Layer, LeafletEvent, PM } from 'leaflet'
 import { useAppDispatch } from '../../../state/hooks'
 
 const editHandler = (e: {layer: L.Layer}, feature: Feature, onChange: (feature: Feature) => void) => {
-  console.log('editHandler', e)
   const result = e.layer as unknown as {_latlng : L.LatLng}
   const latLng = result._latlng
   switch (feature.geometry.type) {
@@ -45,22 +44,13 @@ const editHandler = (e: {layer: L.Layer}, feature: Feature, onChange: (feature: 
 
 /** helper component provides the map graticule */
 export const EditFeature: React.FC = () => {
-  const { editableMapFeature} = useDocContext()
+  const { editableMapFeature } = useDocContext()
   const [drawOptions, setDrawOptions] = useState<PM.ToolbarOptions>({})
   const [globalOptions, setGlobalOptions] = useState<PM.GlobalOptions>({})
   const [editLayer, setEditLayer] = useState<Layer | undefined>(undefined)
   const dispatch = useAppDispatch()
 
   const map = useMap()
-
-  useEffect(() => {
-    if (editableMapFeature === null && editLayer) {
-      editLayer.remove()
-      setEditLayer(undefined)
-      map.pm.disableDraw()
-    }
-  }, [editLayer, editableMapFeature, map.pm])
-
 
   useEffect(() => {
     if (editableMapFeature === null) {
@@ -74,7 +64,11 @@ export const EditFeature: React.FC = () => {
     layerToEdit.addTo(map)
 
     // listen for when the layer has been edited
-    layerToEdit.on('pm:edit', (l) => editHandler(l, feature, editableMapFeature.onChange))
+    const handleEdit = (e: LeafletEvent) => {
+      if (!editableMapFeature?.onChange) return
+      editHandler(e as unknown as {layer: L.Layer}, feature, editableMapFeature.onChange)
+    }
+    layerToEdit.on('pm:edit', handleEdit)
 
     const globalOpts: PM.GlobalOptions = {
       layerGroup: layerToEdit,
@@ -96,8 +90,8 @@ export const EditFeature: React.FC = () => {
 
     setDrawOptions(toolbarOpts)
     
-    layerToEdit.options.pmIgnore = false // Specialy needed for LayerGroups
-    L.PM.reInitLayer(layerToEdit) // Make the LayerGroup accessable for Geoman
+    // layerToEdit.options.pmIgnore = false // Specialy needed for LayerGroups
+    //L.PM.reInitLayer(layerToEdit) // Make the LayerGroup accessable for Geoman
     const editOptions: PM.EditModeOptions = {
       allowRemoval: false,
       allowCutting: false,

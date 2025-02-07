@@ -95,7 +95,7 @@ const featureForShape = (feature: Feature<Geometry, ZoneProps>): Feature<Geometr
         type: 'MultiPoint',
         coordinates: [tl, br]
       }
-    }  
+    }
     return res 
   }
   default:
@@ -125,11 +125,10 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
   }, [state?.specifics?.shapeType])
 
   const mapEdit = () => {
-    console.clear()
+    // console.clear()
     // create a feature for this shape type
     const mapFeature = featureForShape(shape)
     setEditableMapFeature({feature: mapFeature, onChange: (value: Feature<Geometry, GeoJsonProperties>) => {
-      console.log('zone map feature changed', value)
       const shapeType = shape.properties.specifics?.shapeType
       switch(shapeType) {
       case CIRCLE_SHAPE:
@@ -191,6 +190,7 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
     const updatedGeometry: Polygon = { type: 'Polygon', coordinates: shapeCoordinates }
     const updatedProps = {...formProps, specifics: updatedSpecifics} as ZoneProps
     const res: Feature<Geometry, ZoneProps> = {...shape, type: 'Feature', geometry: updatedGeometry, properties: updatedProps }
+    console.log('zone form ok', res)
     onChange(res)
     setIsModalOpen(false)
   }
