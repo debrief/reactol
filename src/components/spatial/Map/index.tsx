@@ -14,6 +14,7 @@ import MouseCoordinates from '../MouseCoordinates'
 import { PolylineMeasure } from '../PolylineMeasure'
 import { BuoyField } from '../BuoyField'
 import { BuoyFieldProps } from '../../../types'
+import { EditFeature } from '../EditFeature'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -110,6 +111,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         <Graticule/>
         <PolylineMeasure/>
         <HomeControl/>
+        <EditFeature/>
       </MapContainer>
 
     </>
