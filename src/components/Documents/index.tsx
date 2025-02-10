@@ -1,8 +1,10 @@
-import { ReactNode, useState, useRef, useEffect, useCallback } from 'react'
+import { ReactNode, useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
-import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
+import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
+import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
+import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode} from 'flexlayout-react'
+import 'flexlayout-react/style/light.css'
 import './index.css'
 
 type TabWithPath =  {
@@ -28,7 +30,8 @@ const Documents = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
-  
+  const layoutRef = useRef<Layout | null>(null)
+
   useEffect(() => {
     if (isTabNameModalVisible) {
       setTimeout(() => {
@@ -87,6 +90,34 @@ const Documents = () => {
       setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
     }
   }, [setMessage, tabs])
+  
+  const layoutModel = useMemo(() => {
+    const model = {
+      global: {},
+      layout: {
+        type: 'row',
+        children: [
+          {
+            type: 'tabset',
+            weight: 100,
+            enableAddTab: true,
+            children: tabs.map(tab => ({
+              type: 'tab',
+              name: tab.label,
+              component: tab.key,
+            })),
+          },
+        ],
+      },
+    }
+    return Model.fromJson(model)
+  }, [tabs])
+
+  const factory = (node: TabNode) => {
+    const component = node.getComponent()
+    const tab = tabs.find(tab => tab.key === component)
+    return tab ? tab.children : null
+  }
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
@@ -186,23 +217,6 @@ const Documents = () => {
     }
   }
 
-  const onTabChange = (key: string) => {
-    setActiveTab(key)
-  }
-
-  function onTabsEdit(
-    e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
-    switch (action) {
-    case 'add':
-      handleNew()
-      break
-    case 'remove':
-      if (typeof e === 'string') {
-        setTabToClose(e)
-      }
-      break
-    }
-  }
 
   const handleCloseTabConfirm = () => {
     if (tabToClose) {
@@ -220,11 +234,7 @@ const Documents = () => {
     setTabToClose(null)
   }
 
-  const tabBarExtras = {
-    left: <Image className='logo-image' alt='Application logo - albatross flying' preview={false} width={30} src='images/albatross-flying.png' />,
-    right: <Tooltip title='Open Existing Document' placement="bottom"><Button onClick={() => openExistingDocument()}>Open</Button></Tooltip>
-  }
-
+  
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     console.log('over')
     // Only prevent default and show indicator if it's a file being dragged
@@ -234,7 +244,26 @@ const Documents = () => {
     }
   }
 
+  const onRenderTabSet = (tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
+    console.log('tabSetNode', tabSetNode)
+    renderValues.buttons.push(
+      <Tooltip title="Open Existing Document" key="open-doc">
+        <Button onClick={openExistingDocument} size="small" >open</Button>
+      </Tooltip>
+    )
+  }
 
+  const onRenderTab = (node: TabNode, renderValues: { buttons: React.ReactNode[] }) => {
+    renderValues.buttons.push(
+      <Tooltip title="New Tab" key={`new-tab-${node.getId()}`}>
+        <Button
+          icon={<PlusOutlined />}
+          size="small"
+          onClick={() => handleNew()}
+        />
+      </Tooltip>
+    )
+  }
 
   return (
     <div>
@@ -250,18 +279,15 @@ const Documents = () => {
           <Alert showIcon type={message?.severity} description={message?.message} />
         </Modal>
       )}
-      { tabs.length > 0 && <Tabs
-        tabBarExtraContent={tabBarExtras}
-        type='editable-card'
-        activeKey={activeTab}
-        onChange={onTabChange}
-        items={tabs}
-        addIcon={<Tooltip title='Create New Document' placement="bottom">
-          <PlusOutlined />
-        </Tooltip>}
-        removeIcon={<Tooltip title='Close Document' placement="bottom"><CloseOutlined/></Tooltip>}
-        onEdit={onTabsEdit}
-      />}
+      { 
+        tabs.length > 0 && <Layout
+          ref={layoutRef}
+          model={layoutModel}
+          factory={factory}
+          onRenderTab={onRenderTab}
+          onRenderTabSet={onRenderTabSet}
+        />
+      }
       <Modal
         title="Please provide a name for the document"
         open={isTabNameModalVisible}
