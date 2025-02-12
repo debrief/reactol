@@ -93,7 +93,7 @@ const Documents = () => {
   
   const layoutModel = useMemo(() => {
     const model = {
-      global: {},
+      global: { tabEnableClose: true },
       layout: {
         type: 'row',
         children: [
@@ -101,6 +101,7 @@ const Documents = () => {
             type: 'tabset',
             weight: 100,
             enableAddTab: true,
+            selected: tabs.findIndex(tab => tab.key === activeTab),
             children: tabs.map(tab => ({
               type: 'tab',
               name: tab.label,
@@ -111,7 +112,7 @@ const Documents = () => {
       },
     }
     return Model.fromJson(model)
-  }, [tabs])
+  }, [tabs, activeTab])
 
   const factory = (node: TabNode) => {
     const component = node.getComponent()
@@ -153,8 +154,6 @@ const Documents = () => {
       }
     } else {
       // conventional app - get doc name
-      // start by clearing document name
-      setDocumentName('Pending')
       setIsTabNameModalVisible(true)
     }
   }
