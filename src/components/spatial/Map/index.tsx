@@ -14,6 +14,7 @@ import MouseCoordinates from '../MouseCoordinates'
 import { PolylineMeasure } from '../PolylineMeasure'
 import { BuoyField } from '../BuoyField'
 import { BuoyFieldProps } from '../../../types'
+import { EditFeature } from '../EditFeature'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -41,16 +42,30 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
   }
 }
 
-/** helper component that freezer map viewport */
-const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
+// Separate component for map features
+const MapFeatures: React.FC<{
+  features: Feature[],
+  onClickHandler: (id: string, modifier: boolean) => void
+}> = ({ features, onClickHandler }) => {
+  const visibleFeatures = useMemo(() => {
+    const vis = features.filter(feature => isVisible(feature))
+    return vis.map((feature: Feature) => featureFor(feature, onClickHandler)).filter(Boolean)
+  }, [features, onClickHandler])
+
+  return <>{visibleFeatures}</>
+}
+
+// Separate component for map controls
+const MapControls: React.FC<{
+  viewportFrozen: boolean
+}> = ({ viewportFrozen }) => {
   const map = useMap()
   const { setMapNode } = useDocContext()
 
   useEffect(() => {
-
     if (map) {
       setMapNode(map.getContainer())
-      if (frozen) {
+      if (viewportFrozen) {
         map.dragging.disable()
         map.scrollWheelZoom.disable()
         map.touchZoom.disable()
@@ -65,8 +80,18 @@ const ViewportProperties: React.FC<{ frozen: boolean }> = ({frozen}) => {
         map.boxZoom.enable()  
       }
     }
-  },[map, frozen, setMapNode])
-  return null
+  },[map, viewportFrozen, setMapNode])
+
+  return (
+    <>
+      <MouseCoordinates/>
+      <ScaleNautic nautic={true} metric={false} imperial={false} />
+      <Graticule/>
+      <PolylineMeasure/>
+      <HomeControl/>
+      <EditFeature/>
+    </>
+  )
 }
 
 const Map: React.FC<MapProps> = ({ children }) => {
@@ -87,32 +112,20 @@ const Map: React.FC<MapProps> = ({ children }) => {
     }
   }, [selection, setSelection])
 
-  const visibleFeatures = useMemo(() => {
-    const vis = features.filter(feature => isVisible(feature))
-    return vis.map((feature: Feature) => featureFor(feature, onClickHandler)).filter(Boolean)
-  }, [features, onClickHandler])
-
   return (
-    <>
-      <MapContainer
-        zoomControl={false}
-        attributionControl={false}
-        center={[35.505, -4.09]}
-        zoom={8}
-      >
-        <ViewportProperties frozen={viewportFrozen} />
-        {children}
-        { 
-          visibleFeatures
-        }
-        <MouseCoordinates/>
-        <ScaleNautic nautic={true} metric={false} imperial={false} />
-        <Graticule/>
-        <PolylineMeasure/>
-        <HomeControl/>
-      </MapContainer>
-
-    </>
+    <MapContainer
+      zoomControl={false}
+      attributionControl={false}
+      center={[35.505, -4.09]}
+      zoom={8}
+    >
+      {children}
+      <MapFeatures 
+        features={features}
+        onClickHandler={onClickHandler}
+      />
+      <MapControls viewportFrozen={viewportFrozen} />
+    </MapContainer>
   )
 }
 

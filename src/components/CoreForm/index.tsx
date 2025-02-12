@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Button, Col, Flex, Row, Tooltip } from 'antd'
+import { useDocContext } from '../../state/DocContext'
 
 export interface CoreFormProps {
   children: React.ReactNode
@@ -14,14 +15,26 @@ export interface CoreFormProps {
 
 export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, onDelete, onCancel, formDirty, isCreate, className}) => {
   const [isExiting, setIsExiting] = useState(false)
+  const { setEditableMapFeature } = useDocContext()
+
+  const localOnSave = useCallback(() => {
+    onSave()
+    setEditableMapFeature(null)
+  }, [onSave, setEditableMapFeature])
+
+  const localOnReset = useCallback(() => {
+    onReset()
+    setEditableMapFeature(null)
+  }, [onReset, setEditableMapFeature])
 
   const handleExit = useCallback((callback: () => void) => {
+    setEditableMapFeature(null)
     setIsExiting(true)
     setTimeout(() => {
       setIsExiting(false)
       callback()
     }, 700) // Match the animation duration
-  }, [])
+  }, [setEditableMapFeature, setIsExiting])
 
   const handleCancel = useCallback(() => {
     handleExit(onCancel)
@@ -30,6 +43,13 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
   const handleDelete = useCallback(() => {
     handleExit(onDelete)
   }, [handleExit, onDelete])
+
+  // Cleanup when component is unmounted
+  useEffect(() => {
+    return () => {
+      setEditableMapFeature(null)
+    }
+  }, [setEditableMapFeature])
 
   return (
     <div style={{marginTop: '5px'}} className={`${className || ''} ${isExiting ? 'exit' : ''}`}>
@@ -48,10 +68,10 @@ export const CoreForm: React.FC<CoreFormProps> = ({children, onReset, onSave, on
               <Button disabled={false} size='small' onClick={handleCancel}>Cancel</Button>
             </Tooltip> }
             { !isCreate && <Tooltip title='Reset changes for this feature' placement="top">
-              <Button disabled={!formDirty} size='small' onClick={onReset}>Reset</Button>
+              <Button disabled={!formDirty} size='small' onClick={localOnReset}>Reset</Button>
             </Tooltip> }
             <Tooltip title='Save edits' placement="top">
-              <Button type='primary' disabled={!formDirty} size='small' onClick={onSave}>{isCreate ? 'Create' : 'Save'}</Button>
+              <Button type='primary' disabled={!formDirty} size='small' onClick={localOnSave}>{isCreate ? 'Create' : 'Save'}</Button>
             </Tooltip>
           </Flex> 
         </Col>

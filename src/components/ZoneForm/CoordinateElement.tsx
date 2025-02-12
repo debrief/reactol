@@ -1,6 +1,6 @@
 // eslint-disable-next-line quotes
 import { ChangeEventHandler, useState, useEffect } from "react"
-import ReactInputMask from 'react-input-mask'
+import ReactInputMask from '@mona-health/react-input-mask'
 
 interface MaskProps {
   mask: string,
@@ -20,7 +20,7 @@ const InputMask: React.FC<MaskProps> = ({ mask, maskChar, alwaysShowMask, value,
       style={style}
       value={value}
       defaultValue={defaultValue}
-      maskChar={maskChar}
+      maskchar={maskChar}
       alwaysShowMask={alwaysShowMask}
       onChange={onChange}
     />

@@ -8,6 +8,11 @@ export interface MessageStruct {
   severity: 'success' | 'error' | 'warning' | 'info'
 }
 
+export interface EditableMapFeature {
+  feature: Feature<Geometry, GeoJsonProperties>
+  onChange: (feature: Feature<Geometry, GeoJsonProperties>) => void
+}
+
 /** document-level context - one per document */
 interface DocContextProps {
   selection: string[]
@@ -22,6 +27,8 @@ interface DocContextProps {
   setMessage: React.Dispatch<React.SetStateAction<MessageStruct | null>>
   copyMapToClipboard: () => Promise<void>
   setMapNode: (node: HTMLElement | null) => void
+  editableMapFeature: EditableMapFeature | null
+  setEditableMapFeature: React.Dispatch<React.SetStateAction<EditableMapFeature | null>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)

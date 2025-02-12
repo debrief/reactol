@@ -1,7 +1,6 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { TileLayer } from 'react-leaflet'
-import Control from 'react-leaflet-custom-control'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
@@ -10,7 +9,6 @@ import { NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
 import { loadJson } from '../../helpers/loaders/loadJson'
 import { loadOpRep } from '../../helpers/loaders/loadOpRep'
-import toDTG from '../../helpers/toDTG'
 import Layers from '../Layers'
 import Properties from '../Properties'
 import Map from '../spatial/Map'
@@ -18,6 +16,7 @@ import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
+import zones from '../../data/zones'
 
 interface FileHandler {
   blobType: string
@@ -45,19 +44,20 @@ function Document({ filePath }: { filePath?: string }) {
   const [isDragging, setIsDragging] = useState(false)
   const { setTime, time, message, setMessage } = useDocContext()
   const [dirty, setDirty] = useState(false)
+  const loadedRef = useRef<boolean>(false)
 
   useEffect(() => {
     setDirty(true)
   }, [features])
 
-  const timePeriod = useMemo(() => {
-    if (time.start && time.end) {
-      const formattedTimePeriod = `${toDTG(new Date(time.start))} - ${toDTG(new Date(time.end))}`
-      return formattedTimePeriod  
-    } else {
-      return 'Pending'
+  useEffect(() => {
+    if (!loadedRef.current) {
+      loadedRef.current = true
+      // (temporarily) load bulk selection
+      dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(zones)) })
     }
-  }, [time])
+
+  }, [dispatch, loadedRef])
 
   useEffect(() => {
     if (features && features.length) {
@@ -195,11 +195,6 @@ function Document({ filePath }: { filePath?: string }) {
               <TileLayer maxNativeZoom={8} maxZoom={16}
                 url="tiles/{z}/{x}/{y}.png"
               />
-              <Control prepend position='topleft'>
-                <div className='time-period'>
-                  {timePeriod}
-                </div>
-              </Control>
             </Map>
           </Splitter.Panel>
         </Splitter>
