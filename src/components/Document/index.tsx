@@ -87,8 +87,11 @@ function Document({ filePath }: { filePath?: string }) {
   }
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(true)
+    // only allow files to be dropped
+    if (event.dataTransfer.types.includes('Files')) {
+      event.preventDefault()
+      setIsDragging(true)
+    }
   }
 
   const handleDragLeave = () => {
