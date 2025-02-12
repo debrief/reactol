@@ -2,7 +2,7 @@ import { ReactNode, useState, useRef, useMemo, useEffect, useCallback } from 're
 import App from '../../App'
 import type { InputRef } from 'antd'
 import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
-import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
+import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined } from '@ant-design/icons'
 import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode} from 'flexlayout-react'
 import 'flexlayout-react/style/light.css'
 import './index.css'
@@ -248,21 +248,15 @@ const Documents = () => {
 
   const onRenderTabSet = (tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
     console.log('tabSetNode', tabSetNode)
+    renderValues.buttons.push(<Tooltip title="New Tab" key={'new-tab-btn'}>
+      <Button
+        icon={<PlusOutlined />}
+        size="small"
+        onClick={() => handleNew()}>New</Button>
+    </Tooltip>)
     renderValues.buttons.push(
       <Tooltip title="Open Existing Document" key="open-doc">
-        <Button onClick={openExistingDocument} size="small" >open</Button>
-      </Tooltip>
-    )
-  }
-
-  const onRenderTab = (node: TabNode, renderValues: { buttons: React.ReactNode[] }) => {
-    renderValues.buttons.push(
-      <Tooltip title="New Tab" key={`new-tab-${node.getId()}`}>
-        <Button
-          icon={<PlusOutlined />}
-          size="small"
-          onClick={() => handleNew()}
-        />
+        <Button  icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >Open</Button>
       </Tooltip>
     )
   }
@@ -286,7 +280,6 @@ const Documents = () => {
           ref={layoutRef}
           model={layoutModel}
           factory={factory}
-          onRenderTab={onRenderTab}
           onRenderTabSet={onRenderTabSet}
         />
       }
