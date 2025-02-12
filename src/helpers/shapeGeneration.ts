@@ -5,23 +5,25 @@ import { ZoneCircleProps, ZoneCircularRingProps, ZoneCircularSectorProps, ZoneRe
 const DEG_TO_RAD = Math.PI / 180
 const EARTH_RADIUS_METERS = 111319.9
 
-/**
- * Validates angle values are within the valid range
- * @param startAngle Start angle in degrees
- * @param endAngle End angle in degrees
- * @throws {Error} If angles are invalid
- */
-const validateAngles = (startAngle: number, endAngle: number) => {
-  if (startAngle < 0 || startAngle > 360) {
-    throw new Error('Start angle must be between 0 and 360 degrees')
-  }
-  if (endAngle < 0 || endAngle > 360) {
-    throw new Error('End angle must be between 0 and 360 degrees')
-  }
-  if (endAngle < startAngle) {
-    throw new Error('End angle must be greater than start angle')
-  }
-}
+// NOTE: we've removed angle validation, since some shapes 
+// reverse the start and end angles during generation
+// /**
+//  * Validates angle values are within the valid range
+//  * @param startAngle Start angle in degrees
+//  * @param endAngle End angle in degrees
+//  * @throws {Error} If angles are invalid
+//  */
+// const validateAngles = (startAngle: number, endAngle: number) => {
+//   if (startAngle < 0 || startAngle > 360) {
+//     throw new Error('Start angle must be between 0 and 360 degrees')
+//   }
+//   if (endAngle < 0 || endAngle > 360) {
+//     throw new Error('End angle must be between 0 and 360 degrees')
+//   }
+//   if (endAngle < startAngle) {
+//     throw new Error('End angle must be greater than start angle')
+//   }
+// }
 
 /**
  * Convert meters to degrees at a given latitude
@@ -63,7 +65,6 @@ export const generateCirclePoints = (
   if (radiusM <= 0) {
     throw new Error('Radius must be positive')
   }
-  validateAngles(startAngle, endAngle)
   
   // Calculate number of points based on radius if not provided
   // More points for larger circles, minimum of 12

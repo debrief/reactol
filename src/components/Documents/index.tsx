@@ -122,7 +122,17 @@ const Documents = () => {
       }
     } else {
       // conventional app - get doc name
-      setIsTabNameModalVisible(true)
+      // setIsTabNameModalVisible(true)
+      const newTab: TabWithPath = {
+        key: '' + Date.now(),
+        label: documentName,
+        children: <App />,
+        path: documentName
+      }
+      setTabs([...tabs, newTab])
+      setActiveTab(newTab.key)
+      setDocumentName('')
+  
     }
   }
 

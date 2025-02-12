@@ -1,7 +1,7 @@
 import * as turf from '@turf/turf'
 import { Feature, Geometry, Polygon, Position } from 'geojson'
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
-import { Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
+import { Polyline, Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useMemo } from 'react'
 import { useDocContext } from '../../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
@@ -66,6 +66,8 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
           <ReactPolygon
             key={feature.id + '-shiny-border-' + isSelected}
             positions={trackCoords}
+            interactive={false}
+            fill={false}
             weight={6}
             opacity={0.7}
             color={'#fff'}
@@ -73,9 +75,10 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
           ></ReactPolygon>
         )}
         <ReactPolygon
-          key={feature.id + '-line-' + isSelected}
+          key={feature.id + '-polygon-' + isSelected}
           fill={true}
           positions={trackCoords}
+          interactive={false}
           weight={lineWeight}
           color={colorFor(feature)}
           eventHandlers={eventHandlers}
@@ -91,6 +94,17 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
             {feature.properties?.name}
           </Tooltip>
         </ReactPolygon>
+        {/* we only allow clicking on the edge, by preventing the polygon from being clicked,
+          but allowing this polyline to be clicked */}
+        <Polyline
+          key={feature.id + '-edge-' + isSelected}
+          positions={trackCoords}
+          interactive={true}
+          weight={lineWeight}
+          color={colorFor(feature)}
+          eventHandlers={eventHandlers}
+        >
+        </Polyline>
       </>
     )
   }, [feature, isSelected, lineWeight, onClickHandler])

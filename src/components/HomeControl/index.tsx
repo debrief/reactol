@@ -80,7 +80,7 @@ export const HomeControl: React.FC = () => {
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright
 
   return (
-    <div style={{ paddingTop: '15px' }} className={positionClass}>
+    <div style={{ paddingTop: '35px' }} className={positionClass}>
       <div
         className='leaflet-control leaflet-bar'
         style={{ display: viewportFrozen ? 'none' : 'block', border: '0 solid black' }}
