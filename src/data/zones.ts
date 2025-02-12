@@ -8,9 +8,10 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'SAP 1-1',
-      color: '#F00',
-      visible: true,
+      stroke: '#F00',
+      fill: '#F00',
       dataType: 'zone',
+      visible: true,
       time: '2024-11-14T19:10:00.000Z',
       timeEnd: '2024-11-15T04:10:00.000Z',
       specifics: {
@@ -299,7 +300,8 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'SAP 1-2',
-      color: '#F55',
+      stroke: '#F55',
+      fill: '#F55',
       dataType: ZONE_TYPE,
       visible: true,
       time: '2024-11-14T18:10:00.000Z',
@@ -340,7 +342,8 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'SAP 2',
-      color: '#0FF',
+      stroke: '#0FF',
+      fill: '#0FF',
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
@@ -380,7 +383,8 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'SIR 1',
-      color: '#FF0',
+      stroke: '#FF0',
+      fill: '#FF0',
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
@@ -424,7 +428,8 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'TRA 1',
-      color: '#F0F',
+      stroke: '#F0F',
+      fill: '#F0F',
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
@@ -476,7 +481,8 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'RING SECTOR ALPHA',
-      color: '#a100e6',
+      stroke: '#a100e6',
+      fill: '#a100e6',
       dataType: 'zone',
       visible: true,
       specifics: {
