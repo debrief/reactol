@@ -3,7 +3,7 @@ import App from '../../App'
 import type { InputRef } from 'antd'
 import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
 import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined } from '@ant-design/icons'
-import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode} from 'flexlayout-react'
+import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action} from 'flexlayout-react'
 import 'flexlayout-react/style/light.css'
 import './index.css'
 
@@ -26,7 +26,7 @@ const DEFAULT_DOC_NAME = 'Pending'
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
-  const [tabToClose, setTabToClose] = useState<string | null>(null)
+  const [tabToClose, setTabToClose] = useState<Action | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
   const [isDragging, setIsDragging] = useState(false)
@@ -41,6 +41,14 @@ const Documents = () => {
       }, 50)
     }
   }, [isTabNameModalVisible])
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    // Only prevent default and show indicator if it's a file being dragged
+    if (event.dataTransfer.types.includes('Files')) {
+      event.preventDefault()
+      setIsDragging(true)
+    }
+  }
 
   const handleDragLeave = useCallback(() => {
     setIsDragging(false)
@@ -220,31 +228,15 @@ const Documents = () => {
     }
   }
 
-
   const handleCloseTabConfirm = () => {
     if (tabToClose) {
-      setTabs(tabs.filter((t) => t.key !== tabToClose))
+      layoutModel.doAction(tabToClose)
       setTabToClose(null)
-      // select another tab if this tab was selected
-      if (tabToClose === activeTab) {
-        const newTab = tabs.length > 0 ? tabs[tabs.length - 1].key : undefined
-        setActiveTab(newTab)
-      }
     }
   }
 
   const handleCloseTabCancel = () => {
     setTabToClose(null)
-  }
-
-  
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    console.log('over')
-    // Only prevent default and show indicator if it's a file being dragged
-    if (event.dataTransfer.types.includes('Files')) {
-      event.preventDefault()
-      setIsDragging(true)
-    }
   }
 
   const onRenderTabSet = (_tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
@@ -259,6 +251,14 @@ const Documents = () => {
         <Button  icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >Open</Button>
       </Tooltip>
     )
+  }
+
+  const handleTabsAction = (action: Action): undefined | Action => {
+    if (action.type.includes('DeleteTab')) {
+      setTabToClose(action)
+      return undefined
+    }
+    return action
   }
 
   return (
@@ -280,6 +280,7 @@ const Documents = () => {
           ref={layoutRef}
           model={layoutModel}
           factory={factory}
+          onAction={handleTabsAction}
           onRenderTabSet={onRenderTabSet}
         />
       }
