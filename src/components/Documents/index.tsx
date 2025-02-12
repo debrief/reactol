@@ -246,8 +246,7 @@ const Documents = () => {
     }
   }
 
-  const onRenderTabSet = (tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
-    console.log('tabSetNode', tabSetNode)
+  const onRenderTabSet = (_tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
     renderValues.buttons.push(<Tooltip title="New Tab" key={'new-tab-btn'}>
       <Button
         icon={<PlusOutlined />}
