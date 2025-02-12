@@ -167,9 +167,7 @@ const Documents = () => {
         path: documentName
       }
       setTabs([...tabs, newTab])
-      setActiveTab(newTab.key)
-      setDocumentName('')
-  
+      setDocumentName('')  
     }
   }
 
