@@ -15,6 +15,7 @@ import { PolylineMeasure } from '../PolylineMeasure'
 import { BuoyField } from '../BuoyField'
 import { BuoyFieldProps } from '../../../types'
 import { EditFeature } from '../EditFeature'
+import TimePeriod from '../TimePeriod'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -89,6 +90,7 @@ const MapControls: React.FC<{
       <Graticule/>
       <PolylineMeasure/>
       <HomeControl/>
+      <TimePeriod/>
       <EditFeature/>
     </>
   )
