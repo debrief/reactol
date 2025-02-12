@@ -232,6 +232,11 @@ const Documents = () => {
     if (tabToClose) {
       layoutModel.doAction(tabToClose)
       setTabToClose(null)
+      const tabToCloseNode = tabToClose.data.node
+      // find the tab node by walking the layoutModel to 
+      // get the tab, then get the `key` for that tab,
+      // then remove that tab from the tabset (the UI will update)      
+      console.log('closing tab:', tabToCloseNode.data.node, layoutModel)
     }
   }
 
@@ -255,11 +260,16 @@ const Documents = () => {
 
   const handleTabsAction = (action: Action): undefined | Action => {
     if (action.type.includes('DeleteTab')) {
+      // ok, use the modal to double-check the 
+      // user wants to save
       setTabToClose(action)
+      // now return undefined, so the close doesn't (yet) close
       return undefined
     }
     return action
   }
+
+  //  console.log('tabs', tabs)
 
   return (
     <div>
