@@ -21,12 +21,14 @@ const fileNameFor = (filePath: string): string => {
   return fileNameWithoutExtension
 }
 
+const DEFAULT_DOC_NAME = 'Pending'
+
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
   const [tabToClose, setTabToClose] = useState<string | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
-  const [documentName, setDocumentName] = useState('')
+  const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
   const [isDragging, setIsDragging] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
@@ -130,7 +132,7 @@ const Documents = () => {
     }
     setTabs([...tabs, newTab])
     setActiveTab(newTab.key)
-    setDocumentName('')
+    setDocumentName(DEFAULT_DOC_NAME)
   }
 
   const handleNew = async () => {
@@ -159,7 +161,7 @@ const Documents = () => {
   }
 
   const handleCancel = () => {
-    setDocumentName('')
+    setDocumentName(DEFAULT_DOC_NAME)
     setIsTabNameModalVisible(false)
   }
 
@@ -292,6 +294,7 @@ const Documents = () => {
           value={documentName}
           onChange={handleNameChange}
           onPressEnter={handleOk}
+          onFocus={(e) => e.target.select()}
         />
       </Modal>
       <Modal
