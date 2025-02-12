@@ -153,6 +153,8 @@ const Documents = () => {
       }
     } else {
       // conventional app - get doc name
+      // start by clearing document name
+      setDocumentName('Pending')
       setIsTabNameModalVisible(true)
     }
   }
@@ -296,8 +298,7 @@ const Documents = () => {
       >
         <Input
           ref={inputRef}
-          defaultValue={'pending'}
-          value={'pending'}
+          value={documentName}
           onChange={handleNameChange}
           onPressEnter={handleOk}
         />
