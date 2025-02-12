@@ -1,0 +1,18 @@
+.time-period-panel {
+  position: absolute;
+  top: 20px;
+  left: 50px;
+/* //  background: rgba(1, 1, 1, 0.2); */
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+}
+
+.time-period-panel p {
+  margin: 0;
+  /* font-family: 'Courier New', Courier, monospace; */
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 0 10px rgba(1, 1, 1, 0.3);
+}
