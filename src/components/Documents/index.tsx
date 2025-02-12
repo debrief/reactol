@@ -25,7 +25,6 @@ const DEFAULT_DOC_NAME = 'Pending'
 
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
-  const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
   const [tabToClose, setTabToClose] = useState<Action | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
   const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
@@ -89,7 +88,6 @@ const Documents = () => {
           path: file.name
         }
         setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
       } catch (e) {
         setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
         return
@@ -111,7 +109,6 @@ const Documents = () => {
             type: 'tabset',
             weight: 100,
             enableAddTab: true,
-            selected: tabs.findIndex(tab => tab.key === activeTab),
             children: tabs.map(tab => ({
               type: 'tab',
               name: tab.label,
@@ -122,7 +119,7 @@ const Documents = () => {
       },
     }
     return Model.fromJson(model)
-  }, [tabs, activeTab])
+  }, [tabs])
 
   const factory = (node: TabNode) => {
     const component = node.getComponent()
@@ -139,7 +136,6 @@ const Documents = () => {
       path: documentName
     }
     setTabs([...tabs, newTab])
-    setActiveTab(newTab.key)
     setDocumentName(DEFAULT_DOC_NAME)
   }
 
@@ -157,7 +153,6 @@ const Documents = () => {
           path: result?.filePath
         }
         setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
       } else {
         console.log('cancelled')
         return
@@ -188,7 +183,6 @@ const Documents = () => {
           path: file.filePath
         }
         setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
       }
     } else {
       // allow local files to be loaded into browser session
@@ -215,7 +209,6 @@ const Documents = () => {
             path: file.name
           }
           setTabs([...tabs, newTab])
-          setActiveTab(newTab.key)
         } catch (error) {
           Modal.error({
             title: 'Invalid File',
@@ -233,10 +226,10 @@ const Documents = () => {
       layoutModel.doAction(tabToClose)
       setTabToClose(null)
       const tabToCloseNode = tabToClose.data.node
-      // find the tab node by walking the layoutModel to 
+      // TODO: find the tab node by walking the layoutModel to 
       // get the tab, then get the `key` for that tab,
       // then remove that tab from the tabset (the UI will update)      
-      console.log('closing tab:', tabToCloseNode.data.node, layoutModel)
+      console.log('closing tab:', tabToCloseNode, layoutModel)
     }
   }
 
