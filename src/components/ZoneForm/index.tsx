@@ -190,7 +190,6 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
     const updatedGeometry: Polygon = { type: 'Polygon', coordinates: shapeCoordinates }
     const updatedProps = {...formProps, specifics: updatedSpecifics} as ZoneProps
     const res: Feature<Geometry, ZoneProps> = {...shape, type: 'Feature', geometry: updatedGeometry, properties: updatedProps }
-    console.log('zone form ok', res)
     onChange(res)
     setIsModalOpen(false)
   }
