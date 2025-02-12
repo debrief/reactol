@@ -16,7 +16,6 @@ import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
-import zones from '../../data/zones'
 
 interface FileHandler {
   blobType: string
@@ -54,7 +53,7 @@ function Document({ filePath }: { filePath?: string }) {
     if (!loadedRef.current) {
       loadedRef.current = true
       // (temporarily) load bulk selection
-      dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(zones)) })
+      // dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(zones)) })
     }
 
   }, [dispatch, loadedRef])
