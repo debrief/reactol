@@ -1,8 +1,10 @@
-import { ReactNode, useState, useRef, useEffect, useCallback } from 'react'
+import { ReactNode, useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Tabs, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
-import { CloseOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons'
+import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
+import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined } from '@ant-design/icons'
+import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action} from 'flexlayout-react'
+import 'flexlayout-react/style/light.css'
 import './index.css'
 
 type TabWithPath =  {
@@ -19,16 +21,18 @@ const fileNameFor = (filePath: string): string => {
   return fileNameWithoutExtension
 }
 
+const DEFAULT_DOC_NAME = 'Pending'
+
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
-  const [activeTab, setActiveTab] = useState<string | undefined>(undefined)
-  const [tabToClose, setTabToClose] = useState<string | null>(null)
+  const [tabToClose, setTabToClose] = useState<Action | null>(null)
   const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
-  const [documentName, setDocumentName] = useState('')
+  const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
   const [isDragging, setIsDragging] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
-  
+  const layoutRef = useRef<Layout | null>(null)
+
   useEffect(() => {
     if (isTabNameModalVisible) {
       setTimeout(() => {
@@ -36,6 +40,14 @@ const Documents = () => {
       }, 50)
     }
   }, [isTabNameModalVisible])
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    // Only prevent default and show indicator if it's a file being dragged
+    if (event.dataTransfer.types.includes('Files')) {
+      event.preventDefault()
+      setIsDragging(true)
+    }
+  }
 
   const handleDragLeave = useCallback(() => {
     setIsDragging(false)
@@ -76,7 +88,6 @@ const Documents = () => {
           path: file.name
         }
         setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
       } catch (e) {
         setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
         return
@@ -87,6 +98,34 @@ const Documents = () => {
       setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
     }
   }, [setMessage, tabs])
+  
+  const layoutModel = useMemo(() => {
+    const model = {
+      global: { tabEnableClose: true },
+      layout: {
+        type: 'row',
+        children: [
+          {
+            type: 'tabset',
+            weight: 100,
+            enableAddTab: true,
+            children: tabs.map(tab => ({
+              type: 'tab',
+              name: tab.label,
+              component: tab.key,
+            })),
+          },
+        ],
+      },
+    }
+    return Model.fromJson(model)
+  }, [tabs])
+
+  const factory = (node: TabNode) => {
+    const component = node.getComponent()
+    const tab = tabs.find(tab => tab.key === component)
+    return tab ? tab.children : null
+  }
 
   const handleOk = () => {
     setIsTabNameModalVisible(false)
@@ -97,8 +136,7 @@ const Documents = () => {
       path: documentName
     }
     setTabs([...tabs, newTab])
-    setActiveTab(newTab.key)
-    setDocumentName('')
+    setDocumentName(DEFAULT_DOC_NAME)
   }
 
   const handleNew = async () => {
@@ -115,29 +153,18 @@ const Documents = () => {
           path: result?.filePath
         }
         setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
       } else {
         console.log('cancelled')
         return
       }
     } else {
       // conventional app - get doc name
-      // setIsTabNameModalVisible(true)
-      const newTab: TabWithPath = {
-        key: '' + Date.now(),
-        label: documentName,
-        children: <App />,
-        path: documentName
-      }
-      setTabs([...tabs, newTab])
-      setActiveTab(newTab.key)
-      setDocumentName('')
-  
+      setIsTabNameModalVisible(true)
     }
   }
 
   const handleCancel = () => {
-    setDocumentName('')
+    setDocumentName(DEFAULT_DOC_NAME)
     setIsTabNameModalVisible(false)
   }
 
@@ -156,7 +183,6 @@ const Documents = () => {
           path: file.filePath
         }
         setTabs([...tabs, newTab])
-        setActiveTab(newTab.key)
       }
     } else {
       // allow local files to be loaded into browser session
@@ -183,7 +209,6 @@ const Documents = () => {
             path: file.name
           }
           setTabs([...tabs, newTab])
-          setActiveTab(newTab.key)
         } catch (error) {
           Modal.error({
             title: 'Invalid File',
@@ -196,33 +221,15 @@ const Documents = () => {
     }
   }
 
-  const onTabChange = (key: string) => {
-    setActiveTab(key)
-  }
-
-  function onTabsEdit(
-    e: string | React.MouseEvent | React.KeyboardEvent, action: 'add' | 'remove'): void {
-    switch (action) {
-    case 'add':
-      handleNew()
-      break
-    case 'remove':
-      if (typeof e === 'string') {
-        setTabToClose(e)
-      }
-      break
-    }
-  }
-
   const handleCloseTabConfirm = () => {
     if (tabToClose) {
-      setTabs(tabs.filter((t) => t.key !== tabToClose))
+      layoutModel.doAction(tabToClose)
       setTabToClose(null)
-      // select another tab if this tab was selected
-      if (tabToClose === activeTab) {
-        const newTab = tabs.length > 0 ? tabs[tabs.length - 1].key : undefined
-        setActiveTab(newTab)
-      }
+      const tabToCloseNode = tabToClose.data.node
+      // TODO: find the tab node by walking the layoutModel to 
+      // get the tab, then get the `key` for that tab,
+      // then remove that tab from the tabset (the UI will update)      
+      console.log('closing tab:', tabToCloseNode, layoutModel)
     }
   }
 
@@ -230,21 +237,32 @@ const Documents = () => {
     setTabToClose(null)
   }
 
-  const tabBarExtras = {
-    left: <Image className='logo-image' alt='Application logo - albatross flying' preview={false} width={30} src='images/albatross-flying.png' />,
-    right: <Tooltip title='Open Existing Document' placement="bottom"><Button onClick={() => openExistingDocument()}>Open</Button></Tooltip>
+  const onRenderTabSet = (_tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
+    renderValues.buttons.push(<Tooltip title="New Tab" key={'new-tab-btn'}>
+      <Button
+        icon={<PlusOutlined />}
+        size="small"
+        onClick={() => handleNew()}>New</Button>
+    </Tooltip>)
+    renderValues.buttons.push(
+      <Tooltip title="Open Existing Document" key="open-doc">
+        <Button  icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >Open</Button>
+      </Tooltip>
+    )
   }
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    console.log('over')
-    // Only prevent default and show indicator if it's a file being dragged
-    if (event.dataTransfer.types.includes('Files')) {
-      event.preventDefault()
-      setIsDragging(true)
+  const handleTabsAction = (action: Action): undefined | Action => {
+    if (action.type.includes('DeleteTab')) {
+      // ok, use the modal to double-check the 
+      // user wants to save
+      setTabToClose(action)
+      // now return undefined, so the close doesn't (yet) close
+      return undefined
     }
+    return action
   }
 
-
+  //  console.log('tabs', tabs)
 
   return (
     <div>
@@ -260,18 +278,15 @@ const Documents = () => {
           <Alert showIcon type={message?.severity} description={message?.message} />
         </Modal>
       )}
-      { tabs.length > 0 && <Tabs
-        tabBarExtraContent={tabBarExtras}
-        type='editable-card'
-        activeKey={activeTab}
-        onChange={onTabChange}
-        items={tabs}
-        addIcon={<Tooltip title='Create New Document' placement="bottom">
-          <PlusOutlined />
-        </Tooltip>}
-        removeIcon={<Tooltip title='Close Document' placement="bottom"><CloseOutlined/></Tooltip>}
-        onEdit={onTabsEdit}
-      />}
+      { 
+        tabs.length > 0 && <Layout
+          ref={layoutRef}
+          model={layoutModel}
+          factory={factory}
+          onAction={handleTabsAction}
+          onRenderTabSet={onRenderTabSet}
+        />
+      }
       <Modal
         title="Please provide a name for the document"
         open={isTabNameModalVisible}
@@ -280,10 +295,10 @@ const Documents = () => {
       >
         <Input
           ref={inputRef}
-          defaultValue={'pending'}
-          value={'pending'}
+          value={documentName}
           onChange={handleNameChange}
           onPressEnter={handleOk}
+          onFocus={(e) => e.target.select()}
         />
       </Modal>
       <Modal
