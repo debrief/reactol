@@ -1,7 +1,7 @@
 // standard set of styling properties, as 
 // defined here: https://github.com/mapbox/simplestyle-spec/tree/master/1.1.0
 
-export type PointProps = {
+export type PointStyleProps = {
   // OPTIONAL: default "medium"
   // specify the size of the marker. sizes
   // can be different pixel sizes in different
@@ -29,7 +29,7 @@ export type PointProps = {
   'marker-color'?: string,
 }
 
-export type LineProps = {
+export type LineStyleProps = {
   // OPTIONAL: default "555555"
   // the color of a line as part of a polygon, polyline, or
   // multigeometry
@@ -53,7 +53,7 @@ export type LineProps = {
   'stroke-width'?: number,
 }
 
-export type PolygonProps = LineProps & {
+export type PolygonStyleProps = LineStyleProps & {
   // OPTIONAL: default "555555"
   // the color of the interior of a polygon
   //
