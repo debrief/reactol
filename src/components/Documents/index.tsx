@@ -88,6 +88,9 @@ const Documents = () => {
           path: file.name
         }
         setTabs([...tabs, newTab])
+        if (layoutModel) {
+          addTabToLayout(newTab, layoutModel)
+        }
       } catch (e) {
         setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
         return
@@ -123,6 +126,9 @@ const Documents = () => {
       label: documentName,
       children: <App />,
       path: documentName
+    }
+    if (layoutModel) {
+      addTabToLayout(newTab, layoutModel)
     }
     setTabs([...tabs, newTab])
     setDocumentName(DEFAULT_DOC_NAME)
@@ -166,7 +172,7 @@ const Documents = () => {
           children: <App filePath={filePath} />, 
           path: filePath
         }
-        setTabs(prevTabs => [...prevTabs, newTab])
+        setTabs([...tabs, newTab])
         if (layoutModel) {
           addTabToLayout(newTab, layoutModel)
         }
