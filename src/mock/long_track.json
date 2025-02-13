@@ -1,7 +1,7 @@
 {
   "type": "Feature",
   "geometry": {
-    "type": "MultiPoint",
+    "type": "LineString",
     "coordinates": [
       [
         2.6502,
