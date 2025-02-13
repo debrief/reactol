@@ -1,7 +1,7 @@
 {
   "type": "Feature",
   "geometry": {
-    "type": "MultiPoint",
+    "type": "LineString",
     "coordinates": [
       [
         2.6502,
@@ -27719,7 +27719,7 @@
   },
   "properties": {
     "dataType": "track",
-    "color": "#F00",
+    "stroke": "#F00",
     "name": "JEN HANSEN IV",
     "visible": true,
     "times": [

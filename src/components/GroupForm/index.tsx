@@ -31,7 +31,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
       title: f.properties?.name || 'Unnamed',
       description: f.properties?.dataType || 'Unknown type',
       type: f.properties?.dataType,
-      color: f.properties?.color,
+      color: f.properties?.stroke,
       env: f.properties?.env
     }))
   }, [nonGroupFeatures])

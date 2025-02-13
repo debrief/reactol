@@ -109,7 +109,7 @@ const getIcon = (feature: Feature | undefined,
 
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
-  const color = feature.properties?.color
+  const color = feature.properties?.stroke
   const environment = feature.properties?.env
   return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
 }
@@ -247,7 +247,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       properties: {
         name: '',
         dataType: REFERENCE_POINT_TYPE,
-        color: '#FF0000',
+        'marker-color': '#FF0000',
         visible: true,
       },
       geometry: {
@@ -270,7 +270,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         name: '',
         shortName: '',
         dataType: BUOY_FIELD_TYPE,
-        color: '#FF0000',
+        'marker-color': '#FF0000',
         visible: true,
       },
       geometry: {

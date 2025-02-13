@@ -9,7 +9,7 @@ const track: Feature = {
   type: 'Feature',
   properties: {
     dataType: TRACK_TYPE,
-    color: '#F00',
+    stroke: '#F00',
     name: 'Track 1',
     times: [
       '2024-11-14T10:00:00.000Z',

@@ -5,7 +5,7 @@
           "type": "Feature",
           "properties": {
               "dataType": "track",
-              "color": "#FF0",
+              "stroke": "#0A6",
               "name": "FOREST HILL",
               "env": "nav",
               "times": [
@@ -89,7 +89,7 @@
                       35.82
                   ]
               ],
-              "type": "MultiPoint"
+              "type": "LineString"
           },
           "id": "fc-1"
       }

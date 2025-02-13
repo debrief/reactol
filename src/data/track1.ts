@@ -6,7 +6,7 @@ const track: Feature<LineString, TrackProps> = {
   type: 'Feature',
   properties: {
     dataType: TRACK_TYPE,
-    color: '#F00',
+    stroke: '#F00',
     name: 'VAN GALEN',
     shortName: 'VANG',
     env: 'nav',

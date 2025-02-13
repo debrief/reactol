@@ -6,7 +6,7 @@
           "properties": {
               "name": "UPDATED SONO2",
               "dataType": "reference-point",
-              "color": "#00FFFF",
+              "marker-color": "#00FFFF",
               "visible": true
           },
           "geometry": {
@@ -23,7 +23,7 @@
           "properties": {
               "name": "POINT D-1 (moved)",
               "dataType": "reference-point",
-              "color": "#FFFF00",
+              "marker-color": "#FFFF00",
               "visible": true
           },
           "geometry": {
