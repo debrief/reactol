@@ -9,7 +9,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     properties: {
       name: 'SAP 1-1',
       stroke: '#F00',
-      fill: '#F00',
+      fill: '#0F0',
       dataType: 'zone',
       visible: true,
       time: '2024-11-14T19:10:00.000Z',
@@ -344,6 +344,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       name: 'SAP 2',
       stroke: '#0FF',
       fill: '#0FF',
+      'fill-opacity': 0.2,
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
@@ -383,8 +384,9 @@ const zones: Feature<Geometry, ZoneProps>[] = [
     type: 'Feature',
     properties: {
       name: 'SIR 1',
-      stroke: '#FF0',
-      fill: '#FF0',
+      stroke: '#F0F',
+      fill: '#0F0',
+      'fill-opacity': 1.0,
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
@@ -430,6 +432,7 @@ const zones: Feature<Geometry, ZoneProps>[] = [
       name: 'TRA 1',
       stroke: '#F0F',
       fill: '#F0F',
+      'fill-opacity': 0.5,
       dataType: ZONE_TYPE,
       visible: true,
       specifics:{
