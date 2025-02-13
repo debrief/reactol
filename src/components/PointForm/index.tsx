@@ -74,8 +74,8 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
   }, [shape, setState])
 
   const localChange = (values: Partial<FormTypeProps>) => {
-    if (values.color) {
-      values.color = (values.color as unknown as Color).toHexString()
+    if (values['marker-color']) {
+      values['marker-color'] = (values['marker-color'] as unknown as Color).toHexString()
     }
     const updatedProps= {...state, ...values} as FormTypeProps
     const converted = convertBack(updatedProps)
@@ -121,7 +121,7 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
       </Form.Item>
       <Form.Item<FormTypeProps>
         label="Color"
-        name='color'
+        name='marker-color'
         style={itemStyle}
         rules={[{ required: true, message: 'color is required!' }]}>
         <ColorPicker format='hex' trigger='click' presets={presetColors} />

@@ -23,7 +23,7 @@ const track: Feature<Geometry, PointProps> = {
   properties: {
     dataType: REFERENCE_POINT_TYPE,
     name: 'SONO 1-1',
-    color: '#F00',
+    'marker-color': '#F00',
     visible: true,
     time: times[1],
     timeEnd: times[2]
@@ -57,7 +57,7 @@ test('no times', () => {
       dataType: REFERENCE_POINT_TYPE,
       name: 'Test Point',
       visible: true,
-      color: '#000000'
+      'marker-color': '#000000'
     }
   }
   delete track.properties.time
@@ -72,7 +72,7 @@ test('only start', () => {
       dataType: REFERENCE_POINT_TYPE,
       name: 'Test Point',
       visible: true,
-      color: '#000000'
+      'marker-color': '#000000'
     }
   }
   track.properties.time = times[0]
@@ -87,7 +87,7 @@ test('only end', () => {
       dataType: REFERENCE_POINT_TYPE,
       name: 'Test Point',
       visible: true,
-      color: '#000000'
+      'marker-color': '#000000'
     }
   }
   track.properties.timeEnd = times[3]
@@ -101,7 +101,7 @@ test('mid time', () => {
       dataType: REFERENCE_POINT_TYPE,
       name: 'Test Point',
       visible: true,
-      color: '#000000'
+      'marker-color': '#000000'
     }
   }
   delete track.properties.time
@@ -120,7 +120,7 @@ test('missing mid time', () => {
       dataType: REFERENCE_POINT_TYPE,
       name: 'Test Point',
       visible: true,
-      color: '#000000'
+      'marker-color': '#000000'
     }
   }
   delete track.properties.time

@@ -56,7 +56,7 @@ export const zoneFeatureFor = (shapeType: string) => {
       name: '',
       dataType: ZONE_TYPE,
       specifics:  zoneShapePropsFor(shapeType),
-      color: '#FF0000',
+      stroke: '#FF0000',
       visible: true,
     },
     geometry: {

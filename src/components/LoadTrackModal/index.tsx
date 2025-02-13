@@ -54,9 +54,9 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   }
 
   const onFinishCreate: FormProps<NewTrackProps>['onFinish'] = (values) => {
-    if (typeof values.color === 'object') {
-      const colorValue = values.color as Color
-      values.color = colorValue.toRgbString()
+    if (typeof values.stroke === 'object') {
+      const colorValue = values.stroke as Color
+      values.stroke = colorValue.toRgbString()
     }
     newTrack(values)
   }
@@ -65,7 +65,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     year: initialYear,
     month: initialMonth,
     env: symbolOptions[0].value,
-    color: presetColors[0].colors[0] as string,
+    stroke: presetColors[0].colors[0] as string,
     labelInterval: '' + Number(defaultIntervals[5].value),
     symbolInterval: '' + Number(defaultIntervals[4].value),
   }
@@ -188,7 +188,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
 
           <Form.Item<NewTrackProps>
             label='Colour'
-            name='color'
+            name='stroke'
             style={itemStyle}
             rules={[{ required: true, message: 'Please enter track color' }]}
           >

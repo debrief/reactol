@@ -8,7 +8,7 @@ const mockFeatures: FeatureCollection = {
       type: 'Feature',
       properties: {
         dataType: TRACK_TYPE,
-        color: '#F00',
+        stroke: '#F00',
         name: 'VAN GALEN',
         times: [
           '2024-11-14T16:16:53.662Z',
@@ -46,7 +46,7 @@ const mockFeatures: FeatureCollection = {
       properties: {
         dataType: ZONE_TYPE,
         name: 'SAP 1-1',
-        color: '#F00',
+        stroke: '#F00',
         startTime: '2024-11-14T19:10:00.000Z',
         endTime: '2024-11-15T04:10:00.000Z',
         visible: true,
@@ -70,7 +70,7 @@ const mockFeatures: FeatureCollection = {
       properties: {
         dataType: REFERENCE_POINT_TYPE,
         name: 'SONO 1-1',
-        color: '#FF0000',
+        'marker-color': '#FF0000',
         time: '2024-11-14T19:10:00.000Z',
         visible: true,
       },
@@ -84,7 +84,7 @@ const mockFeatures: FeatureCollection = {
       type: 'Feature',
       properties: {
         dataType: TRACK_TYPE,
-        color: '#00F',
+        stroke: '#00F',
         name: 'TRACK 2',
         times: [
           '2024-11-15T00:00:00.000Z',
@@ -110,7 +110,7 @@ const mockFeatures: FeatureCollection = {
       properties: {
         dataType: ZONE_TYPE,
         name: 'ZONE 2',
-        color: '#00F',
+        stroke: '#00F',
         startTime: '2024-11-14T22:30:00.000Z',
         endTime: '2024-11-15T05:30:00.000Z',
         visible: true,
@@ -133,7 +133,7 @@ const mockFeatures: FeatureCollection = {
       type: 'Feature',
       properties: {
         dataType: TRACK_TYPE,
-        color: '#FF0',
+        stroke: '#FF0',
         name: 'TRACK 3',
         times: [
           '2024-11-14T12:00:00.000Z',
@@ -161,7 +161,7 @@ const mockFeatures: FeatureCollection = {
       properties: {
         dataType: REFERENCE_POINT_TYPE,
         name: 'POINT 2',
-        color: '#FFFF00',
+        'marker-color': '#FFFF00',
         time: '2024-11-15T10:00:00.000Z',
         visible: true,
       },
@@ -176,7 +176,7 @@ const mockFeatures: FeatureCollection = {
       properties: {
         dataType: REFERENCE_POINT_TYPE,
         name: 'POINT 3',
-        color: '#00FF00',
+        'marker-color': '#00FF00',
         time: '2024-11-15T15:00:00.000Z',
         visible: false,
       },
@@ -191,7 +191,7 @@ const mockFeatures: FeatureCollection = {
       properties: {
         dataType: ZONE_TYPE,
         name: 'ZONE 3',
-        color: '#0F0',
+        stroke: '#0F0',
         startTime: '2024-11-14T22:30:00.000Z',
         endTime: '2024-11-15T06:30:00.000Z',
         visible: false,

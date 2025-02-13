@@ -9,7 +9,7 @@ const points: Feature<Geometry, PointProps>[] = [
     properties: {
       name: 'SONO 1-1',
       dataType: REFERENCE_POINT_TYPE,
-      color: '#FF0000',
+      'marker-color': '#FF0000',
       visible: true,
       time: '2024-11-14T19:10:00.000Z',
     },
@@ -27,7 +27,7 @@ const points: Feature<Geometry, PointProps>[] = [
     properties: {
       name: 'SONO 1-2',
       dataType: REFERENCE_POINT_TYPE,
-      color: '#00FF00',
+      'marker-color': '#00FF00',
       visible: true,
       time: '2024-11-14T21:10:00.000Z',
       timeEnd: '2024-11-15T02:10:00.000Z'
@@ -46,7 +46,7 @@ const points: Feature<Geometry, PointProps>[] = [
     properties: {
       name: 'NEW SONO',
       dataType: REFERENCE_POINT_TYPE,
-      color: '#0000FF',
+      'marker-color': '#0000FF',
       visible: true
     },
     geometry: {
@@ -63,7 +63,7 @@ const points: Feature<Geometry, PointProps>[] = [
     properties: {
       name: 'POINT D-1',
       dataType: REFERENCE_POINT_TYPE,
-      color: '#FFFF00',
+      'marker-color': '#FFFF00',
       visible: true
     },
     geometry: {

@@ -6,7 +6,7 @@ const field: Feature<MultiPoint, BuoyFieldProps> = {
   type: 'Feature',
   properties: { 
     dataType: BUOY_FIELD_TYPE,
-    color: '#FF0',
+    'marker-color': '#FF0',
     name: 'Z12344',
     shortName: '12344',
     visible: true
