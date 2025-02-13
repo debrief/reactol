@@ -11,7 +11,6 @@ type TabWithPath =  {
   key: string
   label: string
   children: ReactNode
-  path: string
 } 
 
 const fileNameFor = (filePath: string): string => {
@@ -84,8 +83,7 @@ const Documents = () => {
         const newTab: TabWithPath = {
           key: '' + Date.now(),
           label: file.name.split('.')[0],
-          children: <App content={content} />,
-          path: file.name
+          children: <App content={content} />
         }
         setTabs([...tabs, newTab])
         if (layoutModel) {
@@ -124,8 +122,7 @@ const Documents = () => {
     const newTab: TabWithPath = {
       key: '' + Date.now(),
       label: documentName,
-      children: <App />,
-      path: documentName
+      children: <App />
     }
     if (layoutModel) {
       addTabToLayout(newTab, layoutModel)
@@ -169,8 +166,7 @@ const Documents = () => {
         const newTab: TabWithPath = {
           key: '' + Date.now(),
           label: fileName,
-          children: <App filePath={filePath} />, 
-          path: filePath
+          children: <App filePath={filePath} />
         }
         setTabs([...tabs, newTab])
         if (layoutModel) {
@@ -201,8 +197,7 @@ const Documents = () => {
         const newTab: TabWithPath = {
           key: '' + Date.now(),
           label: fileNameFor(file.filePath),
-          children: <App filePath={file.filePath} content={file.content} />,
-          path: file.filePath
+          children: <App filePath={file.filePath} content={file.content} />
         }
         setTabs([...tabs, newTab])
         if (layoutModel) {
@@ -230,8 +225,7 @@ const Documents = () => {
           const newTab: TabWithPath = {
             key: '' + Date.now(),
             label: file.name.split('.')[0],
-            children: <App content={content} />,
-            path: file.name
+            children: <App content={content} />
           }
           setTabs([...tabs, newTab])
           if (layoutModel) {
