@@ -3,7 +3,7 @@ import App from '../../App'
 import type { InputRef } from 'antd'
 import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
 import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined } from '@ant-design/icons'
-import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action} from 'flexlayout-react'
+import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action, Actions, DockLocation} from 'flexlayout-react'
 import 'flexlayout-react/style/light.css'
 import './index.css'
 
@@ -104,22 +104,11 @@ const Documents = () => {
       global: { tabEnableClose: true },
       layout: {
         type: 'row',
-        children: [
-          {
-            type: 'tabset',
-            weight: 100,
-            enableAddTab: true,
-            children: tabs.map(tab => ({
-              type: 'tab',
-              name: tab.label,
-              component: tab.key,
-            })),
-          },
-        ],
+        children: [ ],
       },
     }
     return Model.fromJson(model)
-  }, [tabs])
+  }, [])
 
   const factory = (node: TabNode) => {
     const component = node.getComponent()
@@ -139,26 +128,53 @@ const Documents = () => {
     setDocumentName(DEFAULT_DOC_NAME)
   }
 
+  const addTabToLayout = (newTab: TabWithPath, layoutModel: Model) => {
+    const tabSetNode = layoutModel.getRoot().getChildren()[0]
+    
+    if (tabSetNode) {
+      layoutModel.doAction(
+        Actions.addNode(
+          {
+            type: 'tab',
+            name: newTab.label,
+            component: newTab.key, 
+            id: newTab.key 
+          },
+          tabSetNode.getId(),
+          DockLocation.CENTER,
+          0
+        )
+      )
+    }
+  }
+  
   const handleNew = async () => {
-    // are we an electron app?
     if (window.electron) {
-      const options = { title: 'New document', 
-        filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }] }
+      const options = { 
+        title: 'New document', 
+        filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }] 
+      }
       const result = await window.electron.saveFileDialog(options)
+  
       if (result?.filePath) {
+        const filePath = result.filePath
+        const fileName = fileNameFor(filePath)
+  
         const newTab: TabWithPath = {
           key: '' + Date.now(),
-          label: fileNameFor(result?.filePath),
-          children: <App filePath={result?.filePath} />,
-          path: result?.filePath
+          label: fileName,
+          children: <App filePath={filePath} />, 
+          path: filePath
         }
-        setTabs([...tabs, newTab])
+        setTabs(prevTabs => [...prevTabs, newTab])
+        if (layoutModel) {
+          addTabToLayout(newTab, layoutModel)
+        }
       } else {
-        console.log('cancelled')
+        console.log('Cancelled')
         return
       }
     } else {
-      // conventional app - get doc name
       setIsTabNameModalVisible(true)
     }
   }
@@ -183,6 +199,9 @@ const Documents = () => {
           path: file.filePath
         }
         setTabs([...tabs, newTab])
+        if (layoutModel) {
+          addTabToLayout(newTab, layoutModel)
+        }
       }
     } else {
       // allow local files to be loaded into browser session
@@ -209,6 +228,9 @@ const Documents = () => {
             path: file.name
           }
           setTabs([...tabs, newTab])
+          if (layoutModel) {
+            addTabToLayout(newTab, layoutModel)
+          }
         } catch (error) {
           Modal.error({
             title: 'Invalid File',
@@ -220,7 +242,7 @@ const Documents = () => {
       input.click()
     }
   }
-
+  
   const handleCloseTabConfirm = () => {
     if (tabToClose) {
       layoutModel.doAction(tabToClose)
@@ -228,7 +250,8 @@ const Documents = () => {
       const tabToCloseNode = tabToClose.data.node
       // TODO: find the tab node by walking the layoutModel to 
       // get the tab, then get the `key` for that tab,
-      // then remove that tab from the tabset (the UI will update)      
+      // then remove that tab from the tabset (the UI will update) 
+      setTabs(prevTabs => prevTabs.filter(tab => tab.key !== tabToClose.data.node.getId()))
       console.log('closing tab:', tabToCloseNode, layoutModel)
     }
   }
