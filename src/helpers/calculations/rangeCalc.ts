@@ -48,7 +48,7 @@ export const rangeCalc: Calculation = {
 
       const nonNullRanges = ranges ? ranges.filter((range: GraphDatum | undefined) => range !== undefined) as GraphDatum[] : []
         
-      return {label: name + ' Range', color: feature.properties?.color || undefined, data: nonNullRanges}
+      return {label: name + ' Range', color: feature.properties?.stroke || undefined, data: nonNullRanges}
     })
   }
 }

@@ -187,7 +187,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
                   data={dataset.data} 
                   style={{
                     data: {
-                      stroke: dataset.color || undefined ,
+                      stroke: dataset.stroke || undefined ,
                       strokeWidth: 2,
                     },
                   }} x='date' y='value' />      )}

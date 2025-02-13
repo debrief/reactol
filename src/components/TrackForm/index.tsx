@@ -41,8 +41,8 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
 
   const localChange = (values: Partial<FormTypeProps>) => {
     const dupe = {...values} as unknown as TrackProps
-    if (values.color) {
-      dupe.color = (values.color as unknown as Color).toHexString()
+    if (values.stroke) {
+      dupe.stroke = (values.stroke as unknown as Color).toHexString()
     }
     const updatedProps= {...state, ...dupe} as TrackProps
     if (updatedProps.labelInterval) {
@@ -139,7 +139,7 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
         </Form.Item>  
         <Form.Item<FormTypeProps>
           label="Color"
-          name='color'
+          name='stroke'
           style={itemStyle}
           rules={[{ required: true, message: 'color is required!' }]}>
           <ColorPicker style={{marginLeft: 0}} format='hex' trigger='click' presets={presetColors} />

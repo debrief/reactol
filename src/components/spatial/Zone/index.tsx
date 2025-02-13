@@ -17,7 +17,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
   if (feature) {
     const feat = feature as Feature
     if (feat.properties) {
-      return feat.properties.color || '#ff0'
+      return feat.properties.stroke || '#ff0'
     }
   }
   return '#000'

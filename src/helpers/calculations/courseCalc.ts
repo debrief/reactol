@@ -14,7 +14,7 @@ export const courseCalc: Calculation = {
     return withSpeed.map((feature) => {
       const name = feature.properties?.name || feature.id
 
-      return {label: name + ' Course', color: feature.properties?.color || undefined, data: feature.properties?.times.map((time: number, index: number) => {
+      return {label: name + ' Course', color: feature.properties?.stroke || undefined, data: feature.properties?.times.map((time: number, index: number) => {
         return {date: new Date(time).getTime(), value: feature.properties?.courses[index]}})}
     })
   }

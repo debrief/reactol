@@ -167,8 +167,8 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
   }
 
   const localChange = (values: Partial<FormTypeProps>) => {
-    if (values.color) {
-      values.color = (values.color as unknown as Color).toHexString()
+    if (values.stroke) {
+      values.stroke = (values.stroke as unknown as Color).toHexString()
     }
     const updatedProps= {...state, ...values} as FormTypeProps
     const convertedProps = convertBack(updatedProps)

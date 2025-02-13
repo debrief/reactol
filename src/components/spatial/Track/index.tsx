@@ -21,7 +21,7 @@ const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
   if (feature) {
     const feat = feature as Feature
     if (feat.properties) {
-      return feat.properties.color || '#ff0'
+      return feat.properties.stroke || '#ff0'
     }
   }
   return '#000'
@@ -157,7 +157,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
             html: (() => {
               const env = (feature.properties as TrackProps).env
               const size = BASE_ICON_SIZE * ENVIRONMENT_ICON_SCALE
-              const color = (feature.properties as TrackProps).color
+              const color = (feature.properties as TrackProps).stroke
               const svgContent = (() => {
                 switch (env) {
                 case 'air':
