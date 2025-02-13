@@ -27,7 +27,7 @@ export const BuoyField: React.FC<BuoyFieldTypeProps> = ({feature, onClickHandler
   }, [feature])
 
   const color = useMemo(() => {
-    return feature.properties?.stroke || 'blue'
+    return feature.properties?.['marker-color'] || 'blue'
   }, [feature])
 
   const isVisible = useMemo(() => {
