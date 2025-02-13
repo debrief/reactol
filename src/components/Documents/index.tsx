@@ -257,7 +257,7 @@ const Documents = () => {
       // TODO: find the tab node by walking the layoutModel to 
       // get the tab, then get the `key` for that tab,
       // then remove that tab from the tabset (the UI will update) 
-      setTabs(prevTabs => prevTabs.filter(tab => tab.key !== tabToClose.data.node.getId()))
+      setTabs(prevTabs => prevTabs.filter(tab => tab.key !== tabToClose.data.node))
       console.log('closing tab:', tabToCloseNode, layoutModel)
     }
   }
