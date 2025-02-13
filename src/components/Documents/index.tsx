@@ -31,6 +31,39 @@ const Documents = () => {
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
   const inputRef = useRef<InputRef | null>(null)
   const layoutRef = useRef<Layout | null>(null)
+    
+  const layoutModel = useMemo(() => {
+    const model = {
+      global: { tabEnableClose: true },
+      layout: {
+        type: 'row',
+        children: [ ],
+      },
+    }
+    return Model.fromJson(model)
+  }, [])
+
+  const addTabToLayout = useCallback((newTab: TabWithPath) => {
+    if (layoutModel) {
+      const tabSetNode = layoutModel.getRoot().getChildren()[0]
+    
+      if (tabSetNode) {
+        layoutModel.doAction(
+          Actions.addNode(
+            {
+              type: 'tab',
+              name: newTab.label,
+              component: newTab.key, 
+              id: newTab.key 
+            },
+            tabSetNode.getId(),
+            DockLocation.CENTER,
+            0
+          )
+        )
+      }
+    }
+  }, [layoutModel])
 
   useEffect(() => {
     if (isTabNameModalVisible) {
@@ -86,9 +119,7 @@ const Documents = () => {
           children: <App content={content} />
         }
         setTabs([...tabs, newTab])
-        if (layoutModel) {
-          addTabToLayout(newTab, layoutModel)
-        }
+        addTabToLayout(newTab)
       } catch (e) {
         setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
         return
@@ -98,18 +129,7 @@ const Documents = () => {
       console.error('Error handling file:', e)
       setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
     }
-  }, [setMessage, tabs])
-  
-  const layoutModel = useMemo(() => {
-    const model = {
-      global: { tabEnableClose: true },
-      layout: {
-        type: 'row',
-        children: [ ],
-      },
-    }
-    return Model.fromJson(model)
-  }, [])
+  }, [setMessage, tabs, addTabToLayout])
 
   const factory = (node: TabNode) => {
     const component = node.getComponent()
@@ -124,33 +144,12 @@ const Documents = () => {
       label: documentName,
       children: <App />
     }
-    if (layoutModel) {
-      addTabToLayout(newTab, layoutModel)
-    }
+    addTabToLayout(newTab)
     setTabs([...tabs, newTab])
     setDocumentName(DEFAULT_DOC_NAME)
   }
 
-  const addTabToLayout = (newTab: TabWithPath, layoutModel: Model) => {
-    const tabSetNode = layoutModel.getRoot().getChildren()[0]
-    
-    if (tabSetNode) {
-      layoutModel.doAction(
-        Actions.addNode(
-          {
-            type: 'tab',
-            name: newTab.label,
-            component: newTab.key, 
-            id: newTab.key 
-          },
-          tabSetNode.getId(),
-          DockLocation.CENTER,
-          0
-        )
-      )
-    }
-  }
-  
+ 
   const handleNew = async () => {
     if (window.electron) {
       const options = { 
@@ -169,9 +168,7 @@ const Documents = () => {
           children: <App filePath={filePath} />
         }
         setTabs([...tabs, newTab])
-        if (layoutModel) {
-          addTabToLayout(newTab, layoutModel)
-        }
+        addTabToLayout(newTab)
       } else {
         console.log('Cancelled')
         return
@@ -201,7 +198,7 @@ const Documents = () => {
         }
         setTabs([...tabs, newTab])
         if (layoutModel) {
-          addTabToLayout(newTab, layoutModel)
+          addTabToLayout(newTab)
         }
       }
     } else {
@@ -228,9 +225,7 @@ const Documents = () => {
             children: <App content={content} />
           }
           setTabs([...tabs, newTab])
-          if (layoutModel) {
-            addTabToLayout(newTab, layoutModel)
-          }
+          addTabToLayout(newTab)
         } catch (error) {
           Modal.error({
             title: 'Invalid File',
@@ -238,7 +233,6 @@ const Documents = () => {
           })
         }
       }
-
       input.click()
     }
   }
