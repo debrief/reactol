@@ -89,7 +89,7 @@
                       35.82
                   ]
               ],
-              "type": "MultiPoint"
+              "type": "LineString"
           },
           "id": "fc-1"
       }
