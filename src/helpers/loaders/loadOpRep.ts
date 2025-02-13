@@ -65,7 +65,7 @@ const convertToGeoJson = (data: OpRepData[], values: NewTrackProps): Feature<Geo
 
   const props: TrackProps = {
     dataType: TRACK_TYPE,
-    color: values.stroke,
+    stroke: values.stroke,
     name: values.name,
     shortName: values.shortName,
     visible: true,

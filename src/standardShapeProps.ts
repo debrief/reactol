@@ -58,7 +58,7 @@ export type PolygonStyleProps = LineStyleProps & {
   // the color of the interior of a polygon
   //
   // value must follow COLOR RULES
-  'fill': string,
+  'fill'?: string,
 
   // OPTIONAL: default 0.6
   // the opacity of the interior of a polygon. Implementations

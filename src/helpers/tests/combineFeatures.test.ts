@@ -8,7 +8,7 @@ const track: Feature = {
   type: 'Feature',
   properties: {
     dataType: TRACK_TYPE,
-    color: '#F00',
+    'stroke': '#F00',
     name: 'Track 1',
     courses: [1, 2, 3, 4, 5, 6],
     speeds: [11, 12, 13, 14, 15, 16],
