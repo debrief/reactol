@@ -170,6 +170,9 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
     if (values.stroke) {
       values.stroke = (values.stroke as unknown as Color).toHexString()
     }
+    if (values.fill) {
+      values.fill = (values.fill as unknown as Color).toHexString()
+    }
     const updatedProps= {...state, ...values} as FormTypeProps
     const convertedProps = convertBack(updatedProps)
     const combinedProps = ({...formProps, ...convertedProps})
@@ -230,7 +233,14 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
       </Form.Item>
       <Form.Item<FormTypeProps>
         label="Color"
-        name='color'
+        name='stroke'
+        style={itemStyle}
+        rules={[{ required: true, message: 'color is required!' }]}>
+        <ColorPicker format='hex' trigger='click' presets={presetColors} />
+      </Form.Item>
+      <Form.Item<FormTypeProps>
+        label="Fill"
+        name='fill'
         style={itemStyle}
         rules={[{ required: true, message: 'color is required!' }]}>
         <ColorPicker format='hex' trigger='click' presets={presetColors} />

@@ -1,7 +1,7 @@
 import * as turf from '@turf/turf'
-import { Feature, Geometry, Polygon, Position } from 'geojson'
+import { Feature, Polygon, Position } from 'geojson'
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
-import { Polyline, Polyline as ReactPolygon, Tooltip } from 'react-leaflet'
+import { Polyline, Polygon as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useMemo } from 'react'
 import { useDocContext } from '../../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
@@ -11,16 +11,6 @@ import { mouseOut, mouseOver } from '../commonHandlers'
 export interface ZoneProps {
   feature: Feature<Polygon>
   onClickHandler: { (id: string, modifier: boolean): void }
-}
-
-const colorFor = (feature: Feature<Geometry, unknown> | undefined): string => {
-  if (feature) {
-    const feat = feature as Feature
-    if (feat.properties) {
-      return feat.properties.stroke || '#ff0'
-    }
-  }
-  return '#000'
 }
 
 const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
@@ -34,7 +24,21 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
       : true
   }, [feature, timeStart, timeEnd, filterApplied])
 
-  const lineWeight = 2 
+  const color = useMemo(() => {
+    return feature.properties?.stroke || '#F0F'
+  }, [feature])
+
+  const fill = useMemo(() => {
+    return feature.properties?.fill || feature.properties?.stroke || '#F0F'  
+  }, [feature])
+
+  const lineWeight = useMemo(() => {
+    return feature.properties?.['stroke-width'] || 2
+  }, [feature])
+
+  const opacity = useMemo(() => {
+    return feature.properties?.['fill-opacity'] || 0.15
+  }, [feature])
 
   const polygon = useMemo(() => {
     const onclick = (evt: LeafletMouseEvent) => {
@@ -69,20 +73,20 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
             interactive={false}
             fill={false}
             weight={6}
-            opacity={0.7}
             color={'#fff'}
             eventHandlers={eventHandlers}
           ></ReactPolygon>
         )}
         <ReactPolygon
-          key={feature.id + '-polygon-' + isSelected}
+          key={feature.id + '-polygon-' + isSelected + lineWeight + color + fill}
           fill={true}
           positions={trackCoords}
           interactive={false}
           weight={lineWeight}
-          color={colorFor(feature)}
+          color={color}
+          fillColor={fill}
           eventHandlers={eventHandlers}
-          fillOpacity={ isSelected ? 0.15 : 0.1}
+          fillOpacity={ isSelected ? 0.65 : opacity}
         >
           <Tooltip
             className={'zone-label'}
@@ -101,13 +105,13 @@ const Zone: React.FC<ZoneProps> = ({ feature, onClickHandler }) => {
           positions={trackCoords}
           interactive={true}
           weight={lineWeight}
-          color={colorFor(feature)}
+          color={color}
           eventHandlers={eventHandlers}
         >
         </Polyline>
       </>
     )
-  }, [feature, isSelected, lineWeight, onClickHandler])
+  }, [feature, isSelected, lineWeight, onClickHandler, opacity, color, fill])
 
   return <>{isVisible && polygon}</>
 }
