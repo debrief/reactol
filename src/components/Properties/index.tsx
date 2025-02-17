@@ -12,7 +12,7 @@ import { TrackForm } from '../TrackForm'
 import { GroupForm } from '../GroupForm'
 import { BuoyFieldForm } from '../BuoyFieldForm'
 import { ZoneForm } from '../ZoneForm'
-
+import MultiFeatureForm from '../MultiFeatureForm'
 
 const Properties: React.FC = () => {
   const { selection, setSelection, newFeature, setNewFeature } = useDocContext()
@@ -99,28 +99,41 @@ const Properties: React.FC = () => {
       setOriginalState(newFeature)
       setFormDirty(false)
     } else {
-      if (!selectedFeatureIds || selectedFeatureIds.length === 0) {
-        setPropertyForm(<div>No feature selected</div>)
-        setOriginalState(null)
+      if (selectedFeatureIds.length === 0) {
         setFeatureState(null)
-      } else if (selectedFeatureIds && selectedFeatureIds.length > 1) {
-        setPropertyForm(<div>Multiple features selected</div>)
         setOriginalState(null)
-        setFeatureState(null)
-      } else {
-        const selectedFeatureId = selectedFeatureIds[0]
-        const selectedFeat = allFeatures.find((feature) => feature.id === selectedFeatureId)
-        if (selectedFeat) {
-          setOriginalState(selectedFeat)  
-          setFeatureState(selectedFeat)
-          setFormDirty(false)
-        } else {
-          setPropertyForm(<div>Feature not found</div>)
-        }    
+        setPropertyForm(null)
+        return
       }
-  
+
+      if (selectedFeatureIds.length > 1) {
+        // Multiple features selected
+        const selectedFeatures = allFeatures.filter(f => selectedFeatureIds.includes(f.id as string))
+        setPropertyForm(
+          <MultiFeatureForm 
+            features={selectedFeatures}
+            onDelete={() => {
+              dispatch({ type: 'fColl/featuresDeleted', payload: { ids: selectedFeatureIds } })
+              setSelection([])
+            }}
+          />
+        )
+        return
+      }
+
+      // Single feature selected - existing logic
+      const feature = allFeatures.find(
+        (f) => f.id === selectedFeatureIds[0]
+      )
+      if (feature) {
+        setOriginalState(feature)  
+        setFeatureState(feature)
+        setFormDirty(false)
+      } else {
+        setPropertyForm(<div>Feature not found</div>)
+      }    
     }
-  },[selectedFeatureIds, allFeatures, newFeature, setFeatureState, setOriginalState, setPropertyForm])
+  },[selectedFeatureIds, allFeatures, newFeature, setFeatureState, setOriginalState, setPropertyForm, dispatch])
 
   return propertyForm
 }
