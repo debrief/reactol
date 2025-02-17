@@ -8,7 +8,6 @@ import { AppDispatch } from '../../state/store'
 import { NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
 import { loadJson } from '../../helpers/loaders/loadJson'
-import { loadOpRep } from '../../helpers/loaders/loadOpRep'
 import Layers from '../Layers'
 import Properties from '../Properties'
 import Map from '../spatial/Map'
@@ -16,10 +15,13 @@ import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
+import { checkRepSuffix, loadRepPolygon } from '../../helpers/loaders/loadRepPolygon'
+import { loadOpRep } from '../../helpers/loaders/loadOpRep'
 
 interface FileHandler {
   blobType: string
   handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => void
+  checkName?: (name: string) => boolean
 }
 
 export interface TimeState {
@@ -31,7 +33,9 @@ export interface TimeState {
 
 const FileHandlers: FileHandler[] = [
   { blobType: 'application/json', handle: loadJson },
-  { blobType: 'text/plain', handle: loadOpRep } 
+  { blobType: 'text/plain', handle: loadOpRep },
+  // TODO: this next type is a dummy, for testing polygon performance
+  { blobType: 'unknown', handle: loadRepPolygon, checkName: checkRepSuffix }
 ]
 
 function Document({ filePath }: { filePath?: string }) {
@@ -111,7 +115,12 @@ function Document({ filePath }: { filePath?: string }) {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      const handler = file && FileHandlers.find(handler => handler.blobType === file.type)
+      let handler = file && FileHandlers.find(handler => handler.blobType === file.type)
+      console.log('handler 1:',handler , '-', file.type)
+      if (!handler) {
+        handler = file && FileHandlers.find(handler => handler.checkName && handler.checkName(file.name))
+      }
+      console.log('handler 2:',handler , '-', file.type)
       if (handler) {
         try {
           if (file.type === 'text/plain') {
