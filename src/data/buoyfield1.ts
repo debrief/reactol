@@ -9,7 +9,9 @@ const field: Feature<MultiPoint, BuoyFieldProps> = {
     'marker-color': '#FF0',
     name: 'Z12344',
     shortName: '12344',
-    visible: true
+    visible: true,
+    time: '2024-11-14T21:10:00.000Z',
+    timeEnd: '2024-11-15T04:10:00.000Z'
   },
   geometry: {
     type: 'MultiPoint',
