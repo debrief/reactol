@@ -97,7 +97,10 @@ export const EditFeature: React.FC = () => {
       allowCutting: false,
       draggable: true
     }
-    layerToEdit.pm.enable(editOptions)
+
+    setTimeout(() => {
+      layerToEdit.pm.enable(editOptions)
+    }, 100)
 
     setEditLayer(layerToEdit)
 
