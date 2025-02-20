@@ -133,7 +133,7 @@ const Properties: React.FC = () => {
         setPropertyForm(<div>Feature not found</div>)
       }    
     }
-  },[selectedFeatureIds, allFeatures, newFeature, setFeatureState, setOriginalState, setPropertyForm, dispatch])
+  },[selectedFeatureIds, allFeatures, newFeature, setFeatureState, setOriginalState, setPropertyForm, dispatch, setSelection])
 
   return propertyForm
 }
