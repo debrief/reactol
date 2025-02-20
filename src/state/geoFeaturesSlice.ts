@@ -69,11 +69,13 @@ const featuresSlice = createSlice({
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
       const cleaned = action.payload.map((feature) => cleanFeature([], feature))
-      const removeUpdated = state.features.filter((feature) => !cleaned.find((f) => f.id === feature.id))
-      state.features = removeUpdated.concat(cleaned)
+      state.features = state.features.map(feature => {
+        const update = cleaned.find(u => u.id === feature.id)
+        return update || feature
+      })
       state.bbox = updateBounds(state)
     },
-    featureVisibilities(state, action: PayloadAction<{ ids: string[], visible: boolean }>) {
+    featuresVisChange(state, action: PayloadAction<{ ids: string[], visible: boolean }>) {
       const { ids, visible } = action.payload
       state.features.forEach((feature) => {
         if (!feature.properties) {
@@ -82,14 +84,6 @@ const featuresSlice = createSlice({
         if (ids.includes(feature.id as string)) {
           feature.properties.visible = visible
         }
-      })
-      state.bbox = updateBounds(state)
-    },
-    featuresBatchUpdate(state, action: PayloadAction<Feature[]>) {
-      const updates = action.payload
-      state.features = state.features.map(feature => {
-        const update = updates.find(u => u.id === feature.id)
-        return update || feature
       })
       state.bbox = updateBounds(state)
     },
