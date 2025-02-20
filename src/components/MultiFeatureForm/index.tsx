@@ -8,6 +8,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
+import { BUOY_FIELD_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 
 const { Text } = Typography
 
@@ -39,7 +40,7 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
     const newVisibility = allHidden ? true : false
     const ids = features.map(f => f.id as string)
     dispatch({ 
-      type: 'fColl/featureVisibilities', 
+      type: 'fColl/featuresVisChange', 
       payload: { 
         ids,
         visible: newVisibility
@@ -47,15 +48,38 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
     })
   }
 
+  const colorPropsFor = (feature: Feature, color: string): { [Name: string]: number | string } => {
+    switch(feature.properties?.dataType) {
+    case REFERENCE_POINT_TYPE:
+    case BUOY_FIELD_TYPE:  
+      return {
+        'marker-color': color,
+      }
+    case ZONE_TYPE: 
+      return {
+        'stroke': color,
+        'fill': color 
+      }
+    case TRACK_TYPE:
+      return {
+        'stroke': color,
+      }
+    default: 
+      return {}  
+    }
+  }
+
   const handleColorChange = (value: Color) => {
+    const color = value.toHexString()
     const updates = features.map(feature => ({
       ...feature,
       properties: {
         ...feature.properties,
-        color: value.toHexString(),
+        ...colorPropsFor(feature, color),
+        color,
       }
     }))
-    dispatch({ type: 'fColl/featuresBatchUpdate', payload: updates })
+    dispatch({ type: 'fColl/featuresUpdated', payload: updates })
   }
 
   const itemStyle = { marginBottom: '0.5em' }
