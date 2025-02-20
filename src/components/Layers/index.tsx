@@ -47,7 +47,7 @@ type FieldDataNode = {
   children: FieldDataNode[]
 }
 
-const cleanGroup = (key: Key) => {
+const notGroups = (key: Key) => {
   return (key as string).indexOf(':') === -1
 }
 
@@ -365,7 +365,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
-    const cleaned = newKeysArr.filter(justLeaves).filter(cleanGroup)
+    const cleaned = newKeysArr.filter(justLeaves).filter(notGroups)
     if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
       setSelection(cleaned as string[])
     }
@@ -380,7 +380,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
     if (removedKeys.length !== 0) {
       const justNodes = removedKeys.filter(justLeaves)
-      const removeGroups = justNodes.filter(cleanGroup)
+      const removeGroups = justNodes.filter(notGroups)
       // if it is the key for an item in a group, then we have to extract the feature id
       const action = {
         type: 'fColl/featuresVisChange',
@@ -391,7 +391,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       // see if any keys have been added
       const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
       if (addedKeys.length !== 0) {
-        const cleanKeys = addedKeys.filter(justLeaves).filter(cleanGroup)
+        const cleanKeys = addedKeys.filter(justLeaves).filter(notGroups)
         const dedupedKeys = [...new Set(cleanKeys)]
         const action = {
           type: 'fColl/featuresVisChange',
