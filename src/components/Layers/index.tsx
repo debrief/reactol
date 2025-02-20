@@ -168,6 +168,11 @@ const isChecked = (feature: Feature): string => {
   return feature.properties?.visible
 }
 
+// filter out the branches, just leave the leaves
+const justLeaves = (id: Key): boolean => {
+  return !(id as string).startsWith('node-')
+}
+
 interface ToolProps {
   onClick: () => void
   icon: React.ReactNode
@@ -360,11 +365,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     }
   }, [features, handleAdd, addZone])
 
-  // filter out the branches, just leave the leaves
-  const justLeaves = (ids: Key[]): Key[] => {
-    return ids.filter((id) => !(id as string).startsWith('node-'))
-  }
-
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
 
@@ -385,8 +385,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       return
     } else {
       // keys have been added
-      const justNodes = justLeaves(selectedKeys)
-      const cleanedIds = justNodes.map(cleanGroup)
+      const justNodes = selectedKeys.filter(justLeaves)
+      const cleanedIds = justNodes.filter(cleanGroup)
       // de-dupe the cleaned ids
       const dedupedIds = [...new Set(cleanedIds)]
 
@@ -405,29 +405,24 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     // diff the new keys from the checked keys, to see if items have been removed
     const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
     if (removedKeys.length !== 0) {
-      const cleanChecked: Key[] = checkedKeys.map(cleanGroup)
-      const cleanRemoved = removedKeys.map(cleanGroup)
-      const cleanedGroup = cleanChecked.filter(
-        (key) => !cleanRemoved.includes(key)
-      )
-      const keys = justLeaves(cleanedGroup as Key[])
+      const justNodes = removedKeys.filter(justLeaves)
+      const removeGroups = justNodes.filter(cleanGroup)
       // if it is the key for an item in a group, then we have to extract the feature id
       const action = {
-        type: 'fColl/featureVisibilities',
-        payload: { ids: keys },
+        type: 'fColl/featuresVisChange',
+        payload: { ids: removeGroups, visible: false },
       }
-      // check if the payload selection is different from the current selection
       dispatch(action)
     } else {
       // see if any keys have been added
       const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
       if (addedKeys.length !== 0) {
-        const withNew = checkedKeys.concat(addedKeys)
-        const cleanKeys = withNew.map(cleanGroup)
+        const removeGroups = addedKeys.filter(cleanGroup)
+        const cleanKeys = (removeGroups as Key[]).filter(justLeaves)
         const dedupedKeys = [...new Set(cleanKeys)]
         const action = {
-          type: 'fColl/featureVisibilities',
-          payload: { ids: dedupedKeys },
+          type: 'fColl/featuresVisChange',
+          payload: { ids: dedupedKeys, visible: true },
         }
         dispatch(action)
       }
