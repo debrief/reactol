@@ -48,9 +48,7 @@ type FieldDataNode = {
 }
 
 const cleanGroup = (key: Key) => {
-  const colonIndex = (key as string).indexOf(':')
-  if (colonIndex === -1) return key
-  return (key as string).substring(colonIndex + 1)
+  return (key as string).indexOf(':') === -1
 }
 
 const findChildrenOfType = (
@@ -367,33 +365,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
-
-    // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = selectionWithGroups.filter(
-      (key) => !newKeysArr.includes(key)
-    )
-    if (removedKeys.length === 1) {
-      const key = removedKeys[0]
-      const childId = key.indexOf(':')
-        ? key.substring(key.indexOf(':') + 1)
-        : key
-      const trimmedList = selection.filter((id) => id !== childId)
-      // check if the payload selection is different from the current selection
-      if (JSON.stringify(trimmedList) !== JSON.stringify(selection)) {
-        setSelection(trimmedList as string[])
-      }
-      return
-    } else {
-      // keys have been added
-      const justNodes = selectedKeys.filter(justLeaves)
-      const cleanedIds = justNodes.filter(cleanGroup)
-      // de-dupe the cleaned ids
-      const dedupedIds = [...new Set(cleanedIds)]
-
-      // check if the payload selection is different from the current selection
-      if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
-        setSelection(dedupedIds as string[])
-      }
+    const cleaned = newKeysArr.filter(justLeaves).filter(cleanGroup)
+    if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
+      setSelection(cleaned as string[])
     }
   }
 
@@ -417,8 +391,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       // see if any keys have been added
       const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
       if (addedKeys.length !== 0) {
-        const removeGroups = addedKeys.filter(cleanGroup)
-        const cleanKeys = (removeGroups as Key[]).filter(justLeaves)
+        const cleanKeys = addedKeys.filter(justLeaves).filter(cleanGroup)
         const dedupedKeys = [...new Set(cleanKeys)]
         const action = {
           type: 'fColl/featuresVisChange',
