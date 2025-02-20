@@ -10,7 +10,6 @@ export const loadJson = (text: string, features: Feature<Geometry, GeoJsonProper
     const combined = combineFeatures(features, newFeatures)
     dispatch({ type: 'fColl/featuresAdded', payload: combined })
   } else if (json.type === 'Feature') {
-    console.log('about to add feature', json)
     const newFeature = json as Feature<Geometry, GeoJsonProperties>
     dispatch({ type: 'fColl/featureAdded', payload: newFeature })
   } else {
