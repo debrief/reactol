@@ -9,16 +9,25 @@ const initialState: FeatureCollection = {
   bbox: undefined
 }
 
+type idDictionary = { [name: string]: string } 
+
 let counter = 0
 
-export const cleanFeature = (existingIds: string[],feature: Feature): Feature => {
-  counter++
+/** note: this method modifies the contents of the `newIds` argument,
+ *  to keep track of the new feature ids
+ */
+export const cleanFeature = (existingIds: string[],feature: Feature, newIds?: idDictionary): Feature => {
+  const newIdsKeys =  Object.keys(newIds || {})
   if (!feature.id) {
-    feature.id = `f-${counter}`
-  }
-  while (existingIds.includes(feature.id as string)) {
     feature.id = `f-${++counter}`
   }
+  while (existingIds.includes(feature.id as string) || newIdsKeys?.includes(feature.id as string)) {
+    feature.id = `f-${++counter}`
+  }
+  if (newIds) {
+    newIds[feature.id as string] = feature.id as string
+  }  
+
   if (!feature.properties) {
     feature.properties = {}
   }
@@ -58,7 +67,9 @@ const featuresSlice = createSlice({
     },
     featuresAdded(state, action: PayloadAction<Feature[]>) {
       const existingIds = getExistingIds(state.features)
-      const cleaned = action.payload.map((feature) => cleanFeature(existingIds,feature))
+      // store new ids in a dictionary, so it is passed by reference
+      const newIds: idDictionary = {}
+      const cleaned = action.payload.map((feature) => cleanFeature(existingIds ,feature, newIds))
       state.features.push(...cleaned)
       state.bbox = updateBounds(state)
     },
@@ -68,9 +79,9 @@ const featuresSlice = createSlice({
       state.bbox = updateBounds(state)
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
-      const cleaned = action.payload.map((feature) => cleanFeature([], feature))
+      const updates = action.payload
       state.features = state.features.map(feature => {
-        const update = cleaned.find(u => u.id === feature.id)
+        const update = updates.find(u => u.id === feature.id)
         return update || feature
       })
       state.bbox = updateBounds(state)
