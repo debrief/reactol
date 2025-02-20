@@ -18,6 +18,27 @@ interface MultiFeatureFormProps {
   onExport?: () => void
 }
 
+const colorPropertiesForFeatureType = (featureType: string | undefined, color: string): { [Name: string]: number | string } => {
+  switch(featureType) {
+  case REFERENCE_POINT_TYPE:
+  case BUOY_FIELD_TYPE:  
+    return {
+      'marker-color': color,
+    }
+  case ZONE_TYPE: 
+    return {
+      'stroke': color,
+      'fill': color 
+    }
+  case TRACK_TYPE:
+    return {
+      'stroke': color,
+    }
+  default: 
+    return {}  
+  }
+}
+
 const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
   features,
   onDelete,
@@ -48,34 +69,13 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
     })
   }
 
-  const colorPropsFor = (feature: Feature, color: string): { [Name: string]: number | string } => {
-    switch(feature.properties?.dataType) {
-    case REFERENCE_POINT_TYPE:
-    case BUOY_FIELD_TYPE:  
-      return {
-        'marker-color': color,
-      }
-    case ZONE_TYPE: 
-      return {
-        'stroke': color,
-        'fill': color 
-      }
-    case TRACK_TYPE:
-      return {
-        'stroke': color,
-      }
-    default: 
-      return {}  
-    }
-  }
-
   const handleColorChange = (value: Color) => {
     const color = value.toHexString()
     const updates = features.map(feature => ({
       ...feature,
       properties: {
         ...feature.properties,
-        ...colorPropsFor(feature, color),
+        ...colorPropertiesForFeatureType(feature.properties?.dataType, color),
         color,
       }
     }))
