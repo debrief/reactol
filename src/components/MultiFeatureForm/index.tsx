@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Space, Typography, Tooltip, ColorPicker } from 'antd'
+import { Button, Space, Typography, Tooltip, ColorPicker, Form } from 'antd'
 import {
   DeleteOutlined,
   ExportOutlined
@@ -7,6 +7,7 @@ import {
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { Color } from 'antd/es/color-picker'
+import { presetColors } from '../../helpers/standardShades'
 
 const { Text } = Typography
 
@@ -57,42 +58,53 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
     dispatch({ type: 'fColl/featuresBatchUpdate', payload: updates })
   }
 
+  const itemStyle = { marginBottom: '0.5em' }
+
   return (
     <div style={{ padding: '16px' }}>
       <Space direction="vertical" style={{ width: '100%' }}>
         <Text strong>{features.length} items selected</Text>
-        
-        <Space>
-          <Button 
-            onClick={handleVisibilityChange}
-            type={mixedVisibility ? 'dashed' : 'default'}
-          >
-            {allVisible ? 'Hide All' : allHidden ? 'Show All' : 'Mixed Visibility'}
-          </Button>
-
-          <ColorPicker
-            value={currentColor}
-            onChange={handleColorChange}
-            disabled={false}
-          />
-
-          <Tooltip title="Delete selected features">
+        <Form name='multi-feature-form'
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 16 }}
+          style={{ maxWidth: 400 }}
+          autoComplete='off'
+          size='small'>
+          <Form.Item label='Visibility' style={itemStyle}>
             <Button 
-              icon={<DeleteOutlined />} 
-              onClick={onDelete}
-              danger
+              onClick={handleVisibilityChange}
+              type={mixedVisibility ? 'dashed' : 'default'}
+            >
+              {allVisible ? 'Hide All' : allHidden ? 'Show All' : 'Mixed Visibility'}
+            </Button>
+          </Form.Item>
+          <Form.Item label='Color' style={itemStyle}>
+            <ColorPicker
+              value={currentColor}
+              trigger='click'
+              onChange={handleColorChange}
+              disabled={false}
+              presets={presetColors}
             />
-          </Tooltip>
-
-          {onExport && (
-            <Tooltip title="Export selected features">
+          </Form.Item>
+          <Form.Item label='Delete' style={itemStyle}>
+            <Tooltip title="Delete selected features">
               <Button 
-                icon={<ExportOutlined />} 
-                onClick={onExport}
+                icon={<DeleteOutlined />} 
+                onClick={onDelete}
+                danger
               />
             </Tooltip>
-          )}
-        </Space>
+          </Form.Item>
+        </Form>
+        {onExport && (
+          <Tooltip title="Export selected features">
+            <Button 
+              icon={<ExportOutlined />} 
+              onClick={onExport}
+            />
+          </Tooltip>
+        )}
       </Space>
     </div>
   )
