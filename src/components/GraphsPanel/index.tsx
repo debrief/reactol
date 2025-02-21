@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Button } from 'antd'
-import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory'
+import { Select, Space, Checkbox } from 'antd'
+import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme, VictoryLegend } from 'victory'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { GraphDataset } from '../GraphModal'
@@ -10,7 +10,7 @@ import { toShortDTG } from '../../helpers/toDTG'
 export const GraphsPanel: React.FC = () => {
   const features = useAppSelector((state) => state.fColl.features)
   const [showDepth, setShowDepth] = useState<boolean>(false)
-  const [showLegend, setShowLegend] = useState<boolean>(false)
+  const [showLegend, setShowLegend] = useState<boolean>(true)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
   const [data, setData] = useState<GraphDataset[]>([])
@@ -18,10 +18,14 @@ export const GraphsPanel: React.FC = () => {
   const tracks = useMemo(() => 
     features.filter((feature) => feature.properties?.dataType === 'track')
       .map(track => ({
-        label: track.properties?.name || track.id,
+        label: track.properties?.shortName || track.properties?.name || track.id,
         value: track.id
       }))
   , [features])
+
+  const filteredOptions = useMemo(() => 
+    tracks.filter(track => track.value !== primaryTrack)
+  , [primaryTrack, tracks])
 
   // Update data when tracks or calculations change
   useMemo(() => {
@@ -44,11 +48,17 @@ export const GraphsPanel: React.FC = () => {
     setData([...bearingData, ...rangeData])
   }, [primaryTrack, secondaryTracks, features])
 
-  console.log('data', data)
-
   const bearingData = data.filter(d => d.label.includes('Bearing'))
   const rangeData = data.filter(d => !d.label.includes('Bearing'))
-  const fontSize = 14
+  const fontSize = 18
+
+  const legendData = useMemo(() => 
+    rangeData.map(dataset => ({
+      name: dataset.featureName,
+      symbol: { fill: dataset.color || '#1890ff' }
+    }))
+  , [rangeData])
+
   return (
     <div style={{ 
       display: 'flex',
@@ -58,28 +68,32 @@ export const GraphsPanel: React.FC = () => {
       gap: '16px'
     }}>
       <div>
-        <Space>
+        <Space align='center'>
+          Primary:
           <Select
             placeholder="Primary Track"
-            style={{ width: 200 }}
+            style={{ width: 100 }}
             value={primaryTrack}
+            size="small"
             onChange={setPrimaryTrack}
             options={tracks}
           />
+          Secondary:
           <Select
             mode="multiple"
             placeholder="Secondary Tracks/Zones/Points"
-            style={{ width: 300 }}
+            //style={{ width: 200 }}
             value={secondaryTracks}
             onChange={setSecondaryTracks}
-            options={tracks}
+            maxTagCount={'responsive'}
+            options={filteredOptions}
           />
-          <Button onClick={() => setShowDepth(!showDepth)}>
-            {showDepth ? 'Hide' : 'Show'} Depth
-          </Button>
-          <Button onClick={() => setShowLegend(!showLegend)}>
-            {showLegend ? 'Hide' : 'Show'} Legend
-          </Button>
+          <Checkbox onClick={() => setShowDepth(!showDepth)}>
+            Depth
+          </Checkbox>
+          <Checkbox onClick={() => setShowLegend(!showLegend)}>
+            Legend
+          </Checkbox>
         </Space>
       </div>
 
@@ -93,6 +107,18 @@ export const GraphsPanel: React.FC = () => {
             padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
             domainPadding={{ x: 50, y: 50 }}
           >
+            {showLegend && legendData.length > 0 && (
+              <VictoryLegend
+                x={80}
+                y={0}
+                orientation="horizontal"
+                gutter={20}
+                style={{ 
+                  labels: { fontSize }
+                }}
+                data={legendData}
+              />
+            )}
             <VictoryAxis
               tickFormat={(t) => toShortDTG(t)}
               style={{
