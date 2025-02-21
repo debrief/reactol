@@ -47,10 +47,8 @@ type FieldDataNode = {
   children: FieldDataNode[]
 }
 
-const cleanGroup = (key: Key) => {
-  const colonIndex = (key as string).indexOf(':')
-  if (colonIndex === -1) return key
-  return (key as string).substring(colonIndex + 1)
+const notGroups = (key: Key) => {
+  return (key as string).indexOf(':') === -1
 }
 
 const findChildrenOfType = (
@@ -166,6 +164,11 @@ const nameFor = (feature: Feature): string => {
 
 const isChecked = (feature: Feature): string => {
   return feature.properties?.visible
+}
+
+// filter out the branches, just leave the leaves
+const justLeaves = (id: Key): boolean => {
+  return !(id as string).startsWith('node-')
 }
 
 interface ToolProps {
@@ -360,40 +363,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     }
   }, [features, handleAdd, addZone])
 
-  // filter out the branches, just leave the leaves
-  const justLeaves = (ids: Key[]): Key[] => {
-    return ids.filter((id) => !(id as string).startsWith('node-'))
-  }
-
   const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
-
-    // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = selectionWithGroups.filter(
-      (key) => !newKeysArr.includes(key)
-    )
-    if (removedKeys.length === 1) {
-      const key = removedKeys[0]
-      const childId = key.indexOf(':')
-        ? key.substring(key.indexOf(':') + 1)
-        : key
-      const trimmedList = selection.filter((id) => id !== childId)
-      // check if the payload selection is different from the current selection
-      if (JSON.stringify(trimmedList) !== JSON.stringify(selection)) {
-        setSelection(trimmedList as string[])
-      }
-      return
-    } else {
-      // keys have been added
-      const justNodes = justLeaves(selectedKeys)
-      const cleanedIds = justNodes.map(cleanGroup)
-      // de-dupe the cleaned ids
-      const dedupedIds = [...new Set(cleanedIds)]
-
-      // check if the payload selection is different from the current selection
-      if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
-        setSelection(dedupedIds as string[])
-      }
+    const cleaned = newKeysArr.filter(justLeaves).filter(notGroups)
+    if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
+      setSelection(cleaned as string[])
     }
   }
 
@@ -405,29 +379,23 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     // diff the new keys from the checked keys, to see if items have been removed
     const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
     if (removedKeys.length !== 0) {
-      const cleanChecked: Key[] = checkedKeys.map(cleanGroup)
-      const cleanRemoved = removedKeys.map(cleanGroup)
-      const cleanedGroup = cleanChecked.filter(
-        (key) => !cleanRemoved.includes(key)
-      )
-      const keys = justLeaves(cleanedGroup as Key[])
+      const justNodes = removedKeys.filter(justLeaves)
+      const removeGroups = justNodes.filter(notGroups)
       // if it is the key for an item in a group, then we have to extract the feature id
       const action = {
-        type: 'fColl/featureVisibilities',
-        payload: { ids: keys },
+        type: 'fColl/featuresVisChange',
+        payload: { ids: removeGroups, visible: false },
       }
-      // check if the payload selection is different from the current selection
       dispatch(action)
     } else {
       // see if any keys have been added
       const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
       if (addedKeys.length !== 0) {
-        const withNew = checkedKeys.concat(addedKeys)
-        const cleanKeys = withNew.map(cleanGroup)
+        const cleanKeys = addedKeys.filter(justLeaves).filter(notGroups)
         const dedupedKeys = [...new Set(cleanKeys)]
         const action = {
-          type: 'fColl/featureVisibilities',
-          payload: { ids: dedupedKeys },
+          type: 'fColl/featuresVisChange',
+          payload: { ids: dedupedKeys, visible: true },
         }
         dispatch(action)
       }
