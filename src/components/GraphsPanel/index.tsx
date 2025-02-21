@@ -7,6 +7,12 @@ import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { GraphDataset } from '../GraphModal'
 import { toShortDTG } from '../../helpers/toDTG'
 
+type OptionType = {
+  label: string
+  value: string
+  dataType: string
+}
+
 export const GraphsPanel: React.FC = () => {
   const features = useAppSelector((state) => state.fColl.features)
   const [showDepth, setShowDepth] = useState<boolean>(false)
@@ -15,17 +21,21 @@ export const GraphsPanel: React.FC = () => {
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
   const [data, setData] = useState<GraphDataset[]>([])
 
-  const tracks = useMemo(() => 
-    features.filter((feature) => feature.properties?.dataType === 'track')
-      .map(track => ({
-        label: track.properties?.shortName || track.properties?.name || track.id,
-        value: track.id
-      }))
+  const featureOptions: OptionType[] = useMemo(() => 
+    features.map(track => ({
+      label: track.properties?.shortName || track.properties?.name || track.id,
+      value: track.id as string,
+      dataType: track.properties?.dataType as string
+    }))
   , [features])
 
-  const filteredOptions = useMemo(() => 
-    tracks.filter(track => track.value !== primaryTrack)
-  , [primaryTrack, tracks])
+  const trackOptions: OptionType[] = useMemo(() =>
+    featureOptions.filter((feature) => feature.dataType === 'track')
+  , [featureOptions])
+
+  const secondaryOptions = useMemo(() => 
+    featureOptions.filter(track => track.value !== primaryTrack)
+  , [primaryTrack, featureOptions])
 
   // Update data when tracks or calculations change
   useMemo(() => {
@@ -76,17 +86,17 @@ export const GraphsPanel: React.FC = () => {
             value={primaryTrack}
             size="small"
             onChange={setPrimaryTrack}
-            options={tracks}
+            options={trackOptions}
           />
           Secondary:
           <Select
             mode="multiple"
             placeholder="Secondary Tracks/Zones/Points"
-            //style={{ width: 200 }}
+            style={{ width: 200 }}
             value={secondaryTracks}
             onChange={setSecondaryTracks}
             maxTagCount={'responsive'}
-            options={filteredOptions}
+            options={secondaryOptions}
           />
           <Checkbox onClick={() => setShowDepth(!showDepth)}>
             Depth
