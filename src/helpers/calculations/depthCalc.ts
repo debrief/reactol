@@ -3,7 +3,7 @@ import { isTemporal } from '../trackCalculations'
 import { Calculation, GraphDataset } from '../../types'
 
 export const depthCalc: Calculation = {
-  label: 'Depth',
+  label: 'Depth (m)',
   value: 'depth',
   isRelative: false,
   calculate:(features: Feature[]): GraphDataset[] => {
