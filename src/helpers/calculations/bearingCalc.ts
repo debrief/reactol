@@ -22,10 +22,13 @@ export const bearingCalc: Calculation = {
   value: 'bearing',
   isRelative: true,
   calculate:(features: Feature[], baseId?: string): GraphDataset[] => {
-    const temporal = features.filter(isTemporal)
+    if (features.length === 0) {
+      return []
+    }
+    const temporal: Feature[] = features.filter(isTemporal)
     const baseTrack = temporal.find((feature) => feature.id === baseId)
     if (!baseTrack) {
-      console.warn('Couldn\'t find base track', baseId)
+      console.warn('Couldn\'t find base track', baseId, features)
       return []
     }
     const nonBaseTemporal = temporal.filter((feature) => feature.id !== baseId)
