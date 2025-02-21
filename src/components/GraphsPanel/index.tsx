@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Checkbox } from 'antd'
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme, VictoryLegend } from 'victory'
@@ -6,6 +7,8 @@ import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { GraphDataset } from '../GraphModal'
 import { toShortDTG } from '../../helpers/toDTG'
+import { useDocContext } from '../../state/DocContext'
+import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 
 type OptionType = {
   label: string
@@ -15,6 +18,7 @@ type OptionType = {
 
 export const GraphsPanel: React.FC = () => {
   const features = useAppSelector((state) => state.fColl.features)
+  const { time } = useDocContext()
   const [showDepth, setShowDepth] = useState<boolean>(false)
   const [showLegend, setShowLegend] = useState<boolean>(true)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
@@ -44,22 +48,63 @@ export const GraphsPanel: React.FC = () => {
       return
     }
 
-    const tracksToPlot = features.filter(track => 
+    const featuresToPlot = features.filter(track => 
       track.id === primaryTrack || secondaryTracks.includes(track.id as string)
     )
 
-    const bearingData = bearingCalc.calculate(tracksToPlot, primaryTrack)
-    const rangeData = rangeCalc.calculate(tracksToPlot, primaryTrack)
-    
-    console.log('bearingData', tracksToPlot, bearingData)
-    console.log('rangeData', rangeData)
+    // check if there is a time filter
+    let filteredTracks: Feature[] = featuresToPlot
+    console.log('update data', time?.filterApplied)
+    if (time &&  time.filterApplied) {
+      const { start, end } = time
+      const liveFeatures = featuresToPlot.filter(track => 
+        featureIsVisibleInPeriod(track, start, end))
+      filteredTracks = liveFeatures.map(feature => {
+        if (feature.properties?.dataType === 'track') {
+          const lineFeature = feature as Feature<LineString>
+          if (!feature.properties?.times) {
+            return feature
+          }
+          let startIndex = -1, endIndex = 0
+          const times = feature.properties.times
+          for (let i = 0; i < times.length; i++) {
+            const time = new Date(times[i]).getTime()
+            if (startIndex === -1 && time >= start && time <= end) {
+              startIndex = i
+            }
+            if (time > start && time <= end) {
+              endIndex = i
+            }
+          }
+          const res: Feature<LineString> = {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              times: feature.properties.times.slice(startIndex, endIndex + 1),
+              speeds: feature.properties.speeds.slice(startIndex, endIndex + 1),
+              courses: feature.properties.courses.slice(startIndex, endIndex + 1),
+            },
+            geometry: {
+              type: 'LineString',
+              coordinates: lineFeature.geometry.coordinates.slice(startIndex, endIndex + 1)
+            }
+          }
+          return res
+        } else {
+          return feature
+        }
+      })
+    }
 
+    const bearingData = bearingCalc.calculate(filteredTracks, primaryTrack)
+    const rangeData = rangeCalc.calculate(filteredTracks, primaryTrack)
+    
     setData([...bearingData, ...rangeData])
-  }, [primaryTrack, secondaryTracks, features])
+  }, [primaryTrack, secondaryTracks, features, time])
 
   const bearingData = data.filter(d => d.label.includes('Bearing'))
   const rangeData = data.filter(d => !d.label.includes('Bearing'))
-  const fontSize = 18
+  const fontSize = 12
 
   const legendData = useMemo(() => 
     rangeData.map(dataset => ({
@@ -142,7 +187,7 @@ export const GraphsPanel: React.FC = () => {
                 tickLabels: { fontSize: fontSize, padding: 5 },
                 axisLabel: { fontSize: fontSize, padding: 30 }
               }}
-              label="Range (nm)"
+              label={rangeCalc.label}
             />
             {/* Bearing axis (right) */}
             <VictoryAxis
@@ -156,7 +201,7 @@ export const GraphsPanel: React.FC = () => {
                 axisLabel: { fontSize: fontSize, padding: 30 },
                 axis: { strokeDasharray: '4,4' }
               }}
-              label="Bearing (°)"
+              label={bearingCalc.label}
             />
             {/* Range data */}
             <VictoryGroup>
