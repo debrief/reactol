@@ -1,9 +1,9 @@
-import { Calculation, GraphDataset, GraphDatum } from '../../components/GraphModal'
 import { Feature, LineString, MultiPolygon, Point, Polygon, Position } from 'geojson'
 import * as turf from '@turf/turf'
 import nearestPoint from '@turf/nearest-point'
 import pointToPolygonDistance from '@turf/point-to-polygon-distance'
 import pointToLineDistance from '@turf/point-to-line-distance'
+import { Calculation, GraphDataset, GraphDatum } from '../../types'
 
 /** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter
  * then return the coordinates of the point at that index

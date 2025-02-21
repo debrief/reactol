@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react'
+import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Checkbox } from 'antd'
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme, VictoryLegend } from 'victory'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
-import { GraphDataset } from '../GraphModal'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
+import { GraphDataset } from '../../types'
 
 type OptionType = {
   label: string
@@ -54,7 +54,6 @@ export const GraphsPanel: React.FC = () => {
 
     // check if there is a time filter
     let filteredTracks: Feature[] = featuresToPlot
-    console.log('update data', time?.filterApplied)
     if (time &&  time.filterApplied) {
       const { start, end } = time
       const liveFeatures = featuresToPlot.filter(track => 
@@ -142,10 +141,10 @@ export const GraphsPanel: React.FC = () => {
             maxTagCount={'responsive'}
             options={secondaryOptions}
           />
-          <Checkbox onClick={() => setShowDepth(!showDepth)}>
+          <Checkbox checked={showDepth} onClick={() => setShowDepth(!showDepth)}>
             Depth
           </Checkbox>
-          <Checkbox onClick={() => setShowLegend(!showLegend)}>
+          <Checkbox checked={showLegend} onClick={() => setShowLegend(!showLegend)}>
             Legend
           </Checkbox>
         </Space>
@@ -156,8 +155,9 @@ export const GraphsPanel: React.FC = () => {
           <VictoryChart
             theme={VictoryTheme.material}
             scale={{ x: 'time' }}
-            width={1000}
-            height={500}
+            standalone={true}
+            width={800}
+            height={300}
             padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
             domainPadding={{ x: 50, y: 50 }}
           >

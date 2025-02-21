@@ -1,4 +1,4 @@
-import { Calculation, GraphDataset, GraphDatum } from '../../components/GraphModal'
+import { Calculation, GraphDataset, GraphDatum } from '../../types'
 import { Feature, LineString, Position } from 'geojson'
 import { isTemporal } from '../trackCalculations'
 import * as turf from '@turf/turf'
@@ -18,7 +18,7 @@ const nearestPoint = (feature: Feature, time: number): Position | undefined => {
 }
 
 export const bearingCalc: Calculation = {
-  label: 'Bearing',
+  label: 'Bearing (°)',
   value: 'bearing',
   isRelative: true,
   calculate:(features: Feature[], baseId?: string): GraphDataset[] => {

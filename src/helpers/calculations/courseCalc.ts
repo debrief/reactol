@@ -1,4 +1,4 @@
-import { Calculation, GraphDataset } from '../../components/GraphModal'
+import { Calculation, GraphDataset } from '../../types'
 import { Feature } from 'geojson'
 import { isTemporal } from '../trackCalculations'
 

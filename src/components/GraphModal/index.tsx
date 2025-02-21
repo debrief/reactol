@@ -14,6 +14,7 @@ import { courseCalc } from '../../helpers/calculations/courseCalc'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { useAppSelector } from '../../state/hooks'
 import { formatInTimeZone } from 'date-fns-tz'
+import { Calculation, GraphDataset } from '../../types'
 
 const { Title, Text } = Typography
 
@@ -34,19 +35,6 @@ interface GraphForm {
   baseTrack: string
 };
 
-export interface Calculation {
-  label: string
-  value: string
-  isRelative: boolean
-  calculate: {(features: Feature[], baseId?: string): GraphDataset[]}
-}
-
-export type GraphDatum = { date: number, value: number | null }
-
-export type GraphDataset = { label: string, 
-  featureName: string,
-  color?: string,
-  data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
