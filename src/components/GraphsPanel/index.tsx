@@ -55,7 +55,7 @@ const filteredTrack = (feature: Feature, start: number, end: number) => {
 export const GraphsPanel: React.FC = () => {
   const features = useAppSelector((state) => state.fColl.features)
   const { time } = useDocContext()
-  const [showDepth, setShowDepth] = useState<boolean>(false)
+  const [showDepth, setShowDepth] = useState<boolean>(true)
   const [showLegend, setShowLegend] = useState<boolean>(true)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
@@ -194,6 +194,7 @@ export const GraphsPanel: React.FC = () => {
                 tickLabels: { fontSize: fontSize, padding: 5 },
                 axisLabel: { fontSize: fontSize, padding: 30 }
               }}
+              orientation='bottom'
             />
             <VictoryAxis
               dependentAxis
@@ -202,6 +203,7 @@ export const GraphsPanel: React.FC = () => {
                 axisLabel: { fontSize: fontSize, padding: 30 }
               }}
               label={depthCalc.label}
+              tickFormat={(t: number) => `${Math.abs(t)}`}
             />
             {/* Depth data */}
             <VictoryGroup>
