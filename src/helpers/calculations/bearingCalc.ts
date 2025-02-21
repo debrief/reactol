@@ -49,7 +49,7 @@ export const bearingCalc: Calculation = {
 
       const nonNullRanges = ranges ? ranges.filter((range: GraphDatum | undefined) => range !== undefined) as GraphDatum[] : []
         
-      return {label: name + ' Bearing', color: feature.properties?.stroke || undefined, data: nonNullRanges}
+      return {label: name + ' Bearing', color: feature.properties?.stroke || undefined, data: nonNullRanges, featureName: name}
     })
   }
 }

@@ -31,7 +31,7 @@ export const rangeCalc: Calculation = {
     const nonBaseTemporal = temporal.filter((feature) => feature.id !== baseId)
     const baseGeom = baseTrack.geometry as LineString
     return nonBaseTemporal.map((feature) => {
-      const name = feature.properties?.name || feature.id
+      const name = feature.properties?.shortName || feature.properties?.name || feature.id
 
       const ranges = baseTrack.properties?.times.map((time: number, index: number): GraphDatum | undefined => {
         const targetPoint = nearestPoint(feature, time)
@@ -48,7 +48,7 @@ export const rangeCalc: Calculation = {
 
       const nonNullRanges = ranges ? ranges.filter((range: GraphDatum | undefined) => range !== undefined) as GraphDatum[] : []
         
-      return {label: name + ' Range', color: feature.properties?.stroke || undefined, data: nonNullRanges}
+      return {label: name + ' Range', color: feature.properties?.stroke || undefined, data: nonNullRanges, featureName: name}
     })
   }
 }
