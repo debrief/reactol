@@ -67,7 +67,7 @@ const distanceToFeature = (feature: Feature, basePoint: Feature<Point>): number 
 }
 
 export const rangeCalc: Calculation = {
-  label: 'Range',
+  label: 'Range (m)',
   value: 'range',
   isRelative: true,
   calculate:(features: Feature[], baseId?: string): GraphDataset[] => {
@@ -84,7 +84,6 @@ export const rangeCalc: Calculation = {
         const basePoint = baseGeom.coordinates[index]
         const turfBase = turf.point(basePoint)
         if (feature.properties?.times !== undefined) {
-          console.log('track calc', name)
           const nearestPoint = nearestPointTrack(feature, time)
           if (nearestPoint === undefined) {
             return undefined
