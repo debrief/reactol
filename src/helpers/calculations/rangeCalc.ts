@@ -46,7 +46,7 @@ const distanceToFeature = (feature: Feature, basePoint: Feature<Point>): number 
   case 'Polygon':
   {
     const geom = feature as Feature<Polygon>
-    const dist = pointToPolygonDistance(basePoint,geom)
+    const dist = pointToPolygonDistance(basePoint, geom)
     return dist
   }
   case 'MultiPolygon':
