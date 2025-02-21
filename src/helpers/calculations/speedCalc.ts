@@ -16,7 +16,7 @@ export const speedCalc: Calculation = {
 
 
       return {label: name + ' Speed', color: feature.properties?.stroke || undefined, data: feature.properties?.times.map((time: number, index: number) => {
-        return {date: new Date(time).getTime(), value: feature.properties?.speeds[index]}})}
+        return {date: new Date(time).getTime(), value: feature.properties?.speeds[index]}}), featureName: name}
     })
   }
 }

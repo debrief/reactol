@@ -107,7 +107,7 @@ const getIcon = (feature: Feature | undefined,
 
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
-  const color = feature.properties?.stroke
+  const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
   const environment = feature.properties?.env
   return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
 }
@@ -159,7 +159,7 @@ const idFor = (feature: Feature): string => {
 }
 
 const nameFor = (feature: Feature): string => {
-  return feature.properties?.name || feature.id
+  return (feature.properties?.name || feature.id) + ' : ' + feature.id
 }
 
 const isChecked = (feature: Feature): string => {

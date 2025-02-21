@@ -1,6 +1,7 @@
 import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE } from './constants'
 import { LineStyleProps, PointStyleProps, PolygonStyleProps } from './standardShapeProps.ts'
 import { ZoneShapeProps } from './zoneShapeTypes.ts'
+import { Feature } from 'geojson'
 
 /** just a centre time if time provided, else start and end times */
 export type TemporalShapeProps = {time?: string, timeEnd?: string} 
@@ -55,3 +56,18 @@ export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'l
 export type AddTrackProps = {
   trackId: string
 }
+
+// graph support types
+export interface Calculation {
+  label: string
+  value: string
+  isRelative: boolean
+  calculate: {(features: Feature[], baseId?: string): GraphDataset[]}
+}
+
+export type GraphDatum = { date: number, value: number | null }
+
+export type GraphDataset = { label: string, 
+  featureName: string,
+  color?: string,
+  data: GraphDatum[] }

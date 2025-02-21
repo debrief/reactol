@@ -1,4 +1,4 @@
-import { Calculation, GraphDataset } from '../../components/GraphModal'
+import { Calculation, GraphDataset } from '../../types'
 import { Feature } from 'geojson'
 import { isTemporal } from '../trackCalculations'
 
@@ -15,7 +15,7 @@ export const courseCalc: Calculation = {
       const name = feature.properties?.name || feature.id
 
       return {label: name + ' Course', color: feature.properties?.stroke || undefined, data: feature.properties?.times.map((time: number, index: number) => {
-        return {date: new Date(time).getTime(), value: feature.properties?.courses[index]}})}
+        return {date: new Date(time).getTime(), value: feature.properties?.courses[index]}}), featureName: name}
     })
   }
 }

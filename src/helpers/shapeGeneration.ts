@@ -71,16 +71,14 @@ export const generateCirclePoints = (
   const points: Position[] = []
   const angleStep = (endAngle - startAngle) / numPoints
   const radiusDegrees = metersToDegreesAtLatitude(radiusM, origin[1])
-  
+
   for (let i = 0; i <= numPoints; i++) {
-    const angle = (90 - (startAngle + i * angleStep)) * DEG_TO_RAD
+    const coreAngle = (startAngle + i * angleStep)
+    const angleDegs = (90 - coreAngle)
+    const angle = angleDegs * DEG_TO_RAD
     const x = origin[0] + radiusDegrees * Math.cos(angle)
     const y = origin[1] + radiusDegrees * Math.sin(angle)
     points.push([x, y])
-  }
-  
-  if (endAngle - startAngle === 360) {
-    points.push([points[0][0], points[0][1]])
   }
   
   return points
@@ -144,7 +142,8 @@ export const generateShapeCoordinates = (specifics: ZoneShapeProps, coordinates:
     }
     const outerArc = generateCirclePoints(origin, outerRadiusM, startAngle, endAngle)
     const innerArc = generateCirclePoints(origin, innerRadiusM, endAngle, startAngle)
-    return [[...outerArc, ...innerArc, outerArc[0]]]
+    const combined = [[...outerArc, ...innerArc, outerArc[0]]]
+    return [combined[0].reverse()]
   }
   
   case CIRCULAR_SECTOR_SHAPE: {

@@ -1,4 +1,4 @@
-import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
+import { Alert, Card, ConfigProvider, Modal, Splitter, Tabs } from 'antd'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TileLayer } from 'react-leaflet'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
@@ -16,6 +16,7 @@ import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
+import { GraphsPanel } from '../GraphsPanel'
 
 interface FileHandler {
   blobType: string
@@ -162,6 +163,17 @@ function Document({ filePath }: { filePath?: string }) {
     }
   }, [filePath, storeContents])
 
+  const detailTabs = [ {
+    key: '1',
+    label: 'Detail',
+    children: <Properties />
+  }, 
+  { 
+    key: '2',
+    label: 'Graphs',
+    children: <GraphsPanel />
+  }]
+
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
@@ -183,9 +195,7 @@ function Document({ filePath }: { filePath?: string }) {
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
-                <Card title='Detail'>
-                  <Properties />
-                </Card>
+                <Tabs defaultActiveKey="1" items={detailTabs} />
               </Splitter.Panel>
             </Splitter>
           </Splitter.Panel>
