@@ -71,7 +71,6 @@ export const rangeCalc: Calculation = {
   value: 'range',
   isRelative: true,
   calculate:(features: Feature[], baseId?: string): GraphDataset[] => {
-    console.clear()
     const baseTrack = features.find((feature) => feature.id === baseId)
     if (!baseTrack) {
       console.warn('Couldn\'t find base track', baseId)
