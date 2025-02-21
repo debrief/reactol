@@ -8,12 +8,48 @@ import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
-import { GraphDataset } from '../../types'
+import { depthCalc } from '../../helpers/calculations/depthCalc'
 
 type OptionType = {
   label: string
   value: string
   dataType: string
+}
+
+const filteredTrack = (feature: Feature, start: number, end: number) => {
+  if (feature.properties?.dataType === 'track') {
+    const lineFeature = feature as Feature<LineString>
+    if (!feature.properties?.times) {
+      return feature
+    }
+    let startIndex = -1, endIndex = 0
+    const times = feature.properties.times
+    for (let i = 0; i < times.length; i++) {
+      const time = new Date(times[i]).getTime()
+      if (startIndex === -1 && time >= start && time <= end) {
+        startIndex = i
+      }
+      if (time > start && time <= end) {
+        endIndex = i
+      }
+    }
+    const res: Feature<LineString> = {
+      ...feature,
+      properties: {
+        ...feature.properties,
+        times: feature.properties.times.slice(startIndex, endIndex + 1),
+        speeds: feature.properties.speeds.slice(startIndex, endIndex + 1),
+        courses: feature.properties.courses.slice(startIndex, endIndex + 1),
+      },
+      geometry: {
+        type: 'LineString',
+        coordinates: lineFeature.geometry.coordinates.slice(startIndex, endIndex + 1)
+      }
+    }
+    return res
+  } else {
+    return feature
+  }
 }
 
 export const GraphsPanel: React.FC = () => {
@@ -23,7 +59,6 @@ export const GraphsPanel: React.FC = () => {
   const [showLegend, setShowLegend] = useState<boolean>(true)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
-  const [data, setData] = useState<GraphDataset[]>([])
 
   const featureOptions: OptionType[] = useMemo(() => 
     features.map(track => ({
@@ -41,68 +76,42 @@ export const GraphsPanel: React.FC = () => {
     featureOptions.filter(track => track.value !== primaryTrack)
   , [primaryTrack, featureOptions])
 
-  // Update data when tracks or calculations change
-  useMemo(() => {
-    if (!primaryTrack || secondaryTracks.length === 0) {
-      setData([])
-      return
-    }
-
-    const featuresToPlot = features.filter(track => 
+  const featuresToPlot = useMemo(() => 
+    features.filter(track => 
       track.id === primaryTrack || secondaryTracks.includes(track.id as string)
     )
+  , [primaryTrack, secondaryTracks, features])
 
-    // check if there is a time filter
-    let filteredTracks: Feature[] = featuresToPlot
-    if (time &&  time.filterApplied) {
-      const { start, end } = time
-      const liveFeatures = featuresToPlot.filter(track => 
-        featureIsVisibleInPeriod(track, start, end))
-      filteredTracks = liveFeatures.map(feature => {
-        if (feature.properties?.dataType === 'track') {
-          const lineFeature = feature as Feature<LineString>
-          if (!feature.properties?.times) {
-            return feature
-          }
-          let startIndex = -1, endIndex = 0
-          const times = feature.properties.times
-          for (let i = 0; i < times.length; i++) {
-            const time = new Date(times[i]).getTime()
-            if (startIndex === -1 && time >= start && time <= end) {
-              startIndex = i
-            }
-            if (time > start && time <= end) {
-              endIndex = i
-            }
-          }
-          const res: Feature<LineString> = {
-            ...feature,
-            properties: {
-              ...feature.properties,
-              times: feature.properties.times.slice(startIndex, endIndex + 1),
-              speeds: feature.properties.speeds.slice(startIndex, endIndex + 1),
-              courses: feature.properties.courses.slice(startIndex, endIndex + 1),
-            },
-            geometry: {
-              type: 'LineString',
-              coordinates: lineFeature.geometry.coordinates.slice(startIndex, endIndex + 1)
-            }
-          }
-          return res
-        } else {
-          return feature
-        }
-      })
+  const liveFeatures = useMemo(() => {
+    if (time && time.filterApplied) {
+      return featuresToPlot.filter(feature =>
+        featureIsVisibleInPeriod(feature, time.start, time.end)
+      ).map(feature => filteredTrack(feature, time.start, time.end))
+    } else {
+      return featuresToPlot
     }
+  }, [featuresToPlot, time])
 
-    const bearingData = bearingCalc.calculate(filteredTracks, primaryTrack)
-    const rangeData = rangeCalc.calculate(filteredTracks, primaryTrack)
-    
-    setData([...bearingData, ...rangeData])
-  }, [primaryTrack, secondaryTracks, features, time])
+  const depthData = useMemo(() => {
+    if (showDepth) {
+      return depthCalc.calculate(liveFeatures)
+    } else {
+      return []
+    }
+  }, [liveFeatures, showDepth])
 
-  const bearingData = data.filter(d => d.label.includes('Bearing'))
-  const rangeData = data.filter(d => !d.label.includes('Bearing'))
+  const bearingData = useMemo(() => {
+    return bearingCalc.calculate(liveFeatures, primaryTrack)
+  }, [liveFeatures, primaryTrack])
+
+  const rangeData = useMemo(() => {
+    return rangeCalc.calculate(liveFeatures, primaryTrack)
+  }, [liveFeatures, primaryTrack])
+
+  const mainData = useMemo(() => {
+    return [...bearingData, ...rangeData]
+  }, [bearingData, rangeData])
+
   const fontSize = 12
 
   const legendData = useMemo(() => 
@@ -111,6 +120,13 @@ export const GraphsPanel: React.FC = () => {
       symbol: { fill: dataset.color || '#1890ff' }
     }))
   , [rangeData])
+
+  const depthLegendData = useMemo(() => 
+    depthData.map(dataset => ({
+      name: dataset.featureName,
+      symbol: { fill: dataset.color || '#1890ff' }
+    }))
+  , [depthData])
 
   return (
     <div style={{ 
@@ -149,8 +165,62 @@ export const GraphsPanel: React.FC = () => {
           </Checkbox>
         </Space>
       </div>
-
-      {data.length > 0 && (
+      {depthData.length > 0 && (
+        <div style={{ height: '100%', width: '100%', border:'3px solid purple' }}>
+          <VictoryChart
+            theme={VictoryTheme.material}
+            scale={{ x: 'time' }}
+            standalone={true}
+            width={800}
+            height={200}
+            padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
+            domainPadding={{ x: 50, y: 50 }}
+          >
+            {showLegend && depthLegendData.length > 0 && (
+              <VictoryLegend
+                x={80}
+                y={0}
+                orientation="horizontal"
+                gutter={20}
+                style={{ 
+                  labels: { fontSize }
+                }}
+                data={depthLegendData}
+              />
+            )}
+            <VictoryAxis
+              tickFormat={(t) => toShortDTG(t)}
+              style={{
+                tickLabels: { fontSize: fontSize, padding: 5 },
+                axisLabel: { fontSize: fontSize, padding: 30 }
+              }}
+            />
+            <VictoryAxis
+              dependentAxis
+              style={{
+                tickLabels: { fontSize: fontSize, padding: 5 },
+                axisLabel: { fontSize: fontSize, padding: 30 }
+              }}
+              label={depthCalc.label}
+            />
+            {/* Depth data */}
+            <VictoryGroup>
+              {depthData.map((dataset, index) => (
+                <VictoryLine
+                  key={index}
+                  style={{
+                    data: { stroke: dataset.color || '#1890ff' }
+                  }}
+                  data={dataset.data}
+                  x="date"
+                  y="value"
+                />
+              ))}
+            </VictoryGroup>
+          </VictoryChart>
+        </div>
+      )}
+      {mainData.length > 0 && (
         <div style={{ height: '100%', width: '100%', border:'3px solid brown' }}>
           <VictoryChart
             theme={VictoryTheme.material}
