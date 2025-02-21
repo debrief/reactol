@@ -44,6 +44,7 @@ export interface Calculation {
 export type GraphDatum = { date: number, value: number | null }
 
 export type GraphDataset = { label: string, 
+  featureName: string,
   color?: string,
   data: GraphDatum[] }
 
