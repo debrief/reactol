@@ -3,6 +3,7 @@ import { Feature, LineString, MultiPolygon, Point, Polygon, Position } from 'geo
 import * as turf from '@turf/turf'
 import nearestPoint from '@turf/nearest-point'
 import pointToPolygonDistance from '@turf/point-to-polygon-distance'
+import pointToLineDistance from '@turf/point-to-line-distance'
 
 /** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter
  * then return the coordinates of the point at that index
@@ -54,6 +55,12 @@ const distanceToFeature = (feature: Feature, basePoint: Feature<Point>): number 
     const dist = pointToPolygonDistance(basePoint, geom)
     return dist
   }
+  case 'LineString':
+  {
+    const geom = feature as Feature<LineString>
+    const dist = pointToLineDistance(basePoint, geom)
+    return dist
+  }
   default:
     return undefined
   }
@@ -78,6 +85,7 @@ export const rangeCalc: Calculation = {
         const basePoint = baseGeom.coordinates[index]
         const turfBase = turf.point(basePoint)
         if (feature.properties?.times !== undefined) {
+          console.log('track calc', name)
           const nearestPoint = nearestPointTrack(feature, time)
           if (nearestPoint === undefined) {
             return undefined
