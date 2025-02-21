@@ -39,7 +39,6 @@ export const GraphsPanel: React.FC = () => {
 
   // Update data when tracks or calculations change
   useMemo(() => {
-    console.log('primaryTrack', primaryTrack, secondaryTracks)
     if (!primaryTrack || secondaryTracks.length === 0) {
       setData([])
       return
