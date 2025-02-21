@@ -9,11 +9,13 @@ import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
+import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 
 type OptionType = {
   label: string
   value: string
   dataType: string
+  icon: React.ReactNode
 }
 
 const filteredTrack = (feature: Feature, start: number, end: number) => {
@@ -61,11 +63,18 @@ export const GraphsPanel: React.FC = () => {
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
 
   const featureOptions: OptionType[] = useMemo(() => 
-    features.map(track => ({
-      label: track.properties?.shortName || track.properties?.name || track.id,
-      value: track.id as string,
-      dataType: track.properties?.dataType as string
-    }))
+    features.map(feature => {
+      const dataType = feature.properties?.dataType
+      const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
+      const environment = feature.properties?.env
+      const icon = getFeatureIcon({ dataType, color, environment })
+      return {
+        label: feature.properties?.shortName || feature.properties?.name || feature.id,
+        value: feature.id as string,
+        dataType: feature.properties?.dataType as string,
+        icon
+      }
+    })
   , [features])
 
   const trackOptions: OptionType[] = useMemo(() =>
@@ -146,6 +155,18 @@ export const GraphsPanel: React.FC = () => {
             size="small"
             onChange={setPrimaryTrack}
             options={trackOptions}
+            optionRender={option => (
+              <Space>
+                {(option as unknown as OptionType).icon}
+                {option.label}
+              </Space>
+            )}
+            labelRender={option => (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {(option as OptionType).icon}
+                {option.label}
+              </span>
+            )}
           />
           Secondary:
           <Select
