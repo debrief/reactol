@@ -193,7 +193,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           </Checkbox>
         </Space>
       </div>
-      <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResizeEnd={handleSplitterResize}>
+      <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
           <Splitter.Panel>
             <VictoryChart
