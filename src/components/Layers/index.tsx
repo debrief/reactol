@@ -8,6 +8,7 @@ import {
   CloseCircleOutlined,
   ShrinkOutlined,
   FolderOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons'
 import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
@@ -41,6 +42,10 @@ type FieldDataNode = {
   title: string
   key: string
   children: FieldDataNode[]
+}
+
+interface LayerProps {
+  openGraph: { (): void }
 }
 
 const notGroups = (key: Key) => {
@@ -189,9 +194,12 @@ export const ToolButton: React.FC<ToolProps> = ({
   )
 }
 
-const Layers: React.FC = () => {
+const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const { selection, setSelection, setNewFeature } = useDocContext()
   const features = useAppSelector((state) => state.fColl.features)
+  const selectedFeatures = features.filter((feature) =>
+    selection.includes(feature.id as string)
+  )
   const dispatch = useAppDispatch()
 
   const NODE_TRACKS = 'node-tracks'
@@ -205,6 +213,15 @@ const Layers: React.FC = () => {
 
   const clearSelection = () => {
     setSelection([])
+  }
+
+  const temporalFeatureSelected = useMemo(
+    () => selectedFeatures.some((feature) => feature.properties?.times),
+    [selectedFeatures]
+  )
+
+  const onGraphClick = () => {
+    openGraph()
   }
 
   const selectionWithGroups = useMemo(() => {
@@ -423,6 +440,16 @@ const Layers: React.FC = () => {
             />
             <CopyButton />
             <PasteButton />
+            <ToolButton
+              onClick={onGraphClick}
+              disabled={!temporalFeatureSelected}
+              icon={<LineChartOutlined />}
+              title={
+                temporalFeatureSelected
+                  ? 'View graph of selected features'
+                  : 'Select a time-related feature to enable graphs'
+              }
+            />
           </Button.Group>
         </Flex>
       </div>
