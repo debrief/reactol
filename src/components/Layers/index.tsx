@@ -3,7 +3,6 @@ import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd'
 import type { GetProps, TreeDataNode } from 'antd'
 import './index.css'
 import {
-  LineChartOutlined,
   PlusCircleOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
@@ -35,11 +34,8 @@ import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { noop } from 'lodash'
 
-interface LayerProps {
-  openGraph: { (): void }
-}
-
-type TreeProps = GetProps<typeof Tree>
+type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
+const { DirectoryTree } = Tree
 
 type FieldDataNode = {
   title: string
@@ -162,10 +158,6 @@ const nameFor = (feature: Feature): string => {
   return (feature.properties?.name || feature.id) + ' : ' + feature.id
 }
 
-const isChecked = (feature: Feature): string => {
-  return feature.properties?.visible
-}
-
 // filter out the branches, just leave the leaves
 const justLeaves = (id: Key): boolean => {
   return !(id as string).startsWith('node-')
@@ -187,7 +179,7 @@ export const ToolButton: React.FC<ToolProps> = ({
   return (
     <Tooltip title={title}>
       <Button
-        size={'small'}
+        size={'middle'}
         onClick={onClick}
         disabled={disabled}
         type='primary'
@@ -197,19 +189,15 @@ export const ToolButton: React.FC<ToolProps> = ({
   )
 }
 
-const Layers: React.FC<LayerProps> = ({ openGraph }) => {
+const Layers: React.FC = () => {
   const { selection, setSelection, setNewFeature } = useDocContext()
   const features = useAppSelector((state) => state.fColl.features)
-  const selectedFeatures = features.filter((feature) =>
-    selection.includes(feature.id as string)
-  )
   const dispatch = useAppDispatch()
 
   const NODE_TRACKS = 'node-tracks'
   const NODE_FIELDS = 'node-fields'
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
-  const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
   const [createTrackDialogVisible, setcreateTrackDialogVisible] =
     useState(false)
@@ -343,72 +331,14 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     )
     const modelData = items
     setModel(modelData)
-    if (features) {
-      const checked: string[] = features
-        .filter((feature) => isChecked(feature))
-        .map((feature) => idFor(feature))
-      // we also have to find group features, then create checked ids for their visible units
-      const groupFeatures = features.filter(
-        (feature) => feature.properties?.dataType === GROUP_TYPE
-      )
-      groupFeatures.forEach((groupFeature) => {
-        const props = groupFeature.properties as GroupProps
-        props.units.forEach((unitId) => {
-          if (checked.includes(unitId as string)) {
-            checked.push(groupIdFor(groupFeature, unitId as string))
-          }
-        })
-      })
-      setCheckedKeys(checked)
-    }
   }, [features, handleAdd, addZone])
 
-  const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
+  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
     const cleaned = newKeysArr.filter(justLeaves).filter(notGroups)
     if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
       setSelection(cleaned as string[])
     }
-  }
-
-  const onCheck: TreeProps['onCheck'] = (
-    checked: Key[] | { checked: Key[]; halfChecked: Key[] }
-  ) => {
-    const newKeysArr = checked as string[]
-
-    // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
-    if (removedKeys.length !== 0) {
-      const justNodes = removedKeys.filter(justLeaves)
-      const removeGroups = justNodes.filter(notGroups)
-      // if it is the key for an item in a group, then we have to extract the feature id
-      const action = {
-        type: 'fColl/featuresVisChange',
-        payload: { ids: removeGroups, visible: false },
-      }
-      dispatch(action)
-    } else {
-      // see if any keys have been added
-      const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
-      if (addedKeys.length !== 0) {
-        const cleanKeys = addedKeys.filter(justLeaves).filter(notGroups)
-        const dedupedKeys = [...new Set(cleanKeys)]
-        const action = {
-          type: 'fColl/featuresVisChange',
-          payload: { ids: dedupedKeys, visible: true },
-        }
-        dispatch(action)
-      }
-    }
-  }
-
-  const temporalFeatureSelected = useMemo(
-    () => selectedFeatures.some((feature) => feature.properties?.times),
-    [selectedFeatures]
-  )
-
-  const onGraphClick = () => {
-    openGraph()
   }
 
   const onDeleteClick = () => {
@@ -494,29 +424,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
             <CopyButton />
             <PasteButton />
           </Button.Group>
-          <ToolButton
-            onClick={onGraphClick}
-            disabled={!temporalFeatureSelected}
-            icon={<LineChartOutlined />}
-            title={
-              temporalFeatureSelected
-                ? 'View graph of selected features'
-                : 'Select a time-related feature to enable graphs'
-            }
-          />
         </Flex>
       </div>
       {model.length > 0 && (
-        <Tree
-          checkable
+        <DirectoryTree
           showLine={true}
+          style={{ textAlign: 'left', height: '100%', overflow: 'auto' }}
           defaultSelectedKeys={[]}
-          defaultCheckedKeys={[]}
           multiple={true}
           onSelect={onSelect}
-          onCheck={onCheck}
           showIcon={true}
-          checkedKeys={checkedKeys}
           selectedKeys={selectionWithGroups || []}
           expandedKeys={expandedKeys}
           onExpand={(keys) => {
