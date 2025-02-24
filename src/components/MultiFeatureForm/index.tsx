@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Space, Typography, Tooltip, ColorPicker, Form } from 'antd'
+import { Button, Space, Typography, Tooltip, ColorPicker, Form, Checkbox } from 'antd'
 import {
   DeleteOutlined,
   ExportOutlined
@@ -18,6 +18,9 @@ interface MultiFeatureFormProps {
   onExport?: () => void
 }
 
+/** different types of feature store the current color in different style properties.
+ * Produce the correct new properties for this feature type
+ */
 const colorPropertiesForFeatureType = (featureType: string | undefined, color: string): { [Name: string]: number | string } => {
   switch(featureType) {
   case REFERENCE_POINT_TYPE:
@@ -95,21 +98,24 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
           autoComplete='off'
           size='small'>
           <Form.Item label='Visibility' style={itemStyle}>
-            <Button 
-              onClick={handleVisibilityChange}
-              type={mixedVisibility ? 'dashed' : 'default'}
-            >
-              {allVisible ? 'Hide All' : allHidden ? 'Show All' : 'Mixed Visibility'}
-            </Button>
+            <Tooltip title={allVisible ? 'Hide All' : allHidden ? 'Show All' : 'Mixed Visibility, click to hide all'}>
+              <Checkbox onClick={handleVisibilityChange} indeterminate={mixedVisibility} checked={allVisible}></Checkbox>
+            </Tooltip>
           </Form.Item>
           <Form.Item label='Color' style={itemStyle}>
-            <ColorPicker
-              value={currentColor}
-              trigger='click'
-              onChange={handleColorChange}
-              disabled={false}
-              presets={presetColors}
-            />
+            <Tooltip title={currentColor ? `Current color: ${currentColor}` : 'Mixed colors'}>
+              <ColorPicker
+                value={currentColor}
+                disabledAlpha
+                allowClear={false}
+                format='hex'
+                showText={false}
+                trigger='click'
+                onChange={handleColorChange}
+                disabled={false}
+                presets={presetColors}  
+              />
+            </Tooltip>
           </Form.Item>
           <Form.Item label='Delete' style={itemStyle}>
             <Tooltip title="Delete selected features">
