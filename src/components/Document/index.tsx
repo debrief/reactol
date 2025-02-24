@@ -185,15 +185,15 @@ function Document({ filePath }: { filePath?: string }) {
   }
 
   return (
-    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+    <div style={{height: '100%' }} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
       { !!message &&    <Modal title={message?.title} open={!!message} onCancel={() => setMessage(null)} okType='primary'  onOk={() => setMessage(null)}>
         <Alert showIcon type={message?.severity} description={message?.message} />
       </Modal> }
       <ConfigProvider theme={antdTheme}>
-        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
+        <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
           <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
+            <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
               <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                 <Card title='Control Panel'>
                   <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
