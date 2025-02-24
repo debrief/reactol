@@ -10,6 +10,7 @@ import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
+import { GROUP_TYPE } from '../../constants'
 
 type OptionType = {
   label: string
@@ -83,7 +84,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   , [featureOptions])
 
   const secondaryOptions = useMemo(() => 
-    featureOptions.filter(track => track.value !== primaryTrack)
+    featureOptions.filter(track => track.value !== primaryTrack).filter((track) => track.dataType !== 'a' + GROUP_TYPE)
   , [primaryTrack, featureOptions])
 
   const featuresToPlot = useMemo(() => 
@@ -112,16 +113,23 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
 
   const bearingData = useMemo(() => {
     if (primaryTrack === '') return []
-    return bearingCalc.calculate(liveFeatures, primaryTrack)
+    const tNow = Date.now()
+    const res = bearingCalc.calculate(liveFeatures, primaryTrack)
+    console.log('bearing data took:', Date.now() - tNow)
+    return res
   }, [liveFeatures, primaryTrack])
 
   const rangeData = useMemo(() => {
     if (primaryTrack === '') return []
-    return rangeCalc.calculate(liveFeatures, primaryTrack)
+    const tNow = Date.now()
+    const res = rangeCalc.calculate(liveFeatures, primaryTrack)
+    console.log('range data took:', Date.now() - tNow)
+    return res
   }, [liveFeatures, primaryTrack])
 
   const mainData = useMemo(() => {
-    return [...bearingData, ...rangeData]
+    const res = [...bearingData, ...rangeData]
+    return res
   }, [bearingData, rangeData])
 
   const fontSize = 12

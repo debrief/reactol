@@ -155,7 +155,9 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
 
   const saveButton = useMemo(() => {
     return <Tooltip placement='bottom' title={isDirty ? 'Save changes' : 'Document unchanged'}>
-      <Button onClick={handleSave} disabled={!isDirty} variant='outlined' icon={<SaveOutlined/>}/>
+      <Button onClick={handleSave} disabled={!isDirty} variant='outlined'>
+        <SaveOutlined/>
+      </Button>
     </Tooltip>
   }, [handleSave, isDirty])
 
