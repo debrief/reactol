@@ -1,7 +1,7 @@
 import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Checkbox } from 'antd'
+import { Select, Space, Checkbox, Splitter } from 'antd'
 import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme, VictoryLegend } from 'victory'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
@@ -54,13 +54,14 @@ const filteredTrack = (feature: Feature, start: number, end: number) => {
   }
 }
 
-export const GraphsPanel: React.FC = () => {
+export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector((state) => state.fColl.features)
   const { time } = useDocContext()
   const [showDepth, setShowDepth] = useState<boolean>(true)
   const [showLegend, setShowLegend] = useState<boolean>(true)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
+  const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
 
   const featureOptions: OptionType[] = useMemo(() => 
     features.map(feature => {
@@ -137,6 +138,10 @@ export const GraphsPanel: React.FC = () => {
     }))
   , [depthData])
 
+  const handleSplitterResize = (sizes: number[]) => {
+    setSplitterHeights(sizes as [number, number])
+  }
+
   return (
     <div style={{ 
       display: 'flex',
@@ -186,150 +191,156 @@ export const GraphsPanel: React.FC = () => {
           </Checkbox>
         </Space>
       </div>
-      {depthData.length > 0 && (
-        <div style={{ height: '100%', width: '100%', border:'3px solid purple' }}>
-          <VictoryChart
-            theme={VictoryTheme.material}
-            scale={{ x: 'time' }}
-            standalone={true}
-            width={800}
-            height={200}
-            padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
-            domainPadding={{ x: 50, y: 50 }}
-          >
-            {showLegend && depthLegendData.length > 0 && (
-              <VictoryLegend
-                x={80}
-                y={0}
-                orientation="horizontal"
-                gutter={20}
-                style={{ 
-                  labels: { fontSize }
+      <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResizeEnd={handleSplitterResize}>
+        {depthData.length > 0 && (
+          <Splitter.Panel>
+            <div style={{ height: '100%', width: '100%', border:'3px solid purple' }}>
+              <VictoryChart
+                theme={VictoryTheme.material}
+                scale={{ x: 'time' }}
+                standalone={true}
+                width={width || 400}
+                height={splitterHeights?.[0] || 200}
+                padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
+                domainPadding={{ x: 50, y: 50 }}
+              >
+                {showLegend && depthLegendData.length > 0 && (
+                  <VictoryLegend
+                    x={80}
+                    y={0}
+                    orientation="horizontal"
+                    gutter={20}
+                    style={{ 
+                      labels: { fontSize }
+                    }}
+                    data={depthLegendData}
+                  />
+                )}
+                <VictoryAxis
+                  tickFormat={(t) => toShortDTG(t)}
+                  style={{
+                    tickLabels: { fontSize: fontSize, padding: 5 },
+                    axisLabel: { fontSize: fontSize, padding: 30 }
+                  }}
+                  orientation='bottom'
+                />
+                <VictoryAxis
+                  dependentAxis
+                  style={{
+                    tickLabels: { fontSize: fontSize, padding: 5 },
+                    axisLabel: { fontSize: fontSize, padding: 30 }
+                  }}
+                  label={depthCalc.label}
+                  tickFormat={(t: number) => `${Math.abs(t)}`}
+                />
+                {/* Depth data */}
+                <VictoryGroup>
+                  {depthData.map((dataset, index) => (
+                    <VictoryLine
+                      key={index}
+                      style={{
+                        data: { stroke: dataset.color || '#1890ff' }
+                      }}
+                      data={dataset.data}
+                      x="date"
+                      y="value"
+                    />
+                  ))}
+                </VictoryGroup>
+              </VictoryChart>
+            </div>
+          </Splitter.Panel>
+        )}
+        {mainData.length > 0 && (
+          <Splitter.Panel style={{ border:'3px solid brown' }}>
+            <VictoryChart
+              theme={VictoryTheme.material}
+              scale={{ x: 'time' }}
+              standalone={true}
+              width={width || 400}
+              height={splitterHeights?.[1] || 300}
+              padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
+              domainPadding={{ x: 50, y: 50 }}
+            >
+              {showLegend && legendData.length > 0 && (
+                <VictoryLegend
+                  x={80}
+                  y={0}
+                  orientation="horizontal"
+                  gutter={20}
+                  style={{ 
+                    labels: { fontSize }
+                  }}
+                  data={legendData}
+                />
+              )}
+              <VictoryAxis
+                tickFormat={(t) => toShortDTG(t)}
+                style={{
+                  tickLabels: { fontSize: fontSize, padding: 5 },
+                  axisLabel: { fontSize: fontSize, padding: 30 }
                 }}
-                data={depthLegendData}
               />
-            )}
-            <VictoryAxis
-              tickFormat={(t) => toShortDTG(t)}
-              style={{
-                tickLabels: { fontSize: fontSize, padding: 5 },
-                axisLabel: { fontSize: fontSize, padding: 30 }
-              }}
-              orientation='bottom'
-            />
-            <VictoryAxis
-              dependentAxis
-              style={{
-                tickLabels: { fontSize: fontSize, padding: 5 },
-                axisLabel: { fontSize: fontSize, padding: 30 }
-              }}
-              label={depthCalc.label}
-              tickFormat={(t: number) => `${Math.abs(t)}`}
-            />
-            {/* Depth data */}
-            <VictoryGroup>
-              {depthData.map((dataset, index) => (
-                <VictoryLine
-                  key={index}
-                  style={{
-                    data: { stroke: dataset.color || '#1890ff' }
-                  }}
-                  data={dataset.data}
-                  x="date"
-                  y="value"
-                />
-              ))}
-            </VictoryGroup>
-          </VictoryChart>
-        </div>
-      )}
-      {mainData.length > 0 && (
-        <div style={{ height: '100%', width: '100%', border:'3px solid brown' }}>
-          <VictoryChart
-            theme={VictoryTheme.material}
-            scale={{ x: 'time' }}
-            standalone={true}
-            width={800}
-            height={300}
-            padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
-            domainPadding={{ x: 50, y: 50 }}
-          >
-            {showLegend && legendData.length > 0 && (
-              <VictoryLegend
-                x={80}
-                y={0}
-                orientation="horizontal"
-                gutter={20}
-                style={{ 
-                  labels: { fontSize }
+              {/* Range axis (left) */}
+              <VictoryAxis
+                dependentAxis
+                style={{
+                  tickLabels: { fontSize: fontSize, padding: 5 },
+                  axisLabel: { fontSize: fontSize, padding: 30 }
                 }}
-                data={legendData}
+                label={rangeCalc.label}
               />
-            )}
-            <VictoryAxis
-              tickFormat={(t) => toShortDTG(t)}
-              style={{
-                tickLabels: { fontSize: fontSize, padding: 5 },
-                axisLabel: { fontSize: fontSize, padding: 30 }
-              }}
-            />
-            {/* Range axis (left) */}
-            <VictoryAxis
-              dependentAxis
-              style={{
-                tickLabels: { fontSize: fontSize, padding: 5 },
-                axisLabel: { fontSize: fontSize, padding: 30 }
-              }}
-              label={rangeCalc.label}
-            />
-            {/* Bearing axis (right) */}
-            <VictoryAxis
-              dependentAxis
-              orientation="right"
-              domain={[0, 360]}
-              tickValues={[0, 90, 180, 270, 360]}
-              tickFormat={(t: number) => `${t}°`}
-              style={{
-                tickLabels: { fontSize: fontSize, padding: 5 },
-                axisLabel: { fontSize: fontSize, padding: 30 },
-                axis: { strokeDasharray: '4,4' }
-              }}
-              label={bearingCalc.label}
-            />
-            {/* Range data */}
-            <VictoryGroup>
-              {rangeData.map((dataset, index) => (
-                <VictoryLine
-                  key={index}
-                  style={{
-                    data: { stroke: dataset.color || '#1890ff' }
-                  }}
-                  data={dataset.data}
-                  x="date"
-                  y="value"
-                />
-              ))}
-            </VictoryGroup>
-            {/* Bearing data */}
-            <VictoryGroup>
-              {bearingData.map((dataset, index) => (
-                <VictoryLine
-                  key={`bearing-${index}`}
-                  style={{
-                    data: { 
-                      stroke: dataset.color || '#f5222d',
-                      strokeDasharray: '4,4'
-                    }
-                  }}
-                  data={dataset.data}
-                  x="date"
-                  y="value"
-                />
-              ))}
-            </VictoryGroup>
-          </VictoryChart>
-        </div>
-      )}
+              {/* Bearing axis (right) */}
+              <VictoryAxis
+                dependentAxis
+                orientation="right"
+                domain={[0, 360]}
+                tickValues={[0, 90, 180, 270, 360]}
+                tickFormat={(t: number) => `${t}°`}
+                style={{
+                  tickLabels: { fontSize: fontSize, padding: 5 },
+                  axisLabel: { fontSize: fontSize, padding: 30 },
+                  axis: { strokeDasharray: '4,4' }
+                }}
+                label={bearingCalc.label}
+              />
+              {/* Range data */}
+              <VictoryGroup>
+                {rangeData.map((dataset, index) => (
+                  <VictoryLine
+                    key={index}
+                    style={{
+                      data: { stroke: dataset.color || '#1890ff' }
+                    }}
+                    data={dataset.data}
+                    x="date"
+                    y="value"
+                  />
+                ))}
+              </VictoryGroup>
+              {/* Bearing data */}
+              <VictoryGroup>
+                {bearingData.map((dataset, index) => (
+                  <VictoryLine
+                    key={`bearing-${index}`}
+                    style={{
+                      data: { 
+                        stroke: dataset.color || '#f5222d',
+                        strokeDasharray: '4,4'
+                      }
+                    }}
+                    data={dataset.data}
+                    x="date"
+                    y="value"
+                  />
+                ))}
+              </VictoryGroup>
+            </VictoryChart>
+          </Splitter.Panel>
+        )}
+      </Splitter>
+
+     
     </div>
   )
 }

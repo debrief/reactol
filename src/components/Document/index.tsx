@@ -45,6 +45,8 @@ function Document({ filePath }: { filePath?: string }) {
   const { setTime, time, message, setMessage } = useDocContext()
   const [dirty, setDirty] = useState(false)
   const loadedRef = useRef<boolean>(false)
+  const [splitterHeights, setSplitterHeights] = useState<number[] | null>(null)
+  const [splitterWidths, setSplitterWidths] = useState<number[] | null>(null)
 
   useEffect(() => {
     setDirty(true)
@@ -171,8 +173,16 @@ function Document({ filePath }: { filePath?: string }) {
   { 
     key: '2',
     label: 'Graphs',
-    children: <GraphsPanel />
+    children: <GraphsPanel width={splitterWidths ? splitterWidths[0] : 200} height={splitterHeights ? splitterHeights[2] : 200} />
   }]
+
+  const handleSplitterVerticalResize = (sizes: number[]) => {
+    setSplitterHeights(sizes)
+  }
+
+  const handleSplitterHorizontalResize = (sizes: number[]) => {
+    setSplitterWidths(sizes)
+  }
 
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
@@ -181,9 +191,9 @@ function Document({ filePath }: { filePath?: string }) {
         <Alert showIcon type={message?.severity} description={message?.message} />
       </Modal> }
       <ConfigProvider theme={antdTheme}>
-        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
           <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
               <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                 <Card title='Control Panel'>
                   <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
