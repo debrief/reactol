@@ -144,6 +144,14 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     setSplitterHeights(sizes as [number, number])
   }
 
+  const relativePlotHeight = useMemo(() => {
+    if (depthData.length > 0) {
+      return (splitterHeights?.[1] || 200)
+    } else {
+      return (height || 300) - 60 
+    }
+  }, [height, splitterHeights, depthData])
+
   return (
     <div style={{ 
       display: 'flex',
@@ -258,7 +266,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               scale={{ x: 'time' }}
               standalone={true}
               width={width || 400}
-              height={splitterHeights?.[1] || 300}
+              height={relativePlotHeight}
               padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
               domainPadding={{ x: 50, y: 50 }}
             >
