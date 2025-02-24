@@ -1,4 +1,4 @@
-import { Alert, Card, ConfigProvider, Modal, Splitter } from 'antd'
+import { Alert, Card, ConfigProvider, Modal, Splitter, Tabs } from 'antd'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { TileLayer } from 'react-leaflet'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
@@ -16,6 +16,7 @@ import GraphModal from '../GraphModal'
 import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
+import { GraphsPanel } from '../GraphsPanel'
 
 interface FileHandler {
   blobType: string
@@ -44,6 +45,8 @@ function Document({ filePath }: { filePath?: string }) {
   const { setTime, time, message, setMessage } = useDocContext()
   const [dirty, setDirty] = useState(false)
   const loadedRef = useRef<boolean>(false)
+  const [splitterHeights, setSplitterHeights] = useState<number[] | null>(null)
+  const [splitterWidths, setSplitterWidths] = useState<number[] | null>(null)
 
   useEffect(() => {
     setDirty(true)
@@ -162,6 +165,25 @@ function Document({ filePath }: { filePath?: string }) {
     }
   }, [filePath, storeContents])
 
+  const detailTabs = [ {
+    key: '1',
+    label: 'Detail',
+    children: <Properties />
+  }, 
+  { 
+    key: '2',
+    label: 'Graphs',
+    children: <GraphsPanel width={splitterWidths ? splitterWidths[0] : 200} height={splitterHeights ? splitterHeights[2] : 200} />
+  }]
+
+  const handleSplitterVerticalResize = (sizes: number[]) => {
+    setSplitterHeights(sizes)
+  }
+
+  const handleSplitterHorizontalResize = (sizes: number[]) => {
+    setSplitterWidths(sizes)
+  }
+
   return (
     <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
@@ -169,9 +191,9 @@ function Document({ filePath }: { filePath?: string }) {
         <Alert showIcon type={message?.severity} description={message?.message} />
       </Modal> }
       <ConfigProvider theme={antdTheme}>
-        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        <Splitter style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
           <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+            <Splitter layout="vertical" style={{ height: '100vh', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
               <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                 <Card title='Control Panel'>
                   <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
@@ -183,9 +205,7 @@ function Document({ filePath }: { filePath?: string }) {
                 </Card>
               </Splitter.Panel>
               <Splitter.Panel>
-                <Card title='Detail'>
-                  <Properties />
-                </Card>
+                <Tabs defaultActiveKey="1" items={detailTabs} />
               </Splitter.Panel>
             </Splitter>
           </Splitter.Panel>

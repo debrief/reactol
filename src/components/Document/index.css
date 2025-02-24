@@ -95,12 +95,24 @@ html, body, #root, .App, #map {
   color: rgba(84, 125, 238, 0.7);
   pointer-events: none;
 }
-
-.ant-card-head-title {
+.ant-tabs-tab, .ant-tabs-nav-wrap, .ant-card-head-title {
   background: rgba(0, 0, 0, 0.8);
   background-image: linear-gradient(rgba(90, 120, 240, 0.3) 1px, transparent 1px), linear-gradient(to right, rgba(90, 120, 240, 0.3) 1px, transparent 1px);
   background-size: 7px 7px;
   color: #fff;
+}
+
+.ant-tabs-tab {
+  border: 2px solid #0f0 !important;
+}
+
+
+.ant-tabs-tab .ant-tabs-tab-btn {
+  color: #fff !important;
+}
+
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  font-weight: bolder !important;
 }
 
 .ant-card-head {
