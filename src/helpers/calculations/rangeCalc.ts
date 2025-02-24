@@ -32,6 +32,7 @@ const distanceToFeature = (feature: Feature, basePoint: Feature<Point>): number 
   switch (geom.type) {
   case 'Point':
   {
+    if (!geom.coordinates || geom.coordinates.length === 0) return undefined
     const thisPoint = turf.point(geom.coordinates)    
     const distance = turf.distance(thisPoint, basePoint, 'meters')
     return distance
