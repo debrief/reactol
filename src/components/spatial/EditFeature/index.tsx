@@ -63,6 +63,8 @@ export const EditFeature: React.FC = () => {
   const map = useMap()
 
   useEffect(() => {
+    map.pm.removeControls()
+    
     if (!editableMapFeature) return
 
     const feature = editableMapFeature.feature as Feature
