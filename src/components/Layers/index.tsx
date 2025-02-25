@@ -456,7 +456,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       {model.length > 0 && (
         <DirectoryTree
           showLine={true}
-          style={{ textAlign: 'left', height: '100%', overflow: 'auto' }}
+          style={{ textAlign: 'left', height: '100%' }}
           defaultSelectedKeys={[]}
           multiple={true}
           onSelect={onSelect}
