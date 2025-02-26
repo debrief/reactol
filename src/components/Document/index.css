@@ -127,3 +127,16 @@ html, body, #root, .App, #map {
 .ant-modal-content {
   padding: 10px !important;
 }
+
+.ant-splitter-bar-collapse-bar {
+  width: 25px !important;
+  height: 45px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+  background: #fff !important;
+}
+
+.ant-splitter-bar-collapse-bar:hover {
+  background: #99d0ff !important;
+}
