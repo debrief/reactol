@@ -132,3 +132,7 @@ html, body, #root, .App, #map {
   width: 25px !important;
   height: 45px !important;
 }
+
+.ant-splitter-bar-collapse-bar:hover {
+  background: #99d0ff !important;
+}
