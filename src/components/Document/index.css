@@ -131,6 +131,10 @@ html, body, #root, .App, #map {
 .ant-splitter-bar-collapse-bar {
   width: 25px !important;
   height: 45px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+  background: #fff !important;
 }
 
 .ant-splitter-bar-collapse-bar:hover {
