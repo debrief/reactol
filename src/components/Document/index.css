@@ -127,3 +127,8 @@ html, body, #root, .App, #map {
 .ant-modal-content {
   padding: 10px !important;
 }
+
+.ant-splitter-bar-collapse-bar {
+  width: 25px !important;
+  height: 45px !important;
+}
