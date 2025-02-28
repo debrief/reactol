@@ -1,7 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { AppDispatch } from '../../state/store'
-import { MULTI_ZONE_TYPE, POLYGON_SHAPE } from '../../constants'
-import { MultiZoneProps, ZoneProps } from '../../types'
+import { MULTI_POLYGON_SHAPE, MULTI_ZONE_TYPE } from '../../constants'
+import { MultiZoneProps } from '../../types'
 
 interface PolygonData {
   points: Array<{lat: number, lng: number}>
@@ -69,17 +69,17 @@ const parseReplayPolygonLine = (line: string): PolygonData | null => {
   return { points, label }
 }
 
-const convertToGeoJson = (data: PolygonData[]): Feature<Geometry, ZoneProps> => {
+const convertToGeoJson = (data: PolygonData[]): Feature<Geometry, MultiZoneProps> => {
   const coordinates = data.map(polygonData => {
     // close each polygon by adding the first coordinate
     polygonData.points.push(polygonData.points[0])
     return [polygonData.points.map((point) => [point.lng, point.lat])]
   })
 
-  const zoneProps: MultiZoneProps = {
+  const multiZoneProps: MultiZoneProps = {
     dataType: MULTI_ZONE_TYPE,
     specifics: {
-      shapeType: POLYGON_SHAPE
+      shapeType: MULTI_POLYGON_SHAPE
     },
     name: data[0].label, // Using the first polygon's label
     visible: true,
@@ -88,7 +88,7 @@ const convertToGeoJson = (data: PolygonData[]): Feature<Geometry, ZoneProps> => 
   
   const zone: Feature<Geometry, MultiZoneProps> = {
     type: 'Feature',
-    properties: zoneProps,
+    properties: multiZoneProps,
     geometry: {
       type: 'MultiPolygon',
       coordinates: coordinates
