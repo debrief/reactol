@@ -5,7 +5,7 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
 import { AppDispatch } from '../../state/store'
-import { NewTrackProps } from '../../types'
+import { ExistingTrackProps, NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
 import { loadJson } from '../../helpers/loaders/loadJson'
 import { loadOpRep } from '../../helpers/loaders/loadOpRep'
@@ -20,7 +20,7 @@ import { GraphsPanel } from '../GraphsPanel'
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, existingTrackDetails?: ExistingTrackProps, newTrackDetails?: NewTrackProps) => void
 }
 
 export interface TimeState {
@@ -143,7 +143,7 @@ function Document({ filePath }: { filePath?: string }) {
   const setLoadTrackResults = async (values: NewTrackProps) => {
     setIsDialogVisible(false)
     if (currentFile && currentHandler) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, values)
+      currentHandler.handle(await currentFile.text(), features, dispatch, undefined, values)
     }
   }
 
