@@ -1,7 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { AppDispatch } from '../../state/store'
-import { POLYGON_SHAPE, ZONE_TYPE } from '../../constants'
-import { ZoneProps } from '../../types'
+import { MULTI_ZONE_TYPE, POLYGON_SHAPE } from '../../constants'
+import { MultiZoneProps, ZoneProps } from '../../types'
 
 interface PolygonData {
   points: Array<{lat: number, lng: number}>
@@ -69,26 +69,29 @@ const parseReplayPolygonLine = (line: string): PolygonData | null => {
   return { points, label }
 }
 
-const convertToGeoJson = (data: PolygonData): Feature<Geometry, ZoneProps> => {
-  // close the polygon by adding the first coordinate
-  data.points.push(data.points[0])
+const convertToGeoJson = (data: PolygonData[]): Feature<Geometry, ZoneProps> => {
+  const coordinates = data.map(polygonData => {
+    // close each polygon by adding the first coordinate
+    polygonData.points.push(polygonData.points[0])
+    return [polygonData.points.map((point) => [point.lng, point.lat])]
+  })
 
-  const coordinates = data.points.map((point) => [point.lng, point.lat])
-  const zoneProps: ZoneProps = {
-    dataType: ZONE_TYPE,
+  const zoneProps: MultiZoneProps = {
+    dataType: MULTI_ZONE_TYPE,
     specifics: {
       shapeType: POLYGON_SHAPE
     },
-    name: data.label,
+    name: data[0].label, // Using the first polygon's label
     visible: true,
     stroke: '#f00'
   }
-  const zone: Feature<Geometry, ZoneProps> = {
+  
+  const zone: Feature<Geometry, MultiZoneProps> = {
     type: 'Feature',
     properties: zoneProps,
     geometry: {
-      type: 'Polygon',
-      coordinates: [coordinates]
+      type: 'MultiPolygon',
+      coordinates: coordinates
     }
   }
   return zone
@@ -110,12 +113,9 @@ export const loadRepPolygon = async (text: string, _features: Feature<Geometry, 
     }
   }
 
-  // create a polygon shape zone for each line in data
-  const zones: Feature<Geometry, GeoJsonProperties>[] = []
-  data.forEach((line) => {
-    const zone = convertToGeoJson(line)
-    zones.push(zone)
-  })
+  // Create a single MultiPolygon feature containing all polygons
+  const zone = convertToGeoJson(data)
 
-  dispatch({ type: 'fColl/featuresAdded', payload: zones })
+  console.log('zone', zone)
+  dispatch({ type: 'fColl/featuresAdded', payload: [zone] })
 }

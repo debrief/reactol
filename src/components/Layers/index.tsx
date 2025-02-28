@@ -14,6 +14,7 @@ import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
   BUOY_FIELD_TYPE,
   GROUP_TYPE,
+  MULTI_ZONE_TYPE,
   REFERENCE_POINT_TYPE,
   TRACK_TYPE,
   ZONE_TYPE,
@@ -324,6 +325,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     items.push(
       mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
     )
+    items.push(mapFunc(features, 'Multi Zones', 'node-multi-zones', MULTI_ZONE_TYPE, handleAdd, 
+      <AddZoneShape addZone={addZone} />))
     items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd, 
       <AddZoneShape addZone={addZone} />))
     items.push(

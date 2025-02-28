@@ -1,4 +1,4 @@
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE } from './constants'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE, MULTI_ZONE_TYPE } from './constants'
 import { LineStyleProps, PointStyleProps, PolygonStyleProps } from './standardShapeProps.ts'
 import { ZoneShapeProps } from './zoneShapeTypes.ts'
 
@@ -37,6 +37,10 @@ export type CoreShapeProps = CoreDataProps & TemporalShapeProps
 export type ZoneProps = CoreShapeProps & PolygonStyleProps & { dataType: typeof ZONE_TYPE
   specifics: ZoneShapeProps
  }
+export type MultiZoneProps = CoreShapeProps & PolygonStyleProps & { dataType: typeof MULTI_ZONE_TYPE
+  specifics: ZoneShapeProps
+}
+
 export type PointProps = CoreShapeProps & PointStyleProps & { dataType: typeof REFERENCE_POINT_TYPE }
 export type GroupProps = {
   dataType: typeof GROUP_TYPE
