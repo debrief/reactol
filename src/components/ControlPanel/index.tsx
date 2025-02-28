@@ -15,7 +15,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useDocContext } from '../../state/DocContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
-import { SampleDataLoader } from '../SampleDataLoader'
+import { SampleDataLoader } from './SampleDataLoader'
 import { sampleItems } from '../../data/sampleItems'
 
 export interface TimeProps {
