@@ -53,6 +53,10 @@ export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'l
   symbolInterval: string
 }
 
+export type ExistingTrackProps = {
+  trackId: string
+}
+
 export type AddTrackProps = {
   trackId: string
 }
