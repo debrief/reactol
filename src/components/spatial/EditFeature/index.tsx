@@ -1,77 +1,130 @@
-import { FeatureGroup } from 'react-leaflet'
+import { FeatureGroup, useMap } from 'react-leaflet'
 import { GeomanControls } from 'react-leaflet-geoman-v2'
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-import { Feature, Point } from 'geojson'
+import { Feature, Point, Polygon } from 'geojson'
 import { useDocContext } from '../../../state/DocContext'
 import { useEffect, useState } from 'react'
-import { useMap } from 'react-leaflet'
-import L, { Layer, LeafletEvent, PM } from 'leaflet'
+import L, { Layer, PM, Marker, Polygon as LeafletPolygon } from 'leaflet'
 import { useAppDispatch } from '../../../state/hooks'
+interface PMOptions {
+  continueDrawing?: boolean;
+  editable?: boolean;
+  allowCutting?: boolean;
+}
 
-const editHandler = (e: {layer: L.Layer}, feature: Feature, onChange: (feature: Feature) => void) => {
-  const result = e.layer as unknown as {_latlng : L.LatLng}
-  const latLng = result._latlng
+const editHandler = (
+  updatedLayer: Layer | Marker[],
+  feature: Feature,
+  onChange: (feature: Feature) => void
+) => {
   switch (feature.geometry.type) {
-  case 'Point':
-  {
-    const newCoords = [latLng.lng, latLng.lat]
-    const geom = { ... feature.geometry, coordinates: newCoords } as Point
-    const res = { ... feature, geometry: geom}
+  case 'Point': {
+    const marker = updatedLayer as Marker
+    const latlng = marker.getLatLng()
+    const newCoords = [latlng.lng, latlng.lat] 
+    const geom = { ...feature.geometry, coordinates: newCoords } as Point
+    const res = { ...feature, geometry: geom }
     onChange(res)
     break
   }
-  case 'MultiPoint':
-  {
-    const data = e.layer as unknown as { _latlngs: L.LatLng[] }
-    const reversed = data._latlngs.map((l: L.LatLng) => [l.lng, l.lat])
-    const geom = { ... feature.geometry, coordinates: reversed }
-    const res = { ... feature, geometry: geom} 
-    onChange(res)
-    break
-  }
-  case 'Polygon':
-  { 
-    const data = e.layer as unknown as { _latlngs: L.LatLng[][] }
-    const reversed = data._latlngs.map((l: L.LatLng[]) => l.map(ll => [ll.lng, ll.lat]))
-    const geom = { ... feature.geometry, coordinates: reversed }
-    const res = { ... feature, geometry: geom}
-    onChange(res)
-    break
-  }
-  default: 
-    console.log('unknown feature type', feature)
-  }}
 
-/** helper component provides the map graticule */
+  case 'MultiPoint': {
+    const markers = updatedLayer as Marker[]
+    const newCoords = markers.map(marker => {
+      const latlng = marker.getLatLng()
+      return [latlng.lng, latlng.lat]
+    })
+    const geom = { ...feature.geometry, coordinates: newCoords }
+    const res = { ...feature, geometry: geom }
+    onChange(res)
+    break
+  }
+
+  case 'Polygon': {
+    const polygon = updatedLayer as LeafletPolygon
+    const latlngs = polygon.getLatLngs() as L.LatLng[][]
+    const newCoords = latlngs.map(ring => ring.map(latlng => [latlng.lng, latlng.lat]))
+    const geom = { ...feature.geometry, coordinates: newCoords } as Polygon
+    const res = { ...feature, geometry: geom }
+    onChange(res)
+    break
+  }
+
+  default:
+    console.log('Unknown feature type', feature)
+  }
+}
+
 export const EditFeature: React.FC = () => {
   const { editableMapFeature } = useDocContext()
   const [drawOptions, setDrawOptions] = useState<PM.ToolbarOptions>({})
   const [globalOptions, setGlobalOptions] = useState<PM.GlobalOptions>({})
-  const [editLayer, setEditLayer] = useState<Layer | undefined>(undefined)
   const dispatch = useAppDispatch()
-
   const map = useMap()
 
   useEffect(() => {
-    if (editableMapFeature === null) {
-      return
-    }
+    map.pm.removeControls()
+    
+    if (!editableMapFeature) return
 
     const feature = editableMapFeature.feature as Feature
-
-    // create a layer for the activites
-    const layerToEdit = L.geoJSON(feature)
-    layerToEdit.addTo(map)
-
-    // listen for when the layer has been edited
-    const handleEdit = (e: LeafletEvent) => {
-      if (!editableMapFeature?.onChange) return
-      editHandler(e as unknown as {layer: L.Layer}, feature, editableMapFeature.onChange)
+    let layerToEdit: Layer | null = null
+    const markers: Marker[] = []
+    switch (feature.geometry.type) {
+    case 'Point': {
+      const coord = feature.geometry.coordinates as [number, number]
+      const latlng = L.latLng(coord[1], coord[0])
+      layerToEdit = L.marker(latlng, { draggable: true })
+      layerToEdit.on('dragend', () => editHandler(layerToEdit as Marker, feature, editableMapFeature.onChange))
+      break
     }
-    layerToEdit.on('pm:edit', handleEdit)
+
+    case 'MultiPoint': {
+      feature.geometry.coordinates.forEach(coord => {
+        const latlng = L.latLng(coord[1], coord[0])
+        const marker = L.marker(latlng, { draggable: true })
+        console.log('marker', marker)
+          
+        marker.on('dragend', () => editHandler(markers, feature, editableMapFeature.onChange))
+        markers.push(marker)
+        marker.addTo(map)
+      })
+      break
+    }
+
+    case 'Polygon': {
+      const coords = feature.geometry.coordinates as [number, number][][]
+      const latlngs = coords.map(ring => ring.map(coord => L.latLng(coord[1], coord[0])))
+      
+      layerToEdit = L.polygon(latlngs, { color: 'blue' })
+
+      const polygonLayer = layerToEdit as LeafletPolygon & { pm?: PMOptions }
+      
+      setTimeout(() => {
+        polygonLayer.pm?.enable({
+          allowSelfIntersection: false,
+          allowEditing: true,
+          allowRemoval: false,
+          allowCutting: false,
+          draggable: true
+        })
+      }, 100)
+      
+      polygonLayer.on('pm:edit', () => editHandler(polygonLayer, feature, editableMapFeature.onChange))
+      
+      break
+    }
+
+    default:
+      console.log('Unknown feature type:', feature)
+    }
+
+    if (layerToEdit) {
+      layerToEdit.addTo(map)
+    }
 
     const globalOpts: PM.GlobalOptions = {
-      layerGroup: layerToEdit,
+      layerGroup: layerToEdit ? L.layerGroup([layerToEdit, ...markers]) : L.layerGroup(markers),
       continueDrawing: false,
       editable: true,
       allowCutting: false,
@@ -89,32 +142,16 @@ export const EditFeature: React.FC = () => {
     }
 
     setDrawOptions(toolbarOpts)
-    
-    // layerToEdit.options.pmIgnore = false // Specialy needed for LayerGroups
-    //L.PM.reInitLayer(layerToEdit) // Make the LayerGroup accessable for Geoman
-    const editOptions: PM.EditModeOptions = {
-      allowRemoval: false,
-      allowCutting: false,
-      draggable: true
-    }
-    layerToEdit.pm.enable(editOptions)
 
-    setEditLayer(layerToEdit)
-
-    return () => {    
-      map.removeLayer(layerToEdit)
+    return () => {
+      if (layerToEdit) map.removeLayer(layerToEdit)
+      markers.forEach(marker => map.removeLayer(marker))
     }
   }, [map, editableMapFeature, dispatch])
 
-  return <FeatureGroup>
-    <> {(editLayer) &&
-      <>
-        <GeomanControls
-          options={drawOptions}
-          globalOptions={globalOptions}
-        />
-      </>
-    }
-    </>
-  </FeatureGroup>
+  return (
+    <FeatureGroup>
+      <GeomanControls options={drawOptions} globalOptions={globalOptions} />
+    </FeatureGroup>
+  )
 }

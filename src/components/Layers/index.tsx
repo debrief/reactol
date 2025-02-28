@@ -3,12 +3,12 @@ import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd'
 import type { GetProps, TreeDataNode } from 'antd'
 import './index.css'
 import {
-  LineChartOutlined,
   PlusCircleOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
   ShrinkOutlined,
   FolderOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons'
 import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
@@ -36,11 +36,8 @@ import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { noop } from 'lodash'
 
-interface LayerProps {
-  openGraph: { (): void }
-}
-
-type TreeProps = GetProps<typeof Tree>
+type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
+const { DirectoryTree } = Tree
 
 type FieldDataNode = {
   title: string
@@ -48,10 +45,12 @@ type FieldDataNode = {
   children: FieldDataNode[]
 }
 
-const cleanGroup = (key: Key) => {
-  const colonIndex = (key as string).indexOf(':')
-  if (colonIndex === -1) return key
-  return (key as string).substring(colonIndex + 1)
+interface LayerProps {
+  openGraph: { (): void }
+}
+
+const notGroups = (key: Key) => {
+  return (key as string).indexOf(':') === -1
 }
 
 const findChildrenOfType = (
@@ -110,7 +109,7 @@ const getIcon = (feature: Feature | undefined,
 
   // For leaf nodes, show type-specific icon based on dataType
   const dataType = feature.properties?.dataType
-  const color = feature.properties?.stroke
+  const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
   const environment = feature.properties?.env
   return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
 }
@@ -162,11 +161,12 @@ const idFor = (feature: Feature): string => {
 }
 
 const nameFor = (feature: Feature): string => {
-  return feature.properties?.name || feature.id
+  return (feature.properties?.name || feature.id) + ' : ' + feature.id
 }
 
-const isChecked = (feature: Feature): string => {
-  return feature.properties?.visible
+// filter out the branches, just leave the leaves
+const justLeaves = (id: Key): boolean => {
+  return !(id as string).startsWith('node-')
 }
 
 interface ToolProps {
@@ -185,7 +185,7 @@ export const ToolButton: React.FC<ToolProps> = ({
   return (
     <Tooltip title={title}>
       <Button
-        size={'small'}
+        size={'middle'}
         onClick={onClick}
         disabled={disabled}
         type='primary'
@@ -207,7 +207,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const NODE_FIELDS = 'node-fields'
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
-  const [checkedKeys, setCheckedKeys] = React.useState<string[]>([])
   const [message, setMessage] = React.useState<string>('')
   const [createTrackDialogVisible, setcreateTrackDialogVisible] =
     useState(false)
@@ -215,6 +214,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const clearSelection = () => {
     setSelection([])
+  }
+
+  const temporalFeatureSelected = useMemo(
+    () => selectedFeatures.some((feature) => feature.properties?.times),
+    [selectedFeatures]
+  )
+
+  const onGraphClick = () => {
+    openGraph()
   }
 
   const selectionWithGroups = useMemo(() => {
@@ -343,107 +351,14 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     )
     const modelData = items
     setModel(modelData)
-    if (features) {
-      const checked: string[] = features
-        .filter((feature) => isChecked(feature))
-        .map((feature) => idFor(feature))
-      // we also have to find group features, then create checked ids for their visible units
-      const groupFeatures = features.filter(
-        (feature) => feature.properties?.dataType === GROUP_TYPE
-      )
-      groupFeatures.forEach((groupFeature) => {
-        const props = groupFeature.properties as GroupProps
-        props.units.forEach((unitId) => {
-          if (checked.includes(unitId as string)) {
-            checked.push(groupIdFor(groupFeature, unitId as string))
-          }
-        })
-      })
-      setCheckedKeys(checked)
-    }
   }, [features, handleAdd, addZone])
 
-  // filter out the branches, just leave the leaves
-  const justLeaves = (ids: Key[]): Key[] => {
-    return ids.filter((id) => !(id as string).startsWith('node-'))
-  }
-
-  const onSelect: TreeProps['onSelect'] = (selectedKeys) => {
+  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
-
-    // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = selectionWithGroups.filter(
-      (key) => !newKeysArr.includes(key)
-    )
-    if (removedKeys.length === 1) {
-      const key = removedKeys[0]
-      const childId = key.indexOf(':')
-        ? key.substring(key.indexOf(':') + 1)
-        : key
-      const trimmedList = selection.filter((id) => id !== childId)
-      // check if the payload selection is different from the current selection
-      if (JSON.stringify(trimmedList) !== JSON.stringify(selection)) {
-        setSelection(trimmedList as string[])
-      }
-      return
-    } else {
-      // keys have been added
-      const justNodes = justLeaves(selectedKeys)
-      const cleanedIds = justNodes.map(cleanGroup)
-      // de-dupe the cleaned ids
-      const dedupedIds = [...new Set(cleanedIds)]
-
-      // check if the payload selection is different from the current selection
-      if (JSON.stringify(dedupedIds) !== JSON.stringify(selection)) {
-        setSelection(dedupedIds as string[])
-      }
+    const cleaned = newKeysArr.filter(justLeaves).filter(notGroups)
+    if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
+      setSelection(cleaned as string[])
     }
-  }
-
-  const onCheck: TreeProps['onCheck'] = (
-    checked: Key[] | { checked: Key[]; halfChecked: Key[] }
-  ) => {
-    const newKeysArr = checked as string[]
-
-    // diff the new keys from the checked keys, to see if items have been removed
-    const removedKeys = checkedKeys.filter((key) => !newKeysArr.includes(key))
-    if (removedKeys.length !== 0) {
-      const cleanChecked: Key[] = checkedKeys.map(cleanGroup)
-      const cleanRemoved = removedKeys.map(cleanGroup)
-      const cleanedGroup = cleanChecked.filter(
-        (key) => !cleanRemoved.includes(key)
-      )
-      const keys = justLeaves(cleanedGroup as Key[])
-      // if it is the key for an item in a group, then we have to extract the feature id
-      const action = {
-        type: 'fColl/featureVisibilities',
-        payload: { ids: keys },
-      }
-      // check if the payload selection is different from the current selection
-      dispatch(action)
-    } else {
-      // see if any keys have been added
-      const addedKeys = newKeysArr.filter((key) => !checkedKeys.includes(key))
-      if (addedKeys.length !== 0) {
-        const withNew = checkedKeys.concat(addedKeys)
-        const cleanKeys = withNew.map(cleanGroup)
-        const dedupedKeys = [...new Set(cleanKeys)]
-        const action = {
-          type: 'fColl/featureVisibilities',
-          payload: { ids: dedupedKeys },
-        }
-        dispatch(action)
-      }
-    }
-  }
-
-  const temporalFeatureSelected = useMemo(
-    () => selectedFeatures.some((feature) => feature.properties?.times),
-    [selectedFeatures]
-  )
-
-  const onGraphClick = () => {
-    openGraph()
   }
 
   const onDeleteClick = () => {
@@ -528,30 +443,27 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
             />
             <CopyButton />
             <PasteButton />
+            <ToolButton
+              onClick={onGraphClick}
+              disabled={!temporalFeatureSelected}
+              icon={<LineChartOutlined />}
+              title={
+                temporalFeatureSelected
+                  ? 'View graph of selected features'
+                  : 'Select a time-related feature to enable graphs'
+              }
+            />
           </Button.Group>
-          <ToolButton
-            onClick={onGraphClick}
-            disabled={!temporalFeatureSelected}
-            icon={<LineChartOutlined />}
-            title={
-              temporalFeatureSelected
-                ? 'View graph of selected features'
-                : 'Select a time-related feature to enable graphs'
-            }
-          />
         </Flex>
       </div>
       {model.length > 0 && (
-        <Tree
-          checkable
+        <DirectoryTree
           showLine={true}
+          style={{ textAlign: 'left', height: '100%' }}
           defaultSelectedKeys={[]}
-          defaultCheckedKeys={[]}
           multiple={true}
           onSelect={onSelect}
-          onCheck={onCheck}
           showIcon={true}
-          checkedKeys={checkedKeys}
           selectedKeys={selectionWithGroups || []}
           expandedKeys={expandedKeys}
           onExpand={(keys) => {

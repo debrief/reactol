@@ -1,7 +1,6 @@
-import { Button, Flex, Form, FormProps, Layout, Select } from 'antd'
+import { Button, Flex, Form, FormProps, Layout, Modal, Select } from 'antd'
 import { Header, Content, Footer } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
-import ReactModal from 'react-modal-resizable-draggable'
 import { Typography } from 'antd'
 import { Feature } from 'geojson'
 import { speedCalc } from '../../helpers/calculations/speedCalc'
@@ -15,6 +14,7 @@ import { courseCalc } from '../../helpers/calculations/courseCalc'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { useAppSelector } from '../../state/hooks'
 import { formatInTimeZone } from 'date-fns-tz'
+import { Calculation, GraphDataset } from '../../types'
 
 const { Title, Text } = Typography
 
@@ -35,18 +35,6 @@ interface GraphForm {
   baseTrack: string
 };
 
-export interface Calculation {
-  label: string
-  value: string
-  isRelative: boolean
-  calculate: {(features: Feature[], baseId?: string): GraphDataset[]}
-}
-
-export type GraphDatum = { date: number, value: number | null }
-
-export type GraphDataset = { label: string, 
-  color?: string,
-  data: GraphDatum[] }
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
@@ -66,6 +54,10 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
   const closeHandler = () => {
     setWasOpen(true)
+    setCalculations([])
+    setData([])
+    setTracksEnabled(false)
+    setGraphEnabled(false)
     doClose()
   }
 
@@ -165,15 +157,17 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
   }
 
   return (
-    // @ts-expect-error Property 'initWidth' does not exist on type 'IntrinsicAttributes & ModalProps'.
-    <ReactModal 
-      initWidth={800} 
-      initHeight={500} 
+    <Modal 
+      width={800} 
+      height={500} 
       className={'my-modal-custom-class'}
-      onRequestClose={closeHandler} 
-      isOpen={open}>
+      onCancel={closeHandler}
+      destroyOnClose={true}
+      closable={true}
+      footer={null}
+      open={open}>
       <Layout style={{minHeight:'300px', height:'100%'}}>
-        <Header>My Modal</Header>
+        <Header style={{backgroundColor: '#fff', fontSize: 22, borderBottom: '1px solid #ccc'}}>Graph View</Header>
         <Layout style={{height:'100%'}}>
           <Content>
             <VictoryChart theme={VictoryTheme.clean}>
@@ -232,7 +226,7 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
           </Flex>
         </Footer>
       </Layout>
-    </ReactModal>
+    </Modal>
   )
 }
 

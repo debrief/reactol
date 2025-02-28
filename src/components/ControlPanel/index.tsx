@@ -155,15 +155,17 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
 
   const saveButton = useMemo(() => {
     return <Tooltip placement='bottom' title={isDirty ? 'Save changes' : 'Document unchanged'}>
-      <Button onClick={handleSave} disabled={!isDirty} variant='outlined' icon={<SaveOutlined/>}/>
+      <Button onClick={handleSave} disabled={!isDirty} variant='outlined' >
+        <SaveOutlined/>
+      </Button>
     </Tooltip>
   }, [handleSave, isDirty])
 
   return (
     <>
       {' '}
-      <Row>
-        <Col span={20} style={{ textAlign: 'left' }}>
+      <Row style={{padding: '2px'}}>
+        <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
           <Tooltip
             mouseEnterDelay={0.8}
             title='Lock viewport to prevent accidental map movement'

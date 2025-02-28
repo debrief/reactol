@@ -15,3 +15,7 @@ Tree {
   padding-inline-start: 0px;
   padding-inline-end: 2px;
 }
+
+.ant-tree-node-content-wrapper {
+  padding-inline: 0px !important; 
+}

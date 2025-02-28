@@ -58,10 +58,12 @@ describe('load function', () => {
     const newExisting = store.getState() as FeatureCollection
     loadJson(justLineString, newExisting.features, store.dispatch)
     const updatedState = store.getState() as FeatureCollection
-    expect(updatedState.features.length).toBe(2)
+    // note the count goes up, since we 'clean' the ids when we add new ones
+    // so the duplicate will get a new id
+    expect(updatedState.features.length).toBe(3)
     const updatedState2 = store.getState() as FeatureCollection
     const newSecondString = updatedState2.features[1] as Feature<LineString>
-    expect(newSecondString.geometry.coordinates?.length).toBe(8)
+    expect(newSecondString.geometry.coordinates?.length).toBe(4)
   })
 
   it('should not add features to the store from an invalid GeoJSON object', () => {

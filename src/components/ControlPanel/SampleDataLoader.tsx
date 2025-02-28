@@ -1,4 +1,4 @@
-import { Button, Dropdown, MenuProps, Space, Tooltip } from 'antd'
+import { Button, Dropdown, MenuProps, Tooltip } from 'antd'
 import { VerticalAlignBottomOutlined } from '@ant-design/icons'
 import track1 from '../../data/track1'
 import { useAppDispatch } from '../../state/hooks'
@@ -91,9 +91,7 @@ export const SampleDataLoader: React.FC<{ sampleItems: SampleItem[] }> = ({ samp
     <Dropdown trigger={['click']} menu={menuProps}>
       <Tooltip placement='right' title='Load Sample Data'>
         <Button style={{ margin: '0 5px' }} color='primary' variant='outlined'>
-          <Space>
-            <VerticalAlignBottomOutlined />
-          </Space>
+          <VerticalAlignBottomOutlined />
         </Button>
       </Tooltip>
     </Dropdown>
