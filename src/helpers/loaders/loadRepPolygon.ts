@@ -59,7 +59,10 @@ const parseReplayPolygonLine = (line: string): PolygonData | null => {
       if (latDir === 'S') lat = -lat
       if (lngDir === 'W') lng = -lng
 
-      points.push({ lat, lng })
+      const shortLat = parseFloat(lat.toFixed(4))
+      const shortLng = parseFloat(lng.toFixed(4))
+
+      points.push({ lat: shortLat, lng: shortLng })
     } catch (e) {
       console.error(e)
       return null
@@ -83,7 +86,8 @@ const convertToGeoJson = (data: PolygonData[]): Feature<Geometry, MultiZoneProps
     },
     name: data[0].label, // Using the first polygon's label
     visible: true,
-    stroke: '#f00'
+    stroke: '#f00',
+    names: data.map(polygonData => polygonData.label)
   }
   
   const zone: Feature<Geometry, MultiZoneProps> = {

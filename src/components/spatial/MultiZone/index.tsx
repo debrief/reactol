@@ -1,6 +1,7 @@
+import * as turf from '@turf/turf'
 import { Feature, MultiPolygon, Position } from 'geojson'
 import { LatLngExpression, LeafletMouseEvent } from 'leaflet'
-import { Polygon as ReactPolygon } from 'react-leaflet'
+import { Polygon as ReactPolygon, Tooltip } from 'react-leaflet'
 import { useMemo } from 'react'
 import { useDocContext } from '../../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../../helpers/featureIsVisibleAtTime'
@@ -54,6 +55,13 @@ const MultiZone: React.FC<MultiZoneProps> = ({ feature, onClickHandler }) => {
     }
     const polys = feature.geometry.coordinates
     return polys.map((poly, index) => {
+      const points = turf.featureCollection([
+        turf.polygon(poly),
+      ])
+      const centre = turf
+        .center(points)
+        .geometry.coordinates.reverse() as LatLngExpression
+
       const trackCoords =  (poly as unknown as Position[][]).map((line) => line.map((item): LatLngExpression => [item[1], item[0]])) 
       return <ReactPolygon
         key={feature.id + '-polygon-' + isSelected + lineWeight + color + fill + index}
@@ -64,7 +72,17 @@ const MultiZone: React.FC<MultiZoneProps> = ({ feature, onClickHandler }) => {
         color={color}
         fillOpacity={opacity}
         eventHandlers={eventHandlers}
-      ></ReactPolygon>
+      >
+        <Tooltip
+          className={'zone-label'}
+          position={centre}
+          direction='center'
+          opacity={1}
+          permanent
+        >
+          {feature.properties?.names[index]}
+        </Tooltip>
+      </ReactPolygon>
     })
   }, [feature, isSelected, lineWeight, color, fill, opacity, onClickHandler])
 

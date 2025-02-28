@@ -40,6 +40,7 @@ export type ZoneProps = CoreShapeProps & PolygonStyleProps & { dataType: typeof 
  }
 export type MultiZoneProps = CoreShapeProps & PolygonStyleProps & { dataType: typeof MULTI_ZONE_TYPE
   specifics: MultiZonePolygonProps
+  names: string[]
 }
 
 export type PointProps = CoreShapeProps & PointStyleProps & { dataType: typeof REFERENCE_POINT_TYPE }
