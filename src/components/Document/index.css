@@ -140,3 +140,11 @@ html, body, #root, .App, #map {
 .ant-splitter-bar-collapse-bar:hover {
   background: #99d0ff !important;
 }
+
+.ant-select-selection-search-input {
+  padding: 6px !important;
+}
+
+.ant-btn-color-primary.ant-btn-variant-outlined {
+  margin-right: 2px !important;
+}
