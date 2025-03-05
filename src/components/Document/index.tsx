@@ -18,6 +18,12 @@ import './index.css'
 import ControlPanel from '../ControlPanel'
 import { GraphsPanel } from '../GraphsPanel'
 import { TimeSupport } from '../../helpers/time-support'
+import field from '../../data/buoyfield1'
+import track1 from '../../data/track1'
+import track2 from '../../data/track2'
+import track3 from '../../data/track3'
+import zones from '../../data/zones'
+import points from '../../data/points'
 
 interface FileHandler {
   blobType: string
@@ -59,8 +65,12 @@ function Document({ filePath }: { filePath?: string }) {
   useEffect(() => {
     if (!loadedRef.current) {
       loadedRef.current = true
+      const newData: Feature[] = [
+        track1, track2, track3, field, ...zones, ...points
+      ]
+      console.log('loading sample data:', newData)
       // (temporarily) load bulk selection
-      // dispatch({ type: 'fColl/featuresAdded', payload: JSON.parse(JSON.stringify(zones)) })
+      dispatch({ type: 'fColl/featuresAdded', payload: newData })
     }
 
   }, [dispatch, loadedRef])
