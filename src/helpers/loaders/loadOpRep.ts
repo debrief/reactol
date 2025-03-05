@@ -2,6 +2,7 @@ import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
 import { AppDispatch } from '../../state/store'
 import { TRACK_TYPE } from '../../constants'
 import { ExistingTrackProps, NewTrackProps, TrackProps } from '../../types'
+import { cloneDeep } from 'lodash'
 
 interface OpRepData {
   dtg: string
@@ -93,8 +94,11 @@ const addToExistingTrack = (data: OpRepData[], existingTrack: Feature<Geometry, 
 
   const { times, courses, speeds, coordinates } = extractTrackItems(data)
 
+  // we need to clone the track so we can add the new data
+  const newTrack = cloneDeep(existingTrack)
+
   // sort out the year and month
-  const [year, month] = determineYearAndMonth(existingTrack.properties.times, times[0])
+  const [year, month] = determineYearAndMonth(newTrack.properties.times, times[0])
   const dtgs = times.map((item) => new Date(Date.UTC(year, month - 1, item[0], item[1], item[2])).toISOString())
   
   // decide if we are pre-pending or appending data
@@ -102,33 +106,27 @@ const addToExistingTrack = (data: OpRepData[], existingTrack: Feature<Geometry, 
 
   // add this data to the existing track
   if (appendValues) {
-    existingTrack.properties.times.push(...dtgs)
-    if (existingTrack.properties.courses) { 
-      existingTrack.properties.courses.push(...courses)
+    newTrack.properties.times.push(...dtgs)
+    if (newTrack.properties.courses) { 
+      newTrack.properties.courses.push(...courses)
     }
-    if (existingTrack.properties.speeds) {
-      existingTrack.properties.speeds.push(...speeds)
+    if (newTrack.properties.speeds) {
+      newTrack.properties.speeds.push(...speeds)
     }
-    const lineString: LineString = existingTrack.geometry as LineString
+    const lineString: LineString = newTrack.geometry as LineString
     lineString.coordinates.push(...coordinates)
   } else {
-    existingTrack.properties.times.unshift(...dtgs)
-    if (existingTrack.properties.courses) {
-      existingTrack.properties.courses.unshift(...courses)      
+    newTrack.properties.times.unshift(...dtgs)
+    if (newTrack.properties.courses) {
+      newTrack.properties.courses.unshift(...courses)      
     } 
-    if (existingTrack.properties.speeds) {
-      existingTrack.properties.speeds.unshift(...speeds)
+    if (newTrack.properties.speeds) {
+      newTrack.properties.speeds.unshift(...speeds)
     }
-    const lineString: LineString = existingTrack.geometry as LineString
+    const lineString: LineString = newTrack.geometry as LineString
     lineString.coordinates.unshift(...coordinates)
   }
-  const lineString: LineString = existingTrack.geometry as LineString
-  if (appendValues) { 
-    lineString.coordinates.push(...coordinates)
-  } else {
-    lineString.coordinates.unshift(...coordinates)
-  }
-  return existingTrack
+  return newTrack
 }
 
 const generateNewTrack = (data: OpRepData[], values: NewTrackProps): Feature<Geometry, TrackProps> => {
@@ -161,7 +159,7 @@ const generateNewTrack = (data: OpRepData[], values: NewTrackProps): Feature<Geo
   }
 }
 
-export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, existingTrackDetails?: ExistingTrackProps, values?: NewTrackProps) => {
+export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, existingTrackDetails?: ExistingTrackProps, newTrackDetails?: NewTrackProps) => {
 
   const lines = text.split('\n')
   const data: OpRepData[] = []
@@ -171,6 +169,11 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     if (parsedLine) {
       data.push(parsedLine)
     }
+  }
+
+  if (!existingTrackDetails && !newTrackDetails) {
+    console.warn('Need to specify either existing track or new track details')
+    return
   }
 
   if (existingTrackDetails) {
@@ -184,10 +187,10 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     const res = addToExistingTrack(data, existingTrack as Feature<Geometry, TrackProps>)
     dispatch({ type: 'fColl/featureUpdated', payload: res })
   } else {
-    if (!values || !values.year || !values.month || !values.name || !values.shortName || !values.env || !values.stroke) {
+    if (!newTrackDetails || !newTrackDetails.year || !newTrackDetails.month || !newTrackDetails.name || !newTrackDetails.shortName || !newTrackDetails.env || !newTrackDetails.stroke) {
       return
     }  
-    const newFeature = generateNewTrack(data, values)
+    const newFeature = generateNewTrack(data, newTrackDetails)
     dispatch({ type: 'fColl/featureAdded', payload: newFeature }) 
   }
 
