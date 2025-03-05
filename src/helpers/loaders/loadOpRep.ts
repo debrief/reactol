@@ -82,7 +82,10 @@ const extractTrackItems = (data: OpRepData[]): TrackItems => {
   }
 }
 
-export const determineYearAndMonth = (existingTimes: string[], firstItem: [number, number, number]): [number, number] => {
+export const determineYearAndMonth = (existingTimes: string[], firstItem: [number, number, number], initialMonth: number, initialYear: number): [number, number] => {
+  if (existingTimes.length === 0) {
+    return [initialYear, initialMonth]
+  }
   const timeLimits = [existingTimes[0], existingTimes[existingTimes.length - 1]]
   const timeLimitsAsDates = timeLimits.map((item) => new Date(item))
   const earliestDay = timeLimitsAsDates[0].getDate()
@@ -118,7 +121,8 @@ const addToExistingTrack = (data: OpRepData[], existingTrack: Feature<Geometry, 
   const newTrack = cloneDeep(existingTrack)
 
   // sort out the year and month
-  const [year, month] = determineYearAndMonth(existingTrack.properties.times, times[0] )
+  const props = existingTrack.properties
+  const [year, month] = determineYearAndMonth(props.times, times[0], props.initialMonth, props.initialYear )
   const dtgs = times.map((item) => new Date(Date.UTC(year, month - 1, item[0], item[1], item[2])).toISOString())
   
   // decide if we are pre-pending or appending data
@@ -146,7 +150,6 @@ const addToExistingTrack = (data: OpRepData[], existingTrack: Feature<Geometry, 
     const lineString: LineString = newTrack.geometry as LineString
     lineString.coordinates.unshift(...coordinates)
   }
-  console.log('new track', newTrack)
   return newTrack
 }
 
@@ -154,7 +157,7 @@ const generateNewTrack = (data: OpRepData[], values: NewTrackProps): Feature<Geo
 
   const { times, courses, speeds, coordinates } = extractTrackItems(data)
 
-  const dtgs = times.map((item) => new Date(Date.UTC(values.year, values.month - 1, item[0], item[1], item[2])).toISOString())
+  const dtgs = times.map((item) => new Date(Date.UTC(values.initialYear, values.initialMonth - 1, item[0], item[1], item[2])).toISOString())
 
   const props: TrackProps = {
     dataType: TRACK_TYPE,
@@ -166,6 +169,8 @@ const generateNewTrack = (data: OpRepData[], values: NewTrackProps): Feature<Geo
     times: dtgs,
     courses,
     speeds,
+    initialMonth: values.initialMonth,
+    initialYear: values.initialYear,
     labelInterval: parseInt(values.labelInterval),
     symbolInterval: parseInt(values.symbolInterval)
   }
@@ -197,8 +202,6 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     return
   }
 
-  console.log('load op rep', data, existingTrackDetails, newTrackDetails)
-
   if (existingTrackDetails) {
     // find the feature for this track
     const existingTrack = _features.find((feature) => feature.id === existingTrackDetails.trackId)
@@ -210,7 +213,7 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     const res = addToExistingTrack(data, existingTrack as Feature<Geometry, TrackProps>)
     dispatch({ type: 'fColl/featureUpdated', payload: res })
   } else {
-    if (!newTrackDetails || !newTrackDetails.year || !newTrackDetails.month || !newTrackDetails.name || !newTrackDetails.shortName || !newTrackDetails.env || !newTrackDetails.stroke) {
+    if (!newTrackDetails || !newTrackDetails.initialYear || !newTrackDetails.initialMonth || !newTrackDetails.name || !newTrackDetails.shortName || !newTrackDetails.env || !newTrackDetails.stroke) {
       return
     }  
     const newFeature = generateNewTrack(data, newTrackDetails)
