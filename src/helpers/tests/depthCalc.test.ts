@@ -17,7 +17,9 @@ describe('depthCalc', () => {
       visible: true,
       env: 'air',
       labelInterval: 600000,
-      symbolInterval: 60000
+      symbolInterval: 60000,
+      initialMonth: 10,
+      initialYear: 2024
     },
     geometry: {
       type: 'LineString',
