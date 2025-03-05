@@ -113,4 +113,55 @@ describe('loadOpRep function', () => {
     expect(firstTime).toBeTruthy()
     expect(firstTime?.startsWith('2023-11')).toBe(true)
   })
+
+  it('should append data to an existing track when existingTrackDetails is provided', async () => {
+    // Create an initial track
+    const initialOpRepData = `
+      271300Z/3731.25N–01643.69E/095/15.0/-//
+      271301Z/3731.30N–01643.75E/095/15.0/-//
+    `
+    const existing: Feature<Geometry, GeoJsonProperties>[] = []
+    await loadOpRep(initialOpRepData, existing, store.dispatch, undefined, {
+      year: 2024,
+      month: 12,
+      name: 'test-track',
+      shortName: 'tt',
+      env: 'air',
+      stroke: '#ff0',
+      visible: true,
+      dataType: TRACK_TYPE,
+      labelInterval: '600000',
+      symbolInterval: '60000'
+    })
+
+    // Get the created track's ID
+    const state = store.getState() as FeatureCollection
+    expect(state.features.length).toBe(1)
+    const trackId = state.features[0].id
+
+    // Add more data to the existing track
+    const additionalOpRepData = `
+      271302Z/3731.35N–01643.81E/095/15.0/-//
+      271303Z/3731.40N–01643.87E/095/15.0/-//
+    `
+    
+    await loadOpRep(additionalOpRepData, state.features, store.dispatch, {
+      trackId: trackId as string
+    })
+
+    // Verify the updated track
+    const updatedState = store.getState() as FeatureCollection
+    const feature = updatedState.features[0] as Feature<LineString>
+    
+    expect(updatedState.features.length).toBe(1) // Still only one track
+    expect(feature.geometry.coordinates.length).toBe(4) // Combined coordinates
+    expect(feature.properties?.times.length).toBe(4) // Combined times
+    expect(feature.properties?.courses.length).toBe(4) // Combined courses
+    expect(feature.properties?.speeds.length).toBe(4) // Combined speeds
+    
+    // Verify the times are in chronological order
+    const times = feature.properties?.times
+    expect(times?.every((time: string, i: number) => i === 0 || time > times[i - 1])).toBe(true)
+  })
+
 })
