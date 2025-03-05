@@ -47,6 +47,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       label: feature.properties?.name || feature.id,
     }))
 
+  const defaultTrackId = trackOptions[0]?.value  
   const initialYear = new Date().getFullYear()
   const initialMonth = new Date().getMonth() + 1
   const itemStyle = { marginBottom: 0 }
@@ -64,8 +65,8 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   }
 
   const initialNewTrackValues: Partial<NewTrackProps> = {
-    year: initialYear,
-    month: initialMonth,
+    initialYear,
+    initialMonth,
     env: environment || symbolOptions[0].value,
     stroke: presetColors[0].colors[0] as string,
     labelInterval: '' + Number(defaultIntervals[5].value),
@@ -94,6 +95,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           <Form.Item<AddTrackProps>
             label='Track'
             name='trackId'
+            initialValue={defaultTrackId}
             style={itemStyle}
             rules={[
               {
@@ -158,7 +160,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
 
           <Form.Item<NewTrackProps>
             label='Year'
-            name='year'
+            name='initialYear'
             style={itemStyle}
             rules={[{ required: true, message: 'Please enter Year for data' }]}
           >
@@ -167,7 +169,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
 
           <Form.Item<NewTrackProps>
             label='Month'
-            name='month'
+            name='initialMonth'
             style={itemStyle}
             rules={[{ required: true, message: 'Please enter Month for data' }]}
           >
