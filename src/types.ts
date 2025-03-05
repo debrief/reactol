@@ -26,6 +26,8 @@ export type TrackProps = CoreTrackPrps & LineStyleProps & {
   speeds?: number[]
   labelInterval?: number
   symbolInterval?: number
+  initialMonth: number
+  initialYear: number
 }
 
 export type BuoyFieldProps = Omit<CoreTrackPrps, 'env'> & TemporalShapeProps & PointStyleProps & {
@@ -47,10 +49,12 @@ export type GroupProps = {
 }
 
 export type NewTrackProps = Omit<TrackProps, 'times' | 'courses' | 'speeds' | 'labelInterval' | 'symbolInterval'> & {
-  year: number
-  month: number
   labelInterval: string
   symbolInterval: string
+}
+
+export type ExistingTrackProps = {
+  trackId: string
 }
 
 export type AddTrackProps = {

@@ -5,7 +5,7 @@ import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
 import { AppDispatch } from '../../state/store'
-import { NewTrackProps } from '../../types'
+import { ExistingTrackProps, NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
 import { loadJson } from '../../helpers/loaders/loadJson'
 import { loadOpRep } from '../../helpers/loaders/loadOpRep'
@@ -20,7 +20,7 @@ import { GraphsPanel } from '../GraphsPanel'
 
 interface FileHandler {
   blobType: string
-  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, values?: NewTrackProps) => void
+  handle: (text: string, features: Feature<Geometry, GeoJsonProperties>[], dispatch: AppDispatch, existingTrackDetails?: ExistingTrackProps, newTrackDetails?: NewTrackProps) => void
 }
 
 export interface TimeState {
@@ -30,7 +30,7 @@ export interface TimeState {
   end: number
 }
 
-const FileHandlers: FileHandler[] = [
+const fileHandlers: FileHandler[] = [
   { blobType: 'application/json', handle: loadJson },
   { blobType: 'text/plain', handle: loadOpRep } 
 ]
@@ -114,7 +114,7 @@ function Document({ filePath }: { filePath?: string }) {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      const handler = file && FileHandlers.find(handler => handler.blobType === file.type)
+      const handler = file && fileHandlers.find(handler => handler.blobType === file.type)
       if (handler) {
         try {
           if (file.type === 'text/plain') {
@@ -123,7 +123,7 @@ function Document({ filePath }: { filePath?: string }) {
             handler.handle(await file.text(), features, dispatch)
           }
         } catch (e) {
-          console.log('handler error', e)
+          console.error('handler error', file, handler, e)
           setMessage({ title: 'Error', severity: 'error', message: 'Handling error: ' + e })
         }
       }
@@ -143,7 +143,7 @@ function Document({ filePath }: { filePath?: string }) {
   const setLoadTrackResults = async (values: NewTrackProps) => {
     setIsDialogVisible(false)
     if (currentFile && currentHandler) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, values)
+      currentHandler.handle(await currentFile.text(), features, dispatch, undefined, values)
     }
   }
 
@@ -151,9 +151,11 @@ function Document({ filePath }: { filePath?: string }) {
     setIsDialogVisible(false)
   }
 
-  const addToTrack = (trackId: string) => {
+  const addToTrack = async (trackId: string) => {
     setIsDialogVisible(false)
-    console.log('adding data to track:' + trackId)
+    if (currentFile && currentHandler) {
+      currentHandler.handle(await currentFile.text(), features, dispatch, { trackId }, undefined)
+    }
   }
 
   const doSave = useCallback(async () => {
