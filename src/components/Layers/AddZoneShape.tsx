@@ -1,4 +1,4 @@
-import { Dropdown, MenuProps } from 'antd'
+import { Dropdown, MenuProps, Tooltip } from 'antd'
 import {
   PlusCircleOutlined
 } from '@ant-design/icons'
@@ -49,7 +49,9 @@ export const AddZoneShape: React.FC<AddZoneProps> = ({ addZone }) => {
   }
   
   return <Dropdown trigger={['click']} menu={menuProps}>
-    <PlusCircleOutlined />
+    <Tooltip title="Create new zone">
+      <PlusCircleOutlined />
+    </Tooltip>
   </Dropdown>
 
 }
