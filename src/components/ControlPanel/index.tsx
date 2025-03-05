@@ -52,11 +52,10 @@ interface TimeButtonProps {
 }
 
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
-  const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard } = useDocContext()
+  const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
-  const [interval, setInterval] = useState<number>(0)
 
   useEffect(() => {
     try {
@@ -168,7 +167,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
         <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
           <Tooltip
             mouseEnterDelay={0.8}
-            title='Lock viewport to prevent accidental map movement'
+            title='Lock viewport to prevent accidental map movement. When time filtering, mouse wheel updates time'
           >
             <Button
               style={buttonStyle}
