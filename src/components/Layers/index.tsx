@@ -262,7 +262,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [message, setMessage] = React.useState<string>('')
-  const [createTrackDialogVisible, setcreateTrackDialogVisible] =
+  const [pendingTrackEnvironment, setPendingTrackEnvironment] =
     useState<EnvOptions | null>(null)
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
@@ -365,7 +365,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     (e: React.MouseEvent, key: string, title: string) => {
       if (key === NODE_TRACKS) {
         // special case - the environment is passed in title
-        setcreateTrackDialogVisible(title as EnvOptions)
+        setPendingTrackEnvironment(title as EnvOptions)
       } else if (key === NODE_FIELDS) {
         addBuoyField()
       } else if (key === NODE_POINTS) {
@@ -423,7 +423,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const setLoadTrackResults = async (values: NewTrackProps) => {
-    setcreateTrackDialogVisible(null)
+    setPendingTrackEnvironment(null)
     // props in NewTrackProps format to TrackProps format, where they have different type
     const newValues = values as unknown as TrackProps
     newValues.labelInterval = parseInt(values.labelInterval)
@@ -449,7 +449,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const handleDialogCancel = () => {
-    setcreateTrackDialogVisible(null)
+    setPendingTrackEnvironment(null)
   }
   return (
     <>
@@ -525,10 +525,10 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           treeData={model}
         />
       )}
-      {createTrackDialogVisible && (
+      {pendingTrackEnvironment && (
         <LoadTrackModel
-          visible={createTrackDialogVisible !== null}
-          environment={createTrackDialogVisible}
+          visible={pendingTrackEnvironment !== null}
+          environment={pendingTrackEnvironment}
           cancel={handleDialogCancel}
           newTrack={setLoadTrackResults}
           addToTrack={() => {}}
