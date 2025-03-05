@@ -29,6 +29,8 @@ interface DocContextProps {
   setMapNode: (node: HTMLElement | null) => void
   editableMapFeature: EditableMapFeature | null
   setEditableMapFeature: React.Dispatch<React.SetStateAction<EditableMapFeature | null>>
+  interval: number
+  setInterval: React.Dispatch<React.SetStateAction<number>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)
