@@ -132,7 +132,7 @@ const getIcon = (feature: Feature | undefined,
   handleAdd?: (e: React.MouseEvent, key: string, title: string) => void, button?: React.ReactNode) => {
   // If no feature is provided, this is a parent node - show plus icon
   if (!feature) {
-    return handleAdd && (button || <Tooltip title={addIconLabelFor(key, title)}>
+    return handleAdd ? (button || <Tooltip title={addIconLabelFor(key, title)}>
       <PlusCircleOutlined
         style={{ cursor: 'copy' }}
         onClick={(e) => handleAdd(e, key, title)}
