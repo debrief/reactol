@@ -83,10 +83,30 @@ const extractTrackItems = (data: OpRepData[]): TrackItems => {
 }
 
 export const determineYearAndMonth = (existingTimes: string[], firstItem: [number, number, number]): [number, number] => {
-  console.log('determine year and month', existingTimes, firstItem)
-  const times = existingTimes.map((item) => new Date(item))
-  const year = times[0].getFullYear()
-  const month = times[0].getMonth() + 1
+  const timeLimits = [existingTimes[0], existingTimes[existingTimes.length - 1]]
+  const timeLimitsAsDates = timeLimits.map((item) => new Date(item))
+  const earliestDay = timeLimitsAsDates[0].getDate()
+  const latestDay = timeLimitsAsDates[1].getDate()
+  let year = timeLimitsAsDates[1].getFullYear()
+  let month = timeLimitsAsDates[1].getMonth() + 1
+
+  //   Here is the month wrapping logic:
+  // if the day for the first item is 15 or more greater than the earliest day, it must be in the previous month
+  // if the day for the first item is 15 or more less than the earliest day, it must be int he next month
+  if (latestDay - firstItem[0] >= 15) {
+    month++
+    if (month > 12) {
+      year++
+      month = 1
+    }
+  } else if (firstItem[0] - earliestDay >= 15) {
+    month--
+    if (month < 1) {
+      year--
+      month = 12
+    }
+  }
+
   return [year, month]
 }
 
@@ -98,7 +118,7 @@ const addToExistingTrack = (data: OpRepData[], existingTrack: Feature<Geometry, 
   const newTrack = cloneDeep(existingTrack)
 
   // sort out the year and month
-  const [year, month] = determineYearAndMonth(newTrack.properties.times, times[0])
+  const [year, month] = determineYearAndMonth(existingTrack.properties.times, times[0] )
   const dtgs = times.map((item) => new Date(Date.UTC(year, month - 1, item[0], item[1], item[2])).toISOString())
   
   // decide if we are pre-pending or appending data
@@ -126,6 +146,7 @@ const addToExistingTrack = (data: OpRepData[], existingTrack: Feature<Geometry, 
     const lineString: LineString = newTrack.geometry as LineString
     lineString.coordinates.unshift(...coordinates)
   }
+  console.log('new track', newTrack)
   return newTrack
 }
 
@@ -175,6 +196,8 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     console.warn('Need to specify either existing track or new track details')
     return
   }
+
+  console.log('load op rep', data, existingTrackDetails, newTrackDetails)
 
   if (existingTrackDetails) {
     // find the feature for this track
