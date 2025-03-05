@@ -1,7 +1,7 @@
-import { Feature, MultiPoint, Point, Polygon } from 'geojson'
+import { Feature, MultiPoint, MultiPolygon, Point, Polygon } from 'geojson'
 import { MapContainer, useMap } from 'react-leaflet'
 import ScaleNautic from 'react-leaflet-nauticsale'
-import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
+import { BUOY_FIELD_TYPE, GROUP_TYPE, MULTI_ZONE_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -16,6 +16,7 @@ import { BuoyField } from '../BuoyField'
 import { BuoyFieldProps } from '../../../types'
 import { EditFeature } from '../EditFeature'
 import TimePeriod from '../TimePeriod'
+import MultiZone from '../MultiZone'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -31,6 +32,8 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
     return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler} /> 
   case ZONE_TYPE:
     return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
+  case MULTI_ZONE_TYPE:
+    return <MultiZone key={feature.id} feature={feature as Feature<MultiPolygon>} onClickHandler={onClickHandler}/>  
   case REFERENCE_POINT_TYPE:
     return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
   case BUOY_FIELD_TYPE:

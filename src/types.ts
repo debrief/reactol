@@ -1,13 +1,13 @@
-import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE } from './constants'
+import { REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE, GROUP_TYPE, BUOY_FIELD_TYPE, MULTI_ZONE_TYPE } from './constants'
 import { LineStyleProps, PointStyleProps, PolygonStyleProps } from './standardShapeProps.ts'
-import { ZoneShapeProps } from './zoneShapeTypes.ts'
+import { MultiZonePolygonProps, ZoneShapeProps } from './zoneShapeTypes.ts'
 import { Feature } from 'geojson'
 
 /** just a centre time if time provided, else start and end times */
 export type TemporalShapeProps = {time?: string, timeEnd?: string} 
 
 export type CoreDataProps = {
-  dataType: typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE | typeof GROUP_TYPE | typeof BUOY_FIELD_TYPE
+  dataType: typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE | typeof GROUP_TYPE | typeof BUOY_FIELD_TYPE | typeof MULTI_ZONE_TYPE
   name: string
   visible: boolean
 }
@@ -38,6 +38,11 @@ export type CoreShapeProps = CoreDataProps & TemporalShapeProps
 export type ZoneProps = CoreShapeProps & PolygonStyleProps & { dataType: typeof ZONE_TYPE
   specifics: ZoneShapeProps
  }
+export type MultiZoneProps = CoreShapeProps & PolygonStyleProps & { dataType: typeof MULTI_ZONE_TYPE
+  specifics: MultiZonePolygonProps
+  names: string[]
+}
+
 export type PointProps = CoreShapeProps & PointStyleProps & { dataType: typeof REFERENCE_POINT_TYPE }
 export type GroupProps = {
   dataType: typeof GROUP_TYPE
