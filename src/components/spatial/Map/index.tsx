@@ -57,11 +57,9 @@ const MapFeatures: React.FC<{
 }
 
 // Separate component for map controls
-const MapControls: React.FC<{
-  viewportFrozen: boolean
-}> = ({ viewportFrozen }) => {
+const MapControls: React.FC = () => {
   const map = useMap()
-  const { setMapNode } = useDocContext()
+  const { setMapNode, viewportFrozen } = useDocContext()
 
   useEffect(() => {
     if (map) {
@@ -72,7 +70,6 @@ const MapControls: React.FC<{
         map.touchZoom.disable()
         map.doubleClickZoom.disable()
         map.boxZoom.disable() 
-  
       } else {
         map.dragging.enable()
         map.scrollWheelZoom.enable()
@@ -98,7 +95,7 @@ const MapControls: React.FC<{
 
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(state => state.fColl.features)
-  const { selection, setSelection, viewportFrozen } = useDocContext()
+  const { selection, setSelection } = useDocContext()
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -126,7 +123,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         features={features}
         onClickHandler={onClickHandler}
       />
-      <MapControls viewportFrozen={viewportFrozen} />
+      <MapControls/>
     </MapContainer>
   )
 }
