@@ -27,6 +27,7 @@ import {
   PointProps,
   GroupProps,
   BuoyFieldProps,
+  EnvOptions,
 } from '../../types'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
@@ -34,9 +35,16 @@ import { AddZoneShape } from './AddZoneShape'
 import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { noop } from 'lodash'
+import { symbolOptions } from '../../helpers/symbolTypes'
 
 type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
 const { DirectoryTree } = Tree
+
+const NODE_TRACKS = 'node-tracks'
+const NODE_FIELDS = 'node-fields'
+const NODE_ZONES = 'node-zones'
+const NODE_POINTS = 'node-points'
+const NODE_GROUPS = 'node-groups'
 
 type FieldDataNode = {
   title: string
@@ -95,15 +103,41 @@ const groupIdFor = (parent: Feature, child?: string): string => {
   return `${parent.id || 'unknown'}:${child || 'unknown'}`
 }
 
+const addIconLabelFor = (key: string, title: string) => {
+  switch(key) {
+  case NODE_TRACKS: {
+    // special case - get the name for the env
+    const env = title as EnvOptions
+    return 'Create new ' +  symbolOptions.find(e => e.value === env)?.label + ' track'
+  }
+  case NODE_FIELDS: {
+    return 'Create new buoy field'
+  }
+  case NODE_ZONES: {
+    return 'Create new zone'
+  }
+  case NODE_POINTS: {
+    return 'Create new reference point'
+  }
+  case NODE_GROUPS: {
+    return 'Create new group'
+  }
+  default:
+    return 'ERROR - node type not handled: ' + key
+  }
+}
+
 const getIcon = (feature: Feature | undefined, 
   key:string, title: string,
-  handleAdd: (e: React.MouseEvent, key: string, title: string) => void, button?: React.ReactNode) => {
+  handleAdd?: (e: React.MouseEvent, key: string, title: string) => void, button?: React.ReactNode) => {
   // If no feature is provided, this is a parent node - show plus icon
   if (!feature) {
-    return button || <PlusCircleOutlined
-      style={{ cursor: 'copy' }}
-      onClick={(e) => handleAdd(e, key, title)}
-    />
+    return handleAdd ? (button || <Tooltip title={addIconLabelFor(key, title)}>
+      <PlusCircleOutlined
+        style={{ cursor: 'copy' }}
+        onClick={(e) => handleAdd(e, key, title)}
+      />
+    </Tooltip>) : null
   }
 
   // For leaf nodes, show type-specific icon based on dataType
@@ -111,6 +145,30 @@ const getIcon = (feature: Feature | undefined,
   const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
   const environment = feature.properties?.env
   return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
+}
+
+const trackFunc = (features: Feature[], handleAdd: (e: React.MouseEvent, key: string, title: string) => void): TreeDataNode => {
+  // generate new root
+  const root: TreeDataNode = {
+    title: 'Units',
+    key: NODE_TRACKS,
+    icon: <FolderOutlined />,
+    children: [],
+  }
+  const environments = symbolOptions.map((env): TreeDataNode => ({
+    title: env.label,
+    key: env.value,
+    icon: getIcon(undefined, NODE_TRACKS, env.value, handleAdd, undefined),
+    children: features.filter(feature => feature.properties?.env === env.value).map((feature): TreeDataNode => ({
+      title: nameFor(feature),
+      key: idFor(feature),
+      icon: getIcon(feature, idFor(feature), nameFor(feature), undefined, undefined),
+      children: [],
+    }))
+  }))
+
+  root.children = root.children ? root.children.concat(...environments) : [...environments]
+  return root
 }
 
 const mapFunc = (
@@ -202,13 +260,10 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   )
   const dispatch = useAppDispatch()
 
-  const NODE_TRACKS = 'node-tracks'
-  const NODE_FIELDS = 'node-fields'
-
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [message, setMessage] = React.useState<string>('')
-  const [createTrackDialogVisible, setcreateTrackDialogVisible] =
-    useState(false)
+  const [pendingTrackEnvironment, setPendingTrackEnvironment] =
+    useState<EnvOptions | null>(null)
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
   const clearSelection = () => {
@@ -309,12 +364,13 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const handleAdd = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {
       if (key === NODE_TRACKS) {
-        setcreateTrackDialogVisible(true)
+        // special case - the environment is passed in title
+        setPendingTrackEnvironment(title as EnvOptions)
       } else if (key === NODE_FIELDS) {
         addBuoyField()
-      } else if (key === 'node-points') {
+      } else if (key === NODE_POINTS) {
         addPoint()
-      } else if (key === 'node-zones') {
+      } else if (key === NODE_ZONES) {
         throw new Error('This method not responsible for adding zones')
       } else if (key === 'node-groups') {
         addGroup()
@@ -328,7 +384,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   useEffect(() => {
     const items: TreeDataNode[] = []
-    items.push(mapFunc(features, 'Tracks', NODE_TRACKS, TRACK_TYPE, handleAdd))
+    items.push(trackFunc(features, handleAdd))
     items.push(
       mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
     )
@@ -367,7 +423,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const setLoadTrackResults = async (values: NewTrackProps) => {
-    setcreateTrackDialogVisible(false)
+    setPendingTrackEnvironment(null)
     // props in NewTrackProps format to TrackProps format, where they have different type
     const newValues = values as unknown as TrackProps
     newValues.labelInterval = parseInt(values.labelInterval)
@@ -393,7 +449,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
 
   const handleDialogCancel = () => {
-    setcreateTrackDialogVisible(false)
+    setPendingTrackEnvironment(null)
   }
   return (
     <>
@@ -469,9 +525,10 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
           treeData={model}
         />
       )}
-      {createTrackDialogVisible && (
+      {pendingTrackEnvironment && (
         <LoadTrackModel
-          visible={createTrackDialogVisible}
+          visible={pendingTrackEnvironment !== null}
+          environment={pendingTrackEnvironment}
           cancel={handleDialogCancel}
           newTrack={setLoadTrackResults}
           addToTrack={() => {}}
