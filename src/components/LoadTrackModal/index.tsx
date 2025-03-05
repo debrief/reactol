@@ -16,7 +16,7 @@ import {
 import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
 import { useAppSelector } from '../../state/hooks'
-import { AddTrackProps, NewTrackProps } from '../../types'
+import { AddTrackProps, EnvOptions, NewTrackProps } from '../../types'
 import { defaultIntervals } from '../../helpers/timeIntervals'
 import './index.css'
 import { symbolOptions } from '../../helpers/symbolTypes'
@@ -28,6 +28,7 @@ export interface LoadTrackModelProps {
   addToTrack: (trackId: string) => void
   cancel: () => void
   createTrackOnly?: boolean
+  environment?: EnvOptions
 }
 
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
@@ -35,6 +36,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   cancel,
   newTrack,
   addToTrack,
+  environment,
   createTrackOnly = false,
 }) => {
   const features = useAppSelector((state) => state.fColl.features)
@@ -64,7 +66,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const initialNewTrackValues: Partial<NewTrackProps> = {
     year: initialYear,
     month: initialMonth,
-    env: symbolOptions[0].value,
+    env: environment || symbolOptions[0].value,
     stroke: presetColors[0].colors[0] as string,
     labelInterval: '' + Number(defaultIntervals[5].value),
     symbolInterval: '' + Number(defaultIntervals[4].value),
