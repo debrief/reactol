@@ -17,6 +17,7 @@ import { LoadTrackModel } from '../LoadTrackModal'
 import './index.css'
 import ControlPanel from '../ControlPanel'
 import { GraphsPanel } from '../GraphsPanel'
+import { TimeSupport } from '../../helpers/time-support'
 
 interface FileHandler {
   blobType: string
@@ -28,6 +29,9 @@ export interface TimeState {
   start: number
   step: string
   end: number
+  // the outer limits
+  hardStart: number
+  hardEnd: number
 }
 
 const fileHandlers: FileHandler[] = [
@@ -39,10 +43,10 @@ function Document({ filePath }: { filePath?: string }) {
   const features = useAppSelector(state => state.fColl.features)
   const storeContents = useAppSelector(state => state.fColl)
   const dispatch = useAppDispatch()
+  const { setTime, time, message, setMessage, interval } = useDocContext()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const { setTime, time, message, setMessage } = useDocContext()
   const [dirty, setDirty] = useState(false)
   const loadedRef = useRef<boolean>(false)
   const [splitterHeights, setSplitterHeights] = useState<number[] | null>(null)
@@ -66,7 +70,7 @@ function Document({ filePath }: { filePath?: string }) {
       const timeBoundsVal = timeBoundsFor(features)
       if(timeBoundsVal) {
         setTimeBounds(timeBoundsVal)
-        const timePayload = { filterApplied: false, start: timeBoundsVal[0], step: '00h30m', end: timeBoundsVal[1] }
+        const timePayload = { filterApplied: false, start: timeBoundsVal[0], step: '00h30m', end: timeBoundsVal[1], hardStart: timeBoundsVal[0], hardEnd: timeBoundsVal[1] }
         setTime(timePayload)  
       } else {
         setTimeBounds(null)
@@ -186,6 +190,25 @@ function Document({ filePath }: { filePath?: string }) {
     setSplitterWidths(sizes)
   }
 
+  const handleScroll = (event: React.WheelEvent) => {
+    // check if we are in time filter mode
+    if (!time.filterApplied) return
+    const fwd = event.deltaY > 0
+    const timeNow = new Date(time.start)
+    const newStart = fwd
+      ? TimeSupport.increment(timeNow, interval)
+      : TimeSupport.decrement(timeNow, interval)
+    const newEnd = TimeSupport.increment(newStart, interval)
+    if (newEnd.getTime() >= time.hardStart && newStart.getTime() <= time.hardEnd) {
+      const newTime = {
+        ...time,
+        start: newStart.getTime(),
+        end: newEnd.getTime(),
+      }
+      setTime(newTime)
+    }
+  }
+
   return (
     <div style={{height: '100%' }} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       {isDragging && <><div className="modal-back"/> <div className="drag-overlay">+</div></>}
@@ -193,32 +216,36 @@ function Document({ filePath }: { filePath?: string }) {
         <Alert showIcon type={message?.severity} description={message?.message} />
       </Modal> }
       <ConfigProvider theme={antdTheme}>
-        <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
-          <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-            <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
-              <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
-                <Card title='Control Panel'>
-                  <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
-                </Card>
-              </Splitter.Panel>
-              <Splitter.Panel>
-                <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                  { features && <Layers openGraph={() => setGraphOpen(true)} /> }
-                </Card>
-              </Splitter.Panel>
-              <Splitter.Panel>
-                <Tabs defaultActiveKey="1" items={detailTabs} />
-              </Splitter.Panel>
-            </Splitter>
-          </Splitter.Panel>
-          <Splitter.Panel key='right'>
-            <Map>
-              <TileLayer maxNativeZoom={8} maxZoom={16}
-                url="tiles/{z}/{x}/{y}.png"
-              />
-            </Map>
-          </Splitter.Panel>
-        </Splitter>
+        { /* introduce div, so we can catch wheel event */ }
+        <div style={{width: '100%', height: '100%', overflow: 'hidden'}} onWheel={handleScroll}>
+          <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
+            <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
+              <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
+                <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
+                  <Card title='Control Panel'>
+                    <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
+                  </Card>
+                </Splitter.Panel>
+                <Splitter.Panel>
+                  <Card title='Layers' style={{width: '100%', height: '100%'}} >
+                    { features && <Layers openGraph={() => setGraphOpen(true)} /> }
+                  </Card>
+                </Splitter.Panel>
+                <Splitter.Panel>
+                  <Tabs defaultActiveKey="1" items={detailTabs} />
+                </Splitter.Panel>
+              </Splitter>
+            </Splitter.Panel>
+            <Splitter.Panel key='right'>
+              <Map>
+                <TileLayer maxNativeZoom={8} maxZoom={16}
+                  url="tiles/{z}/{x}/{y}.png"
+                />
+              </Map>
+            </Splitter.Panel>
+          </Splitter>
+        </div>
+
         <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
       <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
