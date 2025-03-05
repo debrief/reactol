@@ -68,7 +68,6 @@ function Document({ filePath }: { filePath?: string }) {
       const newData: Feature[] = [
         track1, track2, track3, field, ...zones, ...points
       ]
-      console.log('loading sample data:', newData)
       // (temporarily) load bulk selection
       dispatch({ type: 'fColl/featuresAdded', payload: newData })
     }
