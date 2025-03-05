@@ -30,7 +30,7 @@ export interface TimeState {
   end: number
 }
 
-const FileHandlers: FileHandler[] = [
+const fileHandlers: FileHandler[] = [
   { blobType: 'application/json', handle: loadJson },
   { blobType: 'text/plain', handle: loadOpRep } 
 ]
@@ -114,7 +114,7 @@ function Document({ filePath }: { filePath?: string }) {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
-      const handler = file && FileHandlers.find(handler => handler.blobType === file.type)
+      const handler = file && fileHandlers.find(handler => handler.blobType === file.type)
       if (handler) {
         try {
           if (file.type === 'text/plain') {
@@ -123,7 +123,7 @@ function Document({ filePath }: { filePath?: string }) {
             handler.handle(await file.text(), features, dispatch)
           }
         } catch (e) {
-          console.log('handler error', e)
+          console.error('handler error', file, handler, e)
           setMessage({ title: 'Error', severity: 'error', message: 'Handling error: ' + e })
         }
       }
@@ -151,9 +151,11 @@ function Document({ filePath }: { filePath?: string }) {
     setIsDialogVisible(false)
   }
 
-  const addToTrack = (trackId: string) => {
+  const addToTrack = async (trackId: string) => {
     setIsDialogVisible(false)
-    console.log('adding data to track:' + trackId)
+    if (currentFile && currentHandler) {
+      currentHandler.handle(await currentFile.text(), features, dispatch, { trackId }, undefined)
+    }
   }
 
   const doSave = useCallback(async () => {
