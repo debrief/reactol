@@ -137,7 +137,7 @@ const getIcon = (feature: Feature | undefined,
         style={{ cursor: 'copy' }}
         onClick={(e) => handleAdd(e, key, title)}
       />
-    </Tooltip>)
+    </Tooltip>) : null
   }
 
   // For leaf nodes, show type-specific icon based on dataType
