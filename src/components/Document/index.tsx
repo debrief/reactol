@@ -45,7 +45,7 @@ const fileHandlers: FileHandler[] = [
   { blobType: 'text/plain', handle: loadOpRep } 
 ]
 
-function Document({ filePath }: { filePath?: string }) {
+function Document({ filePath, withSampleData }: { filePath?: string, withSampleData?: boolean }) {
   const features = useAppSelector(state => state.fColl.features)
   const storeContents = useAppSelector(state => state.fColl)
   const dispatch = useAppDispatch()
@@ -64,19 +64,16 @@ function Document({ filePath }: { filePath?: string }) {
   }, [features])
 
   useEffect(() => {
-    if (!loadedRef.current) {
-      loadedRef.current = true
+    if (!loadedRef.current && withSampleData) {
+      // (temporarily) load bulk selection
       const newData: Feature[] = [
         track1, track2, track3, field, ...zones, ...points
       ]
-      // (temporarily) load bulk selection
-      const loadSampleData = false
-      if (loadSampleData) {
-        dispatch({ type: 'fColl/featuresAdded', payload: newData })
-      }
+      dispatch({ type: 'fColl/featuresAdded', payload: newData })
+      loadedRef.current = true
     }
 
-  }, [dispatch, loadedRef])
+  }, [dispatch, loadedRef, withSampleData])
 
   useEffect(() => {
     if (features && features.length) {

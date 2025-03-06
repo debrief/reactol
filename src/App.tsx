@@ -9,6 +9,7 @@ import { cleanFeature } from './state/geoFeaturesSlice.ts'
 export type AppProps = {
   content?: string
   filePath?: string
+  withSampleData?: boolean
 }
 
 /** we will allow a feature collection or a single 
@@ -34,12 +35,12 @@ const toFeatureCollection = (content?: string) => {
   throw new Error('Unknown type: ' + item.type)
 }
 
-function App({ content, filePath }: AppProps) {
+function App({ content, filePath, withSampleData }: AppProps) {
   const [store] = useState(createStore(toFeatureCollection(content)))
   return (
     <Provider store={store}>
       <DocContextProvider>
-        <Document filePath={filePath} />
+        <Document filePath={filePath} withSampleData={withSampleData} />
       </DocContextProvider>  
     </Provider>  
   )
