@@ -25,7 +25,7 @@ const DEFAULT_DOC_NAME = 'Pending'
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [tabToClose, setTabToClose] = useState<Action | null>(null)
-  const [isTabNameModalVisible, setIsTabNameModalVisible] = useState(false)
+  const [newTabState, setNewTabState] = useState<'empty'|'samples'| null>(null)
   const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
   const [isDragging, setIsDragging] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
@@ -66,12 +66,12 @@ const Documents = () => {
   }, [layoutModel])
 
   useEffect(() => {
-    if (isTabNameModalVisible) {
+    if (newTabState) {
       setTimeout(() => {
         inputRef.current?.focus()
       }, 50)
     }
-  }, [isTabNameModalVisible])
+  }, [newTabState])
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     // Only prevent default and show indicator if it's a file being dragged
@@ -138,19 +138,19 @@ const Documents = () => {
   }
 
   const handleOk = () => {
-    setIsTabNameModalVisible(false)
     const newTab: TabWithPath = {
       key: '' + Date.now(),
       label: documentName,
-      children: <App />
+      children: <App withSampleData={newTabState === 'samples'} />
     }
+    setNewTabState(null)
     addTabToLayout(newTab)
     setTabs([...tabs, newTab])
     setDocumentName(DEFAULT_DOC_NAME)
   }
 
  
-  const handleNew = async () => {
+  const handleNew = async (withSample?: boolean) => {
     if (window.electron) {
       const options = { 
         title: 'New document', 
@@ -174,13 +174,13 @@ const Documents = () => {
         return
       }
     } else {
-      setIsTabNameModalVisible(true)
+      setNewTabState( withSample ? 'samples' : 'empty')
     }
   }
 
   const handleCancel = () => {
     setDocumentName(DEFAULT_DOC_NAME)
-    setIsTabNameModalVisible(false)
+    setNewTabState(null)
   }
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -302,7 +302,7 @@ const Documents = () => {
       }
       <Modal
         title="Please provide a name for the document"
-        open={isTabNameModalVisible}
+        open={newTabState !== null}
         onOk={handleOk}
         onCancel={handleCancel}
       >
@@ -345,8 +345,8 @@ const Documents = () => {
                 <Col span={12}><Typography.Text type='secondary'>Open an existing document or create a new one</Typography.Text></Col>
               </Row>
               <Row>
-                <Col span={8}></Col>
-                <Col span={8}><Button onClick={handleNew} size='large' block type='primary'>New</Button></Col>
+                <Col span={6}></Col>
+                <Col span={12}><Button onClick={() => handleNew(false)} size='large' type='primary'>New</Button><Button style={{fontStyle: 'italic', marginLeft: '10px'}} onClick={() => handleNew(true)} size='large' type='primary'>Sample plot</Button></Col>
               </Row>
               <Row style={{ paddingTop: '25px' }}>
                 <Col span={8}></Col>
