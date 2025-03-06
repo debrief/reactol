@@ -25,7 +25,7 @@ const DEFAULT_DOC_NAME = 'Pending'
 const Documents = () => {
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [tabToClose, setTabToClose] = useState<Action | null>(null)
-  const [isTabNameModalVisible, setIsTabNameModalVisible] = useState<'empty'|'samples'| null>(null)
+  const [newTabState, setNewTabState] = useState<'empty'|'samples'| null>(null)
   const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
   const [isDragging, setIsDragging] = useState(false)
   const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
@@ -66,12 +66,12 @@ const Documents = () => {
   }, [layoutModel])
 
   useEffect(() => {
-    if (isTabNameModalVisible) {
+    if (newTabState) {
       setTimeout(() => {
         inputRef.current?.focus()
       }, 50)
     }
-  }, [isTabNameModalVisible])
+  }, [newTabState])
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     // Only prevent default and show indicator if it's a file being dragged
@@ -141,9 +141,9 @@ const Documents = () => {
     const newTab: TabWithPath = {
       key: '' + Date.now(),
       label: documentName,
-      children: <App withSampleData={isTabNameModalVisible === 'samples'} />
+      children: <App withSampleData={newTabState === 'samples'} />
     }
-    setIsTabNameModalVisible(null)
+    setNewTabState(null)
     addTabToLayout(newTab)
     setTabs([...tabs, newTab])
     setDocumentName(DEFAULT_DOC_NAME)
@@ -174,13 +174,13 @@ const Documents = () => {
         return
       }
     } else {
-      setIsTabNameModalVisible( withSample ? 'samples' : 'empty')
+      setNewTabState( withSample ? 'samples' : 'empty')
     }
   }
 
   const handleCancel = () => {
     setDocumentName(DEFAULT_DOC_NAME)
-    setIsTabNameModalVisible(null)
+    setNewTabState(null)
   }
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -302,7 +302,7 @@ const Documents = () => {
       }
       <Modal
         title="Please provide a name for the document"
-        open={isTabNameModalVisible !== null}
+        open={newTabState !== null}
         onOk={handleOk}
         onCancel={handleCancel}
       >
