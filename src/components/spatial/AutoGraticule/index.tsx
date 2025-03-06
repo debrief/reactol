@@ -15,7 +15,7 @@ import {
 } from 'leaflet'
 import './index.css'
 import { useMap } from 'react-leaflet'
-import { useState, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { formatCoordinate } from '../../../helpers/formatCoordinate'
 
 interface GraticuleOptions extends LayerOptions {
@@ -28,29 +28,32 @@ interface GraticuleOptions extends LayerOptions {
     formatter?: (value: number, isLatitude: boolean) => string
 }
 
+interface AutoGraticuleProps {
+  formatter?: (value: number, isLat: boolean) => string
+}
+
 /** helper component provides the map graticule */
-export const Graticule: React.FC = () => {
+export const Graticule: React.FC<AutoGraticuleProps> = ({formatter}) => {
   const map = useMap()
-  const [existing, setExisting] = useState<AutoGraticule | undefined>(undefined)
+  const existing = useRef<AutoGraticule | null>(null)
   useEffect(() => {
     if (map) {
-      if (existing) {
-        existing.remove()
+      if (existing.current) {
+        existing.current.remove()
       }
-      const formatter = (value: number, isLat: boolean): string => {
+      const defaultFormatter = (value: number, isLat: boolean): string => {
         return formatCoordinate(value, isLat, true, '&nbsp;')
       }
       const options: GraticuleOptions = {
         redraw: 'moveend',
         minDistance: 100,  // Minimum distance between two lines in pixels
-        formatter: formatter
+        formatter: formatter || defaultFormatter
       }
       const graticule = new AutoGraticule(options)
       graticule.addTo(map)
-      setExisting(graticule)
+      existing.current = graticule
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[map])
+  },[map, formatter])
   return null
 }
 
