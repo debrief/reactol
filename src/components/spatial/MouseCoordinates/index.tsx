@@ -103,7 +103,7 @@ const MouseCoordinates: React.FC = () => {
     <p>Lat: {latString}</p>
     <p>Lng: {lngString}</p>
     <p style={{ textAlign: 'end'}}><Switch size='small' onChange={() => setUseNatoCoords(!useNatoCoords)} checked={useNatoCoords}
-      checkedChildren="NATO" unCheckedChildren="Decimal" /></p>
+      checkedChildren="DM.M" unCheckedChildren="DMS" /></p>
     <p>Rel to <b>{rangeBearing.subject}</b>:</p>
     <p>{`${('' + rangeBearing.rng.toFixed(1)).padStart(5, '0')} kyds`}/
       {`${('' + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
