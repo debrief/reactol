@@ -44,6 +44,27 @@ const hasEmptyCoordinates = (feature: Feature): boolean => {
   }
 }
 
+interface CoordsSwitchProps {
+  checked: boolean
+  onChange: (checked: boolean) => void
+}
+
+/** convenience component to make time button construction easier */
+const CoordsSwitch: React.FC<CoordsSwitchProps> = ({
+  checked,
+  onChange
+}) => {
+  return (
+    <Switch
+      size='small'
+      onChange={onChange}
+      checked={checked}
+      unCheckedChildren={'DMS'}
+      checkedChildren={'DM.M'}
+    />
+  )
+}
+
 const MouseCoordinates: React.FC = () => {
   const { selection, useNatoCoords, setUseNatoCoords } = useDocContext()
   const features = useAppSelector(state => state.fColl.features)
@@ -102,8 +123,9 @@ const MouseCoordinates: React.FC = () => {
   return !viewportFrozen && (<div className="mouse-coordinates-panel">
     <p>Lat: {latString}</p>
     <p>Lng: {lngString}</p>
-    <p style={{ textAlign: 'end'}}><Switch size='small' onChange={() => setUseNatoCoords(!useNatoCoords)} checked={useNatoCoords}
-      checkedChildren="DM.M" unCheckedChildren="DMS" /></p>
+    <p style={{ textAlign: 'end'}}><CoordsSwitch
+      onChange={() => setUseNatoCoords(!useNatoCoords)}
+      checked={useNatoCoords}/></p>
     <p>Rel to <b>{rangeBearing.subject}</b>:</p>
     <p>{`${('' + rangeBearing.rng.toFixed(1)).padStart(5, '0')} kyds`}/
       {`${('' + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
