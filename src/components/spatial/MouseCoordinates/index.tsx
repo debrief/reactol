@@ -7,7 +7,8 @@ import nearestPoint from '@turf/nearest-point'
 import './index.css'
 import { useDocContext } from '../../../state/DocContext'
 import { useAppSelector } from '../../../state/hooks'
-import { formatCoordinate } from '../../../helpers/formatCoordinate'
+import { formatCoordinate, formatNatoCoords } from '../../../helpers/formatCoordinate'
+import { Switch } from 'antd'
 
 const bearingToAzimuth = (bearing: number) => {
   return (bearing + 360) % 360
@@ -43,8 +44,29 @@ const hasEmptyCoordinates = (feature: Feature): boolean => {
   }
 }
 
+interface CoordsSwitchProps {
+  checked: boolean
+  onChange: (checked: boolean) => void
+}
+
+/** convenience component to make time button construction easier */
+export const CoordsSwitch: React.FC<CoordsSwitchProps> = ({
+  checked,
+  onChange
+}) => {
+  return (
+    <Switch
+      size='small'
+      onChange={onChange}
+      checked={checked}
+      unCheckedChildren={'DMS'}
+      checkedChildren={'DM.M'}
+    />
+  )
+}
+
 const MouseCoordinates: React.FC = () => {
-  const { selection } = useDocContext()
+  const { selection, useNatoCoords, setUseNatoCoords } = useDocContext()
   const features = useAppSelector(state => state.fColl.features)
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0})
   const { viewportFrozen } = useDocContext()
@@ -75,7 +97,10 @@ const MouseCoordinates: React.FC = () => {
             const bearing = bearingToAzimuth(turf.bearing(nearestPt, turfMouse))
             const pointPos = turf.point(nearestPt.geometry.coordinates)
             const range = turf.distance(turfMouse, pointPos)
-            return {rng: range, brg: bearing, subject: selectedFeature.properties?.name || ''}  
+            // convert range from km to kiloyards
+            const rangeM = range * 1000
+            const rangeKly = rangeM / 914.4
+            return {rng: rangeKly, brg: bearing, subject: selectedFeature.properties?.name || ''}  
           } 
         }
       }
@@ -89,12 +114,20 @@ const MouseCoordinates: React.FC = () => {
       return {rng: 0, brg: 0, subject: ''}
     }
   }, [mouseCoords, map, selection, features])
+
+  const latString = useMemo(() => useNatoCoords ? formatNatoCoords(mouseCoords.lat, true, false, ' ') :
+    formatCoordinate(mouseCoords.lat, true, false, ' '), [mouseCoords.lat, useNatoCoords])
+  const lngString = useMemo(() => useNatoCoords ? formatNatoCoords(mouseCoords.lng, false, false, ' ') :
+    formatCoordinate(mouseCoords.lng, false, false, ' '), [mouseCoords.lng, useNatoCoords])
   
   return !viewportFrozen && (<div className="mouse-coordinates-panel">
-    <p>Lat: {formatCoordinate(mouseCoords.lat, true, false, ' ')}</p>
-    <p>Lng: {formatCoordinate(mouseCoords.lng, false, false, ' ')}</p>
+    <p>Lat: {latString}</p>
+    <p>Lng: {lngString}</p>
+    <p style={{ textAlign: 'end'}}><CoordsSwitch
+      onChange={() => setUseNatoCoords(!useNatoCoords)}
+      checked={useNatoCoords}/></p>
     <p>Rel to <b>{rangeBearing.subject}</b>:</p>
-    <p>{`${('' + rangeBearing.rng.toFixed(1)).padStart(5, '0')} km`}/
+    <p>{`${('' + rangeBearing.rng.toFixed(1)).padStart(5, '0')} kyds`}/
       {`${('' + rangeBearing.brg.toFixed(1)).padStart(5, '0')} degs`}</p>
   </div>)
   
