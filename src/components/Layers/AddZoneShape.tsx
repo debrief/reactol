@@ -39,8 +39,10 @@ export const AddZoneShape: React.FC<AddZoneProps> = ({ addZone }) => {
     }
   })
 
-  const handleAddShapeClick = (e: {key: string}) => {
+  const handleAddShapeClick = (e: {key: string, domEvent: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>}) => {
     addZone(e.key)
+    // TODO: This isn't preventing the zones tree node from opening
+    e.domEvent.stopPropagation()
   }
 
   const menuProps = {
