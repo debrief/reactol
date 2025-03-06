@@ -32,3 +32,31 @@ export const formatCoordinate = (coordinate: number, isLat: boolean, allowShorte
     return `${toPadStr(degrees)}°${toPadStr(minutes)}'${toPadStr(seconds)}"${spaceChar}${direction}`
   }
 }
+
+export const formatNatoCoords = (coordinate: number, isLat: boolean, allowShorten: boolean, spaceChar: string): string => {  if (coordinate === 0) {
+  return '0°'
+}
+const toPadStr2 = (num: number) => ('' + num).padStart(2, '0')
+const absolute = Math.abs(coordinate)
+const degrees = Math.floor(absolute)
+const minutesNotTruncated = (absolute - degrees) * 60
+const minutes = (Math.floor(minutesNotTruncated * 100)) / 100
+const minInt = Math.floor(minutes)
+const minDec = Math.floor((minutes - minInt) * 100)
+const minIntStr = ('' + minInt).padStart(2, '0 ')
+const minDecStr = ('' + minDec).padEnd(2, '0 ')
+const minStr = minIntStr + '.' + minDecStr
+const direction = isLat
+  ? coordinate >= 0
+    ? 'N'
+    : 'S'
+  : coordinate >= 0
+    ? 'E'
+    : 'W'
+  
+if (allowShorten && minutes === 0) {
+  return `${toPadStr2(degrees)}°${spaceChar}${direction}`
+} else {
+  return `${toPadStr2(degrees)}°${minStr}'${spaceChar}${direction}`
+}
+}
