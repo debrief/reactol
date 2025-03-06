@@ -31,6 +31,8 @@ interface DocContextProps {
   setEditableMapFeature: React.Dispatch<React.SetStateAction<EditableMapFeature | null>>
   interval: number
   setInterval: React.Dispatch<React.SetStateAction<number>>
+  useNatoCoords: boolean
+  setUseNatoCoords: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)
