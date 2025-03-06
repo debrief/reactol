@@ -47,8 +47,8 @@ const minutesNotTruncated = (absolute - degrees) * 60
 const minutes = (Math.round(minutesNotTruncated * 100)) / 100
 const minInt = Math.floor(minutes)
 const minDec = Math.round((minutes - minInt) * 100)
-const minIntStr = ('' + minInt).padStart(2, '0 ')
-const minDecStr = ('' + minDec).padEnd(2, '0 ')
+const minIntStr = ('' + minInt).padStart(2, '0')
+const minDecStr = ('' + minDec).padEnd(2, '0')
 const minStr = (allowShorten && minDecStr === '00') ? minIntStr : minIntStr + '.' + minDecStr
 const direction = isLat
   ? coordinate >= 0
