@@ -16,6 +16,7 @@ import { BuoyField } from '../BuoyField'
 import { BuoyFieldProps } from '../../../types'
 import { EditFeature } from '../EditFeature'
 import TimePeriod from '../TimePeriod'
+import { formatCoordinate, formatNatoCoords } from '../../../helpers/formatCoordinate'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -59,7 +60,7 @@ const MapFeatures: React.FC<{
 // Separate component for map controls
 const MapControls: React.FC = () => {
   const map = useMap()
-  const { setMapNode, viewportFrozen } = useDocContext()
+  const { setMapNode, viewportFrozen, useNatoCoords } = useDocContext()
 
   useEffect(() => {
     if (map) {
@@ -80,11 +81,17 @@ const MapControls: React.FC = () => {
     }
   },[map, viewportFrozen, setMapNode])
 
+  const gridFormatter = useMemo(() => {
+    return (value: number, isLat: boolean): string => {
+      return useNatoCoords ? formatNatoCoords(value, isLat, true, '&nbsp;') : formatCoordinate(value, isLat, true, '&nbsp;')
+    }
+  }, [useNatoCoords])
+
   return (
     <>
       <MouseCoordinates/>
       <ScaleNautic nautic={true} metric={false} imperial={false} />
-      <Graticule/>
+      <Graticule formatter={gridFormatter}/>
       <PolylineMeasure/>
       <HomeControl/>
       <TimePeriod/>

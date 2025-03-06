@@ -17,6 +17,7 @@ export const DocContextProvider: React.FC<Props> = ({ children }) => {
   const [newFeature, setNewFeature] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [editableMapFeature, setEditableMapFeature] = useState<EditableMapFeature | null>(null)
   const [interval, setInterval] = useState<number>(0)
+  const [useNatoCoords, setUseNatoCoords] = useState<boolean>(true)
 
   const copyMapToClipboard = useCallback(async () => {
     if (!mapNode) {
@@ -36,7 +37,7 @@ export const DocContextProvider: React.FC<Props> = ({ children }) => {
   }, [mapNode])
 
   return (
-    <DocContext.Provider value={{ selection, setMapNode, setSelection, time, setTime, viewportFrozen, copyMapToClipboard, setViewportFrozen, message, setMessage, newFeature, setNewFeature, editableMapFeature, setEditableMapFeature, interval, setInterval }}>
+    <DocContext.Provider value={{ selection, setMapNode, setSelection, time, setTime, viewportFrozen, copyMapToClipboard, setViewportFrozen, message, setMessage, newFeature, setNewFeature, editableMapFeature, setEditableMapFeature, interval, setInterval, useNatoCoords, setUseNatoCoords }}>
       {children}
     </DocContext.Provider>
   )
