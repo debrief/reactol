@@ -57,6 +57,7 @@ function Document({ filePath }: { filePath?: string }) {
   const loadedRef = useRef<boolean>(false)
   const [splitterHeights, setSplitterHeights] = useState<number[] | null>(null)
   const [splitterWidths, setSplitterWidths] = useState<number[] | null>(null)
+  const [pendingOpRepFiles, setPendingOpRepFiles] = useState<File[] | null>(null)
 
   useEffect(() => {
     setDirty(true)
@@ -69,7 +70,10 @@ function Document({ filePath }: { filePath?: string }) {
         track1, track2, track3, field, ...zones, ...points
       ]
       // (temporarily) load bulk selection
-      dispatch({ type: 'fColl/featuresAdded', payload: newData })
+      const loadSampleData = false
+      if (loadSampleData) {
+        dispatch({ type: 'fColl/featuresAdded', payload: newData })
+      }
     }
 
   }, [dispatch, loadedRef])
@@ -119,22 +123,23 @@ function Document({ filePath }: { filePath?: string }) {
 
     const files = event.dataTransfer.files
 
-    if (files.length > 1) {
-      console.log('too many files error')
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
-      return
+    const filesArray = Array.from(files)
+    type FileAndHandler = {
+      file: File
+      handler: FileHandler | undefined
     }
+    const filesAndHandlers = filesArray.map((file): FileAndHandler => ({ file, handler: fileHandlers.find(handler => handler.blobType === file.type) }))
+    const textFiles = filesAndHandlers.filter(({ handler }) => handler?.blobType === 'text/plain')
+    const otherFiles = filesAndHandlers.filter(({ handler }) => handler?.blobType !== 'text/plain')
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const handler = file && fileHandlers.find(handler => handler.blobType === file.type)
+    if (textFiles.length > 0) {
+      setPendingOpRepFiles(textFiles.map(({ file }) => file))
+    }
+    for (let j = 0; j < otherFiles.length; j++) {
+      const { file, handler } = otherFiles[j]
       if (handler) {
         try {
-          if (file.type === 'text/plain') {
-            showDialog(file, handler)
-          } else {
-            handler.handle(await file.text(), features, dispatch)
-          }
+          handler.handle(await file.text(), features, dispatch)
         } catch (e) {
           console.error('handler error', file, handler, e)
           setMessage({ title: 'Error', severity: 'error', message: 'Handling error: ' + e })
@@ -143,32 +148,29 @@ function Document({ filePath }: { filePath?: string }) {
     }
   }
 
-  const [isDialogVisible, setIsDialogVisible] = useState(false)
-  const [currentFile, setCurrentFile] = useState<File | null>(null)
-  const [currentHandler, setCurrentHandler] = useState<FileHandler | null>(null)
-
-  const showDialog = (file: File, handler: FileHandler) => {
-    setCurrentFile(file)
-    setCurrentHandler(handler)
-    setIsDialogVisible(true)
-  }
-
-  const setLoadTrackResults = async (values: NewTrackProps) => {
-    setIsDialogVisible(false)
-    if (currentFile && currentHandler) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, undefined, values)
+  const loadNewTrack = async (values: NewTrackProps) => {
+    if (pendingOpRepFiles) {
+      // concatenate all of the file contents into one long string
+      let fileContents = ''
+      for(let i = 0; i < pendingOpRepFiles.length; i++) {
+        fileContents += await pendingOpRepFiles[i].text() + '\n'
+      }
+      loadOpRep(fileContents, features, dispatch, undefined, values)
     }
+    setPendingOpRepFiles(null)
   }
 
   const handleDialogCancel = () => {
-    setIsDialogVisible(false)
+    setPendingOpRepFiles(null)
   }
 
   const addToTrack = async (trackId: string) => {
-    setIsDialogVisible(false)
-    if (currentFile && currentHandler) {
-      currentHandler.handle(await currentFile.text(), features, dispatch, { trackId }, undefined)
+    if (pendingOpRepFiles) {
+      for (let i = 0; i< pendingOpRepFiles.length; i++){
+        loadOpRep(await pendingOpRepFiles[i].text(), features, dispatch, { trackId }, undefined)
+      }
     }
+    setPendingOpRepFiles(null)
   }
 
   const doSave = useCallback(async () => {
@@ -257,8 +259,8 @@ function Document({ filePath }: { filePath?: string }) {
 
         <GraphModal open={graphOpen} doClose={() => setGraphOpen(false)} />
       </ConfigProvider>
-      <LoadTrackModel visible={isDialogVisible} cancel={handleDialogCancel} 
-        newTrack={setLoadTrackResults} addToTrack={addToTrack} />
+      <LoadTrackModel visible={!!pendingOpRepFiles} cancel={handleDialogCancel} 
+        newTrack={loadNewTrack} addToTrack={addToTrack} />
     </div>
   )
 }
