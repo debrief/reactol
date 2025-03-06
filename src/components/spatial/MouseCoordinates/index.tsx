@@ -50,7 +50,7 @@ interface CoordsSwitchProps {
 }
 
 /** convenience component to make time button construction easier */
-const CoordsSwitch: React.FC<CoordsSwitchProps> = ({
+export const CoordsSwitch: React.FC<CoordsSwitchProps> = ({
   checked,
   onChange
 }) => {

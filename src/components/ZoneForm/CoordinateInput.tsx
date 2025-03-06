@@ -1,9 +1,10 @@
-import { Col, Row, Switch } from 'antd'
+import { Col, Row } from 'antd'
 import { CoordinateElementInput } from './CoordinateElement'
 import { useEffect, useMemo, useState } from 'react'
 import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson'
 import { useDocContext } from '../../state/DocContext'
 import { EditOnMapButton } from '../CoreForm/EditOnMapButton'
+import { CoordsSwitch } from '../spatial/MouseCoordinates'
 
 interface CoordinateInputProps {
   value?: [number, number]
@@ -83,12 +84,9 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
           />
         </Col>
         <Col span={'30px'}>
-          <Switch
-            size="small"
+          <CoordsSwitch
             checked={shortFormat}
             onChange={setShortFormat}
-            checkedChildren="DM"
-            unCheckedChildren="DMS"
           />
         </Col>
         <Col span={'30px'}>
