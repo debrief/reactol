@@ -95,6 +95,21 @@ html, body, #root, .App, #map {
   color: rgba(84, 125, 238, 0.7);
   pointer-events: none;
 }
+
+#detail-tabs .ant-tabs-nav-wrap {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+#detail-tabs .ant-tabs-tab {
+  background: rgba(255, 255, 255, 0.8) !important;  
+  margin-right: 0px !important;
+  margin-left: 10px !important;
+  padding: 0px 5px !important;
+  border-radius: 8px 8px 0 0 !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+
 .ant-tabs-tab, .ant-tabs-nav-wrap, .ant-card-head-title {
   background: rgba(0, 0, 0, 0.8);
   background-image: linear-gradient(rgba(90, 120, 240, 0.3) 1px, transparent 1px), linear-gradient(to right, rgba(90, 120, 240, 0.3) 1px, transparent 1px);
@@ -109,6 +124,11 @@ html, body, #root, .App, #map {
 
 .ant-tabs-tab .ant-tabs-tab-btn {
   color: #fff !important;
+}
+
+
+#detail-tabs .ant-tabs-tab .ant-tabs-tab-btn {
+  color: #000 !important;
 }
 
 .ant-tabs-tab-active .ant-tabs-tab-btn {
