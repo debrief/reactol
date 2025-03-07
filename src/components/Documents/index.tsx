@@ -116,7 +116,7 @@ const Documents = () => {
         const newTab: TabWithPath = {
           key: '' + Date.now(),
           label: file.name.split('.')[0],
-          children: <App content={content} />
+          children: <App content={content} fileName={file.name} />
         }
         setTabs([...tabs, newTab])
         addTabToLayout(newTab)
@@ -141,7 +141,7 @@ const Documents = () => {
     const newTab: TabWithPath = {
       key: '' + Date.now(),
       label: documentName,
-      children: <App withSampleData={newTabState === 'samples'} />
+      children: <App withSampleData={newTabState === 'samples'} fileName={documentName} />
     }
     setNewTabState(null)
     addTabToLayout(newTab)
@@ -222,7 +222,7 @@ const Documents = () => {
           const newTab: TabWithPath = {
             key: '' + Date.now(),
             label: file.name.split('.')[0],
-            children: <App content={content} />
+            children: <App content={content} fileName={file.name} />
           }
           setTabs([...tabs, newTab])
           addTabToLayout(newTab)
