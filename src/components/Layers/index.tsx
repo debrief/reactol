@@ -218,7 +218,8 @@ const idFor = (feature: Feature): string => {
 }
 
 const nameFor = (feature: Feature): string => {
-  return (feature.properties?.name || feature.id) + ' : ' + feature.id
+  return (feature.properties?.name || feature.id)
+  // return (feature.properties?.name || feature.id) + ' : ' + feature.id
 }
 
 // filter out the branches, just leave the leaves
