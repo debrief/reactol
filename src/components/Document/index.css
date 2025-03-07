@@ -95,6 +95,32 @@ html, body, #root, .App, #map {
   color: rgba(84, 125, 238, 0.7);
   pointer-events: none;
 }
+
+#detail-tabs .ant-tabs-nav-wrap {
+  background: rgba(0, 0, 0, 0.3) !important;
+  background-image: linear-gradient(rgba(90, 120, 240, 0.6) 1px, transparent 1px), linear-gradient(to right, rgba(90, 120, 240, 0.6) 1px, transparent 1px);
+  background-size: 7px 7px;
+
+}
+
+#detail-tabs .ant-tabs-tab {
+  background: rgba(0, 0, 0, 0.8) !important;
+  margin-right: 0px !important;
+  margin-left: 10px !important;
+  padding: 0px 5px !important;
+  border-radius: 8px 8px 0 0 !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+#detail-tabs .ant-tabs-tab-active, #detail-tabs .ant-tabs-ink-bar {
+  border: 0 !important;
+}
+
+
+#detail-tabs .ant-tabs-tab .ant-tabs-tab-btn {
+  color: #fff !important;
+}
+
 .ant-tabs-tab, .ant-tabs-nav-wrap, .ant-card-head-title {
   background: rgba(0, 0, 0, 0.8);
   background-image: linear-gradient(rgba(90, 120, 240, 0.3) 1px, transparent 1px), linear-gradient(to right, rgba(90, 120, 240, 0.3) 1px, transparent 1px);
