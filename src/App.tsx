@@ -1,5 +1,5 @@
 import './App.css'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import { createStore } from './state/store.ts'
 import { DocContextProvider } from './state/DocContextProvider.tsx'
 import Document from './components/Document/index.tsx'
@@ -38,10 +38,12 @@ const toFeatureCollection = (content?: string) => {
 
 function App({ content, filePath, withSampleData, fileName }: AppProps) {
   const [store] = useState(createStore(toFeatureCollection(content), fileName || filePath))
+  const canUndo = useSelector((state: any) => state.fColl.past.length > 0)
+  const canRedo = useSelector((state: any) => state.fColl.future.length > 0)
   return (
     <Provider store={store}>
       <DocContextProvider>
-        <Document filePath={filePath} withSampleData={withSampleData} />
+        <Document filePath={filePath} withSampleData={withSampleData} canUndo={canUndo} canRedo={canRedo} />
       </DocContextProvider>  
     </Provider>  
   )

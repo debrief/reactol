@@ -45,7 +45,7 @@ const fileHandlers: FileHandler[] = [
   { blobType: 'text/plain', handle: loadOpRep } 
 ]
 
-function Document({ filePath, withSampleData }: { filePath?: string, withSampleData?: boolean }) {
+function Document({ filePath, withSampleData, canUndo, canRedo }: { filePath?: string, withSampleData?: boolean, canUndo: boolean, canRedo: boolean }) {
   const features = useAppSelector(state => state.fColl.features)
   const storeContents = useAppSelector(state => state.fColl)
   const dispatch = useAppDispatch()
@@ -231,7 +231,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
               <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
                 <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
                   <Card title='Control Panel'>
-                    <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
+                    <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds} canUndo={canUndo} canRedo={canRedo} />
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>

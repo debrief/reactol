@@ -9,7 +9,9 @@ import {
   LockFilled,
   UnlockOutlined,
   FilterFilled,
-  SaveOutlined
+  SaveOutlined,
+  UndoOutlined,
+  RedoOutlined
 } from '@ant-design/icons'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDocContext } from '../../state/DocContext'
@@ -17,6 +19,8 @@ import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
 import { SampleDataLoader } from '../SampleDataLoader'
 import { sampleItems } from '../../data/sampleItems'
+import { ActionCreators } from 'redux-undo'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface TimeProps {
   bounds: [number, number] | null
@@ -56,6 +60,9 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
+  const dispatch = useDispatch()
+  const canUndo = useSelector((state: any) => state.fColl.past.length > 0)
+  const canRedo = useSelector((state: any) => state.fColl.future.length > 0)
 
   useEffect(() => {
     try {
@@ -206,6 +213,22 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               title='Copy map to clipboard'
               icon={<CopyOutlined />}
               disabled={!viewportFrozen}
+            />
+          </Tooltip>
+          <Tooltip title="Undo">
+            <Button
+              onClick={() => dispatch(ActionCreators.undo())}
+              title="Undo"
+              icon={<UndoOutlined />}
+              disabled={!canUndo}
+            />
+          </Tooltip>
+          <Tooltip title="Redo">
+            <Button
+              onClick={() => dispatch(ActionCreators.redo())}
+              title="Redo"
+              icon={<RedoOutlined />}
+              disabled={!canRedo}
             />
           </Tooltip>
         </Col>

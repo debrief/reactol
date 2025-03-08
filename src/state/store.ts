@@ -1,10 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import featuresReducer from './geoFeaturesSlice'
 import { FeatureCollection } from 'geojson'
+import undoable from 'redux-undo'
 
 export const createStore = (content?: FeatureCollection, fileName?: string) => configureStore({
   reducer: {
-    fColl: featuresReducer
+    fColl: undoable(featuresReducer, {
+      filter: (action, currentState, previousHistory) => action.type !== 'save'
+    })
   },
   preloadedState: content ? {
     fColl: content
