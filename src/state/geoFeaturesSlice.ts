@@ -130,7 +130,6 @@ export const selectBounds = (state: FeatureCollection): LatLngBounds | null => {
 
 // Selectors for redux-undo state
 export const selectFeatures = (state: { fColl: { present: FeatureCollection } }) => state.fColl.present.features
-export const selectFeatureCollection = (state: { fColl: { present: FeatureCollection } }) => state.fColl.present
 
 // Export the generated reducer function
 export default featuresSlice.reducer
