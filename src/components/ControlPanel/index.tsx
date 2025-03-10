@@ -60,7 +60,9 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
   const dispatch = useDispatch()
   const canUndo = useAppSelector(state => state.fColl.past.length > 0)
+  const undoTitle = useAppSelector(state => state.fColl.past.length > 0 ? state.fColl.present.details?.undo : 'Nothing to undo')
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
+  const redoTitle = useAppSelector(state => state.fColl.future.length > 0 ? state.fColl.future[0].details?.redo : 'Nothing to redo')
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
@@ -204,7 +206,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <Tooltip placement='bottom' title={canUndo ? 'Undo last action' : 'Nothing to undo'}>
+          <Tooltip placement='bottom' title={canUndo ? undoTitle : 'Nothing to undo'}>
             <Button
               style={buttonStyle}
               onClick={() => dispatch({ type: UNDO_ACTION })}
@@ -212,7 +214,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               disabled={!canUndo}
             />
           </Tooltip>
-          <Tooltip placement='bottom' title={canRedo ? 'Redo last action' : 'Nothing to redo'}>
+          <Tooltip placement='bottom' title={canRedo ? redoTitle : 'Nothing to redo'}>
             <Button
               style={buttonStyle}
               onClick={() => dispatch({ type: REDO_ACTION })}

@@ -149,11 +149,11 @@ const featuresSlice = createSlice({
     },
     featuresDeleted(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
+      const itemName = namesFor(state.features.features.filter(feature => ids.includes(feature.id as string)))
       state.features.features = state.features.features.filter(feature => !ids.includes(feature.id as string))
       state.features.bbox = updateBounds(state.features)
-      const itemName = namesFor(state.features.features.filter(feature => ids.includes(feature.id as string)))
       state.details = {
-        undo: 'Undo delete ' + itemName,
+        undo: 'Undo delete 1' + itemName,
         redo: 'Redo delete ' + itemName
       } 
     },
