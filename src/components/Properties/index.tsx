@@ -2,6 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useState } from 'react'
 import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps, ZoneProps, PointProps } from '../../types'
 import { useDocContext } from '../../state/DocContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 import './index.css'
 import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint, Point } from 'geojson'
 import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
@@ -19,9 +20,7 @@ const Properties: React.FC = () => {
   const [featureState, setFeatureState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [originalState, setOriginalState] = useState<Feature<Geometry, GeoJsonProperties> | null>(null)
   const [formDirty, setFormDirty] = useState<boolean>(false)
-  const allFeatures = useAppSelector(
-    (state) => state.fColl.features
-  )
+  const allFeatures = useAppSelector(selectFeatures)
   const [propertyForm, setPropertyForm] = useState<ReactNode | null>(null)
   const dispatch = useAppDispatch()
   const selectedFeatureIds = selection

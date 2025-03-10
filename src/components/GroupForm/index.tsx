@@ -4,6 +4,7 @@ import { Key, useMemo, useState } from 'react'
 import { GroupProps } from '../../types'
 import { useAppSelector } from '../../state/hooks'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 interface TransferData {
   key: string
@@ -21,7 +22,7 @@ export interface GroupFormProps {
 
 export const GroupForm: React.FC<GroupFormProps> = ({ group, onChange }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const features = useAppSelector(state => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   
   const nonGroupFeatures = useMemo(() => features.filter(f => f.properties?.dataType !== 'group'), [features])
 

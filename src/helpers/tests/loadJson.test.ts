@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash'
 import { loadJson } from '../loaders/loadJson'
-import featuresReducer from '../../state/geoFeaturesSlice'
-import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from 'geojson'
+import featuresReducer, { StoreState } from '../../state/geoFeaturesSlice'
+import { Feature, Geometry, GeoJsonProperties, LineString } from 'geojson'
 import { createStore } from '@reduxjs/toolkit'
 
 describe('load function', () => {
@@ -44,25 +44,25 @@ describe('load function', () => {
     const existing: Feature<Geometry, GeoJsonProperties>[] = []
     loadJson(geoJsonText, existing, store.dispatch)
 
-    const state = store.getState() as FeatureCollection
-    expect(state.features.length).toBe(2)
-    expect(state.features[0]?.properties?.name).toBe('Feature 1')
-    expect(state.features[1]?.properties?.name).toBe('Feature 2')
-    const secondString = state.features[1] as Feature<LineString>
+    const state = store.getState() as StoreState
+    expect(state.data.features.length).toBe(2)
+    expect(state.data.features[0]?.properties?.name).toBe('Feature 1')
+    expect(state.data.features[1]?.properties?.name).toBe('Feature 2')
+    const secondString = state.data.features[1] as Feature<LineString>
     expect(secondString.geometry.coordinates?.length).toBe(4)
 
     // add again, check it gets longer
     const sampleCopy = cloneDeep(sampleData)
     sampleCopy.features = [sampleCopy.features[1]]
     const justLineString = JSON.stringify(sampleCopy)
-    const newExisting = store.getState() as FeatureCollection
-    loadJson(justLineString, newExisting.features, store.dispatch)
-    const updatedState = store.getState() as FeatureCollection
+    const newExisting = store.getState() as StoreState
+    loadJson(justLineString, newExisting.data.features, store.dispatch)
+    const updatedState = store.getState() as StoreState
     // note the count goes up, since we 'clean' the ids when we add new ones
     // so the duplicate will get a new id
-    expect(updatedState.features.length).toBe(3)
-    const updatedState2 = store.getState() as FeatureCollection
-    const newSecondString = updatedState2.features[1] as Feature<LineString>
+    expect(updatedState.data.features.length).toBe(3)
+    const updatedState2 = store.getState() as StoreState
+    const newSecondString = updatedState2.data.features[1] as Feature<LineString>
     expect(newSecondString.geometry.coordinates?.length).toBe(4)
   })
 
@@ -75,7 +75,7 @@ describe('load function', () => {
     const existing: Feature<Geometry, GeoJsonProperties>[] = []
     expect(() => loadJson(invalidGeoJsonText, existing, store.dispatch)).toThrow('Invalid GeoJSON format:InvalidType')
 
-    const state = store.getState() as FeatureCollection
-    expect(state.features.length).toBe(0)
+    const state = store.getState() as StoreState
+    expect(state.data.features.length).toBe(0)
   })
 })

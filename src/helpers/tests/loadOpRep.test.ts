@@ -1,6 +1,6 @@
 import { loadOpRep } from '../loaders/loadOpRep'
-import featuresReducer from '../../state/geoFeaturesSlice'
-import { Feature, Geometry, GeoJsonProperties, FeatureCollection, LineString } from 'geojson'
+import featuresReducer, { StoreState } from '../../state/geoFeaturesSlice'
+import { Feature, Geometry, GeoJsonProperties, LineString } from 'geojson'
 import { createStore } from '@reduxjs/toolkit'
 import { TRACK_TYPE } from '../../constants'
 
@@ -21,9 +21,9 @@ describe('loadOpRep function', () => {
     await loadOpRep(sampleOpRepData, existing, store.dispatch, undefined, {initialYear:2024, initialMonth:12, name:'name-b', shortName:'bbb', env: 'air', stroke: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
-    const state = store.getState() as FeatureCollection
-    expect(state.features.length).toBe(1)
-    const feature = state.features[0] as Feature<LineString>
+    const state = store.getState() as StoreState
+    expect(state.data.features.length).toBe(1)
+    const feature = state.data.features[0] as Feature<LineString>
     expect(feature.geometry.type).toBe('LineString')
     expect(feature.geometry.coordinates.length).toBe(3)
     expect(feature.properties?.times.length).toBe(3)
@@ -43,8 +43,8 @@ describe('loadOpRep function', () => {
     await loadOpRep(sampleOpRepData, existing, store.dispatch, undefined, {initialYear:2024, initialMonth:12, name:'name-a', shortName:'bbb', env: 'air', stroke: 
     '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
-    const state = store.getState() as FeatureCollection
-    const feature = state.features[0] as Feature<LineString>
+    const state = store.getState() as StoreState
+    const feature = state.data.features[0] as Feature<LineString>
     expect(feature.geometry.type).toBe('LineString')
     expect(feature.geometry.coordinates.length).toBe(3)
   })
@@ -59,8 +59,8 @@ describe('loadOpRep function', () => {
     await loadOpRep(sampleOpRepData, existing, store.dispatch, undefined, {initialYear:2024, initialMonth:12, name:'name-a', shortName:'bbb', env: 'air', stroke: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
-    const state = store.getState() as FeatureCollection
-    const feature = state.features[0] as Feature<LineString>
+    const state = store.getState() as StoreState
+    const feature = state.data.features[0] as Feature<LineString>
     expect(feature.geometry.coordinates[0][2]).toBe(-150)
   })
 
@@ -74,8 +74,8 @@ describe('loadOpRep function', () => {
     await loadOpRep(sampleOpRepData, existing, store.dispatch, undefined, {initialYear:2024, initialMonth:12, name:'name-a', shortName:'bbb', env: 'air', stroke: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
-    const state = store.getState() as FeatureCollection
-    const feature = state.features[0] as Feature<LineString>
+    const state = store.getState() as StoreState
+    const feature = state.data.features[0] as Feature<LineString>
     expect(feature.properties?.times.length).toBe(3)
     expect(feature.properties?.courses.length).toBe(3)
     expect(feature.properties?.speeds.length).toBe(3)
@@ -93,8 +93,8 @@ describe('loadOpRep function', () => {
     await loadOpRep(invalidOpRepData, existing, store.dispatch, undefined, {initialYear:2024, initialMonth:12, name:'name-a', shortName:'bbb', env: 'air', stroke: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
-    const state = store.getState() as FeatureCollection
-    const feature = state.features[0] as Feature<LineString>
+    const state = store.getState() as StoreState
+    const feature = state.data.features[0] as Feature<LineString>
     expect(feature.geometry.coordinates.length).toBe(2)
   })
 
@@ -107,8 +107,8 @@ describe('loadOpRep function', () => {
     await loadOpRep(validOpRepData, existing, store.dispatch, undefined, {initialYear:2023, initialMonth:11, name:'name-b', shortName:'bbb', env: 'air', stroke: 
       '#ff0', visible: true, dataType: TRACK_TYPE, labelInterval: '600000', symbolInterval: '60000'})
 
-    const state = store.getState() as FeatureCollection
-    const feature = state.features[0] as Feature<LineString>
+    const state = store.getState() as StoreState
+    const feature = state.data.features[0] as Feature<LineString>
     expect(feature.geometry.coordinates.length).toBe(2)
     expect(feature.properties?.name).toBe('name-b')
     const firstTime = feature.properties?.times[0]
@@ -137,9 +137,9 @@ describe('loadOpRep function', () => {
     })
 
     // Get the created track's ID
-    const state = store.getState() as FeatureCollection
-    expect(state.features.length).toBe(1)
-    const trackId = state.features[0].id
+    const state = store.getState() as StoreState
+    expect(state.data.features.length).toBe(1)
+    const trackId = state.data.features[0].id
 
     // Add more data to the existing track
     const additionalOpRepData = `
@@ -147,15 +147,15 @@ describe('loadOpRep function', () => {
       271303Z/3731.40N–01643.87E/095/15.0/-//
     `
     
-    await loadOpRep(additionalOpRepData, state.features, store.dispatch, {
+    await loadOpRep(additionalOpRepData, state.data.features, store.dispatch, {
       trackId: trackId as string
     })
 
     // Verify the updated track
-    const updatedState = store.getState() as FeatureCollection
-    const feature = updatedState.features[0] as Feature<LineString>
+    const updatedState = store.getState() as StoreState
+    const feature = updatedState.data.features[0] as Feature<LineString>
     
-    expect(updatedState.features.length).toBe(1) // Still only one track
+    expect(updatedState.data.features.length).toBe(1) // Still only one track
     expect(feature.geometry.coordinates.length).toBe(4) // Combined coordinates
     expect(feature.properties?.times.length).toBe(4) // Combined times
     expect(feature.properties?.courses.length).toBe(4) // Combined courses

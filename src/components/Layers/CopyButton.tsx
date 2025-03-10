@@ -7,11 +7,12 @@ import {
 } from '@ant-design/icons'
 import { ToolButton } from '.'
 import { useAppContext } from '../../state/AppContext'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 export const CopyButton: React.FC = () => {
   const { selection, setMessage } = useDocContext()
   const {clipboardUpdated, setClipboardUpdated} = useAppContext()
-  const features = useAppSelector((state) => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
 
   const copyDisabled = useMemo(
     () =>
