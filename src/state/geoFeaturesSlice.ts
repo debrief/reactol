@@ -3,10 +3,26 @@ import { BBox, Feature, FeatureCollection } from 'geojson'
 import * as turf from '@turf/turf'
 import { LatLngBounds } from 'leaflet'
 
-const initialState: FeatureCollection = {
-  type: 'FeatureCollection',
-  features: [],
-  bbox: undefined
+export type StoreState = {
+  features: FeatureCollection
+  details?: HistoryDescriptions
+}
+
+type HistoryDescriptions = {
+  undo: string
+  redo: string
+}
+
+const initialState: StoreState = {
+  features: {
+    type: 'FeatureCollection',
+    features: [],
+    bbox: undefined
+  },
+  details: {
+    undo: 'Undo store initialisation',
+    redo: 'Redo store initialisation'
+  }
 }
 
 type idDictionary = { [name: string]: string } 
@@ -50,45 +66,73 @@ const getExistingIds = (features: Feature[]): string[] => {
   return features.map(feature => feature.id as string)
 }
 
+const namesFor = (features: Feature[]): string => {
+  return features.map(feature => feature.properties?.name || feature.id).join(', ')
+}
+
 // Create the slice and pass in the initial state
 const featuresSlice = createSlice({
   name: 'fColl',
   initialState,
   reducers: {
     storeCleared(state) {
-      state.features = []
-      state.bbox = updateBounds(state)
+      state.features.features = []
+      state.features.bbox = updateBounds(state.features)
+      state.details = {
+        undo: 'Undo clear store',
+        redo: 'Redo clear store'
+      } 
     },
     featureAdded(state, action: PayloadAction<Feature>) {
-      const existingIds = getExistingIds(state.features)
+      const existingIds = getExistingIds(state.features.features)
       const cleaned = cleanFeature(existingIds,action.payload)
-      state.features.push(cleaned)
-      state.bbox = updateBounds(state)
+      state.features.features.push(cleaned)
+      state.features.bbox = updateBounds(state.features)
+      const itemName = namesFor([action.payload])
+      state.details = {
+        undo: 'Undo add ' + itemName,
+        redo: 'Redo add ' + itemName
+      } 
     },
     featuresAdded(state, action: PayloadAction<Feature[]>) {
-      const existingIds = getExistingIds(state.features)
+      const existingIds = getExistingIds(state.features.features)
       // store new ids in a dictionary, so it is passed by reference
       const newIds: idDictionary = {}
       const cleaned = action.payload.map((feature) => cleanFeature(existingIds ,feature, newIds))
-      state.features.push(...cleaned)
-      state.bbox = updateBounds(state)
+      const itemNames = namesFor(action.payload)
+      state.features.features.push(...cleaned)
+      state.features.bbox = updateBounds(state.features)
+      state.details = {
+        undo: 'Undo add ' + itemNames,
+        redo: 'Redo add ' + itemNames
+      } 
     },
     featureUpdated(state, action: PayloadAction<Feature>) {
-      const featureIndex = state.features.findIndex((feature) => feature.id === action.payload.id)
-      state.features.splice(featureIndex, 1, action.payload)
-      state.bbox = updateBounds(state)
+      const featureIndex = state.features.features.findIndex((feature) => feature.id === action.payload.id)
+      state.features.features.splice(featureIndex, 1, action.payload)
+      state.features.bbox = updateBounds(state.features)
+      const itemName = namesFor([action.payload])
+      state.details = {
+        undo: 'Undo modify ' + itemName,
+        redo: 'Redo modify ' + itemName
+      } 
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
       const updates = action.payload
-      state.features = state.features.map(feature => {
+      state.features.features = state.features.features.map(feature => {
         const update = updates.find(u => u.id === feature.id)
         return update || feature
       })
-      state.bbox = updateBounds(state)
+      state.features.bbox = updateBounds(state.features)
+      const itemNames = namesFor(updates)
+      state.details = {
+        undo: 'Undo modify ' + itemNames,
+        redo: 'Redo modify ' + itemNames
+      } 
     },
     featuresVisChange(state, action: PayloadAction<{ ids: string[], visible: boolean }>) {
       const { ids, visible } = action.payload
-      state.features.forEach((feature) => {
+      state.features.features.forEach((feature) => {
         if (!feature.properties) {
           feature.properties = {}
         }
@@ -96,24 +140,39 @@ const featuresSlice = createSlice({
           feature.properties.visible = visible
         }
       })
-      state.bbox = updateBounds(state)
+      state.features.bbox = updateBounds(state.features)
+      const itemName = namesFor(state.features.features.filter(feature => ids.includes(feature.id as string)))
+      state.details = {
+        undo: 'Undo visibility change ' + itemName,
+        redo: 'Redo visibility change ' + itemName
+      } 
     },
     featuresDeleted(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
-      state.features = state.features.filter(feature => !ids.includes(feature.id as string))
-      state.bbox = updateBounds(state)
+      state.features.features = state.features.features.filter(feature => !ids.includes(feature.id as string))
+      state.features.bbox = updateBounds(state.features)
+      const itemName = namesFor(state.features.features.filter(feature => ids.includes(feature.id as string)))
+      state.details = {
+        undo: 'Undo delete ' + itemName,
+        redo: 'Redo delete ' + itemName
+      } 
     },
     featuresDuplicated(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
-      const newFeatures = state.features
+      const newFeatures = state.features.features
         .filter(feature => ids.includes(feature.id as string))
         .map(feature => {
           const newFeature = { ...feature, id: `f-${++counter}` }
           newFeature.properties = { ...feature.properties, name: `Copy of ${feature.properties?.name || feature.id}` }
           return newFeature
         })
-      state.features.push(...newFeatures)
-      state.bbox = updateBounds(state)
+      state.features.features.push(...newFeatures)
+      state.features.bbox = updateBounds(state.features)
+      const itemName = namesFor(newFeatures)
+      state.details = {
+        undo: 'Undo duplicate ' + itemName,
+        redo: 'Redo duplicate ' + itemName
+      } 
     },
   }
 })
@@ -129,7 +188,7 @@ export const selectBounds = (state: FeatureCollection): LatLngBounds | null => {
 }
 
 // Selectors for redux-undo state
-export const selectFeatures = (state: { fColl: { present: FeatureCollection } }) => state.fColl.present.features
+export const selectFeatures = (state: { fColl: { present: StoreState } }) => state.fColl.present.features.features
 
 // Export the generated reducer function
 export default featuresSlice.reducer
