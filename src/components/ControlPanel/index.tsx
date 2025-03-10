@@ -318,8 +318,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               style={{
                 cursor: 'pointer',
                 backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : 
-                  item.type === 'present' ? '#f5f5f5' : 
-                    item.type === 'future' ? '#fff1f0' : undefined,
+                  item.type === 'future' ? '#fff1f0' : undefined,
                 padding: '8px 16px'
               }}
             >
