@@ -66,13 +66,20 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
   const [undoModalVisible, setUndoModalVisible] = useState(false)
+  const [selectedUndoIndex, setSelectedUndoIndex] = useState<number | null>(null)
+  const [previewUndoCount, setPreviewUndoCount] = useState(0)
+  const [modalPosition, setModalPosition] = useState({ x: 20, y: 20 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   
+  const { past, present } = useAppSelector(state => state.fColl)
+
   // Get the undo history from the redux store
-  const undoHistory = useAppSelector(state => {
+  const undoHistory = useMemo(() => {
     const history = []
     // Add past items in reverse order (oldest first)
-    for (let i = 0; i < state.fColl.past.length; i++) {
-      const item = state.fColl.past[i]
+    for (let i = 0; i < past.length; i++) {
+      const item = past[i]
       if (item.details?.undo) {
         history.unshift({
           description: item.details.undo,
@@ -81,14 +88,14 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
       }
     }
     // Add present item last
-    if (state.fColl.present.details?.undo) {
+    if (present.details?.undo) {
       history.unshift({
-        description: state.fColl.present.details.undo,
-        time: TimeSupport.formatDuration(new Date().getTime() - state.fColl.present.details.time)
+        description: present.details.undo,
+        time: TimeSupport.formatDuration(new Date().getTime() - present.details.time)
       })
     }
     return history
-  })
+  }, [past, present])
 
   useEffect(() => {
     try {
@@ -197,12 +204,74 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
     <>
       {' '}
       <Modal
-        title="Select a point to undo to"
+        title={
+          <div
+            style={{ cursor: 'move', width: '100%' }}
+            onMouseDown={(e) => {
+              setIsDragging(true)
+              const rect = e.currentTarget.getBoundingClientRect()
+              setDragOffset({
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+              })
+            }}
+            onMouseMove={(e) => {
+              if (isDragging) {
+                setModalPosition({
+                  x: e.clientX - dragOffset.x,
+                  y: e.clientY - dragOffset.y
+                })
+              }
+            }}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+          >
+            Select a point to undo to
+          </div>
+        }
+        style={{
+          top: modalPosition.y,
+          left: modalPosition.x,
+          position: 'fixed'
+        }}
+        mask={false}
         open={undoModalVisible}
-        onCancel={() => setUndoModalVisible(false)}
+        onCancel={() => {
+          // Reset preview if canceling
+          for (let i = 0; i < previewUndoCount; i++) {
+            dispatch({ type: REDO_ACTION })
+          }
+          setPreviewUndoCount(0)
+          setSelectedUndoIndex(null)
+          setUndoModalVisible(false)
+        }}
         footer={[
-          <Button key="cancel" onClick={() => setUndoModalVisible(false)}>
+          <Button 
+            key="cancel" 
+            onClick={() => {
+              // Reset preview if canceling
+              for (let i = 0; i < previewUndoCount; i++) {
+                dispatch({ type: REDO_ACTION })
+              }
+              setPreviewUndoCount(0)
+              setSelectedUndoIndex(null)
+              setUndoModalVisible(false)
+            }}
+          >
             Cancel
+          </Button>,
+          <Button
+            key="restore"
+            type="primary"
+            disabled={selectedUndoIndex === null}
+            onClick={() => {
+              // Keep the changes by just closing the modal
+              setPreviewUndoCount(0)
+              setSelectedUndoIndex(null)
+              setUndoModalVisible(false)
+            }}
+          >
+            Restore Version
           </Button>
         ]}
       >
@@ -212,15 +281,20 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           renderItem={(item, index) => (
             <List.Item
               onClick={() => {
+                // First redo any existing preview
+                for (let i = 0; i < previewUndoCount; i++) {
+                  dispatch({ type: REDO_ACTION })
+                }
+                // Then undo to the selected point
                 for (let i = 0; i < index + 1; i++) {
-                  console.log('doing undo', i)
                   dispatch({ type: UNDO_ACTION })
                 }
-                setUndoModalVisible(false)
+                setPreviewUndoCount(index + 1)
+                setSelectedUndoIndex(index)
               }}
               style={{
                 cursor: 'pointer',
-                backgroundColor: index === 0 ? '#f5f5f5' : undefined,
+                backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : index === 0 ? '#f5f5f5' : undefined,
                 padding: '8px 16px'
               }}
             >
@@ -254,69 +328,82 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           )}
         />
       </Modal>
-      <Row style={{padding: '2px'}}>
-        <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
-          <Tooltip
-            mouseEnterDelay={0.8}
-            title='Lock viewport to prevent accidental map movement. When time filtering, mouse wheel updates time'
-          >
-            <Button
-              style={buttonStyle}
-              color='primary'
-              variant={viewportFrozen ? 'solid' : 'outlined'}
-              onClick={toggleFreezeViewport}
+      <div
+        onMouseMove={(e) => {
+          if (isDragging) {
+            setModalPosition({
+              x: e.clientX - dragOffset.x,
+              y: e.clientY - dragOffset.y
+            })
+          }
+        }}
+        onMouseUp={() => setIsDragging(false)}
+        onMouseLeave={() => setIsDragging(false)}
+      >
+        <Row style={{padding: '2px'}}>
+          <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
+            <Tooltip
+              mouseEnterDelay={0.8}
+              title='Lock viewport to prevent accidental map movement. When time filtering, mouse wheel updates time'
             >
-              {viewportFrozen ? <LockFilled /> : <UnlockOutlined />}
-            </Button>
-          </Tooltip>
-          <Tooltip
-            mouseEnterDelay={0.8}
-            title={
-              bounds
-                ? 'Enable time controls, to filter tracks by time'
-                : 'No time data available'
-            }
-          >
-            <Button
-              style={buttonStyle}
-              disabled={bounds === null}
-              color='primary'
-              variant={time.filterApplied ? 'solid' : 'outlined'}
-              onClick={() => setFilterApplied(!time.filterApplied)}
+              <Button
+                style={buttonStyle}
+                color='primary'
+                variant={viewportFrozen ? 'solid' : 'outlined'}
+                onClick={toggleFreezeViewport}
+              >
+                {viewportFrozen ? <LockFilled /> : <UnlockOutlined />}
+              </Button>
+            </Tooltip>
+            <Tooltip
+              mouseEnterDelay={0.8}
+              title={
+                bounds
+                  ? 'Enable time controls, to filter tracks by time'
+                  : 'No time data available'
+              }
             >
-              {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
-            </Button>
-          </Tooltip>
-          <Tooltip placement='bottom' title={canUndo ? 'Undo...' : 'Nothing to undo'}>
-            <Button
-              style={buttonStyle}
-              onClick={() => setUndoModalVisible(true)}
-              icon={<UndoOutlined />}
-              disabled={!canUndo}
-            />
-          </Tooltip>
-          <Tooltip placement='bottom' title={canRedo ? redoTitle : 'Nothing to redo'}>
-            <Button
-              style={buttonStyle}
-              onClick={() => dispatch({ type: REDO_ACTION })}
-              icon={<RedoOutlined />}
-              disabled={!canRedo}
-            />
-          </Tooltip>
-          <SampleDataLoader sampleItems={sampleItems} />
-          {saveButton}
-        </Col>
-        <Col span={4}>
-          <Tooltip title={copyTooltip}>
-            <Button
-              onClick={copyMapToClipboard}
-              title='Copy map to clipboard'
-              icon={<CopyOutlined />}
-              disabled={!viewportFrozen}
-            />
-          </Tooltip>
-        </Col>
-      </Row>
+              <Button
+                style={buttonStyle}
+                disabled={bounds === null}
+                color='primary'
+                variant={time.filterApplied ? 'solid' : 'outlined'}
+                onClick={() => setFilterApplied(!time.filterApplied)}
+              >
+                {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
+              </Button>
+            </Tooltip>
+            <Tooltip placement='bottom' title={canUndo ? 'Undo...' : 'Nothing to undo'}>
+              <Button
+                style={buttonStyle}
+                onClick={() => setUndoModalVisible(true)}
+                icon={<UndoOutlined />}
+                disabled={!canUndo}
+              />
+            </Tooltip>
+            <Tooltip placement='bottom' title={canRedo ? redoTitle : 'Nothing to redo'}>
+              <Button
+                style={buttonStyle}
+                onClick={() => dispatch({ type: REDO_ACTION })}
+                icon={<RedoOutlined />}
+                disabled={!canRedo}
+              />
+            </Tooltip>
+            <SampleDataLoader sampleItems={sampleItems} />
+            {saveButton}
+          </Col>
+          <Col span={4}>
+            <Tooltip title={copyTooltip}>
+              <Button
+                onClick={copyMapToClipboard}
+                title='Copy map to clipboard'
+                icon={<CopyOutlined />}
+                disabled={!viewportFrozen}
+              />
+            </Tooltip>
+          </Col>
+        </Row>
+      </div>
       <Form disabled={!time.filterApplied}>
         <table
           style={{
