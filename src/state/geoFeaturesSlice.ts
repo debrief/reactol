@@ -9,8 +9,17 @@ export type StoreState = {
 }
 
 type HistoryDescriptions = {
+  time: number
   undo: string
   redo: string
+}
+
+const newDetails = (undo: string, redo:string): HistoryDescriptions => {
+  return {
+    time: Date.now(),
+    undo,
+    redo
+  }
 }
 
 const initialState: StoreState = {
@@ -19,10 +28,8 @@ const initialState: StoreState = {
     features: [],
     bbox: undefined
   },
-  details: {
-    undo: 'Undo store initialisation',
-    redo: 'Redo store initialisation'
-  }
+  details: newDetails(
+    'Undo store initialisation', 'Redo store initialisation')
 }
 
 type idDictionary = { [name: string]: string } 
@@ -78,10 +85,10 @@ const featuresSlice = createSlice({
     storeCleared(state) {
       state.data.features = []
       state.data.bbox = updateBounds(state.data)
-      state.details = {
-        undo: 'Undo clear store',
-        redo: 'Redo clear store'
-      } 
+      state.details = newDetails(
+        'Undo clear store',
+        'Redo clear store'
+      )
     },
     featureAdded(state, action: PayloadAction<Feature>) {
       const existingIds = getExistingIds(state.data.features)
@@ -89,10 +96,10 @@ const featuresSlice = createSlice({
       state.data.features.push(cleaned)
       state.data.bbox = updateBounds(state.data)
       const itemName = namesFor([action.payload])
-      state.details = {
-        undo: 'Undo add ' + itemName,
-        redo: 'Redo add ' + itemName
-      } 
+      state.details = newDetails(
+        'Undo add ' + itemName,
+        'Redo add ' + itemName
+      )
     },
     featuresAdded(state, action: PayloadAction<Feature[]>) {
       const existingIds = getExistingIds(state.data.features)
@@ -102,20 +109,20 @@ const featuresSlice = createSlice({
       const itemNames = namesFor(action.payload)
       state.data.features.push(...cleaned)
       state.data.bbox = updateBounds(state.data)
-      state.details = {
-        undo: 'Undo add ' + itemNames,
-        redo: 'Redo add ' + itemNames
-      } 
+      state.details = newDetails(
+        'Undo add ' + itemNames,
+        'Redo add ' + itemNames
+      )
     },
     featureUpdated(state, action: PayloadAction<Feature>) {
       const featureIndex = state.data.features.findIndex((feature) => feature.id === action.payload.id)
       state.data.features.splice(featureIndex, 1, action.payload)
       state.data.bbox = updateBounds(state.data)
       const itemName = namesFor([action.payload])
-      state.details = {
-        undo: 'Undo modify ' + itemName,
-        redo: 'Redo modify ' + itemName
-      } 
+      state.details = newDetails(
+        'Undo modify ' + itemName,
+        'Redo modify ' + itemName
+      )
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
       const updates = action.payload
@@ -125,10 +132,10 @@ const featuresSlice = createSlice({
       })
       state.data.bbox = updateBounds(state.data)
       const itemNames = namesFor(updates)
-      state.details = {
-        undo: 'Undo modify ' + itemNames,
-        redo: 'Redo modify ' + itemNames
-      } 
+      state.details = newDetails(
+        'Undo modify ' + itemNames,
+        'Redo modify ' + itemNames
+      )
     },
     featuresVisChange(state, action: PayloadAction<{ ids: string[], visible: boolean }>) {
       const { ids, visible } = action.payload
@@ -142,20 +149,20 @@ const featuresSlice = createSlice({
       })
       state.data.bbox = updateBounds(state.data)
       const itemName = namesFor(state.data.features.filter(feature => ids.includes(feature.id as string)))
-      state.details = {
-        undo: 'Undo visibility change ' + itemName,
-        redo: 'Redo visibility change ' + itemName
-      } 
+      state.details = newDetails(
+        'Undo visibility change ' + itemName,
+        'Redo visibility change ' + itemName
+      )
     },
     featuresDeleted(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
       const itemName = namesFor(state.data.features.filter(feature => ids.includes(feature.id as string)))
       state.data.features = state.data.features.filter(feature => !ids.includes(feature.id as string))
       state.data.bbox = updateBounds(state.data)
-      state.details = {
-        undo: 'Undo delete 1' + itemName,
-        redo: 'Redo delete ' + itemName
-      } 
+      state.details = newDetails(
+        'Undo delete ' + itemName,
+        'Redo delete ' + itemName
+      )
     },
     featuresDuplicated(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
@@ -169,10 +176,10 @@ const featuresSlice = createSlice({
       state.data.features.push(...newFeatures)
       state.data.bbox = updateBounds(state.data)
       const itemName = namesFor(newFeatures)
-      state.details = {
-        undo: 'Undo duplicate ' + itemName,
-        redo: 'Redo duplicate ' + itemName
-      } 
+      state.details = newDetails(
+        'Undo duplicate ' + itemName,
+        'Redo duplicate ' + itemName
+      )
     },
   }
 })

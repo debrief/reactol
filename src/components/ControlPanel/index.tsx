@@ -61,11 +61,25 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const dispatch = useDispatch()
   const canUndo = useAppSelector(state => state.fColl.past.length > 0)
   const undoTitle = useAppSelector(state => state.fColl.past.length > 0 ? state.fColl.present.details?.undo : 'Nothing to undo')
+  const timeOfLastChange = useAppSelector(state => state.fColl.present.details?.time)
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const redoTitle = useAppSelector(state => state.fColl.future.length > 0 ? state.fColl.future[0].details?.redo : 'Nothing to redo')
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
+  const store = useAppSelector(state => state.fColl)
+
+  console.log('store', store)
+
+  const timeSinceLastChange = useMemo(() => {
+    if (timeOfLastChange) {
+      const delta = new Date().getTime() - timeOfLastChange
+      const deltaInPlainEnglish = TimeSupport.formatDuration(delta)
+      return deltaInPlainEnglish
+    } else {
+      return 0
+    }
+  }, [timeOfLastChange])
 
   useEffect(() => {
     try {
@@ -206,7 +220,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <Tooltip placement='bottom' title={canUndo ? undoTitle : 'Nothing to undo'}>
+          <Tooltip placement='bottom' title={canUndo ? undoTitle + ' (' + timeSinceLastChange + ')' : 'Nothing to undo'}>
             <Button
               style={buttonStyle}
               onClick={() => dispatch({ type: UNDO_ACTION })}
