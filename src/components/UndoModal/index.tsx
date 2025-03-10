@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { useAppSelector } from '../../state/hooks'
 import { UNDO_ACTION,  } from '../../state/store'
 import { TimeSupport } from '../../helpers/time-support'
+import { useDocContext } from '../../state/DocContext'
 
 interface UndoModalProps {
   visible: boolean
@@ -17,14 +18,16 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   onRestore
 }) => {
   const dispatch = useDispatch()
+  const { past, present, future } = useAppSelector(state => state.fColl)
+  const { setPreview } = useDocContext()
   const [selectedUndoIndex, setSelectedUndoIndex] = useState<number | null>(null)
   const [modalPosition, setModalPosition] = useState({ x: 20, y: 20 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [hideViewportChanges, setHideViewportChanges] = useState(true)
-  const { past, present, future } = useAppSelector(state => state.fColl)
 
-  console.log('state', past, present.details, !!present.preview, future)
+
+  console.log('state', past, present.details, future)
 
   // Get the undo history from the redux store
   const undoHistory = useMemo(() => {
@@ -122,7 +125,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
       open={visible}
       onCancel={() => {
         // Reset preview if canceling
-        dispatch({ type: 'fColl/clearPreview' })
+        setPreview(null)
         setSelectedUndoIndex(null)
         onCancel()
       }}
@@ -131,7 +134,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
           key="cancel" 
           onClick={() => {
             // Reset preview if canceling
-            dispatch({ type: 'fColl/clearPreview' })
+            setPreview(null)
             setSelectedUndoIndex(null)
             onCancel()
           }}
@@ -146,7 +149,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
             // Apply the actual undo actions
             if (selectedUndoIndex !== null) {
               // Clear the preview
-              dispatch({ type: 'fColl/clearPreview' })
+              setPreview(null)
               // Calculate how many undo actions we need
               const currentIndex = past.length - 1
               const undoCount = currentIndex - selectedUndoIndex
@@ -171,14 +174,14 @@ export const UndoModal: React.FC<UndoModalProps> = ({
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
-                dispatch({ type: 'fColl/clearPreview' })
+                setPreview(null)
                 setSelectedUndoIndex(null)
               } else {
                 // Clear any existing preview
-                dispatch({ type: 'fColl/clearPreview' })
+                setPreview(null)
                 console.log('previewing', index)
                 // Set preview to the state at the selected index
-                dispatch({ type: 'fColl/setPreview', payload: past[past.length - 1 - index] })
+                setPreview(past[past.length - 1 - index])
                 setSelectedUndoIndex(index)
               }
             }}

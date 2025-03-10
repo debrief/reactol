@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react'
 import { TimeState } from '../components/Document'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import { StoreState } from './geoFeaturesSlice'
 
 export interface MessageStruct {
   title: string
@@ -33,6 +34,8 @@ interface DocContextProps {
   setInterval: React.Dispatch<React.SetStateAction<number>>
   useNatoCoords: boolean
   setUseNatoCoords: React.Dispatch<React.SetStateAction<boolean>>
+  preview: StoreState | null
+  setPreview: React.Dispatch<React.SetStateAction<StoreState | null>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)

@@ -28,12 +28,6 @@ const ControlPanel: React.FC<TimeProps> = ({ handleSave, isDirty }) => {
   const [undoModalVisible, setUndoModalVisible] = useState(false)
   const { viewportFrozen, setViewportFrozen } = useDocContext()
 
-
-
-
-
-
-
   const toggleFreezeViewport = () => {
     setViewportFrozen(!viewportFrozen)
   }

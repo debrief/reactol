@@ -172,7 +172,9 @@ const MapControls: React.FC = () => {
 
 const Map: React.FC<MapProps> = ({ children }) => {
   const features = useAppSelector(selectFeatures)
-  const { selection, setSelection } = useDocContext()
+  const { selection, setSelection, preview } = useDocContext()
+
+  const theFeatures = preview ? preview.data.features : features
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {
     if (modifier) {
@@ -197,7 +199,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
     >
       {children}
       <MapFeatures 
-        features={features}
+        features={theFeatures}
         onClickHandler={onClickHandler}
       />
       <ViewportTracker/>
