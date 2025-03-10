@@ -71,10 +71,10 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const undoHistory = useAppSelector(state => {
     const history = []
     // Add past items in reverse order (oldest first)
-    for (let i = 0; i < state.fColl.past.length - 1; i++) {
+    for (let i = 0; i < state.fColl.past.length; i++) {
       const item = state.fColl.past[i]
       if (item.details?.undo) {
-        history.push({
+        history.unshift({
           description: item.details.undo,
           time: TimeSupport.formatDuration(new Date().getTime() - item.details.time)
         })
@@ -82,7 +82,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
     }
     // Add present item last
     if (state.fColl.present.details?.undo) {
-      history.push({
+      history.unshift({
         description: state.fColl.present.details.undo,
         time: TimeSupport.formatDuration(new Date().getTime() - state.fColl.present.details.time)
       })
@@ -212,15 +212,15 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           renderItem={(item, index) => (
             <List.Item
               onClick={() => {
-                const undoCount = undoHistory.length - 1 - index
-                for (let i = 0; i < undoCount; i++) {
+                for (let i = 0; i < index + 1; i++) {
+                  console.log('doing undo', i)
                   dispatch({ type: UNDO_ACTION })
                 }
                 setUndoModalVisible(false)
               }}
               style={{
-                cursor: index === undoHistory.length - 1 ? 'default' : 'pointer',
-                backgroundColor: index === undoHistory.length - 1 ? '#f5f5f5' : undefined,
+                cursor: 'pointer',
+                backgroundColor: index === 0 ? '#f5f5f5' : undefined,
                 padding: '8px 16px'
               }}
             >
@@ -235,7 +235,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
-                  {index === undoHistory.length - 1 ? (
+                  {index === 0 ? (
                     <strong>{item.description} (current state)</strong>
                   ) : (
                     item.description
@@ -287,7 +287,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <Tooltip placement='bottom' title={canUndo ? 'Undo' : 'Nothing to undo'}>
+          <Tooltip placement='bottom' title={canUndo ? 'Undo...' : 'Nothing to undo'}>
             <Button
               style={buttonStyle}
               onClick={() => setUndoModalVisible(true)}
