@@ -7,6 +7,7 @@ import nearestPoint from '@turf/nearest-point'
 import './index.css'
 import { useDocContext } from '../../../state/DocContext'
 import { useAppSelector } from '../../../state/hooks'
+import { selectFeatures } from '../../../state/geoFeaturesSlice'
 import { formatCoordinate, formatNatoCoords } from '../../../helpers/formatCoordinate'
 import { Switch } from 'antd'
 
@@ -67,7 +68,7 @@ export const CoordsSwitch: React.FC<CoordsSwitchProps> = ({
 
 const MouseCoordinates: React.FC = () => {
   const { selection, useNatoCoords, setUseNatoCoords } = useDocContext()
-  const features = useAppSelector(state => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   const [mouseCoords, setMouseCoords] = useState<{ lat: number, lng: number }>({lat:0, lng:0})
   const { viewportFrozen } = useDocContext()
 

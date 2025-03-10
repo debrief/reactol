@@ -11,6 +11,7 @@ import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { GROUP_TYPE } from '../../constants'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 type OptionType = {
   label: string
@@ -56,7 +57,7 @@ const filteredTrack = (feature: Feature, start: number, end: number) => {
 }
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
-  const features = useAppSelector((state) => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   const { time } = useDocContext()
   const [showDepth, setShowDepth] = useState<boolean>(true)
   const [showLegend, setShowLegend] = useState<boolean>(true)

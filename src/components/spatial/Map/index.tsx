@@ -6,6 +6,7 @@ import Track from '../Track'
 import Zone from '../Zone'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useAppSelector } from '../../../state/hooks'
+import { selectFeatures } from '../../../state/geoFeaturesSlice'
 import { useDocContext } from '../../../state/DocContext'
 import { Point as DataPoint } from '../Point'
 import { Graticule } from '../AutoGraticule'
@@ -101,7 +102,7 @@ const MapControls: React.FC = () => {
 }
 
 const Map: React.FC<MapProps> = ({ children }) => {
-  const features = useAppSelector(state => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   const { selection, setSelection } = useDocContext()
 
   const onClickHandler = useCallback((id: string, modifier: boolean): void => {

@@ -36,6 +36,7 @@ import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { noop } from 'lodash'
 import { symbolOptions } from '../../helpers/symbolTypes'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
 const { DirectoryTree } = Tree
@@ -255,7 +256,7 @@ export const ToolButton: React.FC<ToolProps> = ({
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   const { selection, setSelection, setNewFeature } = useDocContext()
-  const features = useAppSelector((state) => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)
   )

@@ -15,6 +15,7 @@ import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { useAppSelector } from '../../state/hooks'
 import { formatInTimeZone } from 'date-fns-tz'
 import { Calculation, GraphDataset } from '../../types'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 const { Title, Text } = Typography
 
@@ -38,7 +39,7 @@ interface GraphForm {
 
 const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
 
-  const allFeatures = useAppSelector(state => state.fColl.features)
+  const allFeatures = useAppSelector(selectFeatures)
   const { selection } = useDocContext()
   const [calculations, setCalculations] = React.useState<Calculation[]>([])
   const [data, setData] = React.useState<GraphDataset[]>([])
