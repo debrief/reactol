@@ -1,0 +1,224 @@
+import { Modal, Button, List, Switch } from 'antd'
+import React, { useMemo, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useAppSelector } from '../../state/hooks'
+import { UNDO_ACTION,  } from '../../state/store'
+import { TimeSupport } from '../../helpers/time-support'
+
+interface UndoModalProps {
+  visible: boolean
+  onCancel: () => void
+  onRestore: () => void
+}
+
+export const UndoModal: React.FC<UndoModalProps> = ({
+  visible,
+  onCancel,
+  onRestore
+}) => {
+  const dispatch = useDispatch()
+  const [selectedUndoIndex, setSelectedUndoIndex] = useState<number | null>(null)
+  const [modalPosition, setModalPosition] = useState({ x: 20, y: 20 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [hideViewportChanges, setHideViewportChanges] = useState(true)
+  const { past, present, future } = useAppSelector(state => state.fColl)
+
+  console.log('state', past, present.details, !!present.preview, future)
+
+  // Get the undo history from the redux store
+  const undoHistory = useMemo(() => {
+    const history = []
+    // Add past items in reverse order (oldest first)
+    for (let i = 0; i < past.length; i++) {
+      const item = past[i]
+      if (item.details?.undo) {
+        const isViewportChange = item.details.undo.toLowerCase().includes('viewport')
+        if (!hideViewportChanges || !isViewportChange) {
+          history.unshift({
+            description: item.details.undo,
+            time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
+            type: 'past',
+            isViewportChange
+          })
+        }
+      }
+    }
+    // Add present item
+    if (present.details?.undo) {
+      const isViewportChange = present.details.undo.toLowerCase().includes('viewport')
+      if (!hideViewportChanges || !isViewportChange) {
+        history.unshift({
+          description: present.details.undo,
+          time: TimeSupport.formatDuration(new Date().getTime() - present.details.time),
+          type: 'present',
+          isViewportChange
+        })
+      }
+    }
+    // Add future items (more recent changes that were undone)
+    for (let i = 0; i < future.length; i++) {
+      const item = future[i]
+      if (item.details?.undo) {
+        const isViewportChange = item.details.undo.toLowerCase().includes('viewport')
+        if (!hideViewportChanges || !isViewportChange) {
+          history.unshift({
+            description: item.details.undo,
+            time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
+            type: 'future',
+            isViewportChange
+          })
+        }
+      }
+    }
+    return history
+  }, [past, present, future, hideViewportChanges])
+
+  return (
+    <Modal
+      title={
+        <div
+          style={{ cursor: 'move', width: '100%' }}
+          onMouseDown={(e) => {
+            setIsDragging(true)
+            const rect = e.currentTarget.getBoundingClientRect()
+            setDragOffset({
+              x: e.clientX - rect.left,
+              y: e.clientY - rect.top
+            })
+          }}
+          onMouseMove={(e) => {
+            if (isDragging) {
+              setModalPosition({
+                x: e.clientX - dragOffset.x,
+                y: e.clientY - dragOffset.y
+              })
+            }
+          }}
+          onMouseUp={() => setIsDragging(false)}
+          onMouseLeave={() => setIsDragging(false)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
+            <span style={{ marginRight: '16px' }}>Select a point to undo to</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
+              marginTop: '10px', marginRight:'30px'}}>
+              <Switch
+                checkedChildren={'Hiding Viewport changes'}
+                unCheckedChildren={'Showing Viewport changes'}
+                size="small"
+                checked={hideViewportChanges}
+                onChange={(checked) => setHideViewportChanges(checked)}
+              />
+            </div>
+          </div>
+        </div>
+      }
+      style={{
+        top: modalPosition.y,
+        left: modalPosition.x,
+        position: 'fixed'
+      }}
+      mask={false}
+      open={visible}
+      onCancel={() => {
+        // Reset preview if canceling
+        dispatch({ type: 'fColl/clearPreview' })
+        setSelectedUndoIndex(null)
+        onCancel()
+      }}
+      footer={[
+        <Button 
+          key="cancel" 
+          onClick={() => {
+            // Reset preview if canceling
+            dispatch({ type: 'fColl/clearPreview' })
+            setSelectedUndoIndex(null)
+            onCancel()
+          }}
+        >
+          Cancel
+        </Button>,
+        <Button
+          key="restore"
+          type="primary"
+          disabled={selectedUndoIndex === null}
+          onClick={() => {
+            // Apply the actual undo actions
+            if (selectedUndoIndex !== null) {
+              // Clear the preview
+              dispatch({ type: 'fColl/clearPreview' })
+              // Calculate how many undo actions we need
+              const currentIndex = past.length - 1
+              const undoCount = currentIndex - selectedUndoIndex
+              // Apply undo actions to reach the selected state
+              for (let i = 0; i < undoCount; i++) {
+                dispatch({ type: UNDO_ACTION })
+              }
+            }
+            setSelectedUndoIndex(null)
+            onRestore()
+          }}
+        >
+          Restore Version
+        </Button>
+      ]}
+    >
+      <List
+        size="small"
+        dataSource={undoHistory}
+        renderItem={(item, index) => (
+          <List.Item
+            onClick={() => {
+              if (index === selectedUndoIndex) {
+                // If clicking the same item again, treat it as deselection
+                dispatch({ type: 'fColl/clearPreview' })
+                setSelectedUndoIndex(null)
+              } else {
+                // Clear any existing preview
+                dispatch({ type: 'fColl/clearPreview' })
+                console.log('previewing', index)
+                // Set preview to the state at the selected index
+                dispatch({ type: 'fColl/setPreview', payload: past[past.length - 1 - index] })
+                setSelectedUndoIndex(index)
+              }
+            }}
+            style={{
+              cursor: 'pointer',
+              backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : 
+                item.type === 'future' ? '#fff1f0' : undefined,
+              padding: '8px 16px'
+            }}
+          >
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr auto',
+              gap: '24px',
+              alignItems: 'center',
+              width: '100%'
+            }}>
+              <div style={{ 
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                color: item.type === 'future' ? '#cf1322' : undefined
+              }}>
+                {index === 0 ? (
+                  <strong>{item.description} (current state)</strong>
+                ) : (
+                  item.description
+                )}
+              </div>
+              <div style={{ 
+                fontFamily: 'monospace',
+                fontSize: '0.9em',
+                whiteSpace: 'nowrap',
+                textAlign: 'right'
+              }}>
+                {item.time}
+              </div>
+            </div>
+          </List.Item>
+        )}
+      />
+    </Modal>
+  )
+}
