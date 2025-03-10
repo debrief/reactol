@@ -9,8 +9,13 @@ import {
   LockFilled,
   UnlockOutlined,
   FilterFilled,
-  SaveOutlined
+  SaveOutlined,
+  UndoOutlined,
+  RedoOutlined
 } from '@ant-design/icons'
+import { useDispatch } from 'react-redux'
+import { useAppSelector } from '../../state/hooks'
+import { UNDO_ACTION, REDO_ACTION } from '../../state/store'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDocContext } from '../../state/DocContext'
 import { TimeSupport } from '../../helpers/time-support'
@@ -53,6 +58,9 @@ interface TimeButtonProps {
 
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
+  const dispatch = useDispatch()
+  const canUndo = useAppSelector(state => state.fColl.past.length > 0)
+  const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
@@ -195,6 +203,22 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
             >
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
+          </Tooltip>
+          <Tooltip placement='bottom' title={canUndo ? 'Undo last action' : 'Nothing to undo'}>
+            <Button
+              style={buttonStyle}
+              onClick={() => dispatch({ type: UNDO_ACTION })}
+              icon={<UndoOutlined />}
+              disabled={!canUndo}
+            />
+          </Tooltip>
+          <Tooltip placement='bottom' title={canRedo ? 'Redo last action' : 'Nothing to redo'}>
+            <Button
+              style={buttonStyle}
+              onClick={() => dispatch({ type: REDO_ACTION })}
+              icon={<RedoOutlined />}
+              disabled={!canRedo}
+            />
           </Tooltip>
           <SampleDataLoader sampleItems={sampleItems} />
           {saveButton}
