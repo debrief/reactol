@@ -42,7 +42,7 @@ const TipButton: React.FC<{
 export const HomeControl: React.FC = () => {
   const map = useMap()
   const currentBounds = selectBounds(
-    useAppSelector((state) => state.fColl.present)
+    useAppSelector((state) => state.fColl.present.features)
   )
   const { viewportFrozen } = useDocContext()
   const measure = useRef<L.Control.PolylineMeasure | null>(null)
