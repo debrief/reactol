@@ -19,7 +19,7 @@ export const createStore = (content?: FeatureCollection, fileName?: string) => c
   preloadedState: content ? {
     fColl: {
       past: [],
-      present: { features: content, details: undefined },
+      present: { data: content, details: undefined },
       future: []
     }
   } : undefined,
