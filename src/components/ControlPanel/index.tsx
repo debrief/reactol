@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Col, Form, Row, Tooltip } from 'antd'
+import { AutoComplete, Button, Col, Form, Row, Tooltip, Modal, List } from 'antd'
 import {
   CopyOutlined,
   StepBackwardOutlined,
@@ -60,26 +60,35 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
   const dispatch = useDispatch()
   const canUndo = useAppSelector(state => state.fColl.past.length > 0)
-  const undoTitle = useAppSelector(state => state.fColl.past.length > 0 ? state.fColl.present.details?.undo : 'Nothing to undo')
-  const timeOfLastChange = useAppSelector(state => state.fColl.present.details?.time)
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const redoTitle = useAppSelector(state => state.fColl.future.length > 0 ? state.fColl.future[0].details?.redo : 'Nothing to redo')
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
-  const store = useAppSelector(state => state.fColl)
-
-  console.log('store', store)
-
-  const timeSinceLastChange = useMemo(() => {
-    if (timeOfLastChange) {
-      const delta = new Date().getTime() - timeOfLastChange
-      const deltaInPlainEnglish = TimeSupport.formatDuration(delta)
-      return deltaInPlainEnglish
-    } else {
-      return 0
+  const [undoModalVisible, setUndoModalVisible] = useState(false)
+  
+  // Get the undo history from the redux store
+  const undoHistory = useAppSelector(state => {
+    const history = []
+    // Add past items in reverse order (oldest first)
+    for (let i = 0; i < state.fColl.past.length - 1; i++) {
+      const item = state.fColl.past[i]
+      if (item.details?.undo) {
+        history.push({
+          description: item.details.undo,
+          time: TimeSupport.formatDuration(new Date().getTime() - item.details.time)
+        })
+      }
     }
-  }, [timeOfLastChange])
+    // Add present item last
+    if (state.fColl.present.details?.undo) {
+      history.push({
+        description: state.fColl.present.details.undo,
+        time: TimeSupport.formatDuration(new Date().getTime() - state.fColl.present.details.time)
+      })
+    }
+    return history
+  })
 
   useEffect(() => {
     try {
@@ -187,6 +196,64 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   return (
     <>
       {' '}
+      <Modal
+        title="Select a point to undo to"
+        open={undoModalVisible}
+        onCancel={() => setUndoModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setUndoModalVisible(false)}>
+            Cancel
+          </Button>
+        ]}
+      >
+        <List
+          size="small"
+          dataSource={undoHistory}
+          renderItem={(item, index) => (
+            <List.Item
+              onClick={() => {
+                const undoCount = undoHistory.length - 1 - index
+                for (let i = 0; i < undoCount; i++) {
+                  dispatch({ type: UNDO_ACTION })
+                }
+                setUndoModalVisible(false)
+              }}
+              style={{
+                cursor: index === undoHistory.length - 1 ? 'default' : 'pointer',
+                backgroundColor: index === undoHistory.length - 1 ? '#f5f5f5' : undefined,
+                padding: '8px 16px'
+              }}
+            >
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr auto',
+                gap: '24px',
+                alignItems: 'center',
+                width: '100%'
+              }}>
+                <div style={{ 
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {index === undoHistory.length - 1 ? (
+                    <strong>{item.description} (current state)</strong>
+                  ) : (
+                    item.description
+                  )}
+                </div>
+                <div style={{ 
+                  fontFamily: 'monospace',
+                  fontSize: '0.9em',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'right'
+                }}>
+                  {item.time}
+                </div>
+              </div>
+            </List.Item>
+          )}
+        />
+      </Modal>
       <Row style={{padding: '2px'}}>
         <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
           <Tooltip
@@ -220,10 +287,10 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <Tooltip placement='bottom' title={canUndo ? undoTitle + ' (' + timeSinceLastChange + ')' : 'Nothing to undo'}>
+          <Tooltip placement='bottom' title={canUndo ? 'Undo' : 'Nothing to undo'}>
             <Button
               style={buttonStyle}
-              onClick={() => dispatch({ type: UNDO_ACTION })}
+              onClick={() => setUndoModalVisible(true)}
               icon={<UndoOutlined />}
               disabled={!canUndo}
             />
