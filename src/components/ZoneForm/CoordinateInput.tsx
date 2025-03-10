@@ -54,7 +54,6 @@ export const CoordinateInput: React.FC<CoordinateInputProps> = ({ value, onChang
         const geom = value.geometry.coordinates as [number, number]
         onChange && onChange(geom)
       }
-      console.log('point changed', value)
     }})
   }
 
