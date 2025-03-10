@@ -3,9 +3,21 @@ import { BBox, Feature, FeatureCollection } from 'geojson'
 import * as turf from '@turf/turf'
 import { LatLngBounds } from 'leaflet'
 
+export type ViewportChangeType = 'pan' | 'zoom_in' | 'zoom_out' | 'fit_to_window' | 'restore'
+
+export type ViewportState = {
+  north: number
+  south: number
+  east: number
+  west: number
+  zoom: number
+  changeType: ViewportChangeType
+}
+
 export type StoreState = {
   data: FeatureCollection
   details?: HistoryDescriptions
+  viewport?: ViewportState
 }
 
 type HistoryDescriptions = {
@@ -29,7 +41,8 @@ const initialState: StoreState = {
     bbox: undefined
   },
   details: newDetails(
-    'Undo store initialisation', 'Redo store initialisation')
+    'Undo store initialisation', 'Redo store initialisation'),
+  viewport: undefined
 }
 
 type idDictionary = { [name: string]: string } 
@@ -82,6 +95,31 @@ const featuresSlice = createSlice({
   name: 'fColl',
   initialState,
   reducers: {
+    setViewport(state, action: PayloadAction<ViewportState>) {
+      state.viewport = action.payload
+      const changeType = action.payload.changeType
+      let description = 'viewport '
+      switch (changeType) {
+      case 'zoom_in':
+        description += 'zoom in'
+        break
+      case 'zoom_out':
+        description += 'zoom out'
+        break
+      case 'fit_to_window':
+        description += 'fit to window'
+        break
+      case 'restore':
+        description += 'restore'
+        break
+      default:
+        description += 'pan'
+      }
+      state.details = newDetails(
+        `Undo ${description}`,
+        `Redo ${description}`
+      )
+    },
     storeCleared(state) {
       state.data.features = []
       state.data.bbox = updateBounds(state.data)

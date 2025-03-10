@@ -1,10 +1,13 @@
 import { Feature, MultiPoint, Point, Polygon } from 'geojson'
-import { MapContainer, useMap } from 'react-leaflet'
+import { MapContainer, useMap, useMapEvents } from 'react-leaflet'
 import ScaleNautic from 'react-leaflet-nauticsale'
+import { useDispatch } from 'react-redux'
+import { LatLngBounds } from 'leaflet'
+import { ViewportChangeType } from '../../../state/geoFeaturesSlice'
 import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useAppSelector } from '../../../state/hooks'
 import { selectFeatures } from '../../../state/geoFeaturesSlice'
 import { useDocContext } from '../../../state/DocContext'
@@ -59,6 +62,72 @@ const MapFeatures: React.FC<{
 }
 
 // Separate component for map controls
+// Separate component to track viewport changes
+const ViewportTracker: React.FC = () => {
+  const map = useMap()
+  const dispatch = useDispatch()
+  const viewport = useAppSelector(state => state.fColl.present.viewport)
+  const lastZoom = useRef(map.getZoom())
+  const isInitialLoad = useRef(true)
+
+  // Track map viewport changes and update Redux
+  useMapEvents({
+    moveend: () => {
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false
+        return
+      }
+
+      const bounds = map.getBounds()
+      const currentZoom = map.getZoom()
+      
+      // Determine the type of viewport change
+      let changeType: ViewportChangeType = 'pan'
+      if (currentZoom !== lastZoom.current) {
+        changeType = currentZoom > lastZoom.current ? 'zoom_in' : 'zoom_out'
+        lastZoom.current = currentZoom
+      }
+
+      const newViewport = {
+        north: bounds.getNorth(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        west: bounds.getWest(),
+        zoom: currentZoom,
+        changeType
+      }
+
+      // Only dispatch if viewport actually changed
+      if (JSON.stringify(newViewport) !== JSON.stringify(viewport)) {
+        dispatch({
+          type: 'fColl/setViewport',
+          payload: newViewport
+        })
+      }
+    }
+  })
+
+  // Update map when viewport changes in Redux
+  useEffect(() => {
+    if (viewport && map) {
+      const bounds = new LatLngBounds(
+        [viewport.south, viewport.west],
+        [viewport.north, viewport.east]
+      )
+      
+      // Use animation for user-initiated changes, but not for undo/redo
+      const animate = viewport.changeType !== 'restore'
+      map.fitBounds(bounds, { animate })
+      map.setZoom(viewport.zoom, { animate })
+      
+      // Update lastZoom to prevent triggering another change
+      lastZoom.current = viewport.zoom
+    }
+  }, [viewport, map])
+
+  return null
+}
+
 const MapControls: React.FC = () => {
   const map = useMap()
   const { setMapNode, viewportFrozen, useNatoCoords } = useDocContext()
@@ -131,6 +200,7 @@ const Map: React.FC<MapProps> = ({ children }) => {
         features={features}
         onClickHandler={onClickHandler}
       />
+      <ViewportTracker/>
       <MapControls/>
     </MapContainer>
   )

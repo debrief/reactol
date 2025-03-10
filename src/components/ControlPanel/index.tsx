@@ -1,4 +1,4 @@
-import { AutoComplete, Button, Col, Form, Row, Tooltip, Modal, List } from 'antd'
+import { AutoComplete, Button, Col, Form, Row, Tooltip, Modal, List, Switch } from 'antd'
 import {
   CopyOutlined,
   StepBackwardOutlined,
@@ -71,6 +71,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const [modalPosition, setModalPosition] = useState({ x: 20, y: 20 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [hideViewportChanges, setHideViewportChanges] = useState(true)
   
   const { past, present, future } = useAppSelector(state => state.fColl)
 
@@ -81,34 +82,46 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
     for (let i = 0; i < past.length; i++) {
       const item = past[i]
       if (item.details?.undo) {
-        history.unshift({
-          description: item.details.undo,
-          time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
-          type: 'past'
-        })
+        const isViewportChange = item.details.undo.toLowerCase().includes('viewport')
+        if (!hideViewportChanges || !isViewportChange) {
+          history.unshift({
+            description: item.details.undo,
+            time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
+            type: 'past',
+            isViewportChange
+          })
+        }
       }
     }
     // Add present item
     if (present.details?.undo) {
-      history.unshift({
-        description: present.details.undo,
-        time: TimeSupport.formatDuration(new Date().getTime() - present.details.time),
-        type: 'present'
-      })
+      const isViewportChange = present.details.undo.toLowerCase().includes('viewport')
+      if (!hideViewportChanges || !isViewportChange) {
+        history.unshift({
+          description: present.details.undo,
+          time: TimeSupport.formatDuration(new Date().getTime() - present.details.time),
+          type: 'present',
+          isViewportChange
+        })
+      }
     }
     // Add future items (more recent changes that were undone)
     for (let i = 0; i < future.length; i++) {
       const item = future[i]
       if (item.details?.undo) {
-        history.unshift({
-          description: item.details.undo,
-          time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
-          type: 'future'
-        })
+        const isViewportChange = item.details.undo.toLowerCase().includes('viewport')
+        if (!hideViewportChanges || !isViewportChange) {
+          history.unshift({
+            description: item.details.undo,
+            time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
+            type: 'future',
+            isViewportChange
+          })
+        }
       }
     }
     return history
-  }, [past, present, future])
+  }, [past, present, future, hideViewportChanges])
 
   useEffect(() => {
     try {
@@ -239,7 +252,19 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
             onMouseUp={() => setIsDragging(false)}
             onMouseLeave={() => setIsDragging(false)}
           >
-            Select a point to undo to
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
+              <span style={{ marginRight: '16px' }}>Select a point to undo to</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
+                marginTop: '10px', marginRight:'30px'}}>
+                <Switch
+                  checkedChildren={'Hiding Viewport changes'}
+                  unCheckedChildren={'Showing Viewport changes'}
+                  size="small"
+                  checked={hideViewportChanges}
+                  onChange={(checked) => setHideViewportChanges(checked)}
+                />
+              </div>
+            </div>
           </div>
         }
         style={{
