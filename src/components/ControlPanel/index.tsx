@@ -72,7 +72,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   
-  const { past, present } = useAppSelector(state => state.fColl)
+  const { past, present, future } = useAppSelector(state => state.fColl)
 
   // Get the undo history from the redux store
   const undoHistory = useMemo(() => {
@@ -83,19 +83,32 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
       if (item.details?.undo) {
         history.unshift({
           description: item.details.undo,
-          time: TimeSupport.formatDuration(new Date().getTime() - item.details.time)
+          time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
+          type: 'past'
         })
       }
     }
-    // Add present item last
+    // Add present item
     if (present.details?.undo) {
       history.unshift({
         description: present.details.undo,
-        time: TimeSupport.formatDuration(new Date().getTime() - present.details.time)
+        time: TimeSupport.formatDuration(new Date().getTime() - present.details.time),
+        type: 'present'
       })
     }
+    // Add future items (more recent changes that were undone)
+    for (let i = 0; i < future.length; i++) {
+      const item = future[i]
+      if (item.details?.undo) {
+        history.unshift({
+          description: item.details.undo,
+          time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
+          type: 'future'
+        })
+      }
+    }
     return history
-  }, [past, present])
+  }, [past, present, future])
 
   useEffect(() => {
     try {
@@ -265,7 +278,8 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
             type="primary"
             disabled={selectedUndoIndex === null}
             onClick={() => {
-              // Keep the changes by just closing the modal
+              // Keep the changes but don't close the modal
+              // Just clear the preview state so user can continue exploring
               setPreviewUndoCount(0)
               setSelectedUndoIndex(null)
               setUndoModalVisible(false)
@@ -281,20 +295,31 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           renderItem={(item, index) => (
             <List.Item
               onClick={() => {
-                // First redo any existing preview
-                for (let i = 0; i < previewUndoCount; i++) {
-                  dispatch({ type: REDO_ACTION })
+                if (index === selectedUndoIndex) {
+                  // If clicking the same item again, treat it as deselection
+                  for (let i = 0; i < previewUndoCount; i++) {
+                    dispatch({ type: REDO_ACTION })
+                  }
+                  setPreviewUndoCount(0)
+                  setSelectedUndoIndex(null)
+                } else {
+                  // First redo any existing preview
+                  for (let i = 0; i < previewUndoCount; i++) {
+                    dispatch({ type: REDO_ACTION })
+                  }
+                  // Then undo to the selected point
+                  for (let i = 0; i < index + 1; i++) {
+                    dispatch({ type: UNDO_ACTION })
+                  }
+                  setPreviewUndoCount(index + 1)
+                  setSelectedUndoIndex(index)
                 }
-                // Then undo to the selected point
-                for (let i = 0; i < index + 1; i++) {
-                  dispatch({ type: UNDO_ACTION })
-                }
-                setPreviewUndoCount(index + 1)
-                setSelectedUndoIndex(index)
               }}
               style={{
                 cursor: 'pointer',
-                backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : index === 0 ? '#f5f5f5' : undefined,
+                backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : 
+                  item.type === 'present' ? '#f5f5f5' : 
+                    item.type === 'future' ? '#fff1f0' : undefined,
                 padding: '8px 16px'
               }}
             >
@@ -307,7 +332,8 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               }}>
                 <div style={{ 
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  color: item.type === 'future' ? '#cf1322' : undefined
                 }}>
                   {index === 0 ? (
                     <strong>{item.description} (current state)</strong>
