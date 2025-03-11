@@ -14,9 +14,15 @@ export type ViewportState = {
   changeType: ViewportChangeType
 }
 
-export type FeatureUpdated = {
-  feature: Feature<Geometry, GeoJsonProperties>
+type CoreUpdated = {
   property?: string
+}
+export type FeatureUpdated = CoreUpdated & {
+  feature: Feature<Geometry, GeoJsonProperties>
+}
+
+export type FeaturesUpdated = CoreUpdated & {
+  features: Feature<Geometry, GeoJsonProperties>[]
 }
 
 export type StoreState = {
@@ -168,17 +174,18 @@ const featuresSlice = createSlice({
         `Redo ${description}`
       )
     },
-    featuresUpdated(state, action: PayloadAction<Feature[]>) {
+    featuresUpdated(state, action: PayloadAction<FeaturesUpdated>) {
       const updates = action.payload
       state.data.features = state.data.features.map(feature => {
-        const update = updates.find(u => u.id === feature.id)
+        const update = updates.features.find(u => u.id === feature.id)
         return update || feature
       })
       state.data.bbox = updateBounds(state.data)
-      const itemNames = namesFor(updates)
+      const itemNames = namesFor(updates.features)
+      const description = action.payload.property ? `${action.payload.property} of ${itemNames}` : `modify ${itemNames}`
       state.details = newDetails(
-        'Undo modify ' + itemNames,
-        'Redo modify ' + itemNames
+        `Undo ${description}`,
+        `Redo ${description}`
       )
     },
     featuresVisChange(state, action: PayloadAction<{ ids: string[], visible: boolean }>) {
