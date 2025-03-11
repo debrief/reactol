@@ -99,7 +99,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
           onMouseLeave={() => setIsDragging(false)}
         >
           <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
-            <span style={{ marginRight: '16px' }}>Select a point to undo to</span>
+            <span style={{ marginRight: '16px' }}>Select a version to undo to</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
               marginTop: '10px', marginRight:'30px'}}>
               <Switch
@@ -186,7 +186,10 @@ export const UndoModal: React.FC<UndoModalProps> = ({
               cursor: 'pointer',
               backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : 
                 item.type === 'future' ? '#fff1f0' : undefined,
-              padding: '8px 16px'
+              padding: '8px 16px',
+              margin: '2px',
+              border: '2px solid #ccc',
+              borderRadius: '5px'
             }}
           >
             <div style={{ 
