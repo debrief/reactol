@@ -26,9 +26,6 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [hideViewportChanges, setHideViewportChanges] = useState(true)
 
-
-  console.log('state', past, present.details, future)
-
   // Get the undo history from the redux store
   const undoHistory = useMemo(() => {
     const history = []
