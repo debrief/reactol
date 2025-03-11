@@ -255,9 +255,11 @@ export const ToolButton: React.FC<ToolProps> = ({
 }
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
-  const { selection, setSelection, setNewFeature } = useDocContext()
+  const { selection, setSelection, setNewFeature, preview } = useDocContext()
   const features = useAppSelector(selectFeatures)
-  const selectedFeatures = features.filter((feature) =>
+  const theFeatures = preview ? preview.data.features : features
+
+  const selectedFeatures = theFeatures.filter((feature) =>
     selection.includes(feature.id as string)
   )
   const dispatch = useAppDispatch()
@@ -283,7 +285,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const selectionWithGroups = useMemo(() => {
     const fullList = [...selection]
-    const groups = features.filter(
+    const groups = theFeatures.filter(
       (feature) => feature.properties?.dataType === GROUP_TYPE
     ) as unknown as Feature<Geometry, GroupProps>[]
     selection.forEach((id: string) => {
@@ -297,7 +299,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       fullList.push(...groupIds)
     })
     return fullList
-  }, [selection, features])
+  }, [selection, theFeatures])
 
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
@@ -386,15 +388,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   useEffect(() => {
     const items: TreeDataNode[] = []
-    items.push(trackFunc(features, handleAdd))
+    items.push(trackFunc(theFeatures, handleAdd))
     items.push(
-      mapFunc(features, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
+      mapFunc(theFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
     )
-    items.push(mapFunc(features, 'Zones', 'node-zones', ZONE_TYPE, handleAdd, 
+    items.push(mapFunc(theFeatures, 'Zones', 'node-zones', ZONE_TYPE, handleAdd, 
       <AddZoneShape addZone={addZone} />))
     items.push(
       mapFunc(
-        features,
+        theFeatures,
         'Points',
         'node-points',
         REFERENCE_POINT_TYPE,
@@ -402,11 +404,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
       )
     )
     items.push(
-      mapFunc(features, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
+      mapFunc(theFeatures, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
     )
     const modelData = items
     setModel(modelData)
-  }, [features, handleAdd, addZone])
+  }, [theFeatures, handleAdd, addZone])
 
   const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
