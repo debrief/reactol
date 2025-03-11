@@ -54,8 +54,13 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
         })
       }
       return validCoords
+    } else {
+      // just produce line
+      const lineLen = Math.ceil(coords.length / 10)
+      return coords.map((coord, index): CoordInstance => {
+        return {pos: [coord[1], coord[0]], time: '', labelVisible: false, symbolVisible: index % lineLen === 0}
+      })
     }
-    return []
   }, [feature, time])
 
   const currentLocation = useMemo(() => {
