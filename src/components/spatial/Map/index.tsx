@@ -30,6 +30,22 @@ interface MapProps {
   children: React.ReactNode;
 }
 
+const featureForGeometry = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void): React.ReactElement | null => {
+  switch(feature.geometry.type) {
+  case 'Point':
+    return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
+  case 'LineString':
+    return <Track key={feature.id} feature={feature} onClickHandler={onClickHandler} /> 
+  case 'Polygon':
+    return <Zone key={feature.id} feature={feature as Feature<Polygon>} onClickHandler={onClickHandler}/>  
+  case 'MultiPoint':
+    return <BuoyField key={feature.id} feature={feature as Feature<MultiPoint, BuoyFieldProps>} onClickHandler={onClickHandler} />
+  default:
+    console.log('Unknown geometry type:',feature)
+    return null
+  }
+}
+
 const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boolean) => void): React.ReactElement | null => {
   switch(feature.properties?.dataType) {
   case TRACK_TYPE:
@@ -43,8 +59,12 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
   case GROUP_TYPE:
     return null  
   default:
-    console.log('Unknown feature type:',feature)
-    throw new Error('Unknown feature type:' + feature.properties?.dataType)
+  {
+    // produce a shape type based on the geometry type
+    const res = featureForGeometry(feature, onClickHandler)
+    console.log('res', res)
+    return res
+  }
   }
 }
 
