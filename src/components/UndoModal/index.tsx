@@ -176,7 +176,6 @@ export const UndoModal: React.FC<UndoModalProps> = ({
               } else {
                 // Clear any existing preview
                 setPreview(null)
-                console.log('previewing', index)
                 // Set preview to the state at the selected index
                 setPreview(past[past.length - 1 - index])
                 setSelectedUndoIndex(index)

@@ -66,7 +66,10 @@ const MapFeatures: React.FC<{
 const ViewportTracker: React.FC = () => {
   const map = useMap()
   const dispatch = useDispatch()
-  const viewport = useAppSelector(state => state.fColl.present.viewport)
+  const currentViewport = useAppSelector(state => state.fColl.present.viewport)
+  const { preview } = useDocContext()
+  const viewport = preview?.viewport || currentViewport
+
   const lastZoom = useRef(map.getZoom())
   const isInitialLoad = useRef(true)
 
@@ -97,8 +100,12 @@ const ViewportTracker: React.FC = () => {
         changeType
       }
 
+      // we need to compare viewport with newViewport, but we should ignore the `changeType` property
+      const viewportWithoutChangeType = { ...viewport, changeType: undefined }
+      const newViewportWithoutChangeType = { ...newViewport, changeType: undefined }
+
       // Only dispatch if viewport actually changed
-      if (JSON.stringify(newViewport) !== JSON.stringify(viewport)) {
+      if (JSON.stringify(newViewportWithoutChangeType) !== JSON.stringify(viewportWithoutChangeType)) {
         dispatch({
           type: 'fColl/setViewport',
           payload: newViewport
