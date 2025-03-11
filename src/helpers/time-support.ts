@@ -13,7 +13,6 @@ export class TimeSupport {
     const date = new Date(Date.now() - duration)
     
     // Use date-fns to format the duration in a human-readable way
-    // The 'strict' version gives more precise output like '1 minute' instead of 'about 1 minute'
     return formatDistanceToNow(date, {
       addSuffix: true, // Adds 'ago' to the output
     })
