@@ -63,25 +63,30 @@ let counter = 0
 /** note: this method modifies the contents of the `newIds` argument,
  *  to keep track of the new feature ids
  */
-export const cleanFeature = (existingIds: string[],feature: Feature, newIds?: idDictionary): Feature => {
+export const cleanFeature = (existingIds: string[], feature: Feature, newIds?: idDictionary): Feature => {
+  let result = feature // note: we will clone this, if we have to
   const newIdsKeys =  Object.keys(newIds || {})
-  if (!feature.id) {
-    feature.id = `f-${++counter}`
+  if (!result.id) {
+    result.id = `f-${++counter}`
   }
-  while (existingIds.includes(feature.id as string) || newIdsKeys?.includes(feature.id as string)) {
-    feature.id = `f-${++counter}`
+  while (existingIds.includes(result.id as string) || newIdsKeys?.includes(result.id as string)) {
+    // ok, we can't amend the id for the original feature. In this 
+    // case we'll have to clone the feature and then modify it.
+    // note:  a shallow copy is ok, since id sits at the top level
+    const newFeature = {...feature, id: `f-${++counter}`}
+    result = newFeature
   }
   if (newIds) {
-    newIds[feature.id as string] = feature.id as string
+    newIds[result.id as string] = result.id as string
   }  
 
-  if (!feature.properties) {
-    feature.properties = {}
+  if (!result.properties) {
+    result.properties = {}
   }
-  if (feature.properties.visible === undefined) {
-    feature.properties.visible = true
+  if (result.properties.visible === undefined) {
+    result.properties.visible = true
   }
-  return feature
+  return result
 }
 
 const updateBounds = (state: FeatureCollection): BBox | undefined => {
