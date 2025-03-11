@@ -211,7 +211,7 @@ export const loadOpRep = async (text: string, _features: Feature<Geometry, GeoJs
     }
     // add the new data to the existing track
     const res = addToExistingTrack(data, existingTrack as Feature<Geometry, TrackProps>)
-    dispatch({ type: 'fColl/featureUpdated', payload: res })
+    dispatch({ type: 'fColl/featureUpdated', payload: { feature: res, property: 'add track data' } })
   } else {
     if (!newTrackDetails || !newTrackDetails.initialYear || !newTrackDetails.initialMonth || !newTrackDetails.name || !newTrackDetails.shortName || !newTrackDetails.env || !newTrackDetails.stroke) {
       return

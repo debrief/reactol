@@ -36,11 +36,21 @@ const Properties: React.FC = () => {
       dispatch({ type: 'fColl/featureAdded', payload: featureState })
       setNewFeature(null)
     } else {
-      // update the feature
-      dispatch({ type: 'fColl/featureUpdated', payload: featureState })
+      // compare feature state to original state, and see if just one field has changed.
+      const originalProps = originalState?.properties
+      const newProps = featureState?.properties
+      if (originalProps && newProps) {
+        const changedProps = Object.keys(newProps).filter(key => newProps[key] !== originalProps[key])
+        if (changedProps.length === 1) {
+          dispatch({ type: 'fColl/featureUpdated', payload: { feature: featureState, property: 'modify ' + changedProps[0] } })
+        } else {
+          // update the feature
+          dispatch({ type: 'fColl/featureUpdated', payload: { feature: featureState } })
+        }
+      }
     }
     setFormDirty(false)
-  }, [dispatch, featureState, newFeature, setNewFeature])
+  }, [dispatch, originalState, featureState, newFeature, setNewFeature])
 
   const onDelete = useCallback(() => {
     // update the feature

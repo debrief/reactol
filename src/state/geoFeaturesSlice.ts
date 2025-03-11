@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { BBox, Feature, FeatureCollection } from 'geojson'
+import { BBox, Feature, FeatureCollection, Geometry, GeoJsonProperties } from 'geojson'
 import * as turf from '@turf/turf'
 import { LatLngBounds } from 'leaflet'
 
@@ -12,6 +12,11 @@ export type ViewportState = {
   west: number
   zoom: number
   changeType: ViewportChangeType
+}
+
+export type FeatureUpdated = {
+  feature: Feature<Geometry, GeoJsonProperties>
+  property?: string
 }
 
 export type StoreState = {
@@ -152,14 +157,15 @@ const featuresSlice = createSlice({
         'Redo add ' + itemNames
       )
     },
-    featureUpdated(state, action: PayloadAction<Feature>) {
-      const featureIndex = state.data.features.findIndex((feature) => feature.id === action.payload.id)
-      state.data.features.splice(featureIndex, 1, action.payload)
+    featureUpdated(state, action: PayloadAction<FeatureUpdated>) {
+      const featureIndex = state.data.features.findIndex((feature) => feature.id === action.payload.feature.id)
+      state.data.features.splice(featureIndex, 1, action.payload.feature)
       state.data.bbox = updateBounds(state.data)
-      const itemName = namesFor([action.payload])
+      const itemName = namesFor([action.payload.feature])
+      const description = action.payload.property ? `${action.payload.property} of ${itemName}` : `modify ${itemName}`
       state.details = newDetails(
-        'Undo modify ' + itemName,
-        'Redo modify ' + itemName
+        `Undo ${description}`,
+        `Redo ${description}`
       )
     },
     featuresUpdated(state, action: PayloadAction<Feature[]>) {
