@@ -125,14 +125,17 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   }
 
   const widthFor = (index: number, futureLen: number) => {
+    const minWidth = 90
+    const scaleSteps = 4
+    const scaleFactor = 8
     if (index < futureLen) {
-      return (90 + (8 / (4 - index))) + '%'
+      return (minWidth + (scaleFactor / (scaleSteps - index))) + '%'
     } else if (index === futureLen) {
       return '100%'
-    } else if (index + futureLen > 4) {
+    } else if (index + futureLen > scaleSteps) {
       return '90%'
     } else {
-      return (90 + (8 / (index))) + '%'
+      return (minWidth + (scaleFactor / (index))) + '%'
     }
   }
   
