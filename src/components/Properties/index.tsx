@@ -79,11 +79,11 @@ const Properties: React.FC = () => {
     case REFERENCE_POINT_TYPE:
       return <PointForm key={key} onChange={updateFeatureState} shape={featureState as Feature<Geometry, PointProps>} />
     case BACKDROP_TYPE:
-      return <BackdropForm key={key} onChange={updateFeatureState} backdrop={featureState as Feature<Geometry, BackdropProps>} />  
+      return <BackdropForm create={newFeature !== null} key={key} onChange={updateFeatureState} backdrop={featureState as Feature<Geometry, BackdropProps>} />  
     default:
       return <PropertiesViewer key={key} feature={featureState} />
     }
-  }, [updateFeatureState])
+  }, [updateFeatureState, newFeature])
 
   const onCancelCreate = useCallback(() => {
     setNewFeature(null)

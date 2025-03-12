@@ -29,6 +29,7 @@ import {
   GroupProps,
   BuoyFieldProps,
   EnvOptions,
+  BackdropProps,
 } from '../../types'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
@@ -125,6 +126,9 @@ const addIconLabelFor = (key: string, title: string) => {
   }
   case NODE_GROUPS: {
     return 'Create new group'
+  }
+  case NODE_BACKDROPS: {
+    return 'Create new backdrop'
   }
   default:
     return 'ERROR - node type not handled: ' + key
@@ -365,6 +369,25 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewFeature(feature)
   }, [setNewFeature, setSelection])
 
+  const addBackdrop = useCallback(() => {
+    const backdrop: Feature<MultiPoint, BackdropProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        dataType: BACKDROP_TYPE,
+        visible: true,
+        url: '',
+        maxNativeZoom: 0,
+        maxZoom: 0,
+      },
+      geometry: {
+        type: 'MultiPoint',
+        coordinates: [],
+      },
+    }
+    localSetNewFeature(backdrop)
+  }, [localSetNewFeature])
+
   const addPoint = useCallback(() => {
     const point: Feature<Point, PointProps> = {
       type: 'Feature',
@@ -435,13 +458,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         throw new Error('This method not responsible for adding zones')
       } else if (key === 'node-groups') {
         addGroup()
+      } else if (key === 'node-backdrops') {
+        addBackdrop()  
       } else {
         console.error(
           'unknown key for create new item ' + key + ' for ' + title
         )
       }
       e.stopPropagation()
-    }, [addGroup, addBuoyField, addPoint]) 
+    }, [addGroup, addBuoyField, addPoint, addBackdrop]) 
 
   useEffect(() => {
     const items: TreeDataNode[] = []
