@@ -1,11 +1,11 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
-import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps, ZoneProps, PointProps } from '../../types'
+import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps, ZoneProps, PointProps, BackdropProps } from '../../types'
 import { useDocContext } from '../../state/DocContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import './index.css'
 import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint, Point } from 'geojson'
-import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { BACKDROP_TYPE, BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { PointForm } from '../PointForm'
 import { CoreForm } from '../CoreForm'
 import { PropertiesViewer } from './PropertiesViewer'
@@ -14,6 +14,7 @@ import { GroupForm } from '../GroupForm'
 import { BuoyFieldForm } from '../BuoyFieldForm'
 import { ZoneForm } from '../ZoneForm'
 import MultiFeatureForm from '../MultiFeatureForm'
+import { BackdropForm } from '../BackdropForm'
 
 const Properties: React.FC = () => {
   const { selection, setSelection, newFeature, setNewFeature } = useDocContext()
@@ -77,6 +78,8 @@ const Properties: React.FC = () => {
       return <ZoneForm key={key} onChange={updateFeatureState} shape={featureState as Feature<Geometry, ZoneProps>} />
     case REFERENCE_POINT_TYPE:
       return <PointForm key={key} onChange={updateFeatureState} shape={featureState as Feature<Geometry, PointProps>} />
+    case BACKDROP_TYPE:
+      return <BackdropForm key={key} onChange={updateFeatureState} backdrop={featureState as Feature<Geometry, BackdropProps>} />  
     default:
       return <PropertiesViewer key={key} feature={featureState} />
     }

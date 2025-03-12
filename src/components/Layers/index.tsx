@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons'
 import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
+  BACKDROP_TYPE,
   BUOY_FIELD_TYPE,
   GROUP_TYPE,
   REFERENCE_POINT_TYPE,
@@ -47,6 +48,7 @@ const NODE_FIELDS = 'node-fields'
 const NODE_ZONES = 'node-zones'
 const NODE_POINTS = 'node-points'
 const NODE_GROUPS = 'node-groups'
+const NODE_BACKDROPS = 'node-backdrops'
 
 type FieldDataNode = {
   title: string
@@ -461,6 +463,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     items.push(
       mapFunc(theFeatures, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
     )
+    items.push(mapFunc(theFeatures, 'Backdops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
     const modelData = items
     setModel(modelData)
   }, [theFeatures, handleAdd, addZone])
