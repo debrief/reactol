@@ -1,5 +1,5 @@
 import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Flex, Modal, Tooltip, Tree } from 'antd'
+import { Button, Flex, Tooltip, Tree } from 'antd'
 import type { GetProps, TreeDataNode } from 'antd'
 import './index.css'
 import {
@@ -36,6 +36,7 @@ import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { noop } from 'lodash'
 import { symbolOptions } from '../../helpers/symbolTypes'
+import { useAppContext } from '../../state/AppContext'
 
 type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
 const { DirectoryTree } = Tree
@@ -254,22 +255,77 @@ export const ToolButton: React.FC<ToolProps> = ({
 }
 
 const Layers: React.FC<LayerProps> = ({ openGraph }) => {
-  const { selection, setSelection, setNewFeature } = useDocContext()
+  const { selection, setSelection, setNewFeature, setMessage } = useDocContext()
   const features = useAppSelector((state) => state.fColl.features)
+  const {clipboardUpdated, setClipboardUpdated} = useAppContext()
+
   const selectedFeatures = features.filter((feature) =>
     selection.includes(feature.id as string)
   )
   const dispatch = useAppDispatch()
+  const treeRef = React.useRef<HTMLDivElement>(null)
 
   const [model, setModel] = React.useState<TreeDataNode[]>([])
-  const [message, setMessage] = React.useState<string>('')
   const [pendingTrackEnvironment, setPendingTrackEnvironment] =
     useState<EnvOptions | null>(null)
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
 
-  const clearSelection = () => {
+  const onCopyClick = useCallback(() => {
+    // get the selected features
+    const selected = features.filter((feature) =>
+      selection.includes(feature.id as string)
+    )
+    const asStr = JSON.stringify(selected)
+    navigator.clipboard.writeText(asStr).then(() => {
+      setClipboardUpdated(!clipboardUpdated)
+    }).catch((e) => {
+      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
+    })
+  }, [features, selection, clipboardUpdated, setClipboardUpdated, setMessage])
+
+  const onDeleteClick = useCallback(() => {
+    dispatch({
+      type: 'fColl/featuresDeleted',
+      payload: { ids: selection },
+    })
     setSelection([])
-  }
+  }, [dispatch, selection, setSelection])
+
+  const clearSelection = useCallback(() => {
+    setSelection([])
+  }, [setSelection])
+
+  // Handle delete key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selection.length > 0) {
+        // support delete key
+        if (e.key === 'Delete') {
+          onDeleteClick()
+          e.stopPropagation()
+        }
+        // clear selection on `escape`
+        if (e.key === 'Escape') {
+          clearSelection()
+          e.stopPropagation()
+        }
+        // copy items to clipboard on `copy`
+        if (e.key === 'c' && e.ctrlKey) {
+          onCopyClick()
+          e.stopPropagation()
+        }
+      }
+    }
+
+    const treeElement = treeRef.current
+    if (treeElement) {
+      treeElement.addEventListener('keydown', handleKeyDown)
+      return () => {
+        treeElement.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+  }, [selection, onDeleteClick, onCopyClick, setMessage, clearSelection, setSelection, setClipboardUpdated])
+
 
   const temporalFeatureSelected = useMemo(
     () => selectedFeatures.some((feature) => feature.properties?.times),
@@ -415,13 +471,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     }
   }
 
-  const onDeleteClick = () => {
-    dispatch({
-      type: 'fColl/featuresDeleted',
-      payload: { ids: selection },
-    })
-    setSelection([])
-  }
+
 
   const setLoadTrackResults = async (values: NewTrackProps) => {
     setPendingTrackEnvironment(null)
@@ -454,14 +504,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
   }
   return (
     <>
-      <Modal
-        title='Message'
-        open={message !== ''}
-        onOk={() => setMessage('')}
-        onCancel={() => setMessage('')}
-      >
-        <Alert type='info' description={message} />
-      </Modal>
       <div
         style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}
       >
@@ -511,20 +553,22 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         </Flex>
       </div>
       {model.length > 0 && (
-        <DirectoryTree
-          showLine={true}
-          style={{ textAlign: 'left', height: '100%' }}
-          defaultSelectedKeys={[]}
-          multiple={true}
-          onSelect={onSelect}
-          showIcon={true}
-          selectedKeys={selectionWithGroups || []}
-          expandedKeys={expandedKeys}
-          onExpand={(keys) => {
-            setExpandedKeys(keys as string[])
-          }}
-          treeData={model}
-        />
+        <div ref={treeRef} tabIndex={0}>
+          <DirectoryTree
+            showLine={true}
+            style={{ textAlign: 'left', height: '100%' }}
+            defaultSelectedKeys={[]}
+            multiple={true}
+            onSelect={onSelect}
+            showIcon={true}
+            selectedKeys={selectionWithGroups || []}
+            expandedKeys={expandedKeys}
+            onExpand={(keys) => {
+              setExpandedKeys(keys as string[])
+            }}
+            treeData={model}
+          />
+        </div>
       )}
       {pendingTrackEnvironment && (
         <LoadTrackModel
