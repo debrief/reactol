@@ -74,6 +74,22 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     return history
   }, [past, present, future, hideViewportChanges])
 
+  const doRestore = () => {
+    if (selectedUndoIndex !== null) {
+      // Clear the preview
+      setPreview(null)
+      // Calculate how many undo actions we need
+      const currentIndex = past.length - 1
+      const undoCount = currentIndex - selectedUndoIndex
+      // Apply undo actions to reach the selected state
+      for (let i = 0; i < undoCount; i++) {
+        dispatch({ type: UNDO_ACTION })
+      }
+    }
+    setSelectedUndoIndex(null)
+    onRestore()
+  }
+
   return (
     <Modal
       title={
@@ -142,22 +158,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
           key="restore"
           type="primary"
           disabled={selectedUndoIndex === null}
-          onClick={() => {
-            // Apply the actual undo actions
-            if (selectedUndoIndex !== null) {
-              // Clear the preview
-              setPreview(null)
-              // Calculate how many undo actions we need
-              const currentIndex = past.length - 1
-              const undoCount = currentIndex - selectedUndoIndex
-              // Apply undo actions to reach the selected state
-              for (let i = 0; i < undoCount; i++) {
-                dispatch({ type: UNDO_ACTION })
-              }
-            }
-            setSelectedUndoIndex(null)
-            onRestore()
-          }}
+          onClick={doRestore}
         >
           Restore Version
         </Button>
@@ -165,9 +166,11 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     >
       <List
         size="small"
+        style={{overflow: 'auto', scrollBehavior: 'auto', height: '100vh'}}
         dataSource={undoHistory}
         renderItem={(item, index) => (
           <List.Item
+            onDoubleClick={doRestore}
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
@@ -186,9 +189,10 @@ export const UndoModal: React.FC<UndoModalProps> = ({
               backgroundColor: index === selectedUndoIndex ? '#e6f7ff' : 
                 item.type === 'future' ? '#fff1f0' : undefined,
               padding: '8px 16px',
-              margin: '2px',
+              margin: 'auto',
               border: '2px solid #ccc',
-              borderRadius: '5px'
+              borderRadius: '5px',
+              width: index > 4 ? '90%' : index === 0 ? '100%' : 90 + (8 / (index)) + '%'
             }}
           >
             <div style={{ 
@@ -204,7 +208,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
                 color: item.type === 'future' ? '#cf1322' : undefined
               }}>
                 {index === 0 ? (
-                  <strong>{item.description} (current state)</strong>
+                  <strong>{item.description}</strong>
                 ) : (
                   item.description
                 )}
@@ -215,7 +219,11 @@ export const UndoModal: React.FC<UndoModalProps> = ({
                 whiteSpace: 'nowrap',
                 textAlign: 'right'
               }}>
-                {item.time}
+                {index === 0 ? (
+                  <strong>{item.time}<br/>(current state)</strong>
+                ) : (
+                  item.time
+                )}
               </div>
             </div>
           </List.Item>
