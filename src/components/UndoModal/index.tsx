@@ -26,9 +26,17 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [hideViewportChanges, setHideViewportChanges] = useState(true)
 
+
   // Get the undo history from the redux store
   const undoHistory = useMemo(() => {
+    if (!visible) {
+      return []
+    }
     const history = []
+    console.log('===========')
+    console.log(past.map((item, index) => '\n' + index + ': ' + item.details?.undo ))
+    console.log('PRESENT', present.details?.undo)
+    console.log(future.map((item, index) => '\n' + index + ': ' + item.details?.undo))
     // Add past items in reverse order (oldest first)
     for (let i = 0; i < past.length; i++) {
       const item = past[i]
@@ -72,16 +80,20 @@ export const UndoModal: React.FC<UndoModalProps> = ({
       }
     }
     return history
-  }, [past, present, future, hideViewportChanges])
+  }, [past, present, future, hideViewportChanges, visible])
+
+  if (!visible) {
+    return null
+  }
 
   const doRestore = () => {
     if (selectedUndoIndex !== null) {
       // Clear the preview
       setPreview(null)
       // Calculate how many undo actions we need
-      const currentIndex = past.length - 1
-      const undoCount = currentIndex - selectedUndoIndex
+      const undoCount =  selectedUndoIndex + 1
       // Apply undo actions to reach the selected state
+      console.log('doing ' + undoCount + ' undo steps' )
       for (let i = 0; i < undoCount; i++) {
         dispatch({ type: UNDO_ACTION })
       }
@@ -89,7 +101,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     setSelectedUndoIndex(null)
     onRestore()
   }
-
+  
   return (
     <Modal
       title={
@@ -166,7 +178,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     >
       <List
         size="small"
-        style={{overflow: 'auto', scrollBehavior: 'auto', height: '100vh'}}
+        style={{overflow: 'auto', scrollBehavior: 'auto'}}
         dataSource={undoHistory}
         renderItem={(item, index) => (
           <List.Item
@@ -174,13 +186,16 @@ export const UndoModal: React.FC<UndoModalProps> = ({
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
+                console.log('remove preview')
                 setPreview(null)
                 setSelectedUndoIndex(null)
               } else {
                 // Clear any existing preview
                 setPreview(null)
                 // Set preview to the state at the selected index
-                setPreview(past[past.length - 1 - index])
+                const previewIndex = past.length - 1 - index
+                console.log('preview index', previewIndex)
+                setPreview(past[previewIndex])
                 setSelectedUndoIndex(index)
               }
             }}
