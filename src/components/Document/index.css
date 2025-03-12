@@ -174,3 +174,13 @@ html, body, #root, .App, #map {
 .ant-btn-color-primary.ant-btn-variant-outlined {
   margin-right: 2px !important;
 }
+
+.ant-tabs-content {
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-tabs-tabpane-active {
+  height: 100% !important;
+}
