@@ -10,7 +10,6 @@ import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
-import { GROUP_TYPE } from '../../constants'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 type OptionType = {
@@ -85,7 +84,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   , [featureOptions])
 
   const secondaryOptions = useMemo(() => 
-    featureOptions.filter(track => track.value !== primaryTrack).filter((track) => track.dataType !== 'a' + GROUP_TYPE)
+    featureOptions.filter(track => track.value !== primaryTrack)
   , [primaryTrack, featureOptions])
 
   const featuresToPlot = useMemo(() => 
