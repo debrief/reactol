@@ -1,4 +1,5 @@
-import { Modal, Button, List, Switch } from 'antd'
+import { Button, List, Switch } from 'antd'
+import { DraggableModal } from '../DraggableModal'
 import React, { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '../../state/hooks'
@@ -21,9 +22,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   const { past, present, future } = useAppSelector(state => state.fColl)
   const { setPreview } = useDocContext()
   const [selectedUndoIndex, setSelectedUndoIndex] = useState<number | null>(null)
-  const [modalPosition, setModalPosition] = useState({ x: 20, y: 20 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+
   const [hideViewportChanges, setHideViewportChanges] = useState(true)
 
 
@@ -33,10 +32,6 @@ export const UndoModal: React.FC<UndoModalProps> = ({
       return []
     }
     const history = []
-    console.log('===========')
-    console.log(past.map((item, index) => '\n' + index + ': ' + item.details?.undo ))
-    console.log('PRESENT', present.details?.undo)
-    console.log(future.map((item, index) => '\n' + index + ': ' + item.details?.undo))
     // Add past items in reverse order (oldest first)
     for (let i = 0; i < past.length; i++) {
       const item = past[i]
@@ -103,50 +98,22 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   }
   
   return (
-    <Modal
-      title={
-        <div
-          style={{ cursor: 'move', width: '100%' }}
-          onMouseDown={(e) => {
-            setIsDragging(true)
-            const rect = e.currentTarget.getBoundingClientRect()
-            setDragOffset({
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top
-            })
-          }}
-          onMouseMove={(e) => {
-            if (isDragging) {
-              setModalPosition({
-                x: e.clientX - dragOffset.x,
-                y: e.clientY - dragOffset.y
-              })
-            }
-          }}
-          onMouseUp={() => setIsDragging(false)}
-          onMouseLeave={() => setIsDragging(false)}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
-            <span style={{ marginRight: '16px' }}>Select a version to undo to</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
-              marginTop: '10px', marginRight:'30px'}}>
-              <Switch
-                checkedChildren={'Hiding Viewport changes'}
-                unCheckedChildren={'Showing Viewport changes'}
-                size="small"
-                checked={hideViewportChanges}
-                onChange={(checked) => setHideViewportChanges(checked)}
-              />
-            </div>
+    <DraggableModal
+      draggableTitle={
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
+          <span style={{ marginRight: '16px' }}>Select a version to undo to</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
+            marginTop: '10px', marginRight:'30px'}}>
+            <Switch
+              checkedChildren={'Hiding Viewport changes'}
+              unCheckedChildren={'Showing Viewport changes'}
+              size="small"
+              checked={hideViewportChanges}
+              onChange={(checked) => setHideViewportChanges(checked)}
+            />
           </div>
         </div>
       }
-      style={{
-        top: modalPosition.y,
-        left: modalPosition.x,
-        position: 'fixed'
-      }}
-      mask={false}
       open={visible}
       onCancel={() => {
         // Reset preview if canceling
@@ -182,7 +149,6 @@ export const UndoModal: React.FC<UndoModalProps> = ({
         dataSource={undoHistory}
         renderItem={(item, index) => (
           <List.Item
-            onDoubleClick={doRestore}
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
@@ -244,6 +210,6 @@ export const UndoModal: React.FC<UndoModalProps> = ({
           </List.Item>
         )}
       />
-    </Modal>
+    </DraggableModal>
   )
 }
