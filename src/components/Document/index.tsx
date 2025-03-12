@@ -173,7 +173,8 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
 
   const doSave = useCallback(async () => {
     if (filePath && window.electron) {
-      const doc = JSON.stringify(storeContents)
+      // just store the current JSON FeatureCollection
+      const doc = JSON.stringify(storeContents.present.data)
       await window.electron.saveFile(filePath, doc)  
     } else {
       window.alert('Local save not supportedin browser')
