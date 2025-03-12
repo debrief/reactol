@@ -3,7 +3,7 @@ import { DraggableModal } from '../DraggableModal'
 import React, { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '../../state/hooks'
-import { UNDO_ACTION,  } from '../../state/store'
+import { UNDO_ACTION, REDO_ACTION  } from '../../state/store'
 import { TimeSupport } from '../../helpers/time-support'
 import { useDocContext } from '../../state/DocContext'
 
@@ -11,6 +11,13 @@ interface UndoModalProps {
   visible: boolean
   onCancel: () => void
   onRestore: () => void
+}
+
+interface UndoHistoryItem {
+  description: string
+  time: string
+  type: 'past' | 'present' | 'future'
+  isViewportChange: boolean
 }
 
 export const UndoModal: React.FC<UndoModalProps> = ({
@@ -26,12 +33,24 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   const [hideViewportChanges, setHideViewportChanges] = useState(true)
 
 
+  const modalOptions = useMemo(() => {
+    if(past.length > 1 && future.length) {
+      return 'Undo/Redo'
+    } else if (past.length) {
+      return 'Undo'
+    } else if (future.length) {
+      return 'Redo'
+    } else {
+      return 'Nothing to undo/redo'
+    }
+  }, [past.length, future.length])
+
   // Get the undo history from the redux store
   const undoHistory = useMemo(() => {
     if (!visible) {
       return []
     }
-    const history = []
+    const history: UndoHistoryItem[] = []
     // Add past items in reverse order (oldest first)
     for (let i = 0; i < past.length; i++) {
       const item = past[i]
@@ -59,14 +78,14 @@ export const UndoModal: React.FC<UndoModalProps> = ({
         })
       }
     }
-    // Add future items (more recent changes that were undone)
+    // Add future items (more recent changes that can be redone)
     for (let i = 0; i < future.length; i++) {
       const item = future[i]
-      if (item.details?.undo) {
-        const isViewportChange = item.details.undo.toLowerCase().includes('viewport')
+      if (item.details?.redo) {
+        const isViewportChange = item.details.redo.toLowerCase().includes('viewport')
         if (!hideViewportChanges || !isViewportChange) {
           history.unshift({
-            description: item.details.undo,
+            description: item.details.redo,
             time: TimeSupport.formatDuration(new Date().getTime() - item.details.time),
             type: 'future',
             isViewportChange
@@ -85,23 +104,43 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     if (selectedUndoIndex !== null) {
       // Clear the preview
       setPreview(null)
-      // Calculate how many undo actions we need
-      const undoCount =  selectedUndoIndex + 1
-      // Apply undo actions to reach the selected state
-      console.log('doing ' + undoCount + ' undo steps' )
-      for (let i = 0; i < undoCount; i++) {
-        dispatch({ type: UNDO_ACTION })
+      // past or future?
+      if(selectedUndoIndex < future.length) {
+        // redo
+        const redoCount = future.length - selectedUndoIndex
+        for (let i = 0; i < redoCount; i++) {
+          dispatch({ type: REDO_ACTION })
+        }
+      } else {
+        // Calculate how many undo actions we need
+        const undoCount =  selectedUndoIndex + 1
+        // Apply undo actions to reach the selected state
+        for (let i = 0; i < undoCount; i++) {
+          dispatch({ type: UNDO_ACTION })
+        }
       }
     }
     setSelectedUndoIndex(null)
     onRestore()
+  }
+
+  const widthFor = (index: number, futureLen: number) => {
+    if (index < futureLen) {
+      return (90 + (8 / (4 - index))) + '%'
+    } else if (index === futureLen) {
+      return '100%'
+    } else if (index + futureLen > 4) {
+      return '90%'
+    } else {
+      return (90 + (8 / (index))) + '%'
+    }
   }
   
   return (
     <DraggableModal
       draggableTitle={
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
-          <span style={{ marginRight: '16px' }}>Select a version to undo to</span>
+          <span style={{ marginRight: '16px' }}>Select a version to {modalOptions} to</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
             marginTop: '10px', marginRight:'30px'}}>
             <Switch
@@ -152,16 +191,20 @@ export const UndoModal: React.FC<UndoModalProps> = ({
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
-                console.log('remove preview')
                 setPreview(null)
                 setSelectedUndoIndex(null)
               } else {
                 // Clear any existing preview
                 setPreview(null)
                 // Set preview to the state at the selected index
-                const previewIndex = past.length - 1 - index
-                console.log('preview index', previewIndex)
-                setPreview(past[previewIndex])
+                if (index < future.length) {
+                  // future
+                  const previewIndex = future.length - 1 - index
+                  setPreview(future[previewIndex])
+                } else {
+                  const previewIndex = past.length - 2 - (index - future.length)
+                  setPreview(past[previewIndex])  
+                }
                 setSelectedUndoIndex(index)
               }
             }}
@@ -173,7 +216,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
               margin: 'auto',
               border: '2px solid #ccc',
               borderRadius: '5px',
-              width: index > 4 ? '90%' : index === 0 ? '100%' : 90 + (8 / (index)) + '%'
+              width: widthFor(index, future.length)
             }}
           >
             <div style={{ 
@@ -200,7 +243,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
                 whiteSpace: 'nowrap',
                 textAlign: 'right'
               }}>
-                {index === 0 ? (
+                {index === future.length ? (
                   <strong>{item.time}<br/>(current state)</strong>
                 ) : (
                   item.time
