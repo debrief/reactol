@@ -110,7 +110,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       return []
     }
   }, [liveFeatures, showDepth])
-
+  
   const bearingData = useMemo(() => {
     if (primaryTrack === '') return []
     const tNow = Date.now()
@@ -165,11 +165,10 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      padding: '16px',
       gap: '16px'
     }}>
-      <div>
-        <Space align='center'>
+      <div style={{ padding: '16px' }}>
+        <Space align='center' wrap>
           Primary:
           <Select
             placeholder="Primary Track"
@@ -209,9 +208,9 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           </Checkbox>
         </Space>
       </div>
-      <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResize={handleSplitterResize}>
+      <Splitter layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
-          <Splitter.Panel>
+          <Splitter.Panel style={{ overflow: 'hidden' }}>
             <VictoryChart
               theme={VictoryTheme.material}
               scale={{ x: 'time' }}
@@ -268,7 +267,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           </Splitter.Panel>
         )}
         {mainData.length > 0 && (
-          <Splitter.Panel>
+          <Splitter.Panel style={{ overflow: 'hidden' }}>
             <VictoryChart
               theme={VictoryTheme.material}
               scale={{ x: 'time' }}
