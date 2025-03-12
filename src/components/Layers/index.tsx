@@ -59,10 +59,6 @@ interface LayerProps {
   openGraph: { (): void }
 }
 
-const notGroups = (key: Key) => {
-  return (key as string).indexOf(':') === -1
-}
-
 const findChildrenOfType = (
   features: Feature[],
   dType: string
@@ -303,10 +299,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     openGraph()
   }
 
-  const selectionWithGroups = useMemo(() => {
-    return [...selection]
-  }, [selection])
-
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
   const localSetNewFeature = useCallback((feature: Feature) => {
@@ -422,7 +414,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
-    const cleaned = newKeysArr.filter(justLeaves).filter(notGroups)
+    const cleaned = newKeysArr.filter(justLeaves)
     if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
       setSelection(cleaned as string[])
     }
@@ -518,7 +510,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
             multiple={true}
             onSelect={onSelect}
             showIcon={true}
-            selectedKeys={selectionWithGroups || []}
+            selectedKeys={selection || []}
             expandedKeys={expandedKeys}
             onExpand={(keys) => {
               setExpandedKeys(keys as string[])
