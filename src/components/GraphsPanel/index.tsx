@@ -165,6 +165,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
+      overflow: 'auto',
       gap: '16px'
     }}>
       <div style={{ padding: '16px' }}>
