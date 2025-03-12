@@ -240,7 +240,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>
-                  <Tabs defaultActiveKey="1" id="detail-tabs" items={detailTabs} />
+                  <Tabs style={{ width: '100%', height: '100%' }} defaultActiveKey="1" id="detail-tabs" items={detailTabs} />
                 </Splitter.Panel>
               </Splitter>
             </Splitter.Panel>
