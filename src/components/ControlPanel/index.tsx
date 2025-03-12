@@ -19,6 +19,7 @@ import { useAppSelector } from '../../state/hooks'
 import { UndoModal } from '../UndoModal'
 import { useDocContext } from '../../state/DocContext'
 import { TimeSupport } from '../../helpers/time-support'
+import { REDO_ACTION } from '../../state/store'
 import { formatInTimeZone } from 'date-fns-tz'
 import { SampleDataLoader } from '../SampleDataLoader'
 import { sampleItems } from '../../data/sampleItems'
@@ -59,6 +60,7 @@ interface TimeButtonProps {
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
 
   const dispatch = useDispatch()
+  const { past, present, future } = useAppSelector(state => state.fColl)
   const canUndo = useAppSelector(state => state.fColl.past.length > 0)
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const redoTitle = useAppSelector(state => state.fColl.future.length > 0 ? state.fColl.future[0].details?.redo : 'Nothing to redo')
@@ -67,6 +69,12 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
+
+  console.log('===========')
+  console.log(past.map((item, index) => '\n' + index + ': ' + item.details?.undo ))
+  console.log('PRESENT', present.details?.undo)
+  console.log(future.map((item, index) => '\n' + index + ': ' + item.details?.undo))
+
 
   useEffect(() => {
     try {
@@ -219,7 +227,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           <Tooltip placement='bottom' title={canRedo ? redoTitle : 'Nothing to redo'}>
             <Button
               style={buttonStyle}
-              onClick={() => dispatch({ type: 'fColl/redo' })}
+              onClick={() => dispatch({ type: REDO_ACTION })}
               icon={<RedoOutlined />}
               disabled={!canRedo}
             />
