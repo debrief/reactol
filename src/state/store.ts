@@ -1,13 +1,27 @@
 import { configureStore } from '@reduxjs/toolkit'
 import featuresReducer from './geoFeaturesSlice'
+import undoable from 'redux-undo'
 import { FeatureCollection } from 'geojson'
+
+// Redux-undo action types
+export const UNDO_ACTION = '@@redux-undo/UNDO'
+export const REDO_ACTION = '@@redux-undo/REDO'
 
 export const createStore = (content?: FeatureCollection, fileName?: string) => configureStore({
   reducer: {
-    fColl: featuresReducer
+    fColl: undoable(featuresReducer, {
+      filter: (action) => {
+        const actionType = action.type as string
+        return actionType.startsWith('fColl/')
+      }
+    })
   },
   preloadedState: content ? {
-    fColl: content
+    fColl: {
+      past: [],
+      present: { data: content, details: undefined },
+      future: []
+    }
   } : undefined,
   devTools: {
     name: `App - ${fileName}`

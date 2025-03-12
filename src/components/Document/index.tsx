@@ -24,6 +24,7 @@ import track2 from '../../data/track2'
 import track3 from '../../data/track3'
 import zones from '../../data/zones'
 import points from '../../data/points'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 interface FileHandler {
   blobType: string
@@ -46,7 +47,7 @@ const fileHandlers: FileHandler[] = [
 ]
 
 function Document({ filePath, withSampleData }: { filePath?: string, withSampleData?: boolean }) {
-  const features = useAppSelector(state => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   const storeContents = useAppSelector(state => state.fColl)
   const dispatch = useAppDispatch()
   const { setTime, time, message, setMessage, interval } = useDocContext()

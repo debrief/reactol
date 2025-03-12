@@ -16,6 +16,7 @@ import {
 import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
 import { useAppSelector } from '../../state/hooks'
+import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { AddTrackProps, EnvOptions, NewTrackProps } from '../../types'
 import { defaultIntervals } from '../../helpers/timeIntervals'
 import './index.css'
@@ -39,7 +40,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   environment,
   createTrackOnly = false,
 }) => {
-  const features = useAppSelector((state) => state.fColl.features)
+  const features = useAppSelector(selectFeatures)
   const trackOptions = features
     .filter((feature) => feature.properties?.dataType === 'track')
     .map((feature) => ({

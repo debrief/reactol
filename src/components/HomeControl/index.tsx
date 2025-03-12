@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 import { useAppSelector } from '../../state/hooks'
-import { selectBounds } from '../../state/geoFeaturesSlice'
+import { useDispatch } from 'react-redux'
+import { selectBounds, ViewportChangeType } from '../../state/geoFeaturesSlice'
 import { Button, Tooltip } from 'antd'
 import {
   ExpandOutlined,
@@ -42,28 +43,53 @@ const TipButton: React.FC<{
 export const HomeControl: React.FC = () => {
   const map = useMap()
   const currentBounds = selectBounds(
-    useAppSelector((state) => state.fColl)
+    useAppSelector((state) => state.fColl.present)
   )
   const { viewportFrozen } = useDocContext()
   const measure = useRef<L.Control.PolylineMeasure | null>(null)
 
+  const dispatch = useDispatch()
+
+  const dispatchViewportChange = useCallback((bounds: L.LatLngBounds, changeType: ViewportChangeType) => {
+    dispatch({
+      type: 'fColl/setViewport',
+      payload: {
+        north: bounds.getNorth(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        west: bounds.getWest(),
+        zoom: map?.getZoom() || 0,
+        changeType
+      }
+    })
+  }, [dispatch, map])
+
   const doHome = useCallback(() => {
     if (map && currentBounds) {
+      // Let the map update first
       map.flyToBounds(currentBounds)
+      // Then dispatch the viewport change
+      dispatchViewportChange(currentBounds, 'fit_to_window')
     }
-  }, [map, currentBounds])
+  }, [map, currentBounds, dispatchViewportChange])
 
   const zoomIn = useCallback(() => {
     if (map) {
+      // Let the map update first
       map.zoomIn()
+      // Then dispatch the viewport change
+      dispatchViewportChange(map.getBounds(), 'zoom_in')
     }
-  }, [map])
+  }, [map, dispatchViewportChange])
 
   const zoomOut = useCallback(() => {
     if (map) {
+      // Let the map update first
       map.zoomOut()
+      // Then dispatch the viewport change
+      dispatchViewportChange(map.getBounds(), 'zoom_out')
     }
-  }, [map])
+  }, [map, dispatchViewportChange])
 
   useEffect(() => {
     if (map && measure.current) {

@@ -3,6 +3,7 @@ import domToImage from 'dom-to-image'
 import { useState, useCallback } from 'react'
 import { TimeState } from '../components/Document'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import { StoreState } from './geoFeaturesSlice'
 
 interface Props {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ export const DocContextProvider: React.FC<Props> = ({ children }) => {
   const [editableMapFeature, setEditableMapFeature] = useState<EditableMapFeature | null>(null)
   const [interval, setInterval] = useState<number>(0)
   const [useNatoCoords, setUseNatoCoords] = useState<boolean>(true)
+  const [preview, setPreview] = useState<StoreState | null>(null)
 
   const copyMapToClipboard = useCallback(async () => {
     if (!mapNode) {
@@ -37,7 +39,7 @@ export const DocContextProvider: React.FC<Props> = ({ children }) => {
   }, [mapNode])
 
   return (
-    <DocContext.Provider value={{ selection, setMapNode, setSelection, time, setTime, viewportFrozen, copyMapToClipboard, setViewportFrozen, message, setMessage, newFeature, setNewFeature, editableMapFeature, setEditableMapFeature, interval, setInterval, useNatoCoords, setUseNatoCoords }}>
+    <DocContext.Provider value={{ selection, setMapNode, setSelection, time, setTime, viewportFrozen, copyMapToClipboard, setViewportFrozen, message, setMessage, newFeature, setNewFeature, editableMapFeature, setEditableMapFeature, interval, setInterval, useNatoCoords, setUseNatoCoords, preview, setPreview }}>
       {children}
     </DocContext.Provider>
   )

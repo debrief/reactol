@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react'
 import { TimeState } from '../components/Document'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import { StoreState } from './geoFeaturesSlice'
 
 export interface MessageStruct {
   title: string
@@ -31,8 +32,10 @@ interface DocContextProps {
   setEditableMapFeature: React.Dispatch<React.SetStateAction<EditableMapFeature | null>>
   interval: number
   setInterval: React.Dispatch<React.SetStateAction<number>>
-  useNatoCoords: boolean
+  useNatoCoords: boolean // whether to display location as DDMM.MMM
   setUseNatoCoords: React.Dispatch<React.SetStateAction<boolean>>
+  preview: StoreState | null // used for undo preview
+  setPreview: React.Dispatch<React.SetStateAction<StoreState | null>>
 }
 
 export const DocContext = createContext<DocContextProps | undefined>(undefined)

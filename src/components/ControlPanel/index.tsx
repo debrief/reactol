@@ -9,9 +9,12 @@ import {
   LockFilled,
   UnlockOutlined,
   FilterFilled,
-  SaveOutlined
+  SaveOutlined,
+  UndoOutlined
 } from '@ant-design/icons'
 import React, { useEffect, useMemo, useState } from 'react'
+import { useAppSelector } from '../../state/hooks'
+import { UndoModal } from '../UndoModal'
 import { useDocContext } from '../../state/DocContext'
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
@@ -52,10 +55,25 @@ interface TimeButtonProps {
 }
 
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
+  const canUndo = useAppSelector(state => state.fColl.past.length > 0)
+  const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
+  const [undoModalVisible, setUndoModalVisible] = useState(false)
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
+
+  const undoRedoTitle = useMemo(() => {
+    if(canUndo && canRedo) {
+      return 'Undo/Redo ...'
+    } else if (canUndo) {
+      return 'Undo ...'
+    } else if (canRedo) {
+      return 'Redo ...'
+    } else {
+      return null
+    }
+  }, [canUndo, canRedo])
 
   useEffect(() => {
     try {
@@ -163,7 +181,8 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   return (
     <>
       {' '}
-      <Row style={{padding: '2px'}}>
+      
+      <Row style={{padding: '2px 0px'}}>
         <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
           <Tooltip
             mouseEnterDelay={0.8}
@@ -195,6 +214,13 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
             >
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
+          </Tooltip>
+          <Tooltip placement='bottom' title={undoRedoTitle || 'Nothing to undo/redo'}>
+            <Button
+              style={buttonStyle}
+              onClick={() => setUndoModalVisible(true)}
+              disabled={!undoRedoTitle}
+            ><UndoOutlined /></Button>
           </Tooltip>
           <SampleDataLoader sampleItems={sampleItems} />
           {saveButton}
@@ -273,6 +299,11 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           </tbody>
         </table>
       </Form>
+      <UndoModal
+        visible={undoModalVisible}
+        onCancel={() => setUndoModalVisible(false)}
+        onRestore={() => setUndoModalVisible(false)}
+      />
     </>
   )
 }

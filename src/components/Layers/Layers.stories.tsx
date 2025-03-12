@@ -7,17 +7,28 @@ import Layers from '.././Layers'
 import featuresReducer from '../../state/geoFeaturesSlice'
 import { FeatureCollection } from 'geojson'
 import mockFeatures from '../../mock/features'
+import undoable from 'redux-undo'
 
-// Custom function to create a mock store with dynamic features
-const createMockStore = (features: FeatureCollection) =>
-  configureStore({
-    reducer: {
-      fColl: featuresReducer,
-    },
-    preloadedState: {
-      fColl:  features,
-    },
-  })
+const createMockStore = (content?: FeatureCollection, fileName?: string) => configureStore({
+  reducer: {
+    fColl: undoable(featuresReducer, {
+      filter: (action) => {
+        const actionType = action.type as string
+        return actionType.startsWith('fColl/')
+      }
+    })
+  },
+  preloadedState: content ? {
+    fColl: {
+      past: [],
+      present: { data: content, details: undefined },
+      future: []
+    }
+  } : undefined,
+  devTools: {
+    name: `App - ${fileName}`
+  }
+})
 
 // Custom decorator to wrap Layers component with necessary providers
 const withProviders = (features: FeatureCollection) => (Story: React.ComponentType) => (
