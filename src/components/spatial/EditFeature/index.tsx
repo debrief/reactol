@@ -147,7 +147,7 @@ export const EditFeature: React.FC = () => {
       if (layerToEdit) map.removeLayer(layerToEdit)
       markers.forEach(marker => map.removeLayer(marker))
     }
-  }, [map, editableMapFeature, dispatch])
+  }, [map, editableMapFeature, dispatch, centreOfMap])
 
   return (
     <FeatureGroup>
