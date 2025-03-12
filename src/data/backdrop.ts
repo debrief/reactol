@@ -2,7 +2,7 @@ import { Feature, Geometry } from 'geojson'
 import { BACKDROP_TYPE } from '../constants'
 import { BackdropProps } from '../types'
 
-const backdrop: Feature<Geometry, BackdropProps> = {
+const backdrops: Feature<Geometry, BackdropProps>[] = [{
   type: 'Feature',
   properties: {
     dataType: BACKDROP_TYPE,
@@ -17,6 +17,21 @@ const backdrop: Feature<Geometry, BackdropProps> = {
     coordinates: []
   },
   id: 'back-1'
-}
+}, {
+  type: 'Feature',
+  properties: {
+    dataType: BACKDROP_TYPE,
+    name: 'OpenStreetMap',
+    visible: false,
+    maxNativeZoom: 20,
+    maxZoom: 20,
+    url: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
+  },
+  geometry: {
+    type: 'MultiPoint',
+    coordinates: []
+  },
+  id: 'back-2'
+}]
 
-export default backdrop
+export default backdrops

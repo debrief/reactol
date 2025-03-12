@@ -23,7 +23,7 @@ import track2 from '../../data/track2'
 import track3 from '../../data/track3'
 import zones from '../../data/zones'
 import points from '../../data/points'
-import backdrop from '../../data/backdrop'
+import backdrops from '../../data/backdrop'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 interface FileHandler {
@@ -68,7 +68,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
     if (!loadedRef.current && withSampleData) {
       // (temporarily) load bulk selection
       const newData: Feature[] = [
-        track1, track2, track3, field, ...zones, ...points, backdrop
+        track1, track2, track3, field, ...zones, ...points, ...backdrops
       ]
       dispatch({ type: 'fColl/featuresAdded', payload: newData })
       loadedRef.current = true
