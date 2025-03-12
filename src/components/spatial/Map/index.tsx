@@ -1,5 +1,5 @@
 import { Feature, MultiPoint, Point, Polygon } from 'geojson'
-import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import { MapContainer, useMap, useMapEvents } from 'react-leaflet'
 import ScaleNautic from 'react-leaflet-nauticsale'
 import { useDispatch } from 'react-redux'
 import { LatLngBounds } from 'leaflet'
@@ -21,6 +21,7 @@ import { BackdropProps, BuoyFieldProps } from '../../../types'
 import { EditFeature } from '../EditFeature'
 import TimePeriod from '../TimePeriod'
 import { formatCoordinate, formatNatoCoords } from '../../../helpers/formatCoordinate'
+import { ATileLayer } from '../ATileLayer'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -43,10 +44,7 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
   case GROUP_TYPE:
     return null 
   case BACKDROP_TYPE:
-  {
-    const backProps = feature.properties as BackdropProps
-    return backProps.visible ? <TileLayer key={feature.id} maxNativeZoom={backProps.maxNativeZoom} maxZoom={backProps.maxZoom} url={backProps.url}  />  : null 
-  }
+    return <ATileLayer feature={feature as Feature<MultiPoint, BackdropProps>} />
   default:
     console.log('Unknown feature type:',feature)
     throw new Error('Unknown feature type:' + feature.properties?.dataType)
