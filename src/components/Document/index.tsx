@@ -236,7 +236,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
                 </Splitter.Panel>
                 <Splitter.Panel style={{overflow: 'visible'}} >
                   <Card title='Layers' style={{width: '100%', height: '100%'}}>
-                    {features && <Layers openGraph={() => setGraphOpen(true)} />}
+                    {features && <Layers splitterWidths={splitterHeights ? splitterHeights[1] : 330} openGraph={() => setGraphOpen(true)} />}
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>

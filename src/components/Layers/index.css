@@ -21,6 +21,6 @@ Tree {
 }
 
 .tree-container {
-  max-height: 400px;
+  height: 92%;
   overflow: auto;
 }
