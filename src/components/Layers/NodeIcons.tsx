@@ -43,12 +43,3 @@ export const PointIcon: React.FC<IconProps> = ({ color }) => (
     <circle cx="8" cy="8" r="3" fill={color || 'currentColor'}/>
   </svg>
 )
-
-export const GroupIcon: React.FC<IconProps> = ({ color }) => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="5" cy="5" r="2" fill={color || 'currentColor'}/>
-    <circle cx="11" cy="5" r="2" fill={color || 'currentColor'}/>
-    <circle cx="8" cy="11" r="2" fill={color || 'currentColor'}/>
-    <path d="M5 5L11 5M5 5L8 11M11 5L8 11" stroke={color || 'currentColor'} strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-)

@@ -48,7 +48,7 @@ const fileHandlers: FileHandler[] = [
 
 function Document({ filePath, withSampleData }: { filePath?: string, withSampleData?: boolean }) {
   const features = useAppSelector(selectFeatures)
-  const storeContents = useAppSelector(state => state.fColl)
+  const documentContents = useAppSelector(state => state.fColl.present.data)
   const dispatch = useAppDispatch()
   const { setTime, time, message, setMessage, interval } = useDocContext()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
@@ -174,12 +174,12 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
   const doSave = useCallback(async () => {
     if (filePath && window.electron) {
       // just store the current JSON FeatureCollection
-      const doc = JSON.stringify(storeContents.present.data)
+      const doc = JSON.stringify(documentContents)
       await window.electron.saveFile(filePath, doc)  
     } else {
       window.alert('Local save not supportedin browser')
     }
-  }, [filePath, storeContents])
+  }, [filePath, documentContents])
 
   const detailTabs = [ {
     key: '1',

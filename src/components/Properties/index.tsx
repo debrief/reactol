@@ -1,16 +1,16 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react'
-import { CoreShapeProps, TrackProps, GroupProps, BuoyFieldProps, ZoneProps, PointProps, BackdropProps } from '../../types'
+import { CoreShapeProps, TrackProps, BuoyFieldProps, ZoneProps, PointProps, BackdropProps } from '../../types'
 import { useDocContext } from '../../state/DocContext'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import './index.css'
-import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint, Point } from 'geojson'
-import { BACKDROP_TYPE, BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+import { Feature, GeoJsonProperties, Geometry, LineString, MultiPoint } from 'geojson'
+import { BACKDROP_TYPE, BUOY_FIELD_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
 import { PointForm } from '../PointForm'
 import { CoreForm } from '../CoreForm'
 import { PropertiesViewer } from './PropertiesViewer'
 import { TrackForm } from '../TrackForm'
-import { GroupForm } from '../GroupForm'
+
 import { BuoyFieldForm } from '../BuoyFieldForm'
 import { ZoneForm } from '../ZoneForm'
 import MultiFeatureForm from '../MultiFeatureForm'
@@ -72,8 +72,6 @@ const Properties: React.FC = () => {
       return <TrackForm key={key} onChange={updateFeatureState} track={featureState as Feature<LineString, TrackProps>} />
     case BUOY_FIELD_TYPE:    
       return <BuoyFieldForm key={key} onChange={updateFeatureState} field={featureState as Feature<MultiPoint, BuoyFieldProps>} />
-    case GROUP_TYPE:
-      return <GroupForm key={key} onChange={updateFeatureState} group={featureState as Feature<Point, GroupProps>} />
     case ZONE_TYPE:
       return <ZoneForm key={key} onChange={updateFeatureState} shape={featureState as Feature<Geometry, ZoneProps>} />
     case REFERENCE_POINT_TYPE:
