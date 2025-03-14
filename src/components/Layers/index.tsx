@@ -556,6 +556,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         <div ref={treeRef} tabIndex={0}>
           <DirectoryTree
             showLine={true}
+            className="tree-container"
             style={{ textAlign: 'left', height: '100%' }}
             defaultSelectedKeys={[]}
             multiple={true}
