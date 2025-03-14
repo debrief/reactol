@@ -58,7 +58,6 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
   const [splitterHeights, setSplitterHeights] = useState<number[] | null>(null)
   const [splitterWidths, setSplitterWidths] = useState<number[] | null>(null)
   const [pendingOpRepFiles, setPendingOpRepFiles] = useState<File[] | null>(null)
-
   useEffect(() => {
     setDirty(true)
   }, [features])
@@ -89,7 +88,8 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [features, setTime])
-
+  
+  
   const antdTheme = {
     components: {
       Splitter: {
@@ -228,19 +228,19 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
         <div style={{width: '100%', height: '100%', overflow: 'hidden'}} onWheel={handleScroll}>
           <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterHorizontalResize}>
             <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
-              <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}  onResizeEnd={handleSplitterVerticalResize}>
-                <Splitter.Panel defaultSize='170' min='170' max='170' resizable={false}>
+              <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterVerticalResize}>
+                <Splitter.Panel style={{minHeight: '170px'}}  defaultSize='170' min='170' max='170' resizable={false}>
                   <Card title='Control Panel'>
                     <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
                   </Card>
                 </Splitter.Panel>
-                <Splitter.Panel>
-                  <Card title='Layers' style={{width: '100%', height: '100%'}} >
-                    { features && <Layers openGraph={() => setGraphOpen(true)} /> }
+                <Splitter.Panel style={{overflow: 'visible'}} >
+                  <Card title='Layers' style={{width: '100%', height: '100%'}}>
+                    {features && <Layers splitterWidths={splitterHeights ? splitterHeights[1] : 330} openGraph={() => setGraphOpen(true)} />}
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel>
-                  <Tabs defaultActiveKey="1" id="detail-tabs" items={detailTabs} />
+                  <Tabs style={{ width: '100%', height: '100%' }} defaultActiveKey="1" id="detail-tabs" items={detailTabs} />
                 </Splitter.Panel>
               </Splitter>
             </Splitter.Panel>
