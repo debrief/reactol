@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons'
 import { Feature, Geometry, MultiPoint, Point } from 'geojson'
 import {
+  BACKDROP_TYPE,
   BUOY_FIELD_TYPE,
   GROUP_TYPE,
   REFERENCE_POINT_TYPE,
@@ -28,6 +29,7 @@ import {
   GroupProps,
   BuoyFieldProps,
   EnvOptions,
+  BackdropProps,
 } from '../../types'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
@@ -47,6 +49,7 @@ const NODE_FIELDS = 'node-fields'
 const NODE_ZONES = 'node-zones'
 const NODE_POINTS = 'node-points'
 const NODE_GROUPS = 'node-groups'
+const NODE_BACKDROPS = 'node-backdrops'
 
 type FieldDataNode = {
   title: string
@@ -123,6 +126,9 @@ const addIconLabelFor = (key: string, title: string) => {
   }
   case NODE_GROUPS: {
     return 'Create new group'
+  }
+  case NODE_BACKDROPS: {
+    return 'Create new backdrop'
   }
   default:
     return 'ERROR - node type not handled: ' + key
@@ -363,6 +369,25 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     setNewFeature(feature)
   }, [setNewFeature, setSelection])
 
+  const addBackdrop = useCallback(() => {
+    const backdrop: Feature<MultiPoint, BackdropProps> = {
+      type: 'Feature',
+      properties: {
+        name: '',
+        dataType: BACKDROP_TYPE,
+        visible: true,
+        url: '',
+        maxNativeZoom: 0,
+        maxZoom: 0,
+      },
+      geometry: {
+        type: 'MultiPoint',
+        coordinates: [],
+      },
+    }
+    localSetNewFeature(backdrop)
+  }, [localSetNewFeature])
+
   const addPoint = useCallback(() => {
     const point: Feature<Point, PointProps> = {
       type: 'Feature',
@@ -433,13 +458,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         throw new Error('This method not responsible for adding zones')
       } else if (key === 'node-groups') {
         addGroup()
+      } else if (key === 'node-backdrops') {
+        addBackdrop()  
       } else {
         console.error(
           'unknown key for create new item ' + key + ' for ' + title
         )
       }
       e.stopPropagation()
-    }, [addGroup, addBuoyField, addPoint]) 
+    }, [addGroup, addBuoyField, addPoint, addBackdrop]) 
 
   useEffect(() => {
     const items: TreeDataNode[] = []
@@ -461,6 +488,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     items.push(
       mapFunc(theFeatures, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
     )
+    items.push(mapFunc(theFeatures, 'Backdops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
     const modelData = items
     setModel(modelData)
   }, [theFeatures, handleAdd, addZone])
