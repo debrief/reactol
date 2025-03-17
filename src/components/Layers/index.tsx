@@ -488,7 +488,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     items.push(
       mapFunc(theFeatures, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
     )
-    items.push(mapFunc(theFeatures, 'Backdops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
+    items.push(mapFunc(theFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
     const modelData = items
     setModel(modelData)
   }, [theFeatures, handleAdd, addZone])
