@@ -229,7 +229,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
                   />
-                  {showLegend && <Legend />}
+                  {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
                   {depthData.map((dataset, index) => (
                     <Line
                       key={index}
@@ -279,14 +279,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     label={{ value: bearingCalc.label, angle: 90, position: 'insideRight' }}
                     fontSize={fontSize}
                   />
-                  <Tooltip 
-                    labelFormatter={toShortDTG}
-                    formatter={(value: number, name: string) => {
-                      const isBearing = name.includes('Bearing')
-                      return [isBearing ? `${value}°` : value, name]
-                    }}
-                  />
-                  {showLegend && <Legend />}
+                  {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
                   {/* Range data */}
                   {rangeData.map((dataset, index) => (
                     <Line
