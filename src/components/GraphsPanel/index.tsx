@@ -2,7 +2,7 @@ import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Checkbox, Splitter } from 'antd'
-import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme, VictoryLegend } from 'victory'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { toShortDTG } from '../../helpers/toDTG'
@@ -56,7 +56,7 @@ const filteredTrack = (feature: Feature, start: number, end: number) => {
   }
 }
 
-export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
+export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height}) => {
   const features = useAppSelector(selectFeatures)
   const { time } = useDocContext()
   const [showDepth, setShowDepth] = useState<boolean>(true)
@@ -135,19 +135,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
 
   const fontSize = 12
 
-  const legendData = useMemo(() => 
-    rangeData.map(dataset => ({
-      name: dataset.featureName,
-      symbol: { fill: dataset.color || '#1890ff' }
-    }))
-  , [rangeData])
-
-  const depthLegendData = useMemo(() => 
-    depthData.map(dataset => ({
-      name: dataset.featureName,
-      symbol: { fill: dataset.color || '#1890ff' }
-    }))
-  , [depthData])
+  // Legend data is now handled directly by Recharts Legend component
 
   const handleSplitterResize = (sizes: number[]) => {
     setSplitterHeights(sizes as [number, number])
@@ -213,146 +201,126 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
           <Splitter.Panel>
-            <VictoryChart
-              theme={VictoryTheme.material}
-              scale={{ x: 'time' }}
-              standalone={true}
-              width={width || 400}
-              height={splitterHeights?.[0] || 200}
-              padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
-              domainPadding={{ x: 50, y: 50 }}
-            >
-              {showLegend && depthLegendData.length > 0 && (
-                <VictoryLegend
-                  x={80}
-                  y={0}
-                  orientation="horizontal"
-                  gutter={20}
-                  style={{ 
-                    labels: { fontSize }
-                  }}
-                  data={depthLegendData}
-                />
-              )}
-              <VictoryAxis
-                tickFormat={(t) => toShortDTG(t)}
-                style={{
-                  tickLabels: { fontSize: fontSize, padding: 5 },
-                  axisLabel: { fontSize: fontSize, padding: 30 }
-                }}
-                orientation='bottom'
-              />
-              <VictoryAxis
-                dependentAxis
-                style={{
-                  tickLabels: { fontSize: fontSize, padding: 5 },
-                  axisLabel: { fontSize: fontSize, padding: 30 }
-                }}
-                label={depthCalc.label}
-                tickFormat={(t: number) => `${Math.abs(t)}`}
-              />
-              {/* Depth data */}
-              <VictoryGroup>
-                {depthData.map((dataset, index) => (
-                  <VictoryLine
-                    key={index}
-                    style={{
-                      data: { stroke: dataset.color || '#1890ff' }
-                    }}
-                    data={dataset.data}
-                    x="date"
-                    y="value"
+            <div style={{ width: '100%', height: splitterHeights?.[0] || 200 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={depthData.flatMap(dataset => 
+                    dataset.data.map(point => ({
+                      ...point,
+                      name: dataset.featureName,
+                      color: dataset.color || '#1890ff'
+                    }))
+                  )}
+                  margin={{ top: 20, right: 60, left: 60, bottom: 50 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={toShortDTG} 
+                    label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
+                    fontSize={fontSize}
                   />
-                ))}
-              </VictoryGroup>
-            </VictoryChart>
+                  <YAxis 
+                    tickFormatter={(t: number) => `${Math.abs(t)}`}
+                    label={{ value: depthCalc.label, angle: -90, position: 'insideLeft' }}
+                    fontSize={fontSize}
+                  />
+                  <Tooltip 
+                    labelFormatter={toShortDTG}
+                    formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
+                  />
+                  {showLegend && <Legend />}
+                  {depthData.map((dataset, index) => (
+                    <Line
+                      key={index}
+                      type="monotone"
+                      dataKey="value"
+                      data={dataset.data}
+                      name={dataset.featureName}
+                      stroke={dataset.color || '#1890ff'}
+                      dot={false}
+                      activeDot={{ r: 8 }}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </Splitter.Panel>
         )}
         {mainData.length > 0 && (
           <Splitter.Panel>
-            <VictoryChart
-              theme={VictoryTheme.material}
-              scale={{ x: 'time' }}
-              standalone={true}
-              width={width || 400}
-              height={relativePlotHeight}
-              padding={{ top: 10, bottom: 50, left: 60, right: 60 }}
-              domainPadding={{ x: 50, y: 50 }}
-            >
-              {showLegend && legendData.length > 0 && (
-                <VictoryLegend
-                  x={80}
-                  y={0}
-                  orientation="horizontal"
-                  gutter={20}
-                  style={{ 
-                    labels: { fontSize }
-                  }}
-                  data={legendData}
-                />
-              )}
-              <VictoryAxis
-                tickFormat={(t) => toShortDTG(t)}
-                style={{
-                  tickLabels: { fontSize: fontSize, padding: 5 },
-                  axisLabel: { fontSize: fontSize, padding: 30 }
-                }}
-              />
-              {/* Range axis (left) */}
-              <VictoryAxis
-                dependentAxis
-                style={{
-                  tickLabels: { fontSize: fontSize, padding: 5 },
-                  axisLabel: { fontSize: fontSize, padding: 30 }
-                }}
-                label={rangeCalc.label}
-              />
-              {/* Bearing axis (right) */}
-              <VictoryAxis
-                dependentAxis
-                orientation="right"
-                domain={[0, 360]}
-                tickValues={[0, 90, 180, 270, 360]}
-                tickFormat={(t: number) => `${t}°`}
-                style={{
-                  tickLabels: { fontSize: fontSize, padding: 5 },
-                  axisLabel: { fontSize: fontSize, padding: 30 },
-                  axis: { strokeDasharray: '4,4' }
-                }}
-                label={bearingCalc.label}
-              />
-              {/* Range data */}
-              <VictoryGroup>
-                {rangeData.map((dataset, index) => (
-                  <VictoryLine
-                    key={index}
-                    style={{
-                      data: { stroke: dataset.color || '#1890ff' }
-                    }}
-                    data={dataset.data}
-                    x="date"
-                    y="value"
+            <div style={{ width: '100%', height: relativePlotHeight }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  margin={{ top: 20, right: 60, left: 60, bottom: 50 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={toShortDTG} 
+                    label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
+                    fontSize={fontSize}
+                    allowDuplicatedCategory={false}
                   />
-                ))}
-              </VictoryGroup>
-              {/* Bearing data */}
-              <VictoryGroup>
-                {bearingData.map((dataset, index) => (
-                  <VictoryLine
-                    key={`bearing-${index}`}
-                    style={{
-                      data: { 
-                        stroke: dataset.color || '#f5222d',
-                        strokeDasharray: '4,4'
-                      }
-                    }}
-                    data={dataset.data}
-                    x="date"
-                    y="value"
+                  {/* Range axis (left) */}
+                  <YAxis 
+                    yAxisId="range"
+                    label={{ value: rangeCalc.label, angle: -90, position: 'insideLeft' }}
+                    fontSize={fontSize}
                   />
-                ))}
-              </VictoryGroup>
-            </VictoryChart>
+                  {/* Bearing axis (right) */}
+                  <YAxis 
+                    yAxisId="bearing"
+                    orientation="right"
+                    domain={[0, 360]}
+                    ticks={[0, 90, 180, 270, 360]}
+                    tickFormatter={(t: number) => `${t}°`}
+                    label={{ value: bearingCalc.label, angle: 90, position: 'insideRight' }}
+                    fontSize={fontSize}
+                  />
+                  <Tooltip 
+                    labelFormatter={toShortDTG}
+                    formatter={(value: number, name: string) => {
+                      const isBearing = name.includes('Bearing')
+                      return [isBearing ? `${value}°` : value, name]
+                    }}
+                  />
+                  {showLegend && <Legend />}
+                  {/* Range data */}
+                  {rangeData.map((dataset, index) => (
+                    <Line
+                      key={index}
+                      yAxisId="range"
+                      type="monotone"
+                      dataKey="value"
+                      data={dataset.data}
+                      name={dataset.featureName}
+                      stroke={dataset.color || '#1890ff'}
+                      dot={false}
+                      activeDot={{ r: 8 }}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                  {/* Bearing data */}
+                  {bearingData.map((dataset, index) => (
+                    <Line
+                      key={`bearing-${index}`}
+                      yAxisId="bearing"
+                      type="monotone"
+                      dataKey="value"
+                      data={dataset.data}
+                      name={`${dataset.featureName} Bearing`}
+                      stroke={dataset.color || '#f5222d'}
+                      strokeDasharray="4 4"
+                      dot={false}
+                      activeDot={{ r: 8 }}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </Splitter.Panel>
         )}
       </Splitter>
