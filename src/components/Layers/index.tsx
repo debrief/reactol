@@ -10,11 +10,10 @@ import {
   FolderOutlined,
   LineChartOutlined,
 } from '@ant-design/icons'
-import { Feature, Geometry, MultiPoint, Point } from 'geojson'
+import { Feature, MultiPoint, Point } from 'geojson'
 import {
   BACKDROP_TYPE,
   BUOY_FIELD_TYPE,
-  GROUP_TYPE,
   REFERENCE_POINT_TYPE,
   TRACK_TYPE,
   ZONE_TYPE,
@@ -26,7 +25,6 @@ import {
   NewTrackProps,
   TrackProps,
   PointProps,
-  GroupProps,
   BuoyFieldProps,
   EnvOptions,
   BackdropProps,
@@ -36,7 +34,7 @@ import { PasteButton } from './PasteButton'
 import { AddZoneShape } from './AddZoneShape'
 import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
-import { noop } from 'lodash'
+
 import { symbolOptions } from '../../helpers/symbolTypes'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
@@ -48,7 +46,7 @@ const NODE_TRACKS = 'node-tracks'
 const NODE_FIELDS = 'node-fields'
 const NODE_ZONES = 'node-zones'
 const NODE_POINTS = 'node-points'
-const NODE_GROUPS = 'node-groups'
+
 const NODE_BACKDROPS = 'node-backdrops'
 
 type FieldDataNode = {
@@ -59,10 +57,6 @@ type FieldDataNode = {
 
 interface LayerProps {
   openGraph: { (): void }
-}
-
-const notGroups = (key: Key) => {
-  return (key as string).indexOf(':') === -1
 }
 
 const findChildrenOfType = (
@@ -79,34 +73,7 @@ const findChildrenOfType = (
   }))
 }
 
-const findChildrenOfGroup = (features: Feature[]): TreeDataNode[] => {
-  const items = features.filter(
-    (feature) => feature.properties?.dataType === GROUP_TYPE
-  )
-  return items.map((item): TreeDataNode => {
-    const props = item.properties as GroupProps
-    const children = features.filter((feature) =>
-      props.units.includes(feature.id as string)
-    )
-    const childFeatures = children.map(child => features.find(f => idFor(f) === child.id)) as Feature[]
-    return {
-      title: nameFor(item),
-      key: item.id as string,
-      children: childFeatures.map((child: Feature): TreeDataNode => {
-        return {
-          title: nameFor(child),
-          key: groupIdFor(item, child.id as string),
-          icon: getIcon(child, groupIdFor(item, child.id as string), nameFor(child), noop, undefined),
-          children: [],
-        }
-      }),
-    }
-  })
-}
 
-const groupIdFor = (parent: Feature, child?: string): string => {
-  return `${parent.id || 'unknown'}:${child || 'unknown'}`
-}
 
 const addIconLabelFor = (key: string, title: string) => {
   switch(key) {
@@ -124,9 +91,7 @@ const addIconLabelFor = (key: string, title: string) => {
   case NODE_POINTS: {
     return 'Create new reference point'
   }
-  case NODE_GROUPS: {
-    return 'Create new group'
-  }
+
   case NODE_BACKDROPS: {
     return 'Create new backdrop'
   }
@@ -189,24 +154,14 @@ const mapFunc = (
 ): TreeDataNode => {
 
   const children = features
-    ? dType === GROUP_TYPE
-      ? findChildrenOfGroup(features).map(child => {
-        // For group children, we need to find the actual feature they reference
-        const referencedFeature = features.find(f => idFor(f) === child.key)
-        // and the child units of this group
-        return {
-          ...child,
-          icon: getIcon(referencedFeature, child.key as string, child.title as string, handleAdd, button),
-        }
-      })
-      : findChildrenOfType(features, dType).map(child => {
-        // Find the corresponding feature for this child
-        const feature = features.find(f => idFor(f) === child.key)
-        return {
-          ...child,
-          icon: getIcon(feature, child.key, child.title, handleAdd, button),
-        }
-      })
+    ? findChildrenOfType(features, dType).map(child => {
+      // Find the corresponding feature for this child
+      const feature = features.find(f => idFor(f) === child.key)
+      return {
+        ...child,
+        icon: getIcon(feature, child.key, child.title, handleAdd, button),
+      }
+    })
     : []
 
   return {
@@ -344,24 +299,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     openGraph()
   }
 
-  const selectionWithGroups = useMemo(() => {
-    const fullList = [...selection]
-    const groups = theFeatures.filter(
-      (feature) => feature.properties?.dataType === GROUP_TYPE
-    ) as unknown as Feature<Geometry, GroupProps>[]
-    selection.forEach((id: string) => {
-      // find the groups that include this feature id
-      const groupsContainingFeature = groups.filter((group) =>
-        group.properties.units.some((unit: string | number) => unit === id)
-      )
-      const groupIds = groupsContainingFeature.map(
-        (group) => (group.id + ':' + id) as string
-      )
-      fullList.push(...groupIds)
-    })
-    return fullList
-  }, [selection, theFeatures])
-
   const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
 
   const localSetNewFeature = useCallback((feature: Feature) => {
@@ -428,22 +365,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
     localSetNewFeature(buoyField)
   }, [localSetNewFeature])
 
-  const addGroup = useCallback(() => {
-    const group: Feature<Geometry, GroupProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: GROUP_TYPE,
-        units: [],
-        visible: true,
-      },
-      geometry: {
-        type: 'GeometryCollection',
-        geometries: [],
-      },
-    }
-    localSetNewFeature(group)
-  }, [localSetNewFeature])
+
 
   const handleAdd = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {
@@ -456,8 +378,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         addPoint()
       } else if (key === NODE_ZONES) {
         throw new Error('This method not responsible for adding zones')
-      } else if (key === 'node-groups') {
-        addGroup()
+
       } else if (key === 'node-backdrops') {
         addBackdrop()  
       } else {
@@ -466,7 +387,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         )
       }
       e.stopPropagation()
-    }, [addGroup, addBuoyField, addPoint, addBackdrop]) 
+    }, [addBuoyField, addPoint, addBackdrop]) 
 
   useEffect(() => {
     const items: TreeDataNode[] = []
@@ -485,9 +406,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         handleAdd
       )
     )
-    items.push(
-      mapFunc(theFeatures, 'Groups', 'node-groups', GROUP_TYPE, handleAdd)
-    )
+
     items.push(mapFunc(theFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
     const modelData = items
     setModel(modelData)
@@ -495,7 +414,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
 
   const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
     const newKeysArr = selectedKeys as string[]
-    const cleaned = newKeysArr.filter(justLeaves).filter(notGroups)
+    const cleaned = newKeysArr.filter(justLeaves)
     if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
       setSelection(cleaned as string[])
     }
@@ -591,7 +510,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
             multiple={true}
             onSelect={onSelect}
             showIcon={true}
-            selectedKeys={selectionWithGroups || []}
+            selectedKeys={selection || []}
             expandedKeys={expandedKeys}
             onExpand={(keys) => {
               setExpandedKeys(keys as string[])
