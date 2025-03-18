@@ -2,7 +2,7 @@ import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Checkbox, Splitter } from 'antd'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
@@ -58,14 +58,21 @@ const filteredTrack = (feature: Feature, start: number, end: number) => {
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height}) => {
   const features = useAppSelector(selectFeatures)
   const { time } = useDocContext()
-  const [showDepth, setShowDepth] = useState<boolean>(true)
+  const [showDepth, setShowDepth] = useState<boolean>(false)
   const [showLegend, setShowLegend] = useState<boolean>(true)
+  const [filterForTime, setFilterForTime] = useState<boolean>(true)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
 
-  const featureOptions: OptionType[] = useMemo(() => 
-    features.map(feature => {
+  const featureOptions: OptionType[] = useMemo(() => {
+    if (!primaryTrack) {
+      setPrimaryTrack(features.find(feature => feature.properties?.dataType === 'track')?.id as string || '')
+    }
+    if (!secondaryTracks.length) {
+      setSecondaryTracks(features.filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
+    }
+    return features.map((feature): OptionType => {
       const dataType = feature.properties?.dataType
       const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
       const environment = feature.properties?.env
@@ -77,7 +84,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
         icon
       }
     })
-  , [features])
+  }, [features, primaryTrack, secondaryTracks])
 
   const trackOptions: OptionType[] = useMemo(() =>
     featureOptions.filter((feature) => feature.dataType === 'track')
@@ -94,7 +101,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   , [primaryTrack, secondaryTracks, features])
 
   const liveFeatures = useMemo(() => {
-    if (time && time.filterApplied) {
+    if (time && time.filterApplied && filterForTime) {
       const result = featuresToPlot.filter(feature =>
         featureIsVisibleInPeriod(feature, time.start, time.end)
       ).map(feature => filteredTrack(feature, time.start, time.end))
@@ -102,7 +109,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     } else {
       return featuresToPlot
     }
-  }, [featuresToPlot, time])
+  }, [featuresToPlot, time, filterForTime])
 
   const depthData = useMemo(() => {
     if (showDepth) {
@@ -198,6 +205,9 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           <Checkbox checked={showLegend} onClick={() => setShowLegend(!showLegend)}>
             Legend
           </Checkbox>
+          <Checkbox disabled={!time.filterApplied} checked={filterForTime} onClick={() => setFilterForTime(!filterForTime)}>
+            Time
+          </Checkbox>
         </Space>
       </div>
       <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResize={handleSplitterResize}>
@@ -227,6 +237,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     label={{ value: depthCalc.label, angle: -90, position: 'insideLeft' }}
                     fontSize={fontSize}
                   />
+                  {!filterForTime && <ReferenceLine x={time?.start} stroke="red" />}
+                  <ReferenceLine y={-99} stroke="red" />
                   <Tooltip 
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
