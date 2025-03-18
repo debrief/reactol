@@ -2,7 +2,7 @@ import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Checkbox, Splitter } from 'antd'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
@@ -60,7 +60,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const { time } = useDocContext()
   const [showDepth, setShowDepth] = useState<boolean>(false)
   const [showLegend, setShowLegend] = useState<boolean>(true)
-  const [filterForTime, setFilterForTime] = useState<boolean>(true)
+  const [filterForTime, setFilterForTime] = useState<boolean>(false)
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
@@ -85,6 +85,20 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       }
     })
   }, [features, primaryTrack, secondaryTracks])
+
+  const referenceAreaTop = useMemo(() => {
+    if (time.filterApplied && !filterForTime) {
+      return <ReferenceArea yAxisId="course" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
+    }
+    return null
+  }, [time, filterForTime])
+
+  const referenceAreaBottom = useMemo(() => {
+    if (time.filterApplied && !filterForTime) {
+      return <ReferenceArea yAxisId="bearing" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
+    }
+    return null
+  }, [time, filterForTime])
 
   const trackOptions: OptionType[] = useMemo(() =>
     featureOptions.filter((feature) => feature.dataType === 'track')
@@ -228,6 +242,15 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     domain={['auto', 'auto']}
                     allowDataOverflow={true}
                   />
+                  {/* we don't use this course axis, it's just for the reference area shading */}
+                  <YAxis 
+                    yAxisId="course"
+                    tickFormatter={(t: number) => `${Math.abs(t)}`}
+                    type="number"
+                    domain={[0, 360]}
+                    orientation='right'
+                    hide={true}
+                  />
                   <XAxis 
                     dataKey="date" 
                     tickFormatter={toShortDTG} 
@@ -237,8 +260,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
                     fontSize={fontSize}
                   />
-                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="depth" x={time?.start} stroke="red" />}
-                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="depth" x={time?.end} stroke="red" />}
+                  {referenceAreaTop}
                   <Tooltip 
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
@@ -299,9 +321,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     fontSize={fontSize}
                   />
                   {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
-                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="range" x={time?.start} stroke="red" />}
-                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="range" x={time?.end} stroke="red" />}
-
+                  {referenceAreaBottom}
                   <Tooltip
                     allowEscapeViewBox={{ x: true, y: true }}
                     labelFormatter={(num) =>toShortDTG(num) + 'Z'}
