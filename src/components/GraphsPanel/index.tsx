@@ -3,14 +3,15 @@ import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Checkbox, Splitter } from 'antd'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { bearingCalc } from '../../helpers/calculations/bearingCalc'
-import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
+import { bearingCalc } from '../../helpers/calculations/bearingCalc'
+import { BEARING_DATA, RANGE_DATA, rangeBearingCalc } from '../../helpers/calculations/rangeBearingCalc'
+import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 
 type OptionType = {
   label: string
@@ -111,21 +112,23 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }
   }, [liveFeatures, showDepth])
 
-  const bearingData = useMemo(() => {
+  const rangeBearingData = useMemo(() => {
     if (primaryTrack === '') return []
     const tNow = Date.now()
-    const res = bearingCalc.calculate(liveFeatures, primaryTrack)
-    console.log('bearing data took:', Date.now() - tNow)
+    const res = rangeBearingCalc.calculate(liveFeatures, primaryTrack)
+    console.log('range/bearing data took:', Date.now() - tNow)
     return res
   }, [liveFeatures, primaryTrack])
 
+  const bearingData = useMemo(() => {
+    // filter the bearing data
+    return rangeBearingData.filter(d => d.extraProp === BEARING_DATA)
+  }, [rangeBearingData])
+
   const rangeData = useMemo(() => {
-    if (primaryTrack === '') return []
-    const tNow = Date.now()
-    const res = rangeCalc.calculate(liveFeatures, primaryTrack)
-    console.log('range data took:', Date.now() - tNow)
-    return res
-  }, [liveFeatures, primaryTrack])
+    // filter the bearing data
+    return rangeBearingData.filter(d => d.extraProp === RANGE_DATA)
+  }, [rangeBearingData])
 
   const mainData = useMemo(() => {
     const res = [...bearingData, ...rangeData]

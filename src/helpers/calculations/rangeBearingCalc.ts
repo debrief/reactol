@@ -1,9 +1,9 @@
-import { Feature, LineString, MultiPolygon, Point, Polygon, Position } from 'geojson'
+import { Feature, LineString, Point, Position } from 'geojson'
 import * as turf from '@turf/turf'
 import nearestPoint from '@turf/nearest-point'
-import pointToPolygonDistance from '@turf/point-to-polygon-distance'
 import pointToLineDistance from '@turf/point-to-line-distance'
 import { Calculation, GraphDataset, GraphDatum } from '../../types'
+import nearestPointOnLine from '@turf/nearest-point-on-line'
 
 /** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter
  * then return the coordinates of the point at that index
@@ -23,10 +23,9 @@ const nearestPointTrack = (feature: Feature, time: number): Position | undefined
 }
 
 
-/** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter
- * then return the coordinates of the point at that index
+/** calculate the range and bearing from the `basePoint` to the nearest point on the `feature` shape
  */
-const distanceToFeature = (feature: Feature, basePoint: Feature<Point>): number | undefined => {
+const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {range: number, bearing: number} | undefined => {
   const geom = feature.geometry
   // for all the different types of geometry, find the point closest to the basePoint, then calculate the distance
   switch (geom.type) {
@@ -35,32 +34,41 @@ const distanceToFeature = (feature: Feature, basePoint: Feature<Point>): number 
     if (!geom.coordinates || geom.coordinates.length === 0) return undefined
     const thisPoint = turf.point(geom.coordinates)    
     const distance = turf.distance(thisPoint, basePoint, 'meters')
-    return distance
+    return {range: distance, bearing: turf.bearing(thisPoint, basePoint)}
   }
   case 'MultiPoint':
   {
     const pointCollectionArr = geom.coordinates.map((coord: Position) => turf.point(coord))
     const pointCollection = turf.featureCollection(pointCollectionArr)
     const nearestPointCoord = nearestPoint(basePoint, pointCollection)
-    return turf.distance(nearestPointCoord, basePoint)
+    return {range: turf.distance(nearestPointCoord, basePoint), bearing: turf.bearing(nearestPointCoord, basePoint)}
   }
   case 'Polygon':
   {
-    const geom = feature as Feature<Polygon>
-    const dist = pointToPolygonDistance(basePoint, geom)
-    return dist
+    const geom = feature as Feature<LineString>
+    const distance = pointToLineDistance(basePoint, geom)
+    const nearest = nearestPointOnLine(geom, basePoint)
+    console.log('nearest', geom, nearest)
+    const bearing = turf.bearing(nearest, basePoint)
+    return {range: distance, bearing: bearing}
   }
   case 'MultiPolygon':
   {
-    const geom = feature as Feature<MultiPolygon>
-    const dist = pointToPolygonDistance(basePoint, geom)
-    return dist
+    throw new Error('Multipolygon not supported for range/bearing')
+    // const geom = feature as Feature<MultiPolygon>
+    // const geom0 = turf.polygon(geom.coordinates[0])
+    // const dist = pointToPolygonDistance(basePoint, geom)
+    // const bearing = turf.bearing(basePoint, geom)
+    // return {range: dist, bearing: bearing}
   }
   case 'LineString':
   {
     const geom = feature as Feature<LineString>
     const dist = pointToLineDistance(basePoint, geom)
-    return dist
+    const nearest = nearestPointOnLine(geom, basePoint)
+    console.log('nearest', geom, nearest)
+    const bearing = turf.bearing(nearest, basePoint)
+    return {range: dist, bearing: bearing}
   }
   default:
     return undefined
@@ -120,14 +128,12 @@ export const rangeBearingCalc: Calculation = {
             bearingData.data.push({date: new Date(time).getTime(), value: absBearing})
           }
         } else {
-          const distanceToFeatureVal = distanceToFeature(feature, turfBase)
-          if (distanceToFeatureVal === undefined) {
+          const rangeBearingToFeatureVal = rangeBearingFeature(feature, turfBase)
+          if (rangeBearingToFeatureVal === undefined) {
             return undefined
           } else {
-            rangeData.data.push({date: new Date(time).getTime(), value: distanceToFeatureVal})
-            const relBearing = turf.bearing(turf.point([0, 0]), turfBase)
-            const absBearing = relBearing < 0 ? relBearing + 360 : relBearing
-            bearingData.data.push({date: new Date(time).getTime(), value: absBearing})
+            rangeData.data.push({date: new Date(time).getTime(), value: rangeBearingToFeatureVal.range})
+            bearingData.data.push({date: new Date(time).getTime(), value: rangeBearingToFeatureVal.bearing})
           }
         }
       })
