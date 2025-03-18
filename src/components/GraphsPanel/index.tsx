@@ -1,8 +1,11 @@
 import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Checkbox, Splitter } from 'antd'
+import { Select, Space, Checkbox, Splitter, Button, Tooltip as ATooltip } from 'antd'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
+import {
+  FilterOutlined,
+  FilterFilled} from '@ant-design/icons'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
@@ -99,6 +102,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }
     return null
   }, [time, filterForTime])
+
+  const buttonStyle = { margin: '0 5px' }
 
   const trackOptions: OptionType[] = useMemo(() =>
     featureOptions.filter((feature) => feature.dataType === 'track')
@@ -219,9 +224,23 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           <Checkbox checked={showLegend} onClick={() => setShowLegend(!showLegend)}>
             Legend
           </Checkbox>
-          <Checkbox disabled={!time.filterApplied} checked={filterForTime} onClick={() => setFilterForTime(!filterForTime)}>
-            Time
-          </Checkbox>
+          <ATooltip
+            mouseEnterDelay={0.8}
+            title={
+              time.filterApplied
+                ? 'Trim graphs to current time filter'
+                : 'No time filter applied'
+            }
+          >
+            <Button
+              style={buttonStyle}
+              disabled={!time.filterApplied}
+              color='primary'
+              onClick={() => setFilterForTime(!filterForTime)}
+            >
+              {filterForTime ? <FilterFilled /> : <FilterOutlined />}
+            </Button>
+          </ATooltip>
         </Space>
       </div>
       <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResize={handleSplitterResize}>
