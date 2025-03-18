@@ -198,7 +198,6 @@ export const rangeBearingCalc: Calculation = {
       bearingData.data = processBearingData(bearingData.data)
       result.push(rangeData)
       result.push(bearingData)
-      console.log('results', result)
     })
     return result
   }
