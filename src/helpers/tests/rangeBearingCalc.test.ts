@@ -1,9 +1,12 @@
+import track1 from '../../data/track1'
+import zones from '../../data/zones'
 import { GraphDatum } from '../../types'
 
 // Import the processBearingData function - we need to make it accessible for testing
 // Since it's not exported directly, we'll test it through a test export
 // This requires a small modification to the original file to expose it for testing
-import { processBearingDataForTest } from '../calculations/rangeBearingCalc'
+import { BEARING_DATA, processBearingDataForTest, rangeBearingCalc } from '../calculations/rangeBearingCalc'
+import { toShortDTG } from '../toDTG'
 
 describe('processBearingData', () => {
   it('should return the original data if less than 2 points', () => {
@@ -47,8 +50,6 @@ describe('processBearingData', () => {
       { date: 4000, value: 179 }  // Jump of 179 degrees - just under threshold
     ]
     const result = processBearingDataForTest(data)
-
-    console.log(result)
     
     // Should have 6 points now - original 4 plus 2 null points for the 2 large jumps
     expect(result.length).toBe(6)
@@ -101,4 +102,12 @@ describe('processBearingData', () => {
     expect(result[1]).toEqual({ date: 1500, value: null }) // First null point
     expect(result[2]).toEqual({ date: 2000, value: 359 })
   })
+
+  it('should generate correct dataset for mock track called "VANG" and polygon "SAP 1-1"', () => {
+    const trackVang = track1
+    const polySap11 = zones[0]
+    const calcData = rangeBearingCalc.calculate([trackVang, polySap11], trackVang.id as string)
+    console.table(calcData.filter(d => d.extraProp === BEARING_DATA)[0].data.map(d => {return {date: toShortDTG(new Date(d.date)), value: d.value}}))
+  })
 })
+

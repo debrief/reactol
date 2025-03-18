@@ -26,6 +26,9 @@ const nearestPointTrack = (feature: Feature, time: number): Position | undefined
   }
 }
 
+const trimToZero360 = (value: number): number => {
+  return value < 0 ? value + 360 : value
+}
 
 /** calculate the range and bearing from the `basePoint` to the nearest point on the `feature` shape
  */
@@ -38,14 +41,14 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
     if (!geom.coordinates || geom.coordinates.length === 0) return undefined
     const thisPoint = turf.point(geom.coordinates)    
     const distance = turf.distance(thisPoint, basePoint, 'meters')
-    return {range: distance, bearing: turf.bearing(thisPoint, basePoint)}
+    return {range: distance, bearing: trimToZero360(turf.bearing(thisPoint, basePoint))}
   }
   case 'MultiPoint':
   {
     const pointCollectionArr = geom.coordinates.map((coord: Position) => turf.point(coord))
     const pointCollection = turf.featureCollection(pointCollectionArr)
     const nearestPointCoord = nearestPoint(basePoint, pointCollection)
-    return {range: turf.distance(nearestPointCoord, basePoint), bearing: turf.bearing(nearestPointCoord, basePoint)}
+    return {range: turf.distance(nearestPointCoord, basePoint), bearing: trimToZero360(turf.bearing(nearestPointCoord, basePoint))}
   }
   case 'Polygon':
   {
@@ -54,7 +57,7 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
     const lineString = turf.lineString(geom.geometry.coordinates[0])
     const distance = pointToLineDistance(basePoint, lineString)
     const nearest = nearestPointOnLine(lineString, basePoint)
-    const bearing = turf.bearing(nearest, basePoint)
+    const bearing = trimToZero360(turf.bearing(nearest, basePoint))
     return {range: distance, bearing: bearing}
   }
   case 'MultiPolygon':
@@ -71,8 +74,7 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
     const geom = feature as Feature<LineString>
     const dist = pointToLineDistance(basePoint, geom)
     const nearest = nearestPointOnLine(geom, basePoint)
-    console.log('nearest', geom, nearest)
-    const bearing = turf.bearing(nearest, basePoint)
+    const bearing = trimToZero360(turf.bearing(nearest, basePoint))
     return {range: dist, bearing: bearing}
   }
   default:
@@ -121,8 +123,8 @@ const processBearingData = (data: GraphDatum[]): GraphDatum[] => {
 export const processBearingDataForTest = processBearingData
 
 export const rangeBearingCalc: Calculation = {
-  label: 'Range (m)',
-  value: 'range',
+  label: 'Range and Bearing',
+  value: 'range & brg',
   isRelative: true,
   calculate:(features: Feature[], baseId?: string): GraphDataset[] => {
     const result: GraphDataset[] = []
@@ -182,9 +184,9 @@ export const rangeBearingCalc: Calculation = {
       })
       // Process the bearing data to handle large jumps
       bearingData.data = processBearingData(bearingData.data)
-      
       result.push(rangeData)
       result.push(bearingData)
+      console.log('results', result)
     })
     return result
   }
