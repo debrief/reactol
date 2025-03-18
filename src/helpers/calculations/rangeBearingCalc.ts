@@ -1,4 +1,4 @@
-import { Feature, LineString, Point, Position } from 'geojson'
+import { Feature, LineString, Point, Polygon, Position } from 'geojson'
 import * as turf from '@turf/turf'
 import nearestPoint from '@turf/nearest-point'
 import pointToLineDistance from '@turf/point-to-line-distance'
@@ -49,21 +49,22 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
   }
   case 'Polygon':
   {
-    const geom = feature as Feature<LineString>
-    const distance = pointToLineDistance(basePoint, geom)
-    const nearest = nearestPointOnLine(geom, basePoint)
-    console.log('nearest', geom, nearest)
+    const geom = feature as Feature<Polygon>
+    // get the first line in the polygon, as a LineString
+    const lineString = turf.lineString(geom.geometry.coordinates[0])
+    const distance = pointToLineDistance(basePoint, lineString)
+    const nearest = nearestPointOnLine(lineString, basePoint)
     const bearing = turf.bearing(nearest, basePoint)
     return {range: distance, bearing: bearing}
   }
   case 'MultiPolygon':
   {
-    throw new Error('Multipolygon not supported for range/bearing')
     // const geom = feature as Feature<MultiPolygon>
     // const geom0 = turf.polygon(geom.coordinates[0])
     // const dist = pointToPolygonDistance(basePoint, geom)
     // const bearing = turf.bearing(basePoint, geom)
     // return {range: dist, bearing: bearing}
+    throw new Error('Multipolygon not supported for range/bearing')
   }
   case 'LineString':
   {
