@@ -216,29 +216,29 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             <div style={{ width: '100%', height: splitterHeights?.[0] || 200 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={depthData.flatMap(dataset => 
-                    dataset.data.map(point => ({
-                      ...point,
-                      name: dataset.featureName,
-                      color: dataset.color || '#1890ff'
-                    }))
-                  )}
                   margin={{ top: 20, right: 60, left: 60, bottom: 50 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    tickFormatter={toShortDTG} 
-                    label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
-                    fontSize={fontSize}
-                  />
                   <YAxis 
+                    yAxisId="depth"
                     tickFormatter={(t: number) => `${Math.abs(t)}`}
                     label={{ value: depthCalc.label, angle: -90, position: 'insideLeft' }}
                     fontSize={fontSize}
+                    type="number"
+                    domain={['auto', 'auto']}
+                    allowDataOverflow={true}
                   />
-                  {!filterForTime && <ReferenceLine x={time?.start} stroke="red" />}
-                  <ReferenceLine y={-99} stroke="red" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={toShortDTG} 
+                    type="number"
+                    domain={['auto', 'auto']}
+                    allowDataOverflow={true}
+                    label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
+                    fontSize={fontSize}
+                  />
+                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="depth" x={time?.start} stroke="red" />}
+                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="depth" x={time?.end} stroke="red" />}
                   <Tooltip 
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
@@ -247,6 +247,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                   {depthData.map((dataset, index) => (
                     <Line
                       key={index}
+                      yAxisId="depth"
                       type="monotone"
                       dataKey="value"
                       data={dataset.data}
@@ -273,19 +274,23 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                   <XAxis 
                     dataKey="date" 
                     tickFormatter={toShortDTG} 
+                    type="number"
+                    domain={['auto', 'auto']}
+                    allowDataOverflow={true}
                     label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
                     fontSize={fontSize}
-                    allowDuplicatedCategory={false}
                   />
                   {/* Range axis (left) */}
                   <YAxis 
                     yAxisId="range"
+                    type="number"
                     label={{ value: 'Range (nmi)', angle: -90, position: 'insideLeft' }}
                     fontSize={fontSize}
                   />
                   {/* Bearing axis (right) */}
                   <YAxis 
                     yAxisId="bearing"
+                    type="number"
                     orientation="right"
                     domain={[0, 360]}
                     ticks={[0, 90, 180, 270, 360]}
@@ -294,6 +299,9 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     fontSize={fontSize}
                   />
                   {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
+                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="range" x={time?.start} stroke="red" />}
+                  {time.filterApplied && !filterForTime && <ReferenceLine yAxisId="range" x={time?.end} stroke="red" />}
+
                   <Tooltip
                     allowEscapeViewBox={{ x: true, y: true }}
                     labelFormatter={(num) =>toShortDTG(num) + 'Z'}
