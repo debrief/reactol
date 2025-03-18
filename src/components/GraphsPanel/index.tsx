@@ -95,9 +95,10 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
 
   const liveFeatures = useMemo(() => {
     if (time && time.filterApplied) {
-      return featuresToPlot.filter(feature =>
+      const result = featuresToPlot.filter(feature =>
         featureIsVisibleInPeriod(feature, time.start, time.end)
       ).map(feature => filteredTrack(feature, time.start, time.end))
+      return result
     } else {
       return featuresToPlot
     }
