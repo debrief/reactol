@@ -5,6 +5,10 @@ import pointToLineDistance from '@turf/point-to-line-distance'
 import { Calculation, GraphDataset, GraphDatum } from '../../types'
 import nearestPointOnLine from '@turf/nearest-point-on-line'
 
+// Threshold for bearing jumps (in degrees) that should break the line
+// Using 180 degrees as the threshold means jumps of this value or larger will break the line
+const BEARING_JUMP_THRESHOLD = 180
+
 /** examine the times in the feature, find the index of the time equal to or greater than the  'time' parameter
  * then return the coordinates of the point at that index
  */
@@ -78,6 +82,43 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
 export const RANGE_DATA = 'range'
 export const BEARING_DATA = 'bearing'
 
+/**
+ * Process bearing data to insert null values when there are large jumps in bearing
+ * This prevents the chart from drawing a line across the chart when bearing wraps around
+ */
+const processBearingData = (data: GraphDatum[]): GraphDatum[] => {
+  if (data.length < 2) return data
+  
+  const result: GraphDatum[] = []
+  
+  for (let i = 0; i < data.length; i++) {
+    // Add the current point
+    result.push(data[i])
+    
+    // If there's a next point, check for a jump
+    if (i < data.length - 1) {
+      const currentBearing = data[i].value as number
+      const nextBearing = data[i + 1].value as number
+      const bearingDiff = Math.abs(currentBearing - nextBearing)
+
+      // If the difference is greater than or equal to threshold
+      if (bearingDiff >= BEARING_JUMP_THRESHOLD) {
+        // Insert a null point at the midpoint time between the two points
+        const midpointTime = (data[i].date + data[i + 1].date) / 2
+        result.push({
+          date: midpointTime,
+          value: null
+        })
+      }
+    }
+  }
+  
+  return result
+}
+
+// Export for testing purposes only
+export const processBearingDataForTest = processBearingData
+
 export const rangeBearingCalc: Calculation = {
   label: 'Range (m)',
   value: 'range',
@@ -125,6 +166,7 @@ export const rangeBearingCalc: Calculation = {
             const absBearing = relBearing < 0 ? relBearing + 360 : relBearing
     
             rangeData.data.push({date: new Date(time).getTime(), value: distance}) 
+            
             bearingData.data.push({date: new Date(time).getTime(), value: absBearing})
           }
         } else {
@@ -137,6 +179,9 @@ export const rangeBearingCalc: Calculation = {
           }
         }
       })
+      // Process the bearing data to handle large jumps
+      bearingData.data = processBearingData(bearingData.data)
+      
       result.push(rangeData)
       result.push(bearingData)
     })
