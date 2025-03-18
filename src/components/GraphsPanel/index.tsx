@@ -11,7 +11,6 @@ import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { BEARING_DATA, RANGE_DATA, rangeBearingCalc } from '../../helpers/calculations/rangeBearingCalc'
-import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 
 type OptionType = {
   label: string
@@ -268,7 +267,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                   {/* Range axis (left) */}
                   <YAxis 
                     yAxisId="range"
-                    label={{ value: rangeCalc.label, angle: -90, position: 'insideLeft' }}
+                    label={{ value: 'Range (nmi)', angle: -90, position: 'insideLeft' }}
                     fontSize={fontSize}
                   />
                   {/* Bearing axis (right) */}

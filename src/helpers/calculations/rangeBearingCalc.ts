@@ -30,6 +30,10 @@ const trimToZero360 = (value: number): number => {
   return value < 0 ? value + 360 : value
 }
 
+const convertKilometresToNauticalMiles = (kilometres: number): number => {
+  return kilometres * 0.539957
+}
+
 /** calculate the range and bearing from the `basePoint` to the nearest point on the `feature` shape
  */
 const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {range: number, bearing: number} | undefined => {
@@ -41,14 +45,18 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
     if (!geom.coordinates || geom.coordinates.length === 0) return undefined
     const thisPoint = turf.point(geom.coordinates)    
     const distance = turf.distance(thisPoint, basePoint, 'meters')
-    return {range: distance, bearing: trimToZero360(turf.bearing(thisPoint, basePoint))}
+    // convert distance to nautical miles
+    const range = convertKilometresToNauticalMiles(distance)
+    return {range: range, bearing: trimToZero360(turf.bearing(thisPoint, basePoint))}
   }
   case 'MultiPoint':
   {
     const pointCollectionArr = geom.coordinates.map((coord: Position) => turf.point(coord))
     const pointCollection = turf.featureCollection(pointCollectionArr)
     const nearestPointCoord = nearestPoint(basePoint, pointCollection)
-    return {range: turf.distance(nearestPointCoord, basePoint), bearing: trimToZero360(turf.bearing(nearestPointCoord, basePoint))}
+    const distance = turf.distance(nearestPointCoord, basePoint, 'meters')
+    const range = convertKilometresToNauticalMiles(distance)
+    return {range: range, bearing: trimToZero360(turf.bearing(nearestPointCoord, basePoint))}
   }
   case 'Polygon':
   {
@@ -56,9 +64,11 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
     // get the first line in the polygon, as a LineString
     const lineString = turf.lineString(geom.geometry.coordinates[0])
     const distance = pointToLineDistance(basePoint, lineString)
+    // convert distance to nautical miles
+    const range = convertKilometresToNauticalMiles(distance)
     const nearest = nearestPointOnLine(lineString, basePoint)
     const bearing = trimToZero360(turf.bearing(nearest, basePoint))
-    return {range: distance, bearing: bearing}
+    return {range: range, bearing: bearing}
   }
   case 'MultiPolygon':
   {
@@ -73,9 +83,11 @@ const rangeBearingFeature = (feature: Feature, basePoint: Feature<Point>): {rang
   {
     const geom = feature as Feature<LineString>
     const dist = pointToLineDistance(basePoint, geom)
+    // convert distance to nautical miles
+    const range = convertKilometresToNauticalMiles(dist)
     const nearest = nearestPointOnLine(geom, basePoint)
     const bearing = trimToZero360(turf.bearing(nearest, basePoint))
-    return {range: dist, bearing: bearing}
+    return {range: range, bearing: bearing}
   }
   default:
     return undefined
