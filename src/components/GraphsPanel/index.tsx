@@ -282,6 +282,13 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     fontSize={fontSize}
                   />
                   {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
+                  <Tooltip
+                    allowEscapeViewBox={{ x: true, y: true }}
+                    labelFormatter={(num) =>toShortDTG(num) + 'Z'}
+                    formatter={(value: number, name: string) => [`${Math.round(Number(value))}`, name]}
+                    itemStyle={{ fontSize: '12px', margin: '0', padding: '0' }}
+                    wrapperStyle={{ fontSize: '14px', margin: '0', padding: '0' }}
+                  />
                   {/* Range data */}
                   {rangeData.map((dataset, index) => (
                     <Line
@@ -290,7 +297,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                       type="monotone"
                       dataKey="value"
                       data={dataset.data}
-                      name={dataset.featureName}
+                      name={`${dataset.featureName} Rng`}
                       stroke={dataset.color || '#1890ff'}
                       dot={false}
                       activeDot={{ r: 8 }}
@@ -305,7 +312,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                       type="monotone"
                       dataKey="value"
                       data={dataset.data}
-                      name={`${dataset.featureName} Bearing`}
+                      name={`${dataset.featureName} Brg`}
                       stroke={dataset.color || '#f5222d'}
                       strokeDasharray="4 4"
                       dot={false}
