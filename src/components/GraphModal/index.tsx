@@ -7,7 +7,7 @@ import { speedCalc } from '../../helpers/calculations/speedCalc'
 import { useEffect } from 'react'
 import React from 'react'
 import { useDocContext } from '../../state/DocContext'
-import { VictoryAxis, VictoryChart, VictoryGroup, VictoryLine, VictoryTheme } from 'victory'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { BaseOptionType, DefaultOptionType } from 'antd/es/select'
 import { rangeCalc } from '../../helpers/calculations/rangeCalc'
 import { courseCalc } from '../../helpers/calculations/courseCalc'
@@ -171,23 +171,47 @@ const GraphView: React.FC<GraphProps> = ({open, doClose}) => {
         <Header style={{backgroundColor: '#fff', fontSize: 22, borderBottom: '1px solid #ccc'}}>Graph View</Header>
         <Layout style={{height:'100%'}}>
           <Content>
-            <VictoryChart theme={VictoryTheme.clean}>
-              {/* <VictoryLegend itemsPerRow={2} x={125} y={20} data={legendLabels}/>  */}
-              { ticks.length && <VictoryAxis crossAxis label={'Time'} tickValues={ticks} tickFormat={formatDate} /> }
-              <VictoryAxis dependentAxis label={calculations.map(calc => calc.label).join(', ')} />
-              {/* <VictoryLine data={data1} />
-          <VictoryLine data={data2} /> */}
-              <VictoryGroup>
-                { data.map((dataset, index) => <VictoryLine key={'line-' + index} 
-                  data={dataset.data} 
-                  style={{
-                    data: {
-                      stroke: dataset.color || undefined ,
-                      strokeWidth: 2,
-                    },
-                  }} x='date' y='value' />      )}
-              </VictoryGroup>
-            </VictoryChart>
+            <div style={{ width: '100%', height: '100%', minHeight: '300px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  margin={{ top: 20, right: 30, left: 30, bottom: 40 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  {ticks.length > 0 && (
+                    <XAxis 
+                      dataKey="date" 
+                      tickFormatter={formatDate}
+                      label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
+                      domain={[ticks[0], ticks[ticks.length - 1]]}
+                      ticks={ticks}
+                      type="number"
+                    />
+                  )}
+                  <YAxis 
+                    label={{ value: calculations.map(calc => calc.label).join(', '), angle: -90, position: 'insideLeft' }}
+                  />
+                  <Tooltip 
+                    labelFormatter={formatDate}
+                    formatter={(value: number, name: string) => [value, name]}
+                  />
+                  <Legend verticalAlign="top" height={36} />
+                  {data.map((dataset, index) => (
+                    <Line
+                      key={`line-${index}`}
+                      type="monotone"
+                      dataKey="value"
+                      data={dataset.data}
+                      name={dataset.featureName}
+                      stroke={dataset.color || '#1890ff'}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 8 }}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </Content>
           <Sider theme='light'>
             <Flex vertical>

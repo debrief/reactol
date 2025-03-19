@@ -4,7 +4,7 @@ import ScaleNautic from 'react-leaflet-nauticsale'
 import { useDispatch } from 'react-redux'
 import { LatLngBounds } from 'leaflet'
 import { ViewportChangeType } from '../../../state/geoFeaturesSlice'
-import { BUOY_FIELD_TYPE, GROUP_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
+import { BACKDROP_TYPE, BUOY_FIELD_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../../constants'
 import Track from '../Track'
 import Zone from '../Zone'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
@@ -17,10 +17,11 @@ import { HomeControl } from '../../HomeControl'
 import MouseCoordinates from '../MouseCoordinates'
 import { PolylineMeasure } from '../PolylineMeasure'
 import { BuoyField } from '../BuoyField'
-import { BuoyFieldProps } from '../../../types'
+import { BackdropProps, BuoyFieldProps } from '../../../types'
 import { EditFeature } from '../EditFeature'
 import TimePeriod from '../TimePeriod'
 import { formatCoordinate, formatNatoCoords } from '../../../helpers/formatCoordinate'
+import { ATileLayer } from '../ATileLayer'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
@@ -40,8 +41,8 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
     return <DataPoint key={feature.id} feature={feature as Feature<Point>} onClickHandler={onClickHandler} /> 
   case BUOY_FIELD_TYPE:
     return <BuoyField key={feature.id} feature={feature as Feature<MultiPoint, BuoyFieldProps>} onClickHandler={onClickHandler} />
-  case GROUP_TYPE:
-    return null  
+  case BACKDROP_TYPE:
+    return <ATileLayer key={feature.id} feature={feature as Feature<MultiPoint, BackdropProps>} />
   default:
     console.log('Unknown feature type:',feature)
     throw new Error('Unknown feature type:' + feature.properties?.dataType)

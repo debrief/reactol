@@ -1,6 +1,5 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter, Tabs } from 'antd'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { TileLayer } from 'react-leaflet'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
@@ -24,6 +23,7 @@ import track2 from '../../data/track2'
 import track3 from '../../data/track3'
 import zones from '../../data/zones'
 import points from '../../data/points'
+import backdrops from '../../data/backdrop'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 interface FileHandler {
@@ -48,7 +48,7 @@ const fileHandlers: FileHandler[] = [
 
 function Document({ filePath, withSampleData }: { filePath?: string, withSampleData?: boolean }) {
   const features = useAppSelector(selectFeatures)
-  const storeContents = useAppSelector(state => state.fColl)
+  const documentContents = useAppSelector(state => state.fColl.present.data)
   const dispatch = useAppDispatch()
   const { setTime, time, message, setMessage, interval } = useDocContext()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
@@ -68,7 +68,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
     if (!loadedRef.current && withSampleData) {
       // (temporarily) load bulk selection
       const newData: Feature[] = [
-        track1, track2, track3, field, ...zones, ...points
+        track1, track2, track3, field, ...zones, ...points, ...backdrops
       ]
       dispatch({ type: 'fColl/featuresAdded', payload: newData })
       loadedRef.current = true
@@ -173,12 +173,13 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
 
   const doSave = useCallback(async () => {
     if (filePath && window.electron) {
-      const doc = JSON.stringify(storeContents)
+      // just store the current JSON FeatureCollection
+      const doc = JSON.stringify(documentContents)
       await window.electron.saveFile(filePath, doc)  
     } else {
       window.alert('Local save not supportedin browser')
     }
-  }, [filePath, storeContents])
+  }, [filePath, documentContents])
 
   const detailTabs = [ {
     key: '1',
@@ -247,9 +248,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
             </Splitter.Panel>
             <Splitter.Panel key='right'>
               <Map>
-                <TileLayer maxNativeZoom={8} maxZoom={16}
-                  url="tiles/{z}/{x}/{y}.png"
-                />
+                <></>
               </Map>
             </Splitter.Panel>
           </Splitter>

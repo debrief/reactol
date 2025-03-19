@@ -165,7 +165,7 @@ const Documents = () => {
         const newTab: TabWithPath = {
           key: '' + Date.now(),
           label: fileName,
-          children: <App filePath={filePath} />
+          children: <App filePath={filePath} withSampleData={withSample} />
         }
         setTabs([...tabs, newTab])
         addTabToLayout(newTab)
