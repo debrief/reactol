@@ -9,6 +9,11 @@ body.dark-mode .flexlayout__layout {
   background-color: #1f1f1f;
 }
 
+body.dark-mode .flexlayout__tabset_tabbar_inner_tab_container,
+body.dark-mode .flexlayout__tab_toolbar {
+  background-color: #666666 !important;
+}
+
 body.dark-mode .flexlayout__tab_button {
   background-color: #2a2a2a;
   color: #f0f0f0;
