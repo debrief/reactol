@@ -4,6 +4,8 @@ import React, { createContext, useContext } from 'react'
 interface AppContextProps {
   clipboardUpdated: boolean | null // toggle for each update
   setClipboardUpdated: React.Dispatch<React.SetStateAction<boolean | null>> // null means un-used
+  isDarkMode: boolean // true for dark mode, false for light mode
+  toggleDarkMode: () => void // function to toggle dark mode
 }
 
 export const AppContext = createContext<AppContextProps | undefined>(undefined)

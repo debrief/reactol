@@ -1,8 +1,9 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter, Tabs } from 'antd'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
+import { useAppContext } from '../../state/AppContext'
 import { AppDispatch } from '../../state/store'
 import { ExistingTrackProps, NewTrackProps } from '../../types'
 import { timeBoundsFor } from '../../helpers/timeBounds'
@@ -91,17 +92,24 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
   }, [features, setTime])
   
   
-  const antdTheme = {
+  const { isDarkMode } = useAppContext()
+
+  const antdTheme = useMemo(() => ({
+    token: {
+      colorBgContainer: isDarkMode ? '#2a2a2a' : '#ffffff',
+      colorText: isDarkMode ? '#f0f0f0' : 'rgba(0, 0, 0, 0.88)',
+      colorBorder: isDarkMode ? '#444444' : '#d9d9d9'
+    },
     components: {
       Splitter: {
         splitBarSize: 10,
       },
       Table: {
-        headerBg: '#555',
+        headerBg: isDarkMode ? '#333' : '#555',
         headerColor: '#fff'
       }
     }
-  }
+  }), [isDarkMode])
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     // only allow files to be dropped
