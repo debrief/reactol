@@ -1,7 +1,7 @@
 import {  useMemo, useState } from 'react'
-import { Feature, LineString } from 'geojson'
+import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Splitter, Button, Tooltip as ATooltip } from 'antd'
+import { Select, Space, Splitter, Button, Tooltip as ATooltip, Modal, Transfer } from 'antd'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import {
   FilterOutlined,
@@ -14,6 +14,7 @@ import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { BEARING_DATA, RANGE_DATA, rangeBearingCalc } from '../../helpers/calculations/rangeBearingCalc'
+import { BACKDROP_TYPE } from '../../constants'
 
 type OptionType = {
   label: string
@@ -22,9 +23,9 @@ type OptionType = {
   icon: React.ReactNode
 }
 
-const filteredTrack = (feature: Feature, start: number, end: number) => {
+const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: number, end: number): Feature<Geometry, GeoJsonProperties> => {
   if (feature.properties?.dataType === 'track') {
-    const lineFeature = feature as Feature<LineString>
+    const lineFeature = feature as Feature<LineString, GeoJsonProperties>
     if (!feature.properties?.times) {
       return feature
     }
@@ -39,8 +40,8 @@ const filteredTrack = (feature: Feature, start: number, end: number) => {
         endIndex = i
       }
     }
-    const res: Feature<LineString> = {
-      ...feature,
+    const res: Feature<LineString, GeoJsonProperties> = {
+      ...lineFeature,
       properties: {
         ...feature.properties,
         times: feature.properties.times.slice(startIndex, endIndex + 1),
@@ -67,6 +68,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [primaryTrack, setPrimaryTrack] = useState<string>('')
   const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
+  const [isTransferModalVisible, setIsTransferModalVisible] = useState<boolean>(false)
+  const [tempSecondaryTracks, setTempSecondaryTracks] = useState<string[]>([])
 
   const featureOptions: OptionType[] = useMemo(() => {
     if (!primaryTrack) {
@@ -110,7 +113,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   , [featureOptions])
 
   const secondaryOptions = useMemo(() => 
-    featureOptions.filter(track => track.value !== primaryTrack)
+    featureOptions.filter(track => track.value !== primaryTrack).filter(feature => feature.dataType !== BACKDROP_TYPE)
   , [primaryTrack, featureOptions])
 
   const featuresToPlot = useMemo(() => 
@@ -208,16 +211,53 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               </span>
             )}
           />
-          Secondary:
-          <Select
-            mode="multiple"
-            placeholder="Secondary Tracks/Zones/Points"
-            style={{ width: 100 }}
-            value={secondaryTracks}
-            onChange={setSecondaryTracks}
-            maxTagCount={'responsive'}
-            options={secondaryOptions}
-          />
+          <Button 
+            onClick={() => {
+              setTempSecondaryTracks([...secondaryTracks])
+              setIsTransferModalVisible(true)
+            }}
+          >
+            Secondary tracks:
+          </Button>
+          
+          <Modal
+            title="Manage Secondary Tracks"
+            open={isTransferModalVisible}
+            onOk={() => {
+              setSecondaryTracks(tempSecondaryTracks)
+              setIsTransferModalVisible(false)
+            }}
+            onCancel={() => setIsTransferModalVisible(false)}
+            width={600}
+          >
+            <Transfer
+              dataSource={secondaryOptions.map(option => ({
+                key: option.value,
+                title: option.label,
+                description: option.dataType,
+                disabled: false
+              }))}
+              titles={['Available', 'Selected']}
+              targetKeys={tempSecondaryTracks}
+              onChange={(nextTargetKeys) => setTempSecondaryTracks(nextTargetKeys as string[])}
+              render={item => (
+                <Space>
+                  {featureOptions.find(opt => opt.value === item.key)?.icon}
+                  {item.title}
+                  <span style={{ color: '#999', fontSize: '12px' }}>{item.description}</span>
+                </Space>
+              )}
+              listStyle={{
+                width: 250,
+                height: 300,
+              }}
+              showSearch
+              filterOption={(inputValue, item) =>
+                item.title.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
+                item.description.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+              }
+            />
+          </Modal>
           <ATooltip title={showDepth ? 'Hide depth' : 'Show depth'}>
             <Button style={buttonStyle} color={showDepth ? 'primary' : 'default'} variant={showDepth ? 'solid' : 'outlined'} onClick={() => setShowDepth(!showDepth)} className={showDepth ? 'fg-profile' : 'fg-profile-o'}></Button>
           </ATooltip>
