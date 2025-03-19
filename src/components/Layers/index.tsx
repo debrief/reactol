@@ -57,6 +57,7 @@ type FieldDataNode = {
 
 interface LayerProps {
   openGraph: { (): void }
+  splitterWidths: number
 }
 
 const findChildrenOfType = (
@@ -216,7 +217,7 @@ export const ToolButton: React.FC<ToolProps> = ({
   )
 }
 
-const Layers: React.FC<LayerProps> = ({ openGraph }) => {
+const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
   const {clipboardUpdated, setClipboardUpdated} = useAppContext()
   const features = useAppSelector(selectFeatures)
@@ -502,10 +503,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph }) => {
         </Flex>
       </div>
       {model.length > 0 && (
-        <div ref={treeRef} tabIndex={0}>
+        <div ref={treeRef} tabIndex={0} style={{ height: '100%' }}>
           <DirectoryTree
             showLine={true}
-            style={{ textAlign: 'left', height: '100%' }}
+            className="tree-container"
+            style={{ textAlign: 'left', height: '100%', maxHeight: splitterWidths }}
             defaultSelectedKeys={[]}
             multiple={true}
             onSelect={onSelect}

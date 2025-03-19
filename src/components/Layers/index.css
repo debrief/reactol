@@ -19,3 +19,8 @@ Tree {
 .ant-tree-node-content-wrapper {
   padding-inline: 0px !important; 
 }
+
+.tree-container {
+  height: 92%;
+  overflow: auto;
+}

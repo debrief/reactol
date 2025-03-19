@@ -208,7 +208,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      padding: '16px',
+      overflow: 'auto',
       gap: '16px'
     }}>
       <div>
@@ -315,7 +315,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           </ATooltip>
         </Space>
       </div>
-      <Splitter style={{height: (height || 300) - 60}} layout='vertical' onResize={handleSplitterResize}>
+      <Splitter layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
           <Splitter.Panel>
             <div style={{ width: '100%', height: splitterHeights?.[0] || 200 }}>
