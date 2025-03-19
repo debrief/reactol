@@ -1,4 +1,4 @@
-import {  useMemo, useState } from 'react'
+import {  useEffect, useMemo, useState } from 'react'
 import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Splitter, Button, Tooltip as ATooltip, Modal, Transfer } from 'antd'
@@ -92,6 +92,12 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     })
   }, [features, primaryTrack, secondaryTracks])
 
+  useEffect(() => {
+    if (!secondaryTracks.length) {
+      setSecondaryTracks(features.filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
+    }
+  }, [features, secondaryTracks])
+
   const referenceAreaTop = useMemo(() => {
     if (time.filterApplied && !filterForTime) {
       return <ReferenceArea yAxisId="course" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
@@ -140,6 +146,22 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       return []
     }
   }, [liveFeatures, showDepth])
+
+  const depthPresent = useMemo(() => {
+    const tracks = liveFeatures.filter((feature) => feature.geometry?.type === 'LineString')
+
+    // filter to tracks with depths
+    const withDepth = tracks.filter((feature) => {
+      const lineString = feature as Feature<LineString>
+      const hasPoints = lineString.geometry?.coordinates.length > 0
+      if (hasPoints) {
+        return lineString.geometry.coordinates[0].length === 3
+      }
+      return false
+    })
+    return withDepth.length > 0
+  }, [liveFeatures])
+
 
   const rangeBearingData = useMemo(() => {
     if (primaryTrack === '') return []
@@ -190,35 +212,39 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }}>
       <div>
         <Space align='center'>
-          Primary:
-          <Select
-            placeholder="Primary Track"
-            style={{ width: 100 }}
-            value={primaryTrack}
-            size="small"
-            onChange={setPrimaryTrack}
-            options={trackOptions}
-            optionRender={option => (
-              <Space>
-                {(option as unknown as OptionType).icon}
-                {option.label}
-              </Space>
-            )}
-            labelRender={option => (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {(option as OptionType).icon}
-                {option.label}
-              </span>
-            )}
-          />
-          <Button 
-            onClick={() => {
-              setTempSecondaryTracks([...secondaryTracks])
-              setIsTransferModalVisible(true)
-            }}
-          >
-            Secondary tracks:
-          </Button>
+          <ATooltip title="Select primary track">
+            Primary:
+            <Select
+              placeholder="Primary Track"
+              style={{ width: 100 }}
+              value={primaryTrack}
+              size="small"
+              onChange={setPrimaryTrack}
+              options={trackOptions}
+              optionRender={option => (
+                <Space>
+                  {(option as unknown as OptionType).icon}
+                  {option.label}
+                </Space>
+              )}
+              labelRender={option => (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {(option as OptionType).icon}
+                  {option.label}
+                </span>
+              )}
+            />
+          </ATooltip>
+          <ATooltip title="Manage secondary items">
+            <Button 
+              onClick={() => {
+                setTempSecondaryTracks([...secondaryTracks])
+                setIsTransferModalVisible(true)
+              }}
+            >
+              Secondary items:
+            </Button>
+          </ATooltip>
           
           <Modal
             title="Manage Secondary Tracks"
@@ -258,8 +284,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               }
             />
           </Modal>
-          <ATooltip title={showDepth ? 'Hide depth' : 'Show depth'}>
-            <Button style={buttonStyle} color={showDepth ? 'primary' : 'default'} variant={showDepth ? 'solid' : 'outlined'} onClick={() => setShowDepth(!showDepth)} className={showDepth ? 'fg-profile' : 'fg-profile-o'}></Button>
+          <ATooltip title={depthPresent ? (showDepth ? 'Hide depth' : 'Show depth') : 'No selected tracks contain depth data'}>
+            <Button disabled={!depthPresent} style={buttonStyle} color={showDepth ? 'primary' : 'default'} variant={showDepth ? 'solid' : 'outlined'} onClick={() => setShowDepth(!showDepth)} className={showDepth ? 'fg-profile' : 'fg-profile-o'}></Button>
           </ATooltip>
           <ATooltip title={showLegend ? 'Hide legend' : 'Show legend'}>
             <Button style={buttonStyle} color={showLegend ? 'primary' : 'default'} variant={showLegend ? 'solid' : 'outlined'} onClick={() => setShowLegend(!showLegend)} className={showLegend ? 'fg-map-legend' : 'fg-map-legend-o'}></Button>
