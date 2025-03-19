@@ -1,7 +1,7 @@
 import {  useMemo, useState } from 'react'
 import { Feature, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Checkbox, Splitter, Button, Tooltip as ATooltip } from 'antd'
+import { Select, Space, Splitter, Button, Tooltip as ATooltip } from 'antd'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import {
   FilterOutlined,
@@ -103,7 +103,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     return null
   }, [time, filterForTime])
 
-  const buttonStyle = { margin: '0 5px' }
+  const buttonStyle = { margin: '0 1px' }
 
   const trackOptions: OptionType[] = useMemo(() =>
     featureOptions.filter((feature) => feature.dataType === 'track')
@@ -218,24 +218,21 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             maxTagCount={'responsive'}
             options={secondaryOptions}
           />
-          <Checkbox checked={showDepth} onClick={() => setShowDepth(!showDepth)}>
-            Depth
-          </Checkbox>
-          <Checkbox checked={showLegend} onClick={() => setShowLegend(!showLegend)}>
-            Legend
-          </Checkbox>
+          <ATooltip title={showDepth ? 'Hide depth' : 'Show depth'}>
+            <Button style={buttonStyle} color={showDepth ? 'primary' : 'default'} variant={showDepth ? 'solid' : 'outlined'} onClick={() => setShowDepth(!showDepth)} className={showDepth ? 'fg-profile' : 'fg-profile-o'}></Button>
+          </ATooltip>
+          <ATooltip title={showLegend ? 'Hide legend' : 'Show legend'}>
+            <Button style={buttonStyle} color={showLegend ? 'primary' : 'default'} variant={showLegend ? 'solid' : 'outlined'} onClick={() => setShowLegend(!showLegend)} className={showLegend ? 'fg-map-legend' : 'fg-map-legend-o'}></Button>
+          </ATooltip>
           <ATooltip
             mouseEnterDelay={0.8}
-            title={
-              time.filterApplied
-                ? 'Trim graphs to current time filter'
-                : 'No time filter applied'
-            }
+            title={time.filterApplied ? 'Trim graphs to current time filter' : 'No time filter applied'}
           >
             <Button
               style={buttonStyle}
               disabled={!time.filterApplied}
-              color='primary'
+              color={filterForTime ? 'primary' : 'default'} 
+              variant={filterForTime ? 'solid' : 'outlined'}
               onClick={() => setFilterForTime(!filterForTime)}
             >
               {filterForTime ? <FilterFilled /> : <FilterOutlined />}
