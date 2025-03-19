@@ -70,6 +70,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
   const [isTransferModalVisible, setIsTransferModalVisible] = useState<boolean>(false)
   const [tempSecondaryTracks, setTempSecondaryTracks] = useState<string[]>([])
+  const [showTooltip, setShowTooltip] = useState<boolean>(true)
 
   const featureOptions: OptionType[] = useMemo(() => {
     if (!primaryTrack) {
@@ -295,6 +296,9 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           <ATooltip title={showLegend ? 'Hide legend' : 'Show legend'}>
             <Button style={buttonStyle} color={showLegend ? 'primary' : 'default'} variant={showLegend ? 'solid' : 'outlined'} onClick={() => setShowLegend(!showLegend)} className={showLegend ? 'fg-map-legend' : 'fg-map-legend-o'}></Button>
           </ATooltip>
+          <ATooltip title={showTooltip ? 'Hide tooltips' : 'Show tooltips'}>
+            <Button style={buttonStyle} color={showTooltip ? 'primary' : 'default'} variant={showTooltip ? 'solid' : 'outlined'} onClick={() => setShowTooltip(!showTooltip)} className={'fg-measure-line'}></Button>
+          </ATooltip>
           <ATooltip
             mouseEnterDelay={0.8}
             title={time.filterApplied ? 'Trim graphs to current time filter' : 'No time filter applied'}
@@ -348,10 +352,10 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     fontSize={fontSize}
                   />
                   {referenceAreaTop}
-                  <Tooltip 
+                  {showTooltip && <Tooltip 
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
-                  />
+                  />}
                   {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
                   {depthData.map((dataset, index) => (
                     <Line
@@ -409,13 +413,13 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                   />
                   {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
                   {referenceAreaBottom}
-                  <Tooltip
+                  {showTooltip && <Tooltip
                     allowEscapeViewBox={{ x: true, y: true }}
                     labelFormatter={(num) =>toShortDTG(num) + 'Z'}
                     formatter={(value: number, name: string) => [`${Math.round(Number(value))}`, name]}
                     itemStyle={{ fontSize: '12px', margin: '0', padding: '0' }}
                     wrapperStyle={{ fontSize: '14px', margin: '0', padding: '0' }}
-                  />
+                  />}
                   {/* Range data */}
                   {rangeData.map((dataset, index) => (
                     <Line
