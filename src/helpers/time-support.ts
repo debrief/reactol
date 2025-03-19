@@ -1,7 +1,22 @@
+import { formatDistanceToNow } from 'date-fns'
+
 /**
  * A utility class for time-related operations.
  */
 export class TimeSupport {
+  static formatDuration(duration: number): string {
+    if (duration < 500) { // Less than half a second
+      return 'just now'
+    }
+    
+    // Create a Date object that is 'duration' milliseconds ago
+    const date = new Date(Date.now() - duration)
+    
+    // Use date-fns to format the duration in a human-readable way
+    return formatDistanceToNow(date, {
+      addSuffix: true, // Adds 'ago' to the output
+    })
+  }
   /**
    * Parses a period string in the format `00h15m`, `01h00m` into milliseconds.
    * @param {string} period - The period string to parse.

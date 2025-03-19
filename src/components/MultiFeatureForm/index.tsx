@@ -82,7 +82,7 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
         color,
       }
     }))
-    dispatch({ type: 'fColl/featuresUpdated', payload: updates })
+    dispatch({ type: 'fColl/featuresUpdated', payload: { property: 'color', features: updates } })
   }
 
   const itemStyle = { marginBottom: '0.5em' }

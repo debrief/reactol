@@ -1,12 +1,59 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { BBox, Feature, FeatureCollection } from 'geojson'
+import { BBox, Feature, FeatureCollection, Geometry, GeoJsonProperties } from 'geojson'
 import * as turf from '@turf/turf'
 import { LatLngBounds } from 'leaflet'
 
-const initialState: FeatureCollection = {
-  type: 'FeatureCollection',
-  features: [],
-  bbox: undefined
+export type ViewportChangeType = 'pan' | 'zoom_in' | 'zoom_out' | 'fit_to_window' | 'restore'
+
+export type ViewportState = {
+  north: number
+  south: number
+  east: number
+  west: number
+  zoom: number
+  changeType: ViewportChangeType
+}
+
+type CoreUpdated = {
+  property?: string
+}
+export type FeatureUpdated = CoreUpdated & {
+  feature: Feature<Geometry, GeoJsonProperties>
+}
+
+export type FeaturesUpdated = CoreUpdated & {
+  features: Feature<Geometry, GeoJsonProperties>[]
+}
+
+export type StoreState = {
+  data: FeatureCollection
+  details?: HistoryDescriptions
+  viewport?: ViewportState
+}
+
+type HistoryDescriptions = {
+  time: number
+  undo: string
+  redo: string
+}
+
+const newDetails = (undo: string, redo:string): HistoryDescriptions => {
+  return {
+    time: Date.now(),
+    undo,
+    redo
+  }
+}
+
+const initialState: StoreState = {
+  data: {
+    type: 'FeatureCollection',
+    features: [],
+    bbox: undefined
+  },
+  details: newDetails(
+    'Undo store initialisation', 'Redo store initialisation'),
+  viewport: undefined
 }
 
 type idDictionary = { [name: string]: string } 
@@ -16,25 +63,30 @@ let counter = 0
 /** note: this method modifies the contents of the `newIds` argument,
  *  to keep track of the new feature ids
  */
-export const cleanFeature = (existingIds: string[],feature: Feature, newIds?: idDictionary): Feature => {
+export const cleanFeature = (existingIds: string[], feature: Feature, newIds?: idDictionary): Feature => {
+  let result = feature // note: we will clone this, if we have to
   const newIdsKeys =  Object.keys(newIds || {})
-  if (!feature.id) {
-    feature.id = `f-${++counter}`
+  if (!result.id) {
+    result.id = `f-${++counter}`
   }
-  while (existingIds.includes(feature.id as string) || newIdsKeys?.includes(feature.id as string)) {
-    feature.id = `f-${++counter}`
+  while (existingIds.includes(result.id as string) || newIdsKeys?.includes(result.id as string)) {
+    // ok, we can't amend the id for the original feature. In this 
+    // case we'll have to clone the feature and then modify it.
+    // note:  a shallow copy is ok, since id sits at the top level
+    const newFeature = {...feature, id: `f-${++counter}`}
+    result = newFeature
   }
   if (newIds) {
-    newIds[feature.id as string] = feature.id as string
+    newIds[result.id as string] = result.id as string
   }  
 
-  if (!feature.properties) {
-    feature.properties = {}
+  if (!result.properties) {
+    result.properties = {}
   }
-  if (feature.properties.visible === undefined) {
-    feature.properties.visible = true
+  if (result.properties.visible === undefined) {
+    result.properties.visible = true
   }
-  return feature
+  return result
 }
 
 const updateBounds = (state: FeatureCollection): BBox | undefined => {
@@ -50,45 +102,100 @@ const getExistingIds = (features: Feature[]): string[] => {
   return features.map(feature => feature.id as string)
 }
 
+const namesFor = (features: Feature[]): string => {
+  return features.map(feature => feature.properties?.name || feature.id).join(', ')
+}
+
 // Create the slice and pass in the initial state
 const featuresSlice = createSlice({
   name: 'fColl',
   initialState,
   reducers: {
+    setViewport(state, action: PayloadAction<ViewportState>) {
+      state.viewport = action.payload
+      const changeType = action.payload.changeType
+      let description = 'viewport '
+      switch (changeType) {
+      case 'zoom_in':
+        description += 'zoom in'
+        break
+      case 'zoom_out':
+        description += 'zoom out'
+        break
+      case 'fit_to_window':
+        description += 'fit to window'
+        break
+      case 'restore':
+        description += 'restore'
+        break
+      default:
+        description += 'pan'
+      }
+      state.details = newDetails(
+        `Undo ${description}`,
+        `Redo ${description}`
+      )
+    },
     storeCleared(state) {
-      state.features = []
-      state.bbox = updateBounds(state)
+      state.data.features = []
+      state.data.bbox = updateBounds(state.data)
+      state.details = newDetails(
+        'Undo clear store',
+        'Redo clear store'
+      )
     },
     featureAdded(state, action: PayloadAction<Feature>) {
-      const existingIds = getExistingIds(state.features)
+      const existingIds = getExistingIds(state.data.features)
       const cleaned = cleanFeature(existingIds,action.payload)
-      state.features.push(cleaned)
-      state.bbox = updateBounds(state)
+      state.data.features.push(cleaned)
+      state.data.bbox = updateBounds(state.data)
+      const itemName = namesFor([action.payload])
+      state.details = newDetails(
+        'Undo add ' + itemName,
+        'Redo add ' + itemName
+      )
     },
     featuresAdded(state, action: PayloadAction<Feature[]>) {
-      const existingIds = getExistingIds(state.features)
+      const existingIds = getExistingIds(state.data.features)
       // store new ids in a dictionary, so it is passed by reference
       const newIds: idDictionary = {}
       const cleaned = action.payload.map((feature) => cleanFeature(existingIds ,feature, newIds))
-      state.features.push(...cleaned)
-      state.bbox = updateBounds(state)
+      const itemNames = namesFor(action.payload)
+      state.data.features.push(...cleaned)
+      state.data.bbox = updateBounds(state.data)
+      state.details = newDetails(
+        'Undo add ' + itemNames,
+        'Redo add ' + itemNames
+      )
     },
-    featureUpdated(state, action: PayloadAction<Feature>) {
-      const featureIndex = state.features.findIndex((feature) => feature.id === action.payload.id)
-      state.features.splice(featureIndex, 1, action.payload)
-      state.bbox = updateBounds(state)
+    featureUpdated(state, action: PayloadAction<FeatureUpdated>) {
+      const featureIndex = state.data.features.findIndex((feature) => feature.id === action.payload.feature.id)
+      state.data.features.splice(featureIndex, 1, action.payload.feature)
+      state.data.bbox = updateBounds(state.data)
+      const itemName = namesFor([action.payload.feature])
+      const description = action.payload.property ? `${action.payload.property} of ${itemName}` : `modify ${itemName}`
+      state.details = newDetails(
+        `Undo ${description}`,
+        `Redo ${description}`
+      )
     },
-    featuresUpdated(state, action: PayloadAction<Feature[]>) {
+    featuresUpdated(state, action: PayloadAction<FeaturesUpdated>) {
       const updates = action.payload
-      state.features = state.features.map(feature => {
-        const update = updates.find(u => u.id === feature.id)
+      state.data.features = state.data.features.map(feature => {
+        const update = updates.features.find(u => u.id === feature.id)
         return update || feature
       })
-      state.bbox = updateBounds(state)
+      state.data.bbox = updateBounds(state.data)
+      const itemNames = namesFor(updates.features)
+      const description = action.payload.property ? `${action.payload.property} of ${itemNames}` : `modify ${itemNames}`
+      state.details = newDetails(
+        `Undo ${description}`,
+        `Redo ${description}`
+      )
     },
     featuresVisChange(state, action: PayloadAction<{ ids: string[], visible: boolean }>) {
       const { ids, visible } = action.payload
-      state.features.forEach((feature) => {
+      state.data.features.forEach((feature) => {
         if (!feature.properties) {
           feature.properties = {}
         }
@@ -96,37 +203,55 @@ const featuresSlice = createSlice({
           feature.properties.visible = visible
         }
       })
-      state.bbox = updateBounds(state)
+      state.data.bbox = updateBounds(state.data)
+      const itemName = namesFor(state.data.features.filter(feature => ids.includes(feature.id as string)))
+      state.details = newDetails(
+        'Undo visibility change ' + itemName,
+        'Redo visibility change ' + itemName
+      )
     },
     featuresDeleted(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
-      state.features = state.features.filter(feature => !ids.includes(feature.id as string))
-      state.bbox = updateBounds(state)
+      const itemName = namesFor(state.data.features.filter(feature => ids.includes(feature.id as string)))
+      state.data.features = state.data.features.filter(feature => !ids.includes(feature.id as string))
+      state.data.bbox = updateBounds(state.data)
+      state.details = newDetails(
+        'Undo delete ' + itemName,
+        'Redo delete ' + itemName
+      )
     },
     featuresDuplicated(state, action: PayloadAction<{ ids: string[], }>) {
       const { ids } = action.payload
-      const newFeatures = state.features
+      const newFeatures = state.data.features
         .filter(feature => ids.includes(feature.id as string))
         .map(feature => {
           const newFeature = { ...feature, id: `f-${++counter}` }
           newFeature.properties = { ...feature.properties, name: `Copy of ${feature.properties?.name || feature.id}` }
           return newFeature
         })
-      state.features.push(...newFeatures)
-      state.bbox = updateBounds(state)
+      state.data.features.push(...newFeatures)
+      state.data.bbox = updateBounds(state.data)
+      const itemName = namesFor(newFeatures)
+      state.details = newDetails(
+        'Undo duplicate ' + itemName,
+        'Redo duplicate ' + itemName
+      )
     },
   }
 })
 
 // Selector to get bounds in Leaflet's LatLngBounds format
-export const selectBounds = (state: FeatureCollection): LatLngBounds | null => {
-  if (!state.bbox) {
+export const selectBounds = (state: StoreState): LatLngBounds | null => {
+  if (!state.data.bbox) {
     return null
   } else {
-    const [minX, minY, maxX, maxY] = state.bbox as [number, number, number, number]
+    const [minX, minY, maxX, maxY] = state.data.bbox as [number, number, number, number]
     return new LatLngBounds([minY, minX], [maxY, maxX])
   }
 }
+
+// Selectors for redux-undo state
+export const selectFeatures = (state: { fColl: { present: StoreState } }) => state.fColl.present.data.features
 
 // Export the generated reducer function
 export default featuresSlice.reducer

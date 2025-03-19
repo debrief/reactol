@@ -1,6 +1,6 @@
 import React from 'react'
-import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon, GroupIcon } from '../components/Layers/NodeIcons'
-import { TRACK_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE, GROUP_TYPE } from '../constants'
+import { TrackIcon, BuoyFieldIcon, ZoneIcon, PointIcon } from '../components/Layers/NodeIcons'
+import { TRACK_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE } from '../constants'
 
 interface GetFeatureIconProps {
   dataType: string
@@ -18,8 +18,6 @@ export const getFeatureIcon = ({ dataType, color, environment }: GetFeatureIconP
     return <ZoneIcon color={color} />
   case REFERENCE_POINT_TYPE:
     return <PointIcon color={color} />
-  case GROUP_TYPE:
-    return <GroupIcon color={color} />
   default:
     return null
   }

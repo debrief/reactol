@@ -57,6 +57,7 @@ const editHandler = (
 
 export const EditFeature: React.FC = () => {
   const { editableMapFeature } = useDocContext()
+  const centreOfMap = useMap().getCenter()
   const [drawOptions, setDrawOptions] = useState<PM.ToolbarOptions>({})
   const [globalOptions, setGlobalOptions] = useState<PM.GlobalOptions>({})
   const dispatch = useAppDispatch()
@@ -72,7 +73,8 @@ export const EditFeature: React.FC = () => {
     const markers: Marker[] = []
     switch (feature.geometry.type) {
     case 'Point': {
-      const coord = feature.geometry.coordinates as [number, number]
+      const coords = feature.geometry.coordinates
+      const coord = coords.length > 0 ? coords as [number, number] : [centreOfMap.lng, centreOfMap.lat]
       const latlng = L.latLng(coord[1], coord[0])
       layerToEdit = L.marker(latlng, { draggable: true })
       layerToEdit.on('dragend', () => editHandler(layerToEdit as Marker, feature, editableMapFeature.onChange))
@@ -83,8 +85,6 @@ export const EditFeature: React.FC = () => {
       feature.geometry.coordinates.forEach(coord => {
         const latlng = L.latLng(coord[1], coord[0])
         const marker = L.marker(latlng, { draggable: true })
-        console.log('marker', marker)
-          
         marker.on('dragend', () => editHandler(markers, feature, editableMapFeature.onChange))
         markers.push(marker)
         marker.addTo(map)
@@ -147,7 +147,7 @@ export const EditFeature: React.FC = () => {
       if (layerToEdit) map.removeLayer(layerToEdit)
       markers.forEach(marker => map.removeLayer(marker))
     }
-  }, [map, editableMapFeature, dispatch])
+  }, [map, editableMapFeature, dispatch, centreOfMap])
 
   return (
     <FeatureGroup>
