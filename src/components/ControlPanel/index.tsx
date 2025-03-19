@@ -62,6 +62,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const start = bounds ? bounds[0] : 0
   const end = bounds ? bounds[1] : 0
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
+  const [filterApplied, setFilterApplied] = useState(false)
 
   const undoRedoTitle = useMemo(() => {
     if(canUndo && canRedo) {
@@ -85,25 +86,21 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   }, [stepTxt, setInterval])
 
   useEffect(() => {
-    if (time.filterApplied) {
+    if (filterApplied) {
       const newStart = TimeSupport.roundDown(new Date(start), interval)
       const newEnd = TimeSupport.increment(newStart, interval)
       const newTime = {
         ...time,
         start: newStart.getTime(),
+        filterApplied: true,
         end: newEnd.getTime(),
       }
       setTime(newTime)
     } else {
-      setTime({ ...time, start, end })
+      setTime({ ...time, start, end, filterApplied: false })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interval, start, end, time.filterApplied, setTime])
-
-  const setFilterApplied = (applied: boolean) => {
-    const newTime = { ...time, filterApplied: applied }
-    setTime(newTime)
-  }
+  }, [interval, start, end, filterApplied, setTime])
 
   const doStep = (fwd: boolean, large: boolean) => {
     if (large) {
