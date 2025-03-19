@@ -1,10 +1,10 @@
 import { ReactNode, useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert } from 'antd'
-import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert, Switch } from 'antd'
+import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined, BulbOutlined } from '@ant-design/icons'
+import { useAppContext } from '../../state/AppContext'
 import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action, Actions, DockLocation} from 'flexlayout-react'
-import 'flexlayout-react/style/light.css'
 import './index.css'
 
 type TabWithPath =  {
@@ -23,6 +23,16 @@ const fileNameFor = (filePath: string): string => {
 const DEFAULT_DOC_NAME = 'Pending'
 
 const Documents = () => {
+  const { isDarkMode, toggleDarkMode } = useAppContext()
+  
+  // Dynamically import the appropriate flexlayout theme
+  useEffect(() => {
+    if (isDarkMode) {
+      import('flexlayout-react/style/dark.css')
+    } else {
+      import('flexlayout-react/style/light.css')
+    }
+  }, [isDarkMode])
   const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
   const [tabToClose, setTabToClose] = useState<Action | null>(null)
   const [newTabState, setNewTabState] = useState<'empty'|'samples'| null>(null)
@@ -259,7 +269,19 @@ const Documents = () => {
     </Tooltip>)
     renderValues.buttons.push(
       <Tooltip title="Open Existing Document" key="open-doc">
-        <Button  icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >Open</Button>
+        <Button icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >Open</Button>
+      </Tooltip>
+    )
+    renderValues.buttons.push(
+      <Tooltip title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'} key='theme-toggle'>
+        <Switch
+          checkedChildren={<BulbOutlined />}
+          unCheckedChildren={<BulbOutlined />}
+          checked={isDarkMode}
+          onChange={toggleDarkMode}
+          size="small"
+          style={{ marginLeft: '8px' }}
+        />
       </Tooltip>
     )
   }

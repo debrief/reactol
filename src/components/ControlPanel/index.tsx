@@ -236,8 +236,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
       <Form disabled={!time.filterApplied}>
         <table
           style={{
-            width: '100%',
-            backgroundColor: time.filterApplied ? 'white' : '#f0f0f0',
+            width: '100%'
           }}
         >
           <thead>
