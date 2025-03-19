@@ -255,6 +255,11 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             }}
             onCancel={() => setIsTransferModalVisible(false)}
             width={600}
+            modalRender={(modal) => (
+              <div onWheel={(e) => e.stopPropagation()}>
+                {modal}
+              </div>
+            )}
           >
             <Transfer
               dataSource={secondaryOptions.map(option => ({
