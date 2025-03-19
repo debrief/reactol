@@ -39,6 +39,7 @@
     "date-fns-tz": "^3.2.0",
     "dom-to-image": "^2.6.0",
     "electron-window-state": "^5.0.3",
+    "font-gis": "^1.0.6",
     "leaflet": "^1.9.4",
     "leaflet.nauticscale": "^1.1.0",
     "leaflet.polylinemeasure": "^3.0.0",
@@ -52,6 +53,7 @@
     "react-leaflet-nauticsale": "^1.1.0",
     "react-modal-resizable-draggable": "^0.1.6",
     "react-redux": "^9.2.0",
+    "recharts": "^2.15.1",
     "redux-undo": "^1.1.0",
     "victory": "^37.3.2"
   },

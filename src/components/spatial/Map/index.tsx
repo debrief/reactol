@@ -42,7 +42,7 @@ const featureFor = (feature: Feature, onClickHandler: (id: string, modifier: boo
   case BUOY_FIELD_TYPE:
     return <BuoyField key={feature.id} feature={feature as Feature<MultiPoint, BuoyFieldProps>} onClickHandler={onClickHandler} />
   case BACKDROP_TYPE:
-    return <ATileLayer feature={feature as Feature<MultiPoint, BackdropProps>} />
+    return <ATileLayer key={feature.id} feature={feature as Feature<MultiPoint, BackdropProps>} />
   default:
     console.log('Unknown feature type:',feature)
     throw new Error('Unknown feature type:' + feature.properties?.dataType)
