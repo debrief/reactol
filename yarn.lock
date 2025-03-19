@@ -6900,6 +6900,13 @@ flora-colossus@^2.0.0:
     debug "^4.3.4"
     fs-extra "^10.1.0"
 
+font-gis@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/font-gis/-/font-gis-1.0.6.tgz#a3bac10ed7477bda7f4823af75990d4bcd63ad22"
+  integrity sha512-4qtmnBGkmTHbsbXW/C2vcR38Bo/yUFfyYXrK0nQbJgR252lmAK3Igho7AueBmPfPLlwbfNcNCwv13IDwKKI6/Q==
+  dependencies:
+    vinyl-paths "^3.0.1"
+
 for-each@^0.3.3:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/for-each/-/for-each-0.3.4.tgz#814517ffc303d1399b2564d8165318e735d0341c"
@@ -10165,7 +10172,7 @@ read-pkg@^2.0.0:
     normalize-package-data "^2.3.2"
     path-type "^2.0.0"
 
-readable-stream@^3.4.0:
+"readable-stream@2 || 3", readable-stream@^3.4.0:
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.6.2.tgz#56a9b36ea965c00c5a93ef31eb111a0f11056967"
   integrity sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==
@@ -11174,6 +11181,14 @@ throttle-debounce@^5.0.0, throttle-debounce@^5.0.2:
   resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-5.0.2.tgz#ec5549d84e053f043c9fd0f2a6dd892ff84456b1"
   integrity sha512-B71/4oyj61iNH0KeCamLuE2rmKuTO5byTOSVwECM5FA7TiAiAW+UqTKZ9ERueC4qvgSttUhdmq1mXC3kJqGX7A==
 
+through2@^3.0.1:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/through2/-/through2-3.0.2.tgz#99f88931cfc761ec7678b41d5d7336b5b6a07bf4"
+  integrity sha512-enaDQ4MUyP2W6ZyT6EsMzqBPZaM/avg8iuo+l2d3QCs0J+6RaqkHV/2/lOwDTueBHeJ/2LG9lrLW3d5rWPucuQ==
+  dependencies:
+    inherits "^2.0.4"
+    readable-stream "2 || 3"
+
 tiny-each-async@2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/tiny-each-async/-/tiny-each-async-2.0.3.tgz#8ebbbfd6d6295f1370003fbb37162afe5a0a51d1"
@@ -11886,6 +11901,13 @@ victory@^37.3.2:
     victory-voronoi "37.3.6"
     victory-voronoi-container "37.3.6"
     victory-zoom-container "37.3.6"
+
+vinyl-paths@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/vinyl-paths/-/vinyl-paths-3.0.1.tgz#16b42404e21ebddfb75954863f553af3345d56b5"
+  integrity sha512-fpjimhur1emSbJSvy5dJjDklCFEh2LvQRSHPzMQlYFjPrdFMHAyzSe1fiLzykoqg9X2tqH8evhsOUDNT55a0sw==
+  dependencies:
+    through2 "^3.0.1"
 
 vite@^5.4.10:
   version "5.4.14"
