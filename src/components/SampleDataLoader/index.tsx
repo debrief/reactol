@@ -8,6 +8,8 @@ import track3 from '../../data/track3'
 import zones from '../../data/zones'
 import points from '../../data/points'
 import field from '../../data/buoyfield1'
+import backdrops from '../../data/backdrop'
+
 import { SampleItem } from '../../data/sampleItems'
 
 /** component providing a `home` button which zooms out to show all visible data */
@@ -26,6 +28,7 @@ export const SampleDataLoader: React.FC<{ sampleItems: SampleItem[] }> = ({ samp
       let data: Feature[] = [track1, track2, track3, field]
       data = data.concat(zones)
       data = data.concat(points)
+      data = data.concat(backdrops)
       dispatch({ type: 'fColl/featuresAdded', payload: data })
     } else {
       const data = sampleItems.find(i => i.name === e.key)?.data
