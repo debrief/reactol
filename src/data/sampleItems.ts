@@ -5,6 +5,7 @@ import track3 from './track3'
 import zones from './zones'
 import points from './points'
 import field from './buoyfield1'
+import backdrops from './backdrop'
 
 export type SampleItem = {
   name: string
@@ -19,4 +20,5 @@ export const sampleItems: SampleItem[] = [
   { name: 'Buoy field', data: [field] },
   { name: 'Zones', data: zones },
   { name: 'Points', data: points },
+  { name: 'Backdrops', data: backdrops }
 ]
