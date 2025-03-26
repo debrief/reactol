@@ -207,7 +207,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               disabled={bounds === null}
               color='primary'
               variant={time.filterApplied ? 'solid' : 'outlined'}
-              onClick={() => setFilterApplied(!time.filterApplied)}
+              onClick={() => setFilterApplied(value => !value)}
             >
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
