@@ -2,6 +2,7 @@ import {  useEffect, useMemo, useState } from 'react'
 import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Splitter, Button, Tooltip as ATooltip, Modal, Transfer } from 'antd'
+import { useAppContext } from '../../state/AppContext'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import {
   FilterOutlined,
@@ -62,6 +63,7 @@ const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: num
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height}) => {
   const features = useAppSelector(selectFeatures)
   const { time } = useDocContext()
+  const { isDarkMode } = useAppContext()
   const [showDepth, setShowDepth] = useState<boolean>(false)
   const [showLegend, setShowLegend] = useState<boolean>(true)
   const [filterForTime, setFilterForTime] = useState<boolean>(false)
@@ -188,6 +190,18 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   }, [bearingData, rangeData])
 
   const fontSize = 12
+  
+  // Theme colors based on dark mode
+  const themeColors = useMemo(() => ({
+    text: isDarkMode ? '#f0f0f0' : '#333333',
+    grid: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
+    background: isDarkMode ? '#2a2a2a' : '#ffffff',
+    tooltip: {
+      background: isDarkMode ? '#333333' : '#ffffff',
+      text: isDarkMode ? '#f0f0f0' : '#333333',
+      border: isDarkMode ? '#444444' : '#cccccc'
+    }
+  }), [isDarkMode])
 
   // Legend data is now handled directly by Recharts Legend component
 
@@ -322,16 +336,18 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   margin={{ top: 20, right: 60, left: 60, bottom: 50 }}
+                  style={{ backgroundColor: themeColors.background }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} />
                   <YAxis 
                     yAxisId="depth"
                     tickFormatter={(t: number) => `${Math.abs(t)}`}
-                    label={{ value: depthCalc.label, angle: -90, position: 'insideLeft' }}
+                    label={{ value: depthCalc.label, angle: -90, position: 'insideLeft', style: { fill: themeColors.text } }}
                     fontSize={fontSize}
                     type="number"
                     domain={['auto', 'auto']}
                     allowDataOverflow={true}
+                    tick={{ fill: themeColors.text }}
                   />
                   {/* we don't use this course axis, it's just for the reference area shading */}
                   <YAxis 
@@ -348,15 +364,26 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     type="number"
                     domain={['auto', 'auto']}
                     allowDataOverflow={true}
-                    label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
+                    label={{ value: 'Time', position: 'insideBottom', offset: -10, style: { fill: themeColors.text } }}
                     fontSize={fontSize}
+                    tick={{ fill: themeColors.text }}
                   />
                   {referenceAreaTop}
                   {showTooltip && <Tooltip 
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
+                    contentStyle={{ 
+                      backgroundColor: themeColors.tooltip.background,
+                      color: themeColors.tooltip.text,
+                      border: `1px solid ${themeColors.tooltip.border}`
+                    }}
                   />}
-                  {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
+                  {showLegend && <Legend 
+                    verticalAlign="top" 
+                    height={12} 
+                    wrapperStyle={{ fontSize:'10px' }}
+                    formatter={(value) => <span style={{ color: themeColors.text }}>{value}</span>}
+                  />}
                   {depthData.map((dataset, index) => (
                     <Line
                       key={index}
@@ -382,23 +409,26 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   margin={{ top: 20, right: 60, left: 60, bottom: 50 }}
+                  style={{ backgroundColor: themeColors.background }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} />
                   <XAxis 
                     dataKey="date" 
                     tickFormatter={toShortDTG} 
                     type="number"
                     domain={['auto', 'auto']}
                     allowDataOverflow={true}
-                    label={{ value: 'Time', position: 'insideBottom', offset: -10 }}
+                    label={{ value: 'Time', position: 'insideBottom', offset: -10, style: { fill: themeColors.text } }}
                     fontSize={fontSize}
+                    tick={{ fill: themeColors.text }}
                   />
                   {/* Range axis (left) */}
                   <YAxis 
                     yAxisId="range"
                     type="number"
-                    label={{ value: 'Range (nmi)', angle: -90, position: 'insideLeft' }}
+                    label={{ value: 'Range (nmi)', angle: -90, position: 'insideLeft', style: { fill: themeColors.text } }}
                     fontSize={fontSize}
+                    tick={{ fill: themeColors.text }}
                   />
                   {/* Bearing axis (right) */}
                   <YAxis 
@@ -408,10 +438,16 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     domain={[0, 360]}
                     ticks={[0, 90, 180, 270, 360]}
                     tickFormatter={(t: number) => `${t}°`}
-                    label={{ value: bearingCalc.label, angle: 90, position: 'insideRight' }}
+                    label={{ value: bearingCalc.label, angle: 90, position: 'insideRight', style: { fill: themeColors.text } }}
                     fontSize={fontSize}
+                    tick={{ fill: themeColors.text }}
                   />
-                  {showLegend && <Legend verticalAlign="top" height={12} wrapperStyle={{ fontSize:'10px' }} />}
+                  {showLegend && <Legend 
+                    verticalAlign="top" 
+                    height={12} 
+                    wrapperStyle={{ fontSize:'10px' }}
+                    formatter={(value) => <span style={{ color: themeColors.text }}>{value}</span>}
+                  />}
                   {referenceAreaBottom}
                   {showTooltip && <Tooltip
                     allowEscapeViewBox={{ x: true, y: true }}
@@ -419,6 +455,11 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     formatter={(value: number, name: string) => [`${Math.round(Number(value))}`, name]}
                     itemStyle={{ fontSize: '12px', margin: '0', padding: '0' }}
                     wrapperStyle={{ fontSize: '14px', margin: '0', padding: '0' }}
+                    contentStyle={{ 
+                      backgroundColor: themeColors.tooltip.background,
+                      color: themeColors.tooltip.text,
+                      border: `1px solid ${themeColors.tooltip.border}`
+                    }}
                   />}
                   {/* Range data */}
                   {rangeData.map((dataset, index) => (
