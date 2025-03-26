@@ -168,9 +168,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
 
   const rangeBearingData = useMemo(() => {
     if (primaryTrack === '') return []
-    const tNow = Date.now()
     const res = rangeBearingCalc.calculate(liveFeatures, primaryTrack)
-    console.log('range/bearing data took:', Date.now() - tNow)
     return res
   }, [liveFeatures, primaryTrack])
 
