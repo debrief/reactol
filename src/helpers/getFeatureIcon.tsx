@@ -9,6 +9,7 @@ interface GetFeatureIconProps {
 }
 
 export const getFeatureIcon = ({ dataType, color, environment }: GetFeatureIconProps): React.ReactNode => {
+  console.log('geting icon for', dataType, color, environment)
   switch (dataType) {
   case TRACK_TYPE:
     return <TrackIcon color={color} environment={environment} />
