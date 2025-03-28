@@ -12,14 +12,15 @@ import {
   SaveOutlined,
   UndoOutlined
 } from '@ant-design/icons'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useAppSelector } from '../../state/hooks'
+import React, { useMemo } from 'react'
 import { UndoModal } from '../UndoModal'
 import { useDocContext } from '../../state/DocContext'
-import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
 import { SampleDataLoader } from '../SampleDataLoader'
 import { sampleItems } from '../../data/sampleItems'
+import { useTimeControls } from './hooks/useTimeControls'
+import { useUndoRedo } from './hooks/useUndoRedo'
+import { useClipboard } from './hooks/useClipboard'
 
 export interface TimeProps {
   bounds: [number, number] | null
@@ -55,81 +56,25 @@ interface TimeButtonProps {
 }
 
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
-  const canUndo = useAppSelector(state => state.fColl.past.length > 0)
-  const canRedo = useAppSelector(state => state.fColl.future.length > 0)
-  const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
-  const [undoModalVisible, setUndoModalVisible] = useState(false)
-  const start = bounds ? bounds[0] : 0
-  const end = bounds ? bounds[1] : 0
-  const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
-  const [filterApplied, setFilterApplied] = useState(false)
-
-  const undoRedoTitle = useMemo(() => {
-    if(canUndo && canRedo) {
-      return 'Undo/Redo ...'
-    } else if (canUndo) {
-      return 'Undo ...'
-    } else if (canRedo) {
-      return 'Redo ...'
-    } else {
-      return null
-    }
-  }, [canUndo, canRedo])
-
-  useEffect(() => {
-    try {
-      const period = TimeSupport.parsePeriod(stepTxt)
-      setInterval(period)
-    } catch (err) {
-      console.log('Invalid time format:' + err)
-    }
-  }, [stepTxt, setInterval])
-
-  useEffect(() => {
-    if (filterApplied) {
-      const newStart = TimeSupport.roundDown(new Date(start), interval)
-      const newEnd = TimeSupport.increment(newStart, interval)
-      const newTime = {
-        ...time,
-        start: newStart.getTime(),
-        filterApplied: true,
-        end: newEnd.getTime(),
-      }
-      setTime(newTime)
-    } else {
-      setTime({ ...time, start, end, filterApplied: false })
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interval, start, end, filterApplied, setTime])
-
-  const doStep = (fwd: boolean, large: boolean) => {
-    if (large) {
-      const newStart = fwd
-        ? TimeSupport.roundDown(new Date(end), interval)
-        : TimeSupport.roundDown(new Date(start), interval)
-      const newEnd = TimeSupport.increment(newStart, interval)
-      const newTime = {
-        ...time,
-        start: newStart.getTime(),
-        end: newEnd.getTime(),
-      }
-      setTime(newTime)
-    } else {
-      const timeNow = new Date(time.start)
-      const newStart = fwd
-        ? TimeSupport.increment(timeNow, interval)
-        : TimeSupport.decrement(timeNow, interval)
-      const newEnd = TimeSupport.increment(newStart, interval)
-      if (newEnd.getTime() >= start && newStart.getTime() <= end) {
-        const newTime = {
-          ...time,
-          start: newStart.getTime(),
-          end: newEnd.getTime(),
-        }
-        setTime(newTime)
-      }
-    }
-  }
+  const { time } = useDocContext()
+  
+  // Custom hooks
+  const { 
+    stepTxt, 
+    setStepTxt, 
+    setFilterApplied, 
+    viewportFrozen, 
+    toggleFreezeViewport, 
+    doStep 
+  } = useTimeControls({ bounds })
+  
+  const { 
+    undoModalVisible, 
+    setUndoModalVisible, 
+    undoRedoTitle 
+  } = useUndoRedo()
+  
+  const { copyTooltip, copyMapToClipboard } = useClipboard()
 
   /** convenience component to make time button construction easier */
   const TimeButton: React.FC<TimeButtonProps> = ({
@@ -150,16 +95,6 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
       </Tooltip>
     )
   }
-
-  const toggleFreezeViewport = () => {
-    setViewportFrozen(!viewportFrozen)
-  }
-
-  const copyTooltip = useMemo(() => {
-    return viewportFrozen
-      ? 'Copy snapshot of map to the clipboard'
-      : 'Lock the viewport in order to take a snapshot of the map'
-  }, [viewportFrozen])
 
   const largeIcon = {
     fontSize: '1.5em',
