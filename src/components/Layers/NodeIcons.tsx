@@ -7,6 +7,7 @@ interface IconProps {
 }
 
 export const TrackIcon: React.FC<IconProps> = ({ color, environment }) => {
+  console.log('geting track icon for', environment)
   if (environment) {
     const EnvironmentIcon = getEnvironmentIcon(environment, color)
     return EnvironmentIcon

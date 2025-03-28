@@ -1,10 +1,11 @@
 import { Feature } from 'geojson'
-import { TreeDataNode } from 'antd'
-import { FolderOutlined } from '@ant-design/icons'
+import { Tooltip, TreeDataNode } from 'antd'
+import { FolderOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { symbolOptions } from '../../helpers/symbolTypes'
-import { NODE_TRACKS } from './constants'
+import { NODE_BACKDROPS, NODE_FIELDS, NODE_POINTS, NODE_TRACKS, NODE_ZONES } from './constants'
 import { DataNode } from 'antd/es/tree'
+import { EnvOptions } from '../../types'
 
 // Helper function to get feature ID
 export const idFor = (feature: Feature): string => {
@@ -21,15 +22,47 @@ export const justLeaves = (id: string): boolean => {
   return !id.startsWith('node-')
 }
 
+const addIconLabelFor = (key: string, title: string) => {
+  switch(key) {
+  case NODE_TRACKS: {
+    // special case - get the name for the env
+    const env = title as EnvOptions
+    return 'Create new ' +  symbolOptions.find(e => e.value === env)?.label + ' track'
+  }
+  case NODE_FIELDS: {
+    return 'Create new buoy field'
+  }
+  case NODE_ZONES: {
+    return 'Create new zone'
+  }
+  case NODE_POINTS: {
+    return 'Create new reference point'
+  }
+
+  case NODE_BACKDROPS: {
+    return 'Create new backdrop'
+  }
+  default:
+    return 'ERROR - node type not handled: ' + key
+  }
+}
 // Get icon for tree node
 export const getIcon = (
   feature: Feature | undefined, 
+  key:string, title: string,
   handleAdd?: (e: React.MouseEvent, key: string, title: string) => void, 
   button?: React.ReactNode
 ) => {
+  console.log('getting icon for 2', key, title)
   // If no feature is provided, this is a parent node - show plus icon
   if (!feature) {
-    return handleAdd ? (button || null) : null
+    return handleAdd ? (button || <Tooltip title={addIconLabelFor(key, title)}>
+      <PlusCircleOutlined
+        style={{ cursor: 'copy' }}
+        onClick={(e) => handleAdd(e, key, title)}
+      />
+    </Tooltip>) : null
+
   }
 
   // For leaf nodes, show type-specific icon based on dataType
@@ -70,13 +103,13 @@ export const trackFunc = (
   const environments = symbolOptions.map((env): TreeDataNode => ({
     title: env.label,
     key: env.value,
-    icon: getIcon(undefined, handleAdd, undefined),
+    icon: getIcon(undefined, NODE_TRACKS, env.value, handleAdd, undefined),
     children: features
       .filter(feature => feature.properties?.env === env.value)
       .map((feature): TreeDataNode => ({
         title: nameFor(feature),
         key: idFor(feature),
-        icon: getIcon(feature, undefined, undefined),
+        icon: getIcon(feature, idFor(feature), nameFor(feature), undefined, undefined),
         children: [],
       }))
   }))
@@ -100,7 +133,7 @@ export const mapFunc = (
       const feature = features.find(f => idFor(f) === child.key)
       return {
         ...child,
-        icon: getIcon(feature, handleAdd, button),
+        icon: getIcon(feature, child.key, child.title, handleAdd, button),
       }
     })
     : []
@@ -108,7 +141,7 @@ export const mapFunc = (
   return {
     title: title,
     key,
-    icon: getIcon(undefined, handleAdd, button),
+    icon: getIcon(undefined, key, title, handleAdd, button),
     children,
   }
 }
