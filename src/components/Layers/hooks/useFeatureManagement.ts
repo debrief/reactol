@@ -9,7 +9,7 @@ import {
   TRACK_TYPE
 } from '../../../constants'
 import { zoneFeatureFor } from '../../../helpers/zoneShapePropsFor'
-import { BackdropProps, BuoyFieldProps, EnvOptions, NewTrackProps, PointProps, TrackProps } from '../../../types'
+import { BackdropProps, BuoyFieldProps, NewTrackProps, PointProps, TrackProps } from '../../../types'
 
 export const useFeatureManagement = () => {
   const dispatch = useAppDispatch()
