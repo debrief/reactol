@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useDocContext } from '../state/DocContext'
+import { useDocContext } from '../../../state/DocContext'
 
 export const useClipboard = () => {
   const { viewportFrozen, copyMapToClipboard } = useDocContext()

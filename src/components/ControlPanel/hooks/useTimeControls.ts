@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { TimeSupport } from '../helpers/time-support'
-import { useDocContext } from '../state/DocContext'
+import { TimeSupport } from '../../../helpers/time-support'
+import { useDocContext } from '../../../state/DocContext'
 
 interface TimeControlsProps {
   bounds: [number, number] | null
