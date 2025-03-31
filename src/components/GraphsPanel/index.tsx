@@ -60,7 +60,7 @@ const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: num
   }
 }
 
-export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height}) => {
+export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
   const { time } = useDocContext()
   const { isDarkMode } = useAppContext()
@@ -73,6 +73,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [isTransferModalVisible, setIsTransferModalVisible] = useState<boolean>(false)
   const [tempSecondaryTracks, setTempSecondaryTracks] = useState<string[]>([])
   const [showTooltip, setShowTooltip] = useState<boolean>(true)
+  const [calculatedPlotHeight, setCalculatedPlotHeight] = useState<number | null>(null)
 
   const featureOptions: OptionType[] = useMemo(() => {
     if (!primaryTrack) {
@@ -207,13 +208,31 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     setSplitterHeights(sizes as [number, number])
   }
 
-  const relativePlotHeight = useMemo(() => {
+  // Calculate the initial relativePlotHeight based on current conditions
+  const initialPlotHeight = useMemo(() => {
     if (depthData.length > 0) {
       return (splitterHeights?.[1] || 200)
     } else {
       return (height || 300) - 60 
     }
   }, [height, splitterHeights, depthData])
+  
+  // Use the calculated height or the state value
+  const relativePlotHeight = calculatedPlotHeight ?? initialPlotHeight
+  
+  // Set the plot height when the component has finished loading
+  useEffect(() => {
+    if (height !== null && width !== null) {
+      // Component has loaded with dimensions
+      if (depthData.length > 0) {
+        // If we have depth data, use the splitter height
+        setCalculatedPlotHeight(splitterHeights?.[1] || 200)
+      } else {
+        // Otherwise use the available space
+        setCalculatedPlotHeight((height || 300) - 60)
+      }
+    }
+  }, [height, width, depthData.length, splitterHeights])
 
   return (
     <div style={{ 
