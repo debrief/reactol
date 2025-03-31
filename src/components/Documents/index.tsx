@@ -1,30 +1,27 @@
-import { ReactNode, useState, useRef, useMemo, useEffect, useCallback } from 'react'
-import App from '../../App'
+import { ReactNode, useRef, useMemo, useEffect, useCallback } from 'react'
 import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert, Switch } from 'antd'
-import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined, BulbOutlined } from '@ant-design/icons'
+import { Button, Tooltip, Switch, Modal, Input, Space, Alert, Row, Col, Typography, Image } from 'antd'
+import { FileAddOutlined, PlusOutlined, BulbOutlined, ExclamationCircleFilled } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
-import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action, Actions, DockLocation} from 'flexlayout-react'
+import { Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Actions, DockLocation } from 'flexlayout-react'
 import './index.css'
 
-type TabWithPath =  {
+// Import custom hooks
+import { useFileHandling } from './hooks/useFileHandling'
+import { useTabManagement } from './hooks/useTabManagement'
+
+export type TabWithPath =  {
   key: string
   label: string
   children: ReactNode
-} 
-
-const fileNameFor = (filePath: string): string => {
-  const path = filePath
-  const fileName = path.split('/').pop()!
-  const fileNameWithoutExtension = fileName.split('.')[0]
-  return fileNameWithoutExtension
 }
-
-const DEFAULT_DOC_NAME = 'Pending'
 
 const Documents = () => {
   const { isDarkMode, toggleDarkMode } = useAppContext()
   
+  const inputRef = useRef<InputRef | null>(null)
+  const layoutRef = useRef<Layout | null>(null)
+    
   // Dynamically import the appropriate flexlayout theme
   useEffect(() => {
     if (isDarkMode) {
@@ -33,15 +30,7 @@ const Documents = () => {
       import('flexlayout-react/style/light.css')
     }
   }, [isDarkMode])
-  const [tabs, setTabs] = useState<NonNullable<TabWithPath>[]>([])
-  const [tabToClose, setTabToClose] = useState<Action | null>(null)
-  const [newTabState, setNewTabState] = useState<'empty'|'samples'| null>(null)
-  const [documentName, setDocumentName] = useState(DEFAULT_DOC_NAME)
-  const [isDragging, setIsDragging] = useState(false)
-  const [message, setMessage] = useState<{ title: string, severity: 'error' | 'warning' | 'info', message: string } | null>(null)
-  const inputRef = useRef<InputRef | null>(null)
-  const layoutRef = useRef<Layout | null>(null)
-    
+  
   const layoutModel = useMemo(() => {
     const model = {
       global: { tabEnableClose: true },
@@ -75,71 +64,34 @@ const Documents = () => {
     }
   }, [layoutModel])
 
-  useEffect(() => {
-    if (newTabState) {
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 50)
-    }
-  }, [newTabState])
+  // This useEffect has been moved below after the hooks are declared
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    // Only prevent default and show indicator if it's a file being dragged
-    if (event.dataTransfer.types.includes('Files')) {
-      event.preventDefault()
-      setIsDragging(true)
-    }
-  }
+  // Get tab management hook first since we need setTabs
+  const {
+    tabs,
+    tabToClose,
+    newTabState,
+    documentName,
+    handleNew,
+    handleOk,
+    handleCancel,
+    handleNameChange,
+    handleCloseTabConfirm,
+    handleCloseTabCancel,
+    handleTabsAction,
+    openExistingDocument,
+    setTabs
+  } = useTabManagement(addTabToLayout, layoutModel)
 
-  const handleDragLeave = useCallback(() => {
-    setIsDragging(false)
-  }, [setIsDragging])
-
-  const handleDrop = useCallback( async (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(false)
-
-    const files = event.dataTransfer.files
-
-    if (files.length > 1) {
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
-      return
-    }
-
-    const file = files[0]
-    
-    // Check file extension
-    const fileName = file.name.toLowerCase()
-    if (!fileName.endsWith('.json') && !fileName.endsWith('.geojson')) {
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only .json and .geojson files are supported' })
-      return
-    }
-    
-    try {
-      const content = await file.text()
-      // Validate that the content is valid JSON
-      try {
-        const data = JSON.parse(content)
-        if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
-          throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
-        }
-        const newTab: TabWithPath = {
-          key: '' + Date.now(),
-          label: file.name.split('.')[0],
-          children: <App content={content} fileName={file.name} />
-        }
-        setTabs([...tabs, newTab])
-        addTabToLayout(newTab)
-      } catch (e) {
-        setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
-        return
-      }
-
-    } catch (e) {
-      console.error('Error handling file:', e)
-      setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
-    }
-  }, [setMessage, tabs, addTabToLayout])
+  // Use the file handling hook
+  const {
+    isDragging,
+    message,
+    setMessage,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop
+  } = useFileHandling(setTabs, addTabToLayout)
 
   const factory = (node: TabNode) => {
     const component = node.getComponent()
@@ -147,118 +99,16 @@ const Documents = () => {
     return tab ? tab.children : null
   }
 
-  const handleOk = () => {
-    const newTab: TabWithPath = {
-      key: '' + Date.now(),
-      label: documentName,
-      children: <App withSampleData={newTabState === 'samples'} fileName={documentName} />
-    }
-    setNewTabState(null)
-    addTabToLayout(newTab)
-    setTabs([...tabs, newTab])
-    setDocumentName(DEFAULT_DOC_NAME)
-  }
-
- 
-  const handleNew = async (withSample?: boolean) => {
-    if (window.electron) {
-      const options = { 
-        title: 'New document', 
-        filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }] 
-      }
-      const result = await window.electron.saveFileDialog(options)
+  // Tab management hook is now used above
   
-      if (result?.filePath) {
-        const filePath = result.filePath
-        const fileName = fileNameFor(filePath)
-  
-        const newTab: TabWithPath = {
-          key: '' + Date.now(),
-          label: fileName,
-          children: <App filePath={filePath} withSampleData={withSample} />
-        }
-        setTabs([...tabs, newTab])
-        addTabToLayout(newTab)
-      } else {
-        console.log('Cancelled')
-        return
-      }
-    } else {
-      setNewTabState( withSample ? 'samples' : 'empty')
+  // Focus input when new tab modal is opened
+  useEffect(() => {
+    if (newTabState) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 100)
     }
-  }
-
-  const handleCancel = () => {
-    setDocumentName(DEFAULT_DOC_NAME)
-    setNewTabState(null)
-  }
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDocumentName(e.target.value)
-  }
-
-  const openExistingDocument = async () => {
-    if (window.electron) {
-      const file = await window.electron.openFile()
-      if (file) {
-        const newTab: TabWithPath = {
-          key: '' + Date.now(),
-          label: fileNameFor(file.filePath),
-          children: <App filePath={file.filePath} content={file.content} />
-        }
-        setTabs([...tabs, newTab])
-        if (layoutModel) {
-          addTabToLayout(newTab)
-        }
-      }
-    } else {
-      // allow local files to be loaded into browser session
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = '.geojson,.json'
-      
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0]
-        if (!file) return
-
-        try {
-          const content = await file.text()
-          const data = JSON.parse(content)
-          
-          if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
-            throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
-          }
-
-          const newTab: TabWithPath = {
-            key: '' + Date.now(),
-            label: file.name.split('.')[0],
-            children: <App content={content} fileName={file.name} />
-          }
-          setTabs([...tabs, newTab])
-          addTabToLayout(newTab)
-        } catch (error) {
-          Modal.error({
-            title: 'Invalid File',
-            content: 'Problem loading file: ' + error,
-          })
-        }
-      }
-      input.click()
-    }
-  }
-  
-  const handleCloseTabConfirm = () => {
-    if (tabToClose) {
-      layoutModel.doAction(tabToClose)
-      setTabToClose(null)
-      const tabToCloseNode = tabToClose.data.node
-      setTabs(prevTabs => prevTabs.filter(tab => tab.key !== tabToCloseNode))
-    }
-  }
-
-  const handleCloseTabCancel = () => {
-    setTabToClose(null)
-  }
+  }, [newTabState])
 
   const onRenderTabSet = (_tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
     renderValues.buttons.push(<Tooltip title="New Tab" key={'new-tab-btn'}>
@@ -286,16 +136,7 @@ const Documents = () => {
     )
   }
 
-  const handleTabsAction = (action: Action): undefined | Action => {
-    if (action.type.includes('DeleteTab')) {
-      // ok, use the modal to double-check the 
-      // user wants to save
-      setTabToClose(action)
-      // now return undefined, so the close doesn't (yet) close
-      return undefined
-    }
-    return action
-  }
+  // handleTabsAction is now provided by the useTabManagement hook
 
   //  console.log('tabs', tabs)
 
