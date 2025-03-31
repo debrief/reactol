@@ -22,6 +22,31 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // Wait for the plot to load after modal confirmation
   await page.waitForTimeout(2000)
   
+  // Find the step forward button (TimeButton component with StepForwardOutlined icon)
+  // Based on the application code, it's a button with tooltip 'Step forward'
+  const stepForwardButton = page.locator('button[title="Step forward"], [data-tooltip="Step forward"]')
+  
+  // Check if the TimePeriod component is visible
+  await expect(page.locator('.time-period-panel')).toBeVisible()
+  
+  // Get the initial time text before any actions
+  const timeTextBeforeFilter = await page.locator('.time-period-panel p').textContent()
+  console.log('Time period before filter:', timeTextBeforeFilter)
+  
+  // Try clicking the step forward button before applying the filter
+  await stepForwardButton.click()
+  
+  // Wait a moment
+  await page.waitForTimeout(500)
+  
+  // Get the time text after clicking step forward (should be unchanged)
+  const timeTextAfterClick = await page.locator('.time-period-panel p').textContent()
+  console.log('Time period after clicking step forward (before filter):', timeTextAfterClick)
+  
+  // Verify that the time text has NOT changed (because filter is not applied)
+  expect(timeTextAfterClick).toEqual(timeTextBeforeFilter)
+  console.log('Verified: Time period did not change when filter is not applied')
+  
   // Find and click the time filter button in the control panel
   // Based on the application code, it's a button with FilterOutlined/FilterFilled icon
   const timeFilterButton = page.locator('button:has(.anticon-filter), button:has(.anticon-filter-filled)')
@@ -38,11 +63,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // This is a more accurate way to confirm the time filter is active
   await expect(page.locator('.time-step-input')).not.toHaveClass(/.*ant-select-disabled.*/)
   
-  // Find and click the step forward button (TimeButton component with StepForwardOutlined icon)
-  // Based on the application code, it's a button with tooltip 'Step forward'
-  const stepForwardButton = page.locator('button[title="Step forward"], [data-tooltip="Step forward"]')
-  // Alternative selector targeting the icon
-  // const stepForwardButton = page.locator('button:has(.anticon-step-forward)')
+  // Now click the step forward button after applying the filter (should work now)
   await stepForwardButton.click()
   
   // Verify that the time has changed after stepping forward
