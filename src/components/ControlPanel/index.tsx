@@ -252,6 +252,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               <td>
                 <AutoComplete
                   style={{ width: 100 }}
+                  className='time-step-input'
                   value={stepTxt}
                   onChange={(value) => setStepTxt(value)}
                   defaultOpen={false}
