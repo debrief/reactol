@@ -197,7 +197,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
   { 
     key: '2',
     label: 'Graphs',
-    children: <GraphsPanel width={splitterWidths ? splitterWidths[0] : 200} height={splitterHeights ? splitterHeights[2] : 200} />
+    children: <GraphsPanel width={splitterWidths ? splitterWidths[0] : 300} height={splitterHeights ? splitterHeights[2] : 400} />
   }]
 
   const handleSplitterVerticalResize = (sizes: number[]) => {
