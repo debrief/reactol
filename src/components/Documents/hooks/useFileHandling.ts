@@ -2,12 +2,29 @@ import { useState, useCallback, ReactElement } from 'react'
 import { TabWithPath } from '../index'
 import App from '../../../App'
 
+/**
+ * Type definition for error/warning messages displayed to the user
+ */
 type MessageType = {
   title: string
   severity: 'error' | 'warning' | 'info'
   message: string
 }
 
+/**
+ * Custom hook that manages file handling functionality for the Documents component.
+ * 
+ * This hook handles:
+ * - Drag and drop interactions for files
+ * - File validation (ensuring only JSON and GeoJSON files are accepted)
+ * - Content parsing and validation
+ * - Error messaging
+ * - Tab creation from valid files
+ * 
+ * @param setTabs - State setter function for tabs array
+ * @param addTabToLayout - Function to add a new tab to the layout
+ * @returns Object containing drag state, message state, and event handlers
+ */
 export const useFileHandling = (
   setTabs: React.Dispatch<React.SetStateAction<TabWithPath[]>>,
   addTabToLayout: (newTab: TabWithPath) => void
@@ -15,6 +32,12 @@ export const useFileHandling = (
   const [isDragging, setIsDragging] = useState(false)
   const [message, setMessage] = useState<MessageType | null>(null)
 
+  /**
+   * Handles the dragover event when files are dragged over the drop area
+   * Only prevents default and shows indicator if it's a file being dragged
+   * 
+   * @param event - The drag event
+   */
   const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     // Only prevent default and show indicator if it's a file being dragged
     if (event.dataTransfer.types.includes('Files')) {
@@ -23,10 +46,20 @@ export const useFileHandling = (
     }
   }, [])
 
+  /**
+   * Handles the dragleave event when files are dragged out of the drop area
+   * Resets the dragging state
+   */
   const handleDragLeave = useCallback(() => {
     setIsDragging(false)
   }, [])
 
+  /**
+   * Handles the drop event when files are dropped on the drop area
+   * Validates files, parses content, and creates new tabs for valid files
+   * 
+   * @param event - The drop event containing the files
+   */
   const handleDrop = useCallback(async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     setIsDragging(false)
@@ -98,6 +131,9 @@ export const useFileHandling = (
     }
   }, [setTabs, addTabToLayout])
 
+  /**
+   * Return all file handling state and functions
+   */
   return {
     isDragging,
     message,

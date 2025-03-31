@@ -1,21 +1,39 @@
-import { ReactNode, useRef, useMemo, useEffect, useCallback } from 'react'
+import { ReactNode, useRef, useEffect } from 'react'
 import type { InputRef } from 'antd'
 import { Button, Tooltip, Switch, Modal, Input, Space, Alert, Row, Col, Typography, Image } from 'antd'
 import { FileAddOutlined, PlusOutlined, BulbOutlined, ExclamationCircleFilled } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
-import { Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Actions, DockLocation } from 'flexlayout-react'
+import { Layout, TabNode, ITabSetRenderValues, TabSetNode, BorderNode } from 'flexlayout-react'
 import './index.css'
 
 // Import custom hooks
 import { useFileHandling } from './hooks/useFileHandling'
 import { useTabManagement } from './hooks/useTabManagement'
+import { useLayoutModel } from './hooks/useLayoutModel'
 
+/**
+ * Type definition for tabs with associated path information
+ */
 export type TabWithPath =  {
-  key: string
-  label: string
-  children: ReactNode
+  key: string        // Unique identifier for the tab
+  label: string      // Display name for the tab
+  children: ReactNode // Content to render inside the tab
 }
 
+/**
+ * Documents component that manages document tabs and content
+ * 
+ * This component uses several custom hooks to handle different aspects of functionality:
+ * - useLayoutModel: Manages the flexlayout model configuration
+ * - useTabManagement: Handles tab state and operations (creation, closing)
+ * - useFileHandling: Manages file drag-and-drop and validation
+ * 
+ * The component provides a flexible layout for document tabs with the ability to:
+ * - Create new documents
+ * - Open existing documents
+ * - Drag and drop files
+ * - Toggle between light and dark themes
+ */
 const Documents = () => {
   const { isDarkMode, toggleDarkMode } = useAppContext()
   
@@ -31,38 +49,8 @@ const Documents = () => {
     }
   }, [isDarkMode])
   
-  const layoutModel = useMemo(() => {
-    const model = {
-      global: { tabEnableClose: true },
-      layout: {
-        type: 'row',
-        children: [ ],
-      },
-    }
-    return Model.fromJson(model)
-  }, [])
-
-  const addTabToLayout = useCallback((newTab: TabWithPath) => {
-    if (layoutModel) {
-      const tabSetNode = layoutModel.getRoot().getChildren()[0]
-    
-      if (tabSetNode) {
-        layoutModel.doAction(
-          Actions.addNode(
-            {
-              type: 'tab',
-              name: newTab.label,
-              component: newTab.key, 
-              id: newTab.key 
-            },
-            tabSetNode.getId(),
-            DockLocation.CENTER,
-            0
-          )
-        )
-      }
-    }
-  }, [layoutModel])
+  // Use the layout model hook
+  const { layoutModel, addTabToLayout } = useLayoutModel()
 
   // This useEffect has been moved below after the hooks are declared
 
