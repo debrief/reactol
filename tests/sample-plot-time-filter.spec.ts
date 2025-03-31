@@ -25,13 +25,18 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // Find and click the time filter button in the control panel
   // Based on the application code, it's a button with FilterOutlined/FilterFilled icon
   const timeFilterButton = page.locator('button:has(.anticon-filter), button:has(.anticon-filter-filled)')
+
+  // Check the time filter is currently disabled
+  await expect(page.locator('.time-step-input')).toHaveClass(/.*ant-select-disabled.*/)
+
   // Alternative selector if the above doesn't work
   // const timeFilterButton = page.locator('button', { has: page.locator('.anticon-filter, .anticon-filter-filled') })
   await timeFilterButton.click()
   
-  // Wait for the time filter to be applied
-  // The button should now show a filled filter icon indicating the filter is applied
-  await page.waitForSelector('.anticon-filter-filled')
+  
+  // Verify that the form containing the time-step-input is no longer disabled
+  // This is a more accurate way to confirm the time filter is active
+  await expect(page.locator('.time-step-input')).not.toHaveClass(/.*ant-select-disabled.*/)
   
   // Find and click the step forward button (TimeButton component with StepForwardOutlined icon)
   // Based on the application code, it's a button with tooltip 'Step forward'
@@ -41,18 +46,28 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   await stepForwardButton.click()
   
   // Verify that the time has changed after stepping forward
-  // Since we don't know exactly how the time is displayed, we'll check for visual changes
-  // in the GraphsPanel component which should update when time changes
   
   // Wait for any animations or updates to complete
   await page.waitForTimeout(500)
   
-  // Verify the graphs panel is visible and has been updated
-  // This assumes there's a container for the graphs
-  await expect(page.locator('.recharts-wrapper, [class*="GraphsPanel"]')).toBeVisible()
+  // Now specifically check that the TimePeriod component is visible
+  await expect(page.locator('.time-period-panel')).toBeVisible()
   
-  // Additional verification could include:
-  // 1. Checking if the time display has changed
-  // 2. Verifying that data points in the graphs have shifted
-  // 3. Checking for specific elements that only appear when time filtering is active
+  // Get the text content of the TimePeriod before stepping forward
+  const initialTimeText = await page.locator('.time-period-panel p').textContent()
+  console.log('Initial time period:', initialTimeText)
+  
+  // Click the step forward button again
+  await stepForwardButton.click()
+  
+  // Wait for the time to update
+  await page.waitForTimeout(500)
+  
+  // Get the updated text content
+  const updatedTimeText = await page.locator('.time-period-panel p').textContent()
+  console.log('Updated time period:', updatedTimeText)
+  
+  // Verify that the time text has changed
+  expect(updatedTimeText).not.toEqual(initialTimeText)
+  console.log('Time period changed successfully from', initialTimeText, 'to', updatedTimeText)
 })
