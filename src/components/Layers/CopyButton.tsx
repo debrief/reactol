@@ -10,7 +10,7 @@ import { useAppContext } from '../../state/AppContext'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 export const CopyButton: React.FC = () => {
-  const { selection, setMessage } = useDocContext()
+  const { selection } = useDocContext()
   const {clipboardUpdated, setClipboardUpdated} = useAppContext()
   const features = useAppSelector(selectFeatures)
 
@@ -34,13 +34,14 @@ export const CopyButton: React.FC = () => {
     navigator.clipboard.writeText(asStr).then(() => {
       setClipboardUpdated(!clipboardUpdated)
     }).catch((e) => {
-      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
+      console.error('Copy error:', e)
     })
   }
 
   return (
     <ToolButton
       onClick={onCopyClick}
+      className='layers-copy-button'
       disabled={copyDisabled}
       icon={<CopyOutlined />}
       title={
