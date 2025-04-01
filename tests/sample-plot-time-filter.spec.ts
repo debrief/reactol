@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
-const plotName = 'Test plot'
 
 test('Open Sample Plot, apply time filter, and step forward in time', async ({ page }) => {
+  const plotName = 'General time test'
   // Navigate to the application
   await page.goto('/')
   
@@ -153,6 +153,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
 })
 
 test('Test time step interval selection in control panel', async ({ page }) => {
+  const plotName = 'Time Step Interval Test'
   // Navigate to the application and create a sample plot
   await page.goto('/')
   await page.waitForSelector('button:has-text("Sample plot")')
@@ -228,6 +229,7 @@ test('Test time step interval selection in control panel', async ({ page }) => {
 })
 
 test('Test viewport lock/unlock functionality in control panel', async ({ page }) => {
+  const plotName = 'Viewport Lock Test'
   // Navigate to the application and create a sample plot
   await page.goto('/')
   await page.waitForSelector('button:has-text("Sample plot")')
@@ -271,6 +273,7 @@ test('Test viewport lock/unlock functionality in control panel', async ({ page }
 })
 
 test('Test undo/redo button in control panel', async ({ page }) => {
+  const plotName = 'Undo Redo Test'
   // Navigate to the application and create a sample plot
   await page.goto('/')
   await page.waitForSelector('button:has-text("Sample plot")')
@@ -281,18 +284,39 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   await page.waitForSelector('.flexlayout__tab_button_content')
   
   // Find the undo/redo button
-  const undoRedoButton = page.locator('button', { has: page.locator('.anticon-undo') })
+  const undoRedoButton = page.locator('.undo-redo-button')
   
   // Initially, there should be nothing to undo/redo, so the button should be disabled
   await expect(undoRedoButton).toBeDisabled()
   
-  // Apply time filter to make a change that can be undone
-  const timeFilterButton = page.locator('.apply-time-filter')
-  await timeFilterButton.click()
+  // find the delete button in the Layers component
+  const deleteButton = page.locator('.layers-delete-button')
   
-  // Wait for time controls to be enabled
-  await expect(page.locator('.time-step-input')).not.toHaveClass(/.*ant-select-disabled.*/)
-  
+  // check delete is disabled
+  await expect(deleteButton).toBeDisabled()
+
+  // expand the `NAV` node
+  await page.locator('.ant-tree-title').locator('span:has-text("NAV")').click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(200)
+
+  // create undo queue by deleting `VAN GALEN` from Layers component.
+  // find a span with the text `VAN GALEN`
+  await page.locator('.ant-tree-list').locator('span:has-text("VAN GALEN")').click()
+
+  // check delete is enabled
+  await expect(deleteButton).not.toBeDisabled()
+
+  // Click the delete button
+  await deleteButton.click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(200)
+    
+  // check the undo/redo button is enabled
+  await expect(undoRedoButton).not.toBeDisabled()
+
   // Click the undo/redo button to open the modal
   await undoRedoButton.click()
   

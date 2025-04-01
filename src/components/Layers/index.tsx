@@ -196,6 +196,7 @@ interface ToolProps {
   icon: React.ReactNode
   title: string
   disabled: boolean
+  className?: string
 }
 
 export const ToolButton: React.FC<ToolProps> = ({
@@ -203,11 +204,13 @@ export const ToolButton: React.FC<ToolProps> = ({
   icon,
   title,
   disabled,
+  className
 }) => {
   return (
     <Tooltip title={title}>
       <Button
         size={'middle'}
+        className={className}
         onClick={onClick}
         disabled={disabled}
         type='primary'
@@ -479,6 +482,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
             />
             <ToolButton
               onClick={onDeleteClick}
+              className='layers-delete-button'
               disabled={selection.length === 0}
               icon={<DeleteOutlined />}
               title={
