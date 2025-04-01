@@ -30,9 +30,7 @@ test('Copying features in Layers component', async ({ page }) => {
   await page.waitForTimeout(100)
   
   // Select a track
-  const referencePoint = page.locator('.ant-tree-node-content-wrapper')
-    .filter({ has: page.locator('.ant-tree-title') })
-    .nth(11)
+  const referencePoint = page.locator('has-text("SONON 1-1")')
   await referencePoint.click()
   
   // Verify that the copy button is now enabled (reference points should be copyable)
@@ -57,9 +55,7 @@ test('Copying features in Layers component', async ({ page }) => {
   
   // Hold down Ctrl/Cmd key and click another item
   await page.keyboard.down('Control')
-  const secondPoint = page.locator('.ant-tree-node-content-wrapper')
-    .filter({ has: page.locator('.ant-tree-title') })
-    .nth(11)
+  const secondPoint = page.locator('has-text("SONON 1-2")')
   await secondPoint.click()
   await page.keyboard.up('Control')
   
