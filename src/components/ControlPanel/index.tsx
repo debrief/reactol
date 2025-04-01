@@ -57,8 +57,6 @@ interface TimeButtonProps {
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const canUndo = useAppSelector(state => state.fColl.past.length > 1)
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
-  const pastLength = useAppSelector(state => state.fColl.past.length)
-  const futureLength = useAppSelector(state => state.fColl.future.length)
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
   const [undoModalVisible, setUndoModalVisible] = useState(false)
   const start = bounds ? bounds[0] : 0
@@ -66,7 +64,6 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const [stepTxt, setStepTxt] = useState<string>(StepOptions[2].value)
   const [filterApplied, setFilterApplied] = useState(false)
 
-  console.log('undo redo lengths', pastLength, futureLength )
   const undoRedoTitle = useMemo(() => {
     if(canUndo && canRedo) {
       return 'Undo/Redo ...'
