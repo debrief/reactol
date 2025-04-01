@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+const plotName = 'Test plot'
 
 test('Open Sample Plot, apply time filter, and step forward in time', async ({ page }) => {
   // Navigate to the application
@@ -14,13 +15,15 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   await page.waitForSelector('div.ant-modal-content')
   
   // Enter a name for the document in the input field
-  await page.locator('input.ant-input').fill('Test Plot')
+  await page.locator('input.ant-input').fill(plotName)
   
   // Click the OK button to confirm
   await page.locator('button:has-text("OK")').click()
   
   // Wait for the plot to load after modal confirmation
-  await page.waitForTimeout(2000)
+  await page.waitForTimeout(1000)
+
+  expect (await page.locator('.flexlayout__tab_button_content').first().textContent()).toEqual(plotName)
   
   // Find the step forward button (TimeButton component with StepForwardOutlined icon)
   // Based on the application code, it's a button with tooltip 'Step forward'
@@ -29,15 +32,19 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // Check if the TimePeriod component is visible
   await expect(page.locator('.time-period-panel')).toBeVisible()
   
+  // check the time start and end are outer period of data
+  const timeStart = page.locator('.time-start-txt')
+  const timeEnd = page.locator('.time-end-txt')
+  expect(await timeStart.textContent()).toEqual('Nov 141616Z')
+  expect(await timeEnd.textContent()).toEqual('Nov 151017Z')  
+
   // Get the initial time text before any actions
   const timeTextBeforeFilter = await page.locator('.time-period-panel p').textContent()
   console.log('Time period before filter:', timeTextBeforeFilter)
-  
-  // Try clicking the step forward button before applying the filter
-  // await stepForwardButton.click()
-  
-  // Wait a moment
-  await page.waitForTimeout(500)
+
+  // check time step buttons are disabled
+  await expect(page.locator('.step-forward')).toBeDisabled()
+  await expect(page.locator('.step-backward')).toBeDisabled()
   
   // Get the time text after clicking step forward (should be unchanged)
   const timeTextAfterClick = await page.locator('.time-period-panel p').textContent()
@@ -59,6 +66,10 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   await timeFilterButton.click()
   
   console.log('about to enable time filter')
+
+  // check the time start and end are clipped to new values
+  expect(await timeStart.textContent()).toEqual('Nov 141600Z')
+  expect(await timeEnd.textContent()).toEqual('Nov 141700Z')
   
   // Verify that the form containing the time-step-input is no longer disabled
   // This is a more accurate way to confirm the time filter is active
@@ -92,4 +103,51 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // Verify that the time text has changed
   expect(updatedTimeText).not.toEqual(initialTimeText)
   console.log('Time period changed successfully from', initialTimeText, 'to', updatedTimeText)
+
+  // check the time start and end times have moved forwards
+  expect(await timeStart.textContent()).toEqual('Nov 141800Z')
+  expect(await timeEnd.textContent()).toEqual('Nov 141900Z')
+
+  // get the large step fowards button
+  const largeStepForwardButton = page.locator('.jump-to-end')
+  await largeStepForwardButton.click()
+
+  // Wait for the time to update
+  await page.waitForTimeout(500)
+
+  // Get the updated text content
+  const updatedTimeText2 = await page.locator('.time-period-panel p').textContent()
+  console.log('Updated time period:', updatedTimeText2)
+  
+  // Verify that the time text has changed
+  expect(updatedTimeText2).not.toEqual(initialTimeText)
+  console.log('Time period changed successfully from', initialTimeText, 'to', updatedTimeText2)
+
+  // check the time start and end times have moved to end
+  expect(await timeStart.textContent()).toEqual('Nov 151000Z')
+  expect(await timeEnd.textContent()).toEqual('Nov 151100Z')
+
+  // get the large step backwards button
+  const largeStepBackButton = page.locator('.jump-to-start')
+  await largeStepBackButton.click()
+
+  // Wait for the time to update
+  await page.waitForTimeout(500)
+
+  // check the time start and end times have moved to start
+  expect(await timeStart.textContent()).toEqual('Nov 141600Z')
+  expect(await timeEnd.textContent()).toEqual('Nov 141700Z')
+
+  // disable time filter
+  await timeFilterButton.click()
+
+  // Wait for the time to update
+  await page.waitForTimeout(500)
+
+  // check time step interval is disabled
+  await expect(page.locator('.time-step-input')).toHaveClass(/.*ant-select-disabled.*/)
+
+  // check time step buttons are disabled
+  await expect(page.locator('.step-forward')).toBeDisabled()
+  await expect(page.locator('.step-backward')).toBeDisabled()
 })

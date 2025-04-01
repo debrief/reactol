@@ -250,7 +250,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           </thead>
           <tbody>
             <tr style={{ fontFamily: 'monospace' }}>
-              <td>{timeStr(time.start)}</td>
+              <td className='time-start-txt'>{timeStr(time.start)}</td>
               <td>
                 <AutoComplete
                   style={{ width: 100 }}
@@ -262,7 +262,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
                   placeholder='00h30m'
                 />
               </td>
-              <td>{timeStr(time.end)}</td>
+              <td className='time-end-txt'>{timeStr(time.end)}</td>
             </tr>
             <tr style={{ fontFamily: 'monospace' }}>
               <td>
