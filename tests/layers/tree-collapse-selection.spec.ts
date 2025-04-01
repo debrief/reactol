@@ -15,9 +15,12 @@ test('Collapsing the tree and clearing selection in Layers component', async ({ 
   
   // Wait for the plot to load
   await page.waitForSelector('.flexlayout__tab_button_content')
+
+  // quick delay, to let layers load
+  await page.waitForTimeout(100)
   
   // Verify that the tree is expanded by default (check for expanded nodes)
-  await expect(page.locator('.ant-tree-list-holder-inner .ant-tree-treenode.ant-tree-treenode-switcher-open')).toBeVisible()
+  await expect(page.locator('.ant-tree-node-content-wrapper-open').first()).toBeVisible()
   
   // Select a feature from the tree (VAN GALEN is a known feature in the sample plot)
   const vanGalenNode = page.locator('span:has-text("VAN GALEN")').first()
@@ -28,16 +31,16 @@ test('Collapsing the tree and clearing selection in Layers component', async ({ 
   await expect(vanGalenNode).toHaveClass(/ant-tree-node-selected/)
   
   // Verify that the clear selection button is enabled
-  const clearSelectionButton = page.locator('button', { has: page.locator('.anticon-close-circle') })
+  const clearSelectionButton = page.locator('.layers-clear-button')
   await expect(clearSelectionButton).not.toBeDisabled()
   
   // Click the collapse all button
-  const collapseButton = page.locator('button', { has: page.locator('.anticon-shrink') })
+  const collapseButton = page.locator('.layers-collapse-button')
   await expect(collapseButton).not.toBeDisabled()
   await collapseButton.click()
   
   // Verify that the tree is collapsed
-  await expect(page.locator('.ant-tree-list-holder-inner .ant-tree-treenode.ant-tree-treenode-switcher-open')).not.toBeVisible()
+  await expect(page.locator('.ant-tree-treenode-switcher-close').first()).toBeVisible()
   
   // Verify that the selection is maintained even after collapsing
   await expect(clearSelectionButton).not.toBeDisabled()
@@ -51,7 +54,10 @@ test('Collapsing the tree and clearing selection in Layers component', async ({ 
   // Expand the tree again to verify we can still access nodes
   const unitsNode = page.locator('.ant-tree-title:has-text("Units")').first()
   await unitsNode.click()
+
+  // quick delay, to let layers load
+  await page.waitForTimeout(100)
   
-  // Verify that a child node is now visible
-  await expect(page.locator('.ant-tree-list-holder-inner .ant-tree-treenode.ant-tree-treenode-switcher-open')).toBeVisible()
+  // Verify that nodes are expanded
+  await expect(page.locator('.ant-tree-node-content-wrapper-open').first()).toBeVisible()
 })

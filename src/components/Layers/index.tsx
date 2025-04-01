@@ -471,12 +471,14 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
             <ToolButton
               onClick={() => setExpandedKeys([])}
               icon={<ShrinkOutlined />}
+              className='layers-collapse-button'
               title='Collapse All'
               disabled={!isExpanded}
             />
             <ToolButton
               onClick={clearSelection}
               disabled={selection.length === 0}
+              className='layers-clear-button'
               icon={<CloseCircleOutlined />}
               title={'Clear selection'}
             />
