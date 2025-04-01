@@ -55,7 +55,7 @@ interface TimeButtonProps {
 }
 
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
-  const canUndo = useAppSelector(state => state.fColl.past.length > 0)
+  const canUndo = useAppSelector(state => state.fColl.past.length > 1)
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const { time, setTime, viewportFrozen, setViewportFrozen, copyMapToClipboard, interval, setInterval } = useDocContext()
   const [undoModalVisible, setUndoModalVisible] = useState(false)
@@ -217,6 +217,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           <Tooltip placement='bottom' title={undoRedoTitle || 'Nothing to undo/redo'}>
             <Button
               style={buttonStyle}
+              className='undo-redo-button'
               onClick={() => setUndoModalVisible(true)}
               disabled={!undoRedoTitle}
             ><UndoOutlined /></Button>
@@ -228,6 +229,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           <Tooltip title={copyTooltip}>
             <Button
               onClick={copyMapToClipboard}
+              className='copy-map-to-clipboard'
               title='Copy map to clipboard'
               icon={<CopyOutlined />}
               disabled={!viewportFrozen}

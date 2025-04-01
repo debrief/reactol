@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
-const plotName = 'Test plot'
 
 test('Open Sample Plot, apply time filter, and step forward in time', async ({ page }) => {
+  const plotName = 'General time test'
   // Navigate to the application
   await page.goto('/')
   
@@ -150,4 +150,227 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // check time step buttons are disabled
   await expect(page.locator('.step-forward')).toBeDisabled()
   await expect(page.locator('.step-backward')).toBeDisabled()
+})
+
+test('Test time step interval selection in control panel', async ({ page }) => {
+  const plotName = 'Time Step Interval Test'
+  // Navigate to the application and create a sample plot
+  await page.goto('/')
+  await page.waitForSelector('button:has-text("Sample plot")')
+  await page.click('button:has-text("Sample plot")')
+  await page.waitForSelector('div.ant-modal-content')
+  await page.locator('input.ant-input').fill(plotName)
+  await page.locator('button:has-text("OK")').click()
+  await page.waitForSelector('.flexlayout__tab_button_content')
+  await page.waitForSelector('.step-forward')
+  
+  // Apply time filter to enable time controls
+  const timeFilterButton = page.locator('.apply-time-filter')
+  await timeFilterButton.click()
+  
+  // Wait for time controls to be enabled
+  await expect(page.locator('.time-step-input')).not.toHaveClass(/.*ant-select-disabled.*/)
+  
+  // Get initial time values
+  const timeStart = page.locator('.time-start-txt')
+  const timeEnd = page.locator('.time-end-txt')
+  const initialStart = await timeStart.textContent()
+  const initialEnd = await timeEnd.textContent()
+  
+  // Wait for the time to update
+  await page.waitForTimeout(200)
+
+  // Open the time step dropdown
+  await page.locator('.time-step-input').click()
+  await page.waitForSelector('.ant-select-dropdown')
+  
+  // Select a different time step (15 minutes)
+  await page.locator('.ant-select-item-option').filter({ hasText: '00h15m' }).click()
+  
+  // Wait for the time to update
+  await page.waitForTimeout(500)
+
+  // Get updated time values
+  const trimmedStart = await timeStart.textContent()
+  const trimmedEnd = await timeEnd.textContent()
+  expect(trimmedStart).toEqual('Nov 141615Z')
+  expect(trimmedEnd).toEqual('Nov 141630Z')
+  
+  // Verify time step was applied by clicking step forward and checking time change
+  await page.locator('.step-forward').click()
+  await page.waitForTimeout(500)
+  
+  // Get updated time values
+  const updatedStart = await timeStart.textContent()
+  const updatedEnd = await timeEnd.textContent()
+  
+  // Verify times have changed according to the new step interval
+  expect(updatedStart).not.toEqual(initialStart)
+  expect(updatedEnd).not.toEqual(initialEnd)
+
+  expect(updatedStart).toEqual('Nov 141630Z')
+  expect(updatedEnd).toEqual('Nov 141645Z')
+  
+  
+  // The difference should be 15 minutes (our selected interval)
+  // We can verify this by checking the format (MMM ddHHmm'Z')
+  // Format example: 'Nov 141600Z'
+  console.log('Time values:', trimmedStart, updatedStart)
+  
+  // Extract hours and minutes from the time strings
+  // The format is 'MMM ddHHmmZ' where HH is at position 6-8 and mm is at position 8-10
+  const initialHour = parseInt(trimmedStart?.substring(6, 8) || '0')
+  const initialMinute = parseInt(trimmedStart?.substring(8, 10) || '0')
+  const updatedHour = parseInt(updatedStart?.substring(6, 8) || '0')
+  const updatedMinute = parseInt(updatedStart?.substring(8, 10) || '0')
+  
+  console.log('Parsed time components:', initialHour, initialMinute, updatedHour, updatedMinute)
+  
+  // Calculate the time in minutes for comparison
+  const initialTimeInMinutes = initialHour * 60 + initialMinute
+  const updatedTimeInMinutes = updatedHour * 60 + updatedMinute
+  
+  // Check if the difference is approximately 15 minutes (allowing for rounding)
+  const timeDiff = Math.abs(updatedTimeInMinutes - initialTimeInMinutes)
+  console.log('Time difference in minutes:', timeDiff)
+  
+  // We selected 15 minutes as the step, so expect a difference of about 15 minutes
+  expect(timeDiff).toEqual(15)
+
+  // We don't need to close the tab at the end of the test
+  // Playwright will handle closing the browser context after each test
+})
+
+test('Test viewport lock/unlock functionality in control panel', async ({ page }) => {
+  const plotName = 'Viewport Lock Test'
+  // Navigate to the application and create a sample plot
+  await page.goto('/')
+  await page.waitForSelector('button:has-text("Sample plot")')
+  await page.click('button:has-text("Sample plot")')
+  await page.waitForSelector('div.ant-modal-content')
+  await page.locator('input.ant-input').fill(plotName)
+  await page.locator('button:has-text("OK")').click()
+  await page.waitForSelector('.flexlayout__tab_button_content')
+  
+  // Find the viewport lock button
+  // Based on the component code, it's a button with UnlockOutlined/LockFilled icon
+  const viewportLockButton = page.locator('button', { has: page.locator('.anticon-unlock, .anticon-lock') })
+  
+  // Check initial state - viewport should be unlocked by default
+  // The button should have 'outlined' variant when unlocked
+  await expect(viewportLockButton).toHaveAttribute('class', expect.stringMatching(/.*ant-btn-outlined.*/))
+  
+  // Find the copy to clipboard button
+  const copyButton = page.locator('.copy-map-to-clipboard')
+  
+  // Copy button should be disabled when viewport is unlocked
+  await expect(copyButton).toBeDisabled()
+  
+  // Click the viewport lock button to lock the viewport
+  await viewportLockButton.click()
+  
+  // Verify the button state changed - it should now have 'solid' variant
+  await expect(viewportLockButton).toHaveAttribute('class', expect.stringMatching(/.*ant-btn-solid.*/))
+  
+  // Copy button should now be enabled
+  await expect(copyButton).not.toBeDisabled()
+  
+  // Click the viewport lock button again to unlock
+  await viewportLockButton.click()
+  
+  // Verify the button state changed back
+  await expect(viewportLockButton).toHaveAttribute('class', expect.stringMatching(/.*ant-btn-outlined.*/))
+  
+  // Copy button should be disabled again
+  await expect(copyButton).toBeDisabled()
+})
+
+test('Test undo/redo button in control panel', async ({ page }) => {
+  const plotName = 'Undo Redo Test'
+  // Navigate to the application and create a sample plot
+  await page.goto('/')
+  await page.waitForSelector('button:has-text("Sample plot")')
+  await page.click('button:has-text("Sample plot")')
+  await page.waitForSelector('div.ant-modal-content')
+  await page.locator('input.ant-input').fill(plotName)
+  await page.locator('button:has-text("OK")').click()
+  await page.waitForSelector('.flexlayout__tab_button_content')
+  
+  // Find the undo/redo button
+  const undoRedoButton = page.locator('.undo-redo-button')
+  
+  // Initially, there should be nothing to undo/redo, so the button should be disabled
+  await expect(undoRedoButton).toBeDisabled()
+  
+  // find the delete button in the Layers component
+  const deleteButton = page.locator('.layers-delete-button')
+  
+  // check delete is disabled
+  await expect(deleteButton).toBeDisabled()
+
+  // create undo queue by deleting `VAN GALEN` from Layers component.
+  // find a span with the text `VAN GALEN`
+  const vanGalen = page.locator('span:has-text("VAN GALEN")').first()
+  await expect(vanGalen).toBeVisible()
+  await vanGalen.click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
+  // check delete is enabled
+  await expect(deleteButton).not.toBeDisabled()
+
+  // Click the delete button
+  await deleteButton.click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(200)
+
+  // check we can no longer find `VAN GALEN`
+  await expect(vanGalen).not.toBeVisible()
+
+  // check the undo/redo button is enabled
+  await expect(undoRedoButton).not.toBeDisabled()
+
+  // Click the undo/redo button to open the modal
+  await undoRedoButton.click()
+  
+  // Verify the undo modal appears
+  const undoModal = page.locator('.ant-modal-content').filter({ hasText: 'Select a version' })
+  await expect(undoModal).toBeVisible()
+  
+  // Close the modal
+  await undoModal.locator('button:has-text("Cancel")').click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
+  // check undo modal closed
+  await expect(undoModal).not.toBeVisible()
+
+  // check vanGalen still not visible
+  await expect(vanGalen).not.toBeVisible()
+  
+  // re-open the undo modal
+  await undoRedoButton.click()
+  await expect(undoModal).toBeVisible()
+
+  // Select the first version
+  await undoModal.locator('.ant-list-items').locator('.ant-list-item').first().click()
+
+  // do restore
+  await page.locator('button:has-text("Restore Version")').click()
+
+  // check undo modal closed
+  await expect(undoModal).not.toBeVisible()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
+  // check vanGalen is visible
+  await expect(vanGalen).toBeVisible()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
 })
