@@ -143,6 +143,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
         <Button
           color='primary'
           variant='outlined'
+          className={`${tooltip.toLowerCase().replace(/\s+/g, '-')}`}
           icon={icon}
           disabled={!time.filterApplied}
           onClick={() => doStep(forward, large)}
@@ -205,6 +206,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
             <Button
               style={buttonStyle}
               disabled={bounds === null}
+              className='apply-time-filter'
               color='primary'
               variant={time.filterApplied ? 'solid' : 'outlined'}
               onClick={() => setFilterApplied(value => !value)}
@@ -248,10 +250,11 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           </thead>
           <tbody>
             <tr style={{ fontFamily: 'monospace' }}>
-              <td>{timeStr(time.start)}</td>
+              <td className='time-start-txt'>{timeStr(time.start)}</td>
               <td>
                 <AutoComplete
                   style={{ width: 100 }}
+                  className='time-step-input'
                   value={stepTxt}
                   onChange={(value) => setStepTxt(value)}
                   defaultOpen={false}
@@ -259,7 +262,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
                   placeholder='00h30m'
                 />
               </td>
-              <td>{timeStr(time.end)}</td>
+              <td className='time-end-txt'>{timeStr(time.end)}</td>
             </tr>
             <tr style={{ fontFamily: 'monospace' }}>
               <td>

@@ -5,8 +5,7 @@ import { GraphDatum } from '../../types'
 // Import the processBearingData function - we need to make it accessible for testing
 // Since it's not exported directly, we'll test it through a test export
 // This requires a small modification to the original file to expose it for testing
-import { BEARING_DATA, processBearingDataForTest, rangeBearingCalc } from '../calculations/rangeBearingCalc'
-import { toShortDTG } from '../toDTG'
+import { processBearingDataForTest, rangeBearingCalc } from '../calculations/rangeBearingCalc'
 
 describe('processBearingData', () => {
   it('should return the original data if less than 2 points', () => {
@@ -107,7 +106,8 @@ describe('processBearingData', () => {
     const trackVang = track1
     const polySap11 = zones[0]
     const calcData = rangeBearingCalc.calculate([trackVang, polySap11], trackVang.id as string)
-    console.table(calcData.filter(d => d.extraProp === BEARING_DATA)[0].data.map(d => {return {date: toShortDTG(new Date(d.date)), value: d.value}}))
+    // console.table(calcData.filter(d => d.extraProp === BEARING_DATA)[0].data.map(d => {return {date: toShortDTG(new Date(d.date)), value: d.value}}))
+    expect(calcData[0].data.length).toEqual(1081)
   })
 })
 
