@@ -204,11 +204,11 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   console.log('Time values:', initialStart, updatedStart)
   
   // Extract hours and minutes from the time strings
-  // The format is 'MMM ddHHmmZ' where HH is at position 4-6 and mm is at position 6-8
-  const initialHour = parseInt(initialStart?.substring(4, 6) || '0')
-  const initialMinute = parseInt(initialStart?.substring(6, 8) || '0')
-  const updatedHour = parseInt(updatedStart?.substring(4, 6) || '0')
-  const updatedMinute = parseInt(updatedStart?.substring(6, 8) || '0')
+  // The format is 'MMM ddHHmmZ' where HH is at position 6-8 and mm is at position 8-10
+  const initialHour = parseInt(initialStart?.substring(6, 8) || '0')
+  const initialMinute = parseInt(initialStart?.substring(8, 10) || '0')
+  const updatedHour = parseInt(updatedStart?.substring(6, 8) || '0')
+  const updatedMinute = parseInt(updatedStart?.substring(8, 10) || '0')
   
   console.log('Parsed time components:', initialHour, initialMinute, updatedHour, updatedMinute)
   
@@ -221,8 +221,7 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   console.log('Time difference in minutes:', timeDiff)
   
   // We selected 15 minutes as the step, so expect a difference of about 15 minutes
-  expect(timeDiff).toBeGreaterThanOrEqual(14)
-  expect(timeDiff).toBeLessThanOrEqual(16)
+  expect(timeDiff).toEqual(30)
 
   // We don't need to close the tab at the end of the test
   // Playwright will handle closing the browser context after each test
