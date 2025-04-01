@@ -246,7 +246,7 @@ test('Test viewport lock/unlock functionality in control panel', async ({ page }
   await expect(viewportLockButton).toHaveAttribute('class', expect.stringMatching(/.*ant-btn-outlined.*/))
   
   // Find the copy to clipboard button
-  const copyButton = page.locator('button', { has: page.locator('.anticon-copy') })
+  const copyButton = page.locator('.copy-map-to-clipboard')
   
   // Copy button should be disabled when viewport is unlocked
   await expect(copyButton).toBeDisabled()

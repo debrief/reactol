@@ -228,6 +228,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           <Tooltip title={copyTooltip}>
             <Button
               onClick={copyMapToClipboard}
+              className='copy-map-to-clipboard'
               title='Copy map to clipboard'
               icon={<CopyOutlined />}
               disabled={!viewportFrozen}
