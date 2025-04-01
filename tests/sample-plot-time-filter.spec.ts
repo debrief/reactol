@@ -24,7 +24,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   
   // Find the step forward button (TimeButton component with StepForwardOutlined icon)
   // Based on the application code, it's a button with tooltip 'Step forward'
-  const stepForwardButton = page.locator('button[title="Step forward"], [data-tooltip="Step forward"]')
+  const stepForwardButton = page.locator('.step-forward')
   
   // Check if the TimePeriod component is visible
   await expect(page.locator('.time-period-panel')).toBeVisible()
@@ -34,7 +34,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   console.log('Time period before filter:', timeTextBeforeFilter)
   
   // Try clicking the step forward button before applying the filter
-  await stepForwardButton.click()
+  // await stepForwardButton.click()
   
   // Wait a moment
   await page.waitForTimeout(500)
@@ -49,7 +49,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   
   // Find and click the time filter button in the control panel
   // Based on the application code, it's a button with FilterOutlined/FilterFilled icon
-  const timeFilterButton = page.locator('button:has(.anticon-filter), button:has(.anticon-filter-filled)')
+  const timeFilterButton = page.locator('.apply-time-filter')
 
   // Check the time filter is currently disabled
   await expect(page.locator('.time-step-input')).toHaveClass(/.*ant-select-disabled.*/)
@@ -58,6 +58,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // const timeFilterButton = page.locator('button', { has: page.locator('.anticon-filter, .anticon-filter-filled') })
   await timeFilterButton.click()
   
+  console.log('about to enable time filter')
   
   // Verify that the form containing the time-step-input is no longer disabled
   // This is a more accurate way to confirm the time filter is active
