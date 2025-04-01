@@ -177,6 +177,9 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   const initialStart = await timeStart.textContent()
   const initialEnd = await timeEnd.textContent()
   
+  // Wait for the time to update
+  await page.waitForTimeout(200)
+
   // Open the time step dropdown
   await page.locator('.time-step-input').click()
   await page.waitForSelector('.ant-select-dropdown')
@@ -186,6 +189,12 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   
   // Wait for the time to update
   await page.waitForTimeout(500)
+
+  // Get updated time values
+  const trimmedStart = await timeStart.textContent()
+  const trimmedEnd = await timeEnd.textContent()
+  expect(trimmedStart).toEqual('Nov 141615Z')
+  expect(trimmedEnd).toEqual('Nov 141630Z')
   
   // Verify time step was applied by clicking step forward and checking time change
   await page.locator('.step-forward').click()
@@ -198,16 +207,20 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   // Verify times have changed according to the new step interval
   expect(updatedStart).not.toEqual(initialStart)
   expect(updatedEnd).not.toEqual(initialEnd)
+
+  expect(updatedStart).toEqual('Nov 141630Z')
+  expect(updatedEnd).toEqual('Nov 141645Z')
+  
   
   // The difference should be 15 minutes (our selected interval)
   // We can verify this by checking the format (MMM ddHHmm'Z')
   // Format example: 'Nov 141600Z'
-  console.log('Time values:', initialStart, updatedStart)
+  console.log('Time values:', trimmedStart, updatedStart)
   
   // Extract hours and minutes from the time strings
   // The format is 'MMM ddHHmmZ' where HH is at position 6-8 and mm is at position 8-10
-  const initialHour = parseInt(initialStart?.substring(6, 8) || '0')
-  const initialMinute = parseInt(initialStart?.substring(8, 10) || '0')
+  const initialHour = parseInt(trimmedStart?.substring(6, 8) || '0')
+  const initialMinute = parseInt(trimmedStart?.substring(8, 10) || '0')
   const updatedHour = parseInt(updatedStart?.substring(6, 8) || '0')
   const updatedMinute = parseInt(updatedStart?.substring(8, 10) || '0')
   
@@ -222,7 +235,7 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   console.log('Time difference in minutes:', timeDiff)
   
   // We selected 15 minutes as the step, so expect a difference of about 15 minutes
-  expect(timeDiff).toEqual(30)
+  expect(timeDiff).toEqual(15)
 
   // We don't need to close the tab at the end of the test
   // Playwright will handle closing the browser context after each test
