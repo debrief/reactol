@@ -108,6 +108,7 @@ const getIcon = (feature: Feature | undefined,
   if (!feature) {
     return handleAdd ? (button || <Tooltip title={addIconLabelFor(key, title)}>
       <PlusCircleOutlined
+        className="add-icon"
         style={{ cursor: 'copy' }}
         onClick={(e) => handleAdd(e, key, title)}
       />
