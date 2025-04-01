@@ -64,11 +64,16 @@ test('Deleting items in Layers component', async ({ page }) => {
   
   // Verify that the delete button is disabled again after deletion
   await expect(deleteButton).toBeDisabled()
-  
-  // Test keyboard shortcut for deletion
-  // Select another item
-  const anotherNode = page.locator('.ant-tree-node-content-wrapper').filter({ has: page.locator('.ant-tree-title') }).nth(9)
-  await anotherNode.click()
+
+  // since the 9th item is a folder, the delete will still be disabled
+  await expect(deleteButton).toBeDisabled()
+
+  // wait for the ui to update
+  await page.waitForTimeout(100)
+
+  // now select the 10th item
+  const anotherNode2 = page.locator('.ant-tree-node-content-wrapper').filter({ has: page.locator('.ant-tree-title') }).nth(11)
+  await anotherNode2.click()
   
   // Verify that the delete button is enabled
   await expect(deleteButton).not.toBeDisabled()
