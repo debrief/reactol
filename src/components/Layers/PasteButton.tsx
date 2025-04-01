@@ -111,6 +111,7 @@ export const PasteButton: React.FC = () => {
   return (
     <ToolButton
       onClick={onPasteClick}
+      className='layers-paste-button'
       disabled={pasteDisabled}
       icon={<DiffOutlined />}
       title={pasteDisabled ? 'No valid GeoJSON data in clipboard' : 'Paste GeoJSON data'}
