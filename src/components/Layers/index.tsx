@@ -235,7 +235,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const [model, setModel] = React.useState<TreeDataNode[]>([])
   const [pendingTrackEnvironment, setPendingTrackEnvironment] =
     useState<EnvOptions | null>(null)
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS])
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
 
   const onCopyClick = useCallback(() => {
     // get the selected features
