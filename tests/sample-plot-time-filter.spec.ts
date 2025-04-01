@@ -21,8 +21,10 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   await page.locator('button:has-text("OK")').click()
   
   // Wait for the plot to load after modal confirmation
-  await page.waitForTimeout(1000)
-
+  await page.waitForSelector('.flexlayout__tab_button_content')
+  await page.waitForSelector('.step-forward')
+  
+  // Verify that the plot has been created
   expect (await page.locator('.flexlayout__tab_button_content').first().textContent()).toEqual(plotName)
   
   // Find the step forward button (TimeButton component with StepForwardOutlined icon)
@@ -65,8 +67,6 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   // const timeFilterButton = page.locator('button', { has: page.locator('.anticon-filter, .anticon-filter-filled') })
   await timeFilterButton.click()
   
-  console.log('about to enable time filter')
-
   // check the time start and end are clipped to new values
   expect(await timeStart.textContent()).toEqual('Nov 141600Z')
   expect(await timeEnd.textContent()).toEqual('Nov 141700Z')
