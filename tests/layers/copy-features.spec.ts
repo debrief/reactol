@@ -17,7 +17,7 @@ test('Copying features in Layers component', async ({ page }) => {
   await page.waitForSelector('.flexlayout__tab_button_content')
   
   // Find the copy button
-  const copyButton = page.locator('button', { has: page.locator('.anticon-copy') })
+  const copyButton = page.locator('.layers-copy-button')
   
   // Initially, the copy button should be disabled
   await expect(copyButton).toBeDisabled()
@@ -29,10 +29,11 @@ test('Copying features in Layers component', async ({ page }) => {
   // Wait for the points to be visible
   await page.waitForTimeout(100)
   
-  // Select a reference point
+  // Select a track
   const referencePoint = page.locator('.ant-tree-node-content-wrapper')
     .filter({ has: page.locator('.ant-tree-title') })
-    .nth(10)
+    .nth(11)
+  console.log('got button', referencePoint)  
   await referencePoint.click()
   
   // Verify that the copy button is now enabled (reference points should be copyable)
