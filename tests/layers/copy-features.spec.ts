@@ -33,7 +33,6 @@ test('Copying features in Layers component', async ({ page }) => {
   const referencePoint = page.locator('.ant-tree-node-content-wrapper')
     .filter({ has: page.locator('.ant-tree-title') })
     .nth(11)
-  console.log('got button', referencePoint)  
   await referencePoint.click()
   
   // Verify that the copy button is now enabled (reference points should be copyable)
