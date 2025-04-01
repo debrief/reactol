@@ -295,15 +295,14 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   // check delete is disabled
   await expect(deleteButton).toBeDisabled()
 
-  // expand the `NAV` node
-  await page.locator('.ant-tree-title').locator('span:has-text("NAV")').click()
-
-  // Wait for the UI to update
-  await page.waitForTimeout(200)
-
   // create undo queue by deleting `VAN GALEN` from Layers component.
   // find a span with the text `VAN GALEN`
-  await page.locator('.ant-tree-list').locator('span:has-text("VAN GALEN")').click()
+  const vanGalen = page.locator('span:has-text("VAN GALEN")').first()
+  await expect(vanGalen).toBeVisible()
+  await vanGalen.click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
 
   // check delete is enabled
   await expect(deleteButton).not.toBeDisabled()
@@ -313,7 +312,10 @@ test('Test undo/redo button in control panel', async ({ page }) => {
 
   // Wait for the UI to update
   await page.waitForTimeout(200)
-    
+
+  // check we can no longer find `VAN GALEN`
+  await expect(vanGalen).not.toBeVisible()
+
   // check the undo/redo button is enabled
   await expect(undoRedoButton).not.toBeDisabled()
 
@@ -321,12 +323,41 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   await undoRedoButton.click()
   
   // Verify the undo modal appears
-  await expect(page.locator('.ant-modal-content')).toBeVisible()
-  await expect(page.locator('.ant-modal-title')).toContainText('Undo')
+  const undoModal = page.locator('.ant-modal-content').filter({ hasText: 'Select a version' })
+  await expect(undoModal).toBeVisible()
   
   // Close the modal
-  await page.locator('button:has-text("Cancel")').click()
+  await undoModal.locator('button:has-text("Cancel")').click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
+  // check undo modal closed
+  await expect(undoModal).not.toBeVisible()
+
+  // check vanGalen still not visible
+  await expect(vanGalen).not.toBeVisible()
   
-  // Wait for modal to close
-  await expect(page.locator('.ant-modal-content')).not.toBeVisible()
+  // re-open the undo modal
+  await undoRedoButton.click()
+  await expect(undoModal).toBeVisible()
+
+  // Select the first version
+  await undoModal.locator('.ant-list-items').locator('.ant-list-item').first().click()
+
+  // do restore
+  await page.locator('button:has-text("Restore Version")').click()
+
+  // check undo modal closed
+  await expect(undoModal).not.toBeVisible()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
+  // check vanGalen is visible
+  await expect(vanGalen).toBeVisible()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
 })
