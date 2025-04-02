@@ -1,7 +1,8 @@
-import {  useEffect, useMemo, useState } from 'react'
-import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
+import { useEffect, useMemo, useState } from 'react'
+// No geojson types needed directly in this component
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Splitter, Button, Tooltip as ATooltip, Modal, Transfer } from 'antd'
+import type { TransferItem } from 'antd/es/transfer'
 import { useAppContext } from '../../state/AppContext'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import {
@@ -9,13 +10,16 @@ import {
   FilterFilled} from '@ant-design/icons'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
-import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
-import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { FeatureIcon } from '../Layers/FeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
+import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
-import { BEARING_DATA, RANGE_DATA, rangeBearingCalc } from '../../helpers/calculations/rangeBearingCalc'
 import { BACKDROP_TYPE } from '../../constants'
+import { getFilteredFeatures } from './trackUtils'
+import { useDepthData } from './useDepthData'
+import { useRangeBearingData } from './useRangeBearingData'
+import { useThemeColors } from './useThemeColors'
+import { TrackSelectionModal } from './TrackSelectionModal'
 
 type OptionType = {
   label: string
@@ -24,41 +28,7 @@ type OptionType = {
   icon: React.ReactNode
 }
 
-const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: number, end: number): Feature<Geometry, GeoJsonProperties> => {
-  if (feature.properties?.dataType === 'track') {
-    const lineFeature = feature as Feature<LineString, GeoJsonProperties>
-    if (!feature.properties?.times) {
-      return feature
-    }
-    let startIndex = -1, endIndex = 0
-    const times = feature.properties.times
-    for (let i = 0; i < times.length; i++) {
-      const time = new Date(times[i]).getTime()
-      if (startIndex === -1 && time >= start && time <= end) {
-        startIndex = i
-      }
-      if (time > start && time <= end) {
-        endIndex = i
-      }
-    }
-    const res: Feature<LineString, GeoJsonProperties> = {
-      ...lineFeature,
-      properties: {
-        ...feature.properties,
-        times: feature.properties.times.slice(startIndex, endIndex + 1),
-        speeds: feature.properties.speeds.slice(startIndex, endIndex + 1),
-        courses: feature.properties.courses.slice(startIndex, endIndex + 1),
-      },
-      geometry: {
-        type: 'LineString',
-        coordinates: lineFeature.geometry.coordinates.slice(startIndex, endIndex + 1)
-      }
-    }
-    return res
-  } else {
-    return feature
-  }
-}
+// Track filtering logic has been moved to trackUtils.ts
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
@@ -72,6 +42,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
   const [isTransferModalVisible, setIsTransferModalVisible] = useState<boolean>(false)
   const [tempSecondaryTracks, setTempSecondaryTracks] = useState<string[]>([])
+  const [isTrackSelectionModalOpen, setIsTrackSelectionModalOpen] = useState<boolean>(false)
   const [showTooltip, setShowTooltip] = useState<boolean>(true)
   const [calculatedPlotHeight, setCalculatedPlotHeight] = useState<number | null>(null)
 
@@ -133,74 +104,20 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   , [primaryTrack, secondaryTracks, features])
 
   const liveFeatures = useMemo(() => {
-    if (time && time.filterApplied && filterForTime) {
-      const result = featuresToPlot.filter(feature =>
-        featureIsVisibleInPeriod(feature, time.start, time.end)
-      ).map(feature => filteredTrack(feature, time.start, time.end))
-      return result
-    } else {
-      return featuresToPlot
-    }
+    return getFilteredFeatures(featuresToPlot, time, filterForTime)
   }, [featuresToPlot, time, filterForTime])
 
-  const depthData = useMemo(() => {
-    if (showDepth) {
-      return depthCalc.calculate(liveFeatures)
-    } else {
-      return []
-    }
-  }, [liveFeatures, showDepth])
-
-  const depthPresent = useMemo(() => {
-    const tracks = liveFeatures.filter((feature) => feature.geometry?.type === 'LineString')
-
-    // filter to tracks with depths
-    const withDepth = tracks.filter((feature) => {
-      const lineString = feature as Feature<LineString>
-      const hasPoints = lineString.geometry?.coordinates.length > 0
-      if (hasPoints) {
-        return lineString.geometry.coordinates[0].length === 3
-      }
-      return false
-    })
-    return withDepth.length > 0
-  }, [liveFeatures])
+  // Use the depth data hook to manage depth calculations
+  const { depthData, depthPresent } = useDepthData(liveFeatures, showDepth)
 
 
-  const rangeBearingData = useMemo(() => {
-    if (primaryTrack === '') return []
-    const res = rangeBearingCalc.calculate(liveFeatures, primaryTrack)
-    return res
-  }, [liveFeatures, primaryTrack])
-
-  const bearingData = useMemo(() => {
-    // filter the bearing data
-    return rangeBearingData.filter(d => d.extraProp === BEARING_DATA)
-  }, [rangeBearingData])
-
-  const rangeData = useMemo(() => {
-    // filter the bearing data
-    return rangeBearingData.filter(d => d.extraProp === RANGE_DATA)
-  }, [rangeBearingData])
-
-  const mainData = useMemo(() => {
-    const res = [...bearingData, ...rangeData]
-    return res
-  }, [bearingData, rangeData])
+  // Use the range bearing data hook to manage calculations
+  const { rangeData, bearingData } = useRangeBearingData(liveFeatures, primaryTrack)
 
   const fontSize = 12
   
-  // Theme colors based on dark mode
-  const themeColors = useMemo(() => ({
-    text: isDarkMode ? '#f0f0f0' : '#333333',
-    grid: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
-    background: isDarkMode ? '#2a2a2a' : '#ffffff',
-    tooltip: {
-      background: isDarkMode ? '#333333' : '#ffffff',
-      text: isDarkMode ? '#f0f0f0' : '#333333',
-      border: isDarkMode ? '#444444' : '#cccccc'
-    }
-  }), [isDarkMode])
+  // Use the theme colors hook to manage dark/light mode styling
+  const themeColors = useThemeColors(isDarkMode)
 
   // Legend data is now handled directly by Recharts Legend component
 
@@ -267,6 +184,26 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               )}
             />
           </ATooltip>
+          <ATooltip title="Manage tracks">
+            <Button 
+              onClick={() => {
+                setIsTrackSelectionModalOpen(true)
+              }}
+            >
+              Manage tracks
+            </Button>
+          </ATooltip>
+          
+          <TrackSelectionModal
+            isModalOpen={isTrackSelectionModalOpen}
+            setIsModalOpen={setIsTrackSelectionModalOpen}
+            trackOptions={features.filter(f => f.properties?.dataType === 'track')}
+            primaryTrack={primaryTrack}
+            secondaryTracks={secondaryTracks}
+            setPrimaryTrack={setPrimaryTrack}
+            setSecondaryTracks={setSecondaryTracks}
+          />
+          
           <ATooltip title="Manage secondary items">
             <Button 
               onClick={() => {
@@ -287,7 +224,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             }}
             onCancel={() => setIsTransferModalVisible(false)}
             width={600}
-            modalRender={(modal) => (
+            modalRender={(modal: React.ReactNode) => (
               <div onWheel={(e) => e.stopPropagation()}>
                 {modal}
               </div>
@@ -303,7 +240,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               titles={['Available', 'Selected']}
               targetKeys={tempSecondaryTracks}
               onChange={(nextTargetKeys) => setTempSecondaryTracks(nextTargetKeys as string[])}
-              render={item => (
+              render={(item: TransferItem) => (
                 <Space>
                   {featureOptions.find(opt => opt.value === item.key)?.icon}
                   {item.title}
@@ -315,9 +252,9 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                 height: 300,
               }}
               showSearch
-              filterOption={(inputValue, item) =>
-                item.title.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1 ||
-                item.description.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+              filterOption={(inputValue: string, item: TransferItem) =>
+                (item.title?.toLowerCase().indexOf(inputValue.toLowerCase()) ?? -1) !== -1 ||
+                (item.description?.toLowerCase().indexOf(inputValue.toLowerCase()) ?? -1) !== -1
               }
             />
           </Modal>
@@ -420,7 +357,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             </div>
           </Splitter.Panel>
         )}
-        {mainData.length > 0 && (
+        {(rangeData.length > 0 && bearingData.length > 0) && (
           <Splitter.Panel>
             <div style={{ width: '100%', height: relativePlotHeight }}>
               <ResponsiveContainer width="100%" height="100%">
