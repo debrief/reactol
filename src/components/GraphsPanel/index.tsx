@@ -123,8 +123,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   , [featureOptions])
 
   const secondaryOptions = useMemo(() => 
-    featureOptions.filter(track => track.value !== primaryTrack).filter(feature => feature.dataType !== BACKDROP_TYPE)
-  , [primaryTrack, featureOptions])
+    featureOptions.filter(feature => feature.dataType !== BACKDROP_TYPE && feature.value !== primaryTrack)
+  , [featureOptions, primaryTrack])
 
   const featuresToPlot = useMemo(() => 
     features.filter(track => 
