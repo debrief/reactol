@@ -30,7 +30,7 @@ test('Copying features in Layers component', async ({ page }) => {
   await page.waitForTimeout(100)
   
   // Select a track
-  const referencePoint = page.locator('span:has-text("SONON 1-1")')
+  const referencePoint = page.locator('span:has-text("SONO 1-1")').first()
   await referencePoint.click()
   
   // Verify that the copy button is now enabled (reference points should be copyable)
@@ -54,10 +54,10 @@ test('Copying features in Layers component', async ({ page }) => {
   await referencePoint.click()
   
   // Hold down Ctrl/Cmd key and click another item
-  await page.keyboard.down('Control')
-  const secondPoint = page.locator('span:has-text("SONON 1-2")')
+  await page.keyboard.down('Meta')
+  const secondPoint = page.locator('span:has-text("SONO 1-2")').first()
   await secondPoint.click()
-  await page.keyboard.up('Control')
+  await page.keyboard.up('Meta')
   
   // Verify that the copy button is enabled
   await expect(copyButton).not.toBeDisabled()
