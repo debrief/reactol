@@ -5,7 +5,7 @@ import { useAppSelector } from '../../state/hooks'
 import {
   CopyOutlined
 } from '@ant-design/icons'
-import { ToolButton } from '.'
+import { ToolButton } from './ToolButton'
 import { useAppContext } from '../../state/AppContext'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 

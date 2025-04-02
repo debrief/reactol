@@ -190,34 +190,8 @@ const justLeaves = (id: Key): boolean => {
   return !(id as string).startsWith('node-')
 }
 
-interface ToolProps {
-  onClick: () => void
-  icon: React.ReactNode
-  title: string
-  disabled: boolean
-  className?: string
-}
-
-export const ToolButton: React.FC<ToolProps> = ({
-  onClick,
-  icon,
-  title,
-  disabled,
-  className
-}) => {
-  return (
-    <Tooltip title={title}>
-      <Button
-        size={'middle'}
-        className={className}
-        onClick={onClick}
-        disabled={disabled}
-        type='primary'
-        icon={icon}
-      />
-    </Tooltip>
-  )
-}
+// ToolButton has been moved to its own file
+import { ToolButton } from './ToolButton'
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()

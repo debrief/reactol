@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ToolButton } from '.'
+import { ToolButton } from './ToolButton'
 import { Feature } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { DiffOutlined } from '@ant-design/icons'
