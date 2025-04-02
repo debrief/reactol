@@ -8,8 +8,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
-import { BUOY_FIELD_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
-import { LineStyleProps, PointStyleProps, PolygonStyleProps } from '../../standardShapeProps'
+// Constants and types are now imported in the helper file
 
 const { Text } = Typography
 
@@ -19,56 +18,8 @@ interface MultiFeatureFormProps {
   onExport?: () => void
 }
 
-/** different types of feature store the current color in different style properties.
- * Produce the correct new properties for this feature type
- */
-const colorPropertiesForFeatureType = (featureType: string | undefined, color: string): { [Name: string]: number | string } => {
-  switch(featureType) {
-  case REFERENCE_POINT_TYPE:
-  case BUOY_FIELD_TYPE:  
-    return {
-      'marker-color': color,
-    }
-  case ZONE_TYPE: 
-    return {
-      'stroke': color,
-      'fill': color 
-    }
-  case TRACK_TYPE:
-    return {
-      'stroke': color,
-    }
-  default: 
-    return {}  
-  }
-}
-
-const featureColor = (feature: Feature<Geometry, GeoJsonProperties>): string => {
-  const defaultColor = '#ffff00'
-  if (feature.properties) {
-    const fProps = feature.properties
-    switch(fProps.dataType) {
-    case REFERENCE_POINT_TYPE: 
-    case BUOY_FIELD_TYPE: {
-      const props = fProps as PointStyleProps
-      return props['marker-color'] || defaultColor
-    }
-    case ZONE_TYPE: {
-      const props = fProps as LineStyleProps
-      return props['stroke'] || defaultColor
-    }
-    case TRACK_TYPE: {
-      const props = fProps as PolygonStyleProps
-      return props['stroke'] || defaultColor
-    }
-    default: {
-      return fProps.color || fProps['stroke'] || fProps['marker-color'] || defaultColor
-    }
-    }
-  }
-  // return yellow by default
-  return defaultColor
-}
+// Importing helper functions from the featureHelpers file
+import { featureColor, colorPropertiesForFeatureType } from '../../helpers/featureHelpers'
 
 const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
   features,
