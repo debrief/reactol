@@ -16,7 +16,7 @@ import { BACKDROP_TYPE } from '../../constants'
 import { useGraphData } from './useGraphData'
 import { FeatureSelectorModal } from './FeatureSelectorModal'
 import { featureAsOption, OptionType } from './featureUtils'
-import { filteredTrack } from './trackUtils'
+import { filterTrackDataToPeriod } from './trackUtils'
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
@@ -33,21 +33,23 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [calculatedPlotHeight, setCalculatedPlotHeight] = useState<number | null>(null)
 
   useEffect(() => {
+    // set the first track as the primary
     setPrimaryTrack(features.find(feature => feature.properties?.dataType === 'track')?.id as string)
   }, [features])
 
   useEffect(() => {
+    // select all non-primary tracks as the secondary
     setSecondaryTracks(features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
   }, [features, primaryTrack])
 
-  const referenceAreaTop = useMemo(() => {
+  const referenceAreaDepth = useMemo(() => {
     if (time.filterApplied && !filterForTime) {
       return <ReferenceArea yAxisId="course" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
     }
     return null
   }, [time, filterForTime])
 
-  const referenceAreaBottom = useMemo(() => {
+  const referenceAreaRangeBearing = useMemo(() => {
     if (time.filterApplied && !filterForTime) {
       return <ReferenceArea yAxisId="bearing" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
     }
@@ -70,7 +72,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     if (time && time.filterApplied && filterForTime) {
       const result = featuresToPlot.filter(feature =>
         featureIsVisibleInPeriod(feature, time.start, time.end)
-      ).map(feature => filteredTrack(feature, time.start, time.end))
+      ).map(feature => filterTrackDataToPeriod(feature, time.start, time.end))
       return result
     } else {
       return featuresToPlot
@@ -242,7 +244,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     fontSize={fontSize}
                     tick={{ fill: themeColors.text }}
                   />
-                  {referenceAreaTop}
+                  {referenceAreaDepth}
                   {showTooltip && <Tooltip 
                     labelFormatter={toShortDTG}
                     formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
@@ -322,7 +324,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     wrapperStyle={{ fontSize:'10px' }}
                     formatter={(value) => <span style={{ color: themeColors.text }}>{value}</span>}
                   />}
-                  {referenceAreaBottom}
+                  {referenceAreaRangeBearing}
                   {showTooltip && <Tooltip
                     allowEscapeViewBox={{ x: true, y: true }}
                     labelFormatter={(num) =>toShortDTG(num) + 'Z'}

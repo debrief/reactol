@@ -7,7 +7,7 @@ import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
  * @param end End time in milliseconds
  * @returns A new feature with only the points within the time range
  */
-export const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: number, end: number): Feature<Geometry, GeoJsonProperties> => {
+export const filterTrackDataToPeriod = (feature: Feature<Geometry, GeoJsonProperties>, start: number, end: number): Feature<Geometry, GeoJsonProperties> => {
   if (feature.properties?.dataType === 'track') {
     const lineFeature = feature as Feature<LineString, GeoJsonProperties>
     if (!feature.properties?.times) {
