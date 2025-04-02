@@ -468,7 +468,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
           gap='small'
           justify='end'
           wrap
-          style={{ marginTop: '2px', height: '0' }}
+          style={{ marginTop: '2px', minHeight: '32px', position: 'relative', zIndex: 10 }}
         >
           <Button.Group>
             <ToolButton
