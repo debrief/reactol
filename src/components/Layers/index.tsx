@@ -43,22 +43,21 @@ const justLeaves = (id: Key): boolean => {
 // Components have been moved to their own files
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
+  const treeRef = React.useRef<HTMLDivElement>(null)
+  const dispatch = useAppDispatch()
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
+  const [model, setModel] = React.useState<TreeDataNode[]>([])
+  const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
+
   const theFeatures = preview ? preview.data.features : features
 
   const selectedFeatures = theFeatures.filter((feature) =>
     selection.includes(feature.id as string)
   )
-  const dispatch = useAppDispatch()
-  const treeRef = React.useRef<HTMLDivElement>(null)
-
-  const [model, setModel] = React.useState<TreeDataNode[]>([])
-  const [pendingTrackEnvironment, setPendingTrackEnvironment] =
-    useState<EnvOptions | null>(null)
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
-
+  
   const onCopyClick = useCallback(() => {
     // get the selected features
     const selected = features.filter((feature) =>
@@ -136,7 +135,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     (e: React.MouseEvent, key: string, title: string) => {
       if (key === NODE_TRACKS) {
         // special case - the environment is passed in title
-        setPendingTrackEnvironment(title as EnvOptions)
+        setPendingTrack(title as EnvOptions)
       } else if (key === NODE_FIELDS) {
         addBuoyField()
       } else if (key === NODE_POINTS) {
@@ -175,10 +174,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     }
   }
 
-
-
   const setLoadTrackResults = async (values: NewTrackProps) => {
-    setPendingTrackEnvironment(null)
+    setPendingTrack(null)
     // props in NewTrackProps format to TrackProps format, where they have different type
     const newValues = values as unknown as TrackProps
     newValues.labelInterval = parseInt(values.labelInterval)
@@ -204,7 +201,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   }
 
   const handleDialogCancel = () => {
-    setPendingTrackEnvironment(null)
+    setPendingTrack(null)
   }
   return (
     <>
@@ -226,10 +223,10 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         maxHeight={splitterWidths}
         treeRef={treeRef}
       />
-      {pendingTrackEnvironment && (
+      {pendingTrack && (
         <LoadTrackModel
-          visible={pendingTrackEnvironment !== null}
-          environment={pendingTrackEnvironment}
+          visible={pendingTrack !== null}
+          environment={pendingTrack}
           cancel={handleDialogCancel}
           newTrack={setLoadTrackResults}
           addToTrack={() => {}}
