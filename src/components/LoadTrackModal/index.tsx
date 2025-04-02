@@ -17,12 +17,13 @@ import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
 import { useAppSelector } from '../../state/hooks'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
-import { AddTrackProps, EnvOptions, NewTrackProps } from '../../types'
+import { AddTrackProps, EnvOptions, NewTrackProps, TrackProps } from '../../types'
 import { defaultIntervals } from '../../helpers/timeIntervals'
 import './index.css'
 import { symbolOptions } from '../../helpers/symbolTypes'
-import { useMemo } from 'react'
-import { useTrackCreation } from './useTrackCreation'
+import { useCallback, useMemo } from 'react'
+import { useAppDispatch } from '../../state/hooks'
+import { TRACK_TYPE } from '../../constants'
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -58,7 +59,37 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     addToTrack(id.trackId)
   }
 
-  const { createTrack } = useTrackCreation()
+  const dispatch = useAppDispatch()
+
+  // Track creation logic
+  const createTrack = useCallback((values: NewTrackProps) => {
+    // Convert props from NewTrackProps format to TrackProps format
+    const newValues = values as unknown as TrackProps
+    newValues.labelInterval = parseInt(values.labelInterval)
+    newValues.symbolInterval = parseInt(values.symbolInterval)
+    
+    // Create the new track feature
+    const newTrack = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [],
+      },
+      properties: {
+        ...newValues,
+        dataType: TRACK_TYPE,
+        times: [],
+        courses: [],
+        speeds: [],
+      },
+    }
+    
+    // Dispatch the action to add the feature
+    dispatch({
+      type: 'fColl/featureAdded',
+      payload: newTrack,
+    })
+  }, [dispatch])
 
   const onFinishCreate: FormProps<NewTrackProps>['onFinish'] = (values) => {
     if (typeof values.stroke === 'object') {
