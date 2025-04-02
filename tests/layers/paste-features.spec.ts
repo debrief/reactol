@@ -38,7 +38,6 @@ test('Pasting features in Layers component', async ({ browser }) => {
   
   // Find the paste button
   const pasteButton = page.locator('.layers-paste-button')
-  await pasteButton.highlight()
   expect(await pasteButton.count()).toBe(1)
   
   // and the copy button
@@ -81,6 +80,11 @@ test('Pasting features in Layers component', async ({ browser }) => {
   expect(await pasteButton.isVisible()).toBeTruthy()
   expect(await pasteButton.isEnabled()).toBeTruthy()
   await pasteButton.click({ force: true })
+
+  await page.waitForTimeout(100)
+
+  // check paste disabled
+  await expect(pasteButton).toBeDisabled()
   
   // // After pasting, we should see a new item in the tree
   // // Wait for the UI to update

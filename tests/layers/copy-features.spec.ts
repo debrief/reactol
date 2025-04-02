@@ -24,6 +24,8 @@ test('Copying features in Layers component', async ({ browser }) => {
   
   // Find the copy button
   const copyButton = page.locator('.layers-copy-button')
+  const pasteButton = page.locator('.layers-paste-button')
+  const deleteButton = page.locator('.layers-delete-button')
   
   // Initially, the copy button should be disabled
   await expect(copyButton).toBeDisabled()
@@ -44,6 +46,9 @@ test('Copying features in Layers component', async ({ browser }) => {
   
   // Click the copy button
   await copyButton.click({ force: true })
+
+  await page.waitForTimeout(100)
+  await expect(pasteButton).not.toBeDisabled()
   
   // There's no direct way to verify clipboard content in Playwright, but we can
   // verify that the UI responds as expected after a copy operation
@@ -70,16 +75,45 @@ test('Copying features in Layers component', async ({ browser }) => {
   
   // Click the copy button to copy multiple items
   await copyButton.click({ force: true })
+
+  // delete the selected items
+  await deleteButton.click()
+
+  await page.waitForTimeout(100)
+
+  // check the items are not visible
+  await expect(referencePoint).not.toBeVisible()
+  await expect(secondPoint).not.toBeVisible()
+
+  // restore the items
+  await pasteButton.click()
+  await page.waitForTimeout(100)
+
+  // check the items are visible
+  await expect(referencePoint).toBeVisible()
+  await expect(secondPoint).toBeVisible()
   
   // Test keyboard shortcut for copying
   // Clear selection first
   await clearSelectionButton.click({ force: true })
   
+  // check copy disabled
+  await expect(copyButton).toBeDisabled()
+
   // Select an item again
   await referencePoint.click()
-  
+
+  // check copy enabled
+  await expect(copyButton).not.toBeDisabled()
+    
+  // check paste disabled
+  await expect(pasteButton).toBeDisabled()
+
   // Press Ctrl+C
   await page.keyboard.press('Control+c')
+
+  // check paste enabled
+  await expect(pasteButton).not.toBeDisabled()
   
   // Verify that the UI still shows the item as selected
   await expect(referencePoint).toHaveClass(/ant-tree-node-selected/)
