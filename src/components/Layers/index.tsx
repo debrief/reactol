@@ -1,19 +1,18 @@
-import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 // TreeDataNode is used in the useMemo type
 import './index.css'
-import { TRACK_TYPE } from '../../constants'
+// TRACK_TYPE is now used in useTrackManagement
 import { useDocContext } from '../../state/DocContext'
-import { useAppSelector, useAppDispatch } from '../../state/hooks'
+import { useAppSelector } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import {
-  NewTrackProps,
-  TrackProps,
-  EnvOptions
-} from '../../types'
+import { EnvOptions } from '../../types'
 // These components are now used in LayersToolbar
 import { AddZoneShape } from './AddZoneShape'
 import { LayersToolbar } from './LayersToolbar'
 import { useFeatureCreation } from './useFeatureCreation'
+import { useKeyboardHandlers } from './useKeyboardHandlers'
+import { useSelectionHandlers } from './useSelectionHandlers'
+import { useTrackManagement } from './useTrackManagement'
 
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
@@ -35,21 +34,17 @@ interface LayerProps {
   splitterWidths: number
 }
 
-// filter out the branches, just leave the leaves
-const justLeaves = (id: Key): boolean => {
-  return !(id as string).startsWith('node-')
-}
+// justLeaves has been moved to useSelectionHandlers
 
 // Components have been moved to their own files
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const treeRef = React.useRef<HTMLDivElement>(null)
-  const dispatch = useAppDispatch()
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
   // Model data is derived from features and handlers
-  const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
+  // Track management is handled by a custom hook
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
 
   const theFeatures = preview ? preview.data.features : features
@@ -58,61 +53,23 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     selection.includes(feature.id as string)
   )
   
-  const onCopyClick = useCallback(() => {
-    // get the selected features
-    const selected = features.filter((feature) =>
-      selection.includes(feature.id as string)
-    )
-    const asStr = JSON.stringify(selected)
-    navigator.clipboard.writeText(asStr).then(() => {
-      setClipboardUpdated(clipboardUpdated => !clipboardUpdated)
-    }).catch((e) => {
-      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
-    })
-  }, [features, selection, setClipboardUpdated, setMessage])
+  // Use the selection handlers hook to manage selection operations
+  const { onCopyClick, onDeleteClick, clearSelection, onSelect } = useSelectionHandlers({
+    features,
+    selection,
+    setSelection,
+    setMessage,
+    setClipboardUpdated
+  })
 
-  const onDeleteClick = useCallback(() => {
-    dispatch({
-      type: 'fColl/featuresDeleted',
-      payload: { ids: selection },
-    })
-    setSelection([])
-  }, [dispatch, selection, setSelection])
-
-  const clearSelection = useCallback(() => {
-    setSelection([])
-  }, [setSelection])
-
-  // Handle delete key press
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (selection.length > 0) {
-        // support delete key
-        if (e.key === 'Delete') {
-          onDeleteClick()
-          e.stopPropagation()
-        }
-        // clear selection on `escape`
-        if (e.key === 'Escape') {
-          clearSelection()
-          e.stopPropagation()
-        }
-        // copy items to clipboard on `copy`
-        if (e.key === 'c' && e.ctrlKey) {
-          onCopyClick()
-          e.stopPropagation()
-        }
-      }
-    }
-
-    const treeElement = treeRef.current
-    if (treeElement) {
-      treeElement.addEventListener('keydown', handleKeyDown)
-      return () => {
-        treeElement.removeEventListener('keydown', handleKeyDown)
-      }
-    }
-  }, [selection, onDeleteClick, onCopyClick, setMessage, clearSelection, setSelection, setClipboardUpdated])
+  // Use custom hook for keyboard shortcuts
+  useKeyboardHandlers({
+    selection,
+    onDeleteClick,
+    onCopyClick,
+    clearSelection,
+    elementRef: treeRef
+  })
 
 
   const temporalFeatureSelected = useMemo(
@@ -130,6 +87,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { addBackdrop, addPoint, addZone, addBuoyField } = useFeatureCreation(setNewFeature, setSelection)
 
 
+
+  // Track management is handled by a custom hook
+  const { pendingTrack, setPendingTrack, handleDialogCancel, setLoadTrackResults } = useTrackManagement()
 
   const handleAdd: HandleAddFunction = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {
@@ -151,7 +111,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         )
       }
       e.stopPropagation()
-    }, [addBuoyField, addPoint, addBackdrop]) 
+    }, [addBuoyField, addPoint, addBackdrop, setPendingTrack]) 
 
   // Use useMemo to create the model data only when dependencies change
   const model = useMemo(() => {
@@ -168,42 +128,9 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     return modelData
   }, [theFeatures, handleAdd, addZone])
 
-  const onSelect = (selectedKeys: React.Key[]) => {
-    const cleaned = selectedKeys.filter(key => justLeaves(key))
-    if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
-      setSelection(cleaned.map(key => key.toString()))
-    }
-  }
+  // onSelect is now provided by useSelectionHandlers
 
-  const setLoadTrackResults = async (values: NewTrackProps) => {
-    setPendingTrack(null)
-    // props in NewTrackProps format to TrackProps format, where they have different type
-    const newValues = values as unknown as TrackProps
-    newValues.labelInterval = parseInt(values.labelInterval)
-    newValues.symbolInterval = parseInt(values.symbolInterval)
-    const newTrack = {
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates: [],
-      },
-      properties: {
-        ...newValues,
-        dataType: TRACK_TYPE,
-        times: [],
-        courses: [],
-        speeds: [],
-      },
-    }
-    dispatch({
-      type: 'fColl/featureAdded',
-      payload: newTrack,
-    })
-  }
-
-  const handleDialogCancel = () => {
-    setPendingTrack(null)
-  }
+  // Track management functions are now provided by useTrackManagement
   return (
     <>
       <LayersToolbar 
