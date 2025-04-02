@@ -82,7 +82,7 @@ export const PasteButton: React.FC = () => {
     }
   }, [checkClipboard])
 
-  const onPasteClick = async () => {
+  const onPasteClick = useCallback(async () => {
     try {
       const text = await navigator.clipboard.readText()
       const parsed = JSON.parse(text)
@@ -104,9 +104,9 @@ export const PasteButton: React.FC = () => {
       })
     } catch (e) {
       setMessage({ title: 'Error', severity: 'error', message: 'Paste error: ' + e })
-      setPasteDisabled(true)
     }
-  }
+    setPasteDisabled(true)
+  }, [dispatch, setMessage, setPasteDisabled])
 
   return (
     <ToolButton
