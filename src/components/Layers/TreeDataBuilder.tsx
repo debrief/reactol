@@ -66,28 +66,25 @@ export class TreeDataBuilder {
    * @param title The node title
    * @returns The label for the add icon
    */
+  // Map of node types to their add icon labels
+  private static readonly nodeLabels = [
+    {
+      key: NODE_TRACKS,
+      getLabel: (title: string) => {
+        // special case - get the name for the env
+        const env = title as EnvOptions
+        return `Create new ${symbolOptions.find(e => e.value === env)?.label} track`
+      }
+    },
+    { key: NODE_FIELDS, getLabel: () => 'Create new buoy field' },
+    { key: NODE_ZONES, getLabel: () => 'Create new zone' },
+    { key: NODE_POINTS, getLabel: () => 'Create new reference point' },
+    { key: NODE_BACKDROPS, getLabel: () => 'Create new backdrop' }
+  ]
+
   static addIconLabelFor(key: string, title: string): string {
-    switch(key) {
-    case NODE_TRACKS: {
-      // special case - get the name for the env
-      const env = title as EnvOptions
-      return 'Create new ' + symbolOptions.find(e => e.value === env)?.label + ' track'
-    }
-    case NODE_FIELDS: {
-      return 'Create new buoy field'
-    }
-    case NODE_ZONES: {
-      return 'Create new zone'
-    }
-    case NODE_POINTS: {
-      return 'Create new reference point'
-    }
-    case NODE_BACKDROPS: {
-      return 'Create new backdrop'
-    }
-    default:
-      return 'ERROR - node type not handled: ' + key
-    }
+    const nodeType = this.nodeLabels.find(node => node.key === key)
+    return nodeType ? nodeType.getLabel(title) : `ERROR - node type not handled: ${key}`
   }
 
   /**
