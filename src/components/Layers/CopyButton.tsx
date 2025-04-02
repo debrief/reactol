@@ -8,7 +8,6 @@ import {
 import { ToolButton } from '.'
 import { useAppContext } from '../../state/AppContext'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
-import { isPlaywright } from '../../helpers/browserDetection'
 
 export const CopyButton: React.FC = () => {
   const { selection, setMessage } = useDocContext()
@@ -35,11 +34,7 @@ export const CopyButton: React.FC = () => {
     navigator.clipboard.writeText(asStr).then(() => {
       setClipboardUpdated(!clipboardUpdated)
     }).catch((e) => {
-      if (isPlaywright) {
-        console.error('Copy error:', e)
-      } else {
-        setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
-      }
+      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })
   }
 

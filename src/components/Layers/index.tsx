@@ -38,7 +38,6 @@ import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 import { symbolOptions } from '../../helpers/symbolTypes'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
-import { isPlaywright } from '../../helpers/browserDetection'
 
 type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
 const { DirectoryTree } = Tree
@@ -250,11 +249,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     navigator.clipboard.writeText(asStr).then(() => {
       setClipboardUpdated(!clipboardUpdated)
     }).catch((e) => {
-      if (isPlaywright) {
-        console.error('Copy error:', e)
-      } else {
-        setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
-      }
+      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })
   }, [features, selection, clipboardUpdated, setClipboardUpdated, setMessage])
 

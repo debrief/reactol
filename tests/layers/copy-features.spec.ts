@@ -1,8 +1,14 @@
 import { test, expect } from '@playwright/test'
 
-test('Copying features in Layers component', async ({ page }) => {
+test('Copying features in Layers component', async ({ browser }) => {
   const plotName = 'Copy Features Test'
-  
+
+  // let the app read and write to the clipboard
+  const context = await browser.newContext({
+    permissions: ['clipboard-write', 'clipboard-read'],
+  })
+  const page = await context.newPage()
+
   // Navigate to the application and create a sample plot
   await page.goto('/')
   await page.waitForSelector('button:has-text("Sample plot")')
