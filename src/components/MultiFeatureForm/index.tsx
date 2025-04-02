@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Button, Space, Typography, Tooltip, ColorPicker, Form, Checkbox } from 'antd'
 import {
   DeleteOutlined,
@@ -8,7 +8,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useAppDispatch } from '../../state/hooks'
 import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
-import { BUOY_FIELD_TYPE, REFERENCE_POINT_TYPE, TRACK_TYPE, ZONE_TYPE } from '../../constants'
+// Constants and types are now imported in the helper file
 
 const { Text } = Typography
 
@@ -18,29 +18,8 @@ interface MultiFeatureFormProps {
   onExport?: () => void
 }
 
-/** different types of feature store the current color in different style properties.
- * Produce the correct new properties for this feature type
- */
-const colorPropertiesForFeatureType = (featureType: string | undefined, color: string): { [Name: string]: number | string } => {
-  switch(featureType) {
-  case REFERENCE_POINT_TYPE:
-  case BUOY_FIELD_TYPE:  
-    return {
-      'marker-color': color,
-    }
-  case ZONE_TYPE: 
-    return {
-      'stroke': color,
-      'fill': color 
-    }
-  case TRACK_TYPE:
-    return {
-      'stroke': color,
-    }
-  default: 
-    return {}  
-  }
-}
+// Importing helper functions from the featureHelpers file
+import { featureColor, colorPropertiesForFeatureType } from '../../helpers/featureHelpers'
 
 const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
   features,
@@ -55,9 +34,11 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
   const mixedVisibility = !allVisible && !allHidden
 
   // Check if all features have the same color
-  const colors = new Set(features.map(f => f.properties?.color))
-  const sameColor = colors.size === 1
-  const currentColor = sameColor ? features[0].properties?.color : undefined
+  const currentColor = useMemo(() => {
+    const colors = new Set(features.map(f => featureColor(f)))
+    const sameColor = colors.size === 1
+    return sameColor ? featureColor(features[0]) : undefined
+  }, [features])
 
   const handleVisibilityChange = () => {
     // If mixed or all visible, hide all. If all hidden, show all
