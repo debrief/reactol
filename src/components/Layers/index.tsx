@@ -60,8 +60,6 @@ interface LayerProps {
   splitterWidths: number
 }
 
-
-
 const findChildrenOfType = (
   features: Feature[],
   dType: string
@@ -75,8 +73,6 @@ const findChildrenOfType = (
     children: [],
   }))
 }
-
-
 
 const addIconLabelFor = (key: string, title: string) => {
   switch(key) {
@@ -461,14 +457,23 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   return (
     <>
       <div
-        style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}
+        style={{ position: 'relative' }}
       >
         <Flex
           className='toolbar'
           gap='small'
           justify='end'
           wrap
-          style={{ marginTop: '2px', minHeight: '32px', position: 'relative', zIndex: 10 }}
+          style={{
+            position: 'absolute',
+            top: '2px',
+            right: '0',
+            zIndex: 10,
+            background: 'rgba(255, 255, 255, 0.9)',
+            padding: '2px',
+            borderRadius: '4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
         >
           <Button.Group>
             <ToolButton
