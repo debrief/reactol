@@ -7,7 +7,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
-import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { BACKDROP_TYPE } from '../../constants'
 import { useGraphData } from './useGraphData'
@@ -15,6 +14,7 @@ import { FeatureSelectorModal } from './FeatureSelectorModal'
 import { featureAsOption, OptionType } from './featureUtils'
 import { filterTrackDataToPeriod } from './trackUtils'
 import { GraphsToolbar } from './GraphsToolbar'
+import { DepthChart } from './DepthChart'
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
@@ -169,75 +169,15 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       <Splitter layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
           <Splitter.Panel>
-            <div style={{ width: '100%', height: splitterHeights?.[0] || 200 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  margin={{ top: 20, right: 60, left: 60, bottom: 50 }}
-                  style={{ backgroundColor: themeColors.background }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} />
-                  <YAxis 
-                    yAxisId="depth"
-                    tickFormatter={(t: number) => `${Math.abs(t)}`}
-                    label={{ value: depthCalc.label, angle: -90, position: 'insideLeft', style: { fill: themeColors.text } }}
-                    fontSize={fontSize}
-                    type="number"
-                    domain={['auto', 'auto']}
-                    allowDataOverflow={true}
-                    tick={{ fill: themeColors.text }}
-                  />
-                  {/* we don't use this course axis, it's just for the reference area shading */}
-                  <YAxis 
-                    yAxisId="course"
-                    tickFormatter={(t: number) => `${Math.abs(t)}`}
-                    type="number"
-                    domain={[0, 360]}
-                    orientation='right'
-                    hide={true}
-                  />
-                  <XAxis 
-                    dataKey="date" 
-                    tickFormatter={toShortDTG} 
-                    type="number"
-                    domain={['auto', 'auto']}
-                    allowDataOverflow={true}
-                    label={{ value: 'Time', position: 'insideBottom', offset: -10, style: { fill: themeColors.text } }}
-                    fontSize={fontSize}
-                    tick={{ fill: themeColors.text }}
-                  />
-                  {referenceAreaDepth}
-                  {showTooltip && <Tooltip 
-                    labelFormatter={toShortDTG}
-                    formatter={(value: number) => [`${Math.abs(Number(value))}`, 'Depth']}
-                    contentStyle={{ 
-                      backgroundColor: themeColors.tooltip.background,
-                      color: themeColors.tooltip.text,
-                      border: `1px solid ${themeColors.tooltip.border}`
-                    }}
-                  />}
-                  {showLegend && <Legend 
-                    verticalAlign="top" 
-                    height={12} 
-                    wrapperStyle={{ fontSize:'10px' }}
-                    formatter={(value) => <span style={{ color: themeColors.text }}>{value}</span>}
-                  />}
-                  {depthData.map((dataset, index) => (
-                    <Line
-                      key={index}
-                      yAxisId="depth"
-                      type="monotone"
-                      dataKey="value"
-                      data={dataset.data}
-                      name={dataset.featureName}
-                      stroke={dataset.color || '#1890ff'}
-                      dot={false}
-                      activeDot={{ r: 8 }}
-                      isAnimationActive={false}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <DepthChart
+              depthData={depthData}
+              height={splitterHeights?.[0] || 200}
+              themeColors={themeColors}
+              showTooltip={showTooltip}
+              showLegend={showLegend}
+              referenceArea={referenceAreaDepth}
+              fontSize={fontSize}
+            />
           </Splitter.Panel>
         )}
         {bearingData.length > 0 && rangeData.length > 0 && (
