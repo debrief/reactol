@@ -1,6 +1,7 @@
 import { featureColor, colorPropertiesForFeatureType } from '../featureHelpers'
 import { sampleItems } from '../../data/sampleItems'
 import { REFERENCE_POINT_TYPE, BUOY_FIELD_TYPE, ZONE_TYPE, TRACK_TYPE } from '../../constants'
+import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 
 // Get sample features of different types from the sampleItems collection
 const getPointFeature = () => sampleItems.find(item => item.name === 'Points')?.data[0]
@@ -59,7 +60,7 @@ describe('featureColor', () => {
       }
     }
     
-    const color = featureColor(featureWithoutColor as any)
+    const color = featureColor(featureWithoutColor as Feature<Geometry, GeoJsonProperties>)
     expect(color).toBe('#ffff00') // Default yellow color
   })
 
@@ -73,7 +74,7 @@ describe('featureColor', () => {
       }
     }
     
-    const color = featureColor(featureWithoutProperties as any)
+    const color = featureColor(featureWithoutProperties as Feature<Geometry, GeoJsonProperties>)
     expect(color).toBe('#ffff00') // Default yellow color
   })
 })
