@@ -3,7 +3,7 @@ import { Feature } from 'geojson'
 import { TreeDataNode } from 'antd'
 import { FolderOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
-import { getFeatureIcon } from '../../helpers/getFeatureIcon'
+import { FeatureIcon } from './FeatureIcon'
 import { symbolOptions } from '../../helpers/symbolTypes'
 import { EnvOptions } from '../../types'
 
@@ -124,7 +124,7 @@ export class TreeDataBuilder {
     const dataType = feature.properties?.dataType
     const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
     const environment = feature.properties?.env
-    return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
+    return dataType ? <FeatureIcon dataType={dataType} color={color} environment={environment} /> : <FolderOutlined />
   }
 
   /**

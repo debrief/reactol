@@ -11,7 +11,7 @@ import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
-import { getFeatureIcon } from '../../helpers/getFeatureIcon'
+import { FeatureIcon } from '../Layers/FeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { bearingCalc } from '../../helpers/calculations/bearingCalc'
 import { BEARING_DATA, RANGE_DATA, rangeBearingCalc } from '../../helpers/calculations/rangeBearingCalc'
@@ -86,7 +86,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       const dataType = feature.properties?.dataType
       const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
       const environment = feature.properties?.env
-      const icon = getFeatureIcon({ dataType, color, environment })
+      const icon = <FeatureIcon dataType={dataType} color={color} environment={environment} />
       return {
         label: feature.properties?.shortName || feature.properties?.name || feature.id,
         value: feature.id as string,
