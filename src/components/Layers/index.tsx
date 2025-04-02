@@ -77,10 +77,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     [selectedFeatures]
   )
 
-  const onGraphClick = () => {
-    openGraph()
-  }
-
   const isExpanded = useMemo(() => expandedKeys.length > 0, [expandedKeys])
 
   // Use the feature creation hook to get methods for creating new features
@@ -137,7 +133,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         onCollapse={() => setExpandedKeys([])} 
         onClearSelection={clearSelection}
         onDelete={onDeleteClick}
-        onGraph={onGraphClick}
+        onGraph={openGraph}
         isExpanded={isExpanded}
         hasSelection={selection.length > 0}
         hasTemporalFeature={temporalFeatureSelected}
