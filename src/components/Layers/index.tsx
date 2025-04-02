@@ -1,14 +1,10 @@
 import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Flex, Tooltip, Tree } from 'antd'
+import { Tooltip, Tree } from 'antd'
 import type { GetProps, TreeDataNode } from 'antd'
 import './index.css'
 import {
   PlusCircleOutlined,
-  DeleteOutlined,
-  CloseCircleOutlined,
-  ShrinkOutlined,
   FolderOutlined,
-  LineChartOutlined,
 } from '@ant-design/icons'
 import { Feature, MultiPoint, Point } from 'geojson'
 import {
@@ -29,9 +25,9 @@ import {
   EnvOptions,
   BackdropProps,
 } from '../../types'
-import { CopyButton } from './CopyButton'
-import { PasteButton } from './PasteButton'
+// These components are now used in LayersToolbar
 import { AddZoneShape } from './AddZoneShape'
+import { LayersToolbar } from './LayersToolbar'
 import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { getFeatureIcon } from '../../helpers/getFeatureIcon'
 
@@ -190,8 +186,7 @@ const justLeaves = (id: Key): boolean => {
   return !(id as string).startsWith('node-')
 }
 
-// ToolButton has been moved to its own file
-import { ToolButton } from './ToolButton'
+// Components have been moved to their own files
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
@@ -276,7 +271,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     openGraph()
   }
 
-  const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
+  const isExpanded = useMemo(() => expandedKeys.length > 0, [expandedKeys])
 
   const localSetNewFeature = useCallback((feature: Feature) => {
     setSelection([])
@@ -430,72 +425,21 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   }
   return (
     <>
-      <div
-        style={{ position: 'relative' }}
-      >
-        <Flex
-          className='toolbar'
-          gap='small'
-          justify='end'
-          wrap
-          style={{
-            position: 'absolute',
-            top: '2px',
-            right: '0',
-            zIndex: 10,
-            background: 'rgba(255, 255, 255, 0.9)',
-            padding: '2px',
-            borderRadius: '4px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}
-        >
-          <Button.Group>
-            <ToolButton
-              onClick={() => setExpandedKeys([])}
-              icon={<ShrinkOutlined />}
-              className='layers-collapse-button'
-              title='Collapse All'
-              disabled={!isExpanded}
-            />
-            <ToolButton
-              onClick={clearSelection}
-              disabled={selection.length === 0}
-              className='layers-clear-button'
-              icon={<CloseCircleOutlined />}
-              title={'Clear selection'}
-            />
-            <ToolButton
-              onClick={onDeleteClick}
-              className='layers-delete-button'
-              disabled={selection.length === 0}
-              icon={<DeleteOutlined />}
-              title={
-                selection.length > 0
-                  ? 'Delete selected items'
-                  : 'Select items to enable delete'
-              }
-            />
-            <CopyButton />
-            <PasteButton />
-            <ToolButton
-              onClick={onGraphClick}
-              disabled={!temporalFeatureSelected}
-              icon={<LineChartOutlined />}
-              title={
-                temporalFeatureSelected
-                  ? 'View graph of selected features'
-                  : 'Select a time-related feature to enable graphs'
-              }
-            />
-          </Button.Group>
-        </Flex>
-      </div>
+      <LayersToolbar 
+        onCollapse={() => setExpandedKeys([])} 
+        onClearSelection={clearSelection}
+        onDelete={onDeleteClick}
+        onGraph={onGraphClick}
+        isExpanded={isExpanded}
+        hasSelection={selection.length > 0}
+        hasTemporalFeature={temporalFeatureSelected}
+      />
       {model.length > 0 && (
         <div ref={treeRef} tabIndex={0} style={{ height: '100%' }}>
           <DirectoryTree
-            showLine={true}
+            showLine
             className="tree-container"
-            style={{ textAlign: 'left', height: '100%', maxHeight: splitterWidths }}
+            style={{ textAlign: 'left', height: '100%', maxHeight: `${splitterWidths}px` }}
             defaultSelectedKeys={[]}
             multiple={true}
             onSelect={onSelect}
