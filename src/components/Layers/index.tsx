@@ -1,6 +1,5 @@
 import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
-import { Tree } from 'antd'
-import type { GetProps, TreeDataNode } from 'antd'
+import type { TreeDataNode } from 'antd'
 import './index.css'
 import { Feature, MultiPoint, Point } from 'geojson'
 import {
@@ -8,7 +7,6 @@ import {
   BUOY_FIELD_TYPE,
   REFERENCE_POINT_TYPE,
   TRACK_TYPE,
-  ZONE_TYPE,
 } from '../../constants'
 import { useDocContext } from '../../state/DocContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
@@ -29,10 +27,10 @@ import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
 
-type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
-const { DirectoryTree } = Tree
+// DirectoryTree has been moved to TreeView component
 
 import { HandleAddFunction, TreeDataBuilder } from './TreeDataBuilder'
+import { TreeView } from './TreeView'
 import {
   NODE_TRACKS,
   NODE_FIELDS,
@@ -216,7 +214,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       } else if (key === NODE_ZONES) {
         throw new Error('This method not responsible for adding zones')
 
-      } else if (key === 'node-backdrops') {
+      } else if (key === NODE_BACKDROPS) {
         addBackdrop()  
       } else {
         console.error(
@@ -227,33 +225,23 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     }, [addBuoyField, addPoint, addBackdrop]) 
 
   useEffect(() => {
-    const items: TreeDataNode[] = []
-    items.push(TreeDataBuilder.buildTrackNode(theFeatures, handleAdd))
-    items.push(
-      TreeDataBuilder.buildTypeNode(theFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
-    )
-    items.push(TreeDataBuilder.buildTypeNode(theFeatures, 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, 
-      <AddZoneShape addZone={addZone} />))
-    items.push(
-      TreeDataBuilder.buildTypeNode(
-        theFeatures,
-        'Points',
-        NODE_POINTS,
-        REFERENCE_POINT_TYPE,
-        handleAdd
-      )
-    )
-
-    items.push(TreeDataBuilder.buildTypeNode(theFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
-    const modelData = items
+    // Use TreeDataBuilder.buildTreeModel to construct the tree model
+    const modelData = TreeDataBuilder.buildTreeModel(theFeatures, handleAdd)
+    
+    // Add the custom button for zones
+    const zonesNode = modelData.find(node => node.key === NODE_ZONES)
+    if (zonesNode) {
+      zonesNode.icon = TreeDataBuilder.getIcon(undefined, NODE_ZONES, 'Zones', handleAdd, 
+        <AddZoneShape addZone={addZone} />)
+    }
+    
     setModel(modelData)
   }, [theFeatures, handleAdd, addZone])
 
-  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
-    const newKeysArr = selectedKeys as string[]
-    const cleaned = newKeysArr.filter(justLeaves)
+  const onSelect = (selectedKeys: React.Key[]) => {
+    const cleaned = selectedKeys.filter(key => justLeaves(key))
     if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
-      setSelection(cleaned as string[])
+      setSelection(cleaned.map(key => key.toString()))
     }
   }
 
@@ -299,25 +287,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         hasSelection={selection.length > 0}
         hasTemporalFeature={temporalFeatureSelected}
       />
-      {model.length > 0 && (
-        <div ref={treeRef} tabIndex={0} style={{ height: '100%' }}>
-          <DirectoryTree
-            showLine
-            className="tree-container"
-            style={{ textAlign: 'left', height: '100%', maxHeight: `${splitterWidths}px` }}
-            defaultSelectedKeys={[]}
-            multiple={true}
-            onSelect={onSelect}
-            showIcon={true}
-            selectedKeys={selection || []}
-            expandedKeys={expandedKeys}
-            onExpand={(keys) => {
-              setExpandedKeys(keys as string[])
-            }}
-            treeData={model}
-          />
-        </div>
-      )}
+      <TreeView
+        treeData={model}
+        selectedKeys={selection}
+        expandedKeys={expandedKeys}
+        onSelect={onSelect}
+        onExpand={(keys: string[]) => setExpandedKeys(keys)}
+        maxHeight={splitterWidths}
+        treeRef={treeRef}
+      />
       {pendingTrackEnvironment && (
         <LoadTrackModel
           visible={pendingTrackEnvironment !== null}
