@@ -47,33 +47,34 @@ test('Deleting items in Layers component', async ({ page }) => {
   await page.waitForTimeout(100)
   
   // Select the first two reference points (if available)
-  const firstPoint = page.locator('.ant-tree-node-content-wrapper').filter({ has: page.locator('.ant-tree-title') }).nth(10)
+  const firstPoint = page.locator('.ant-tree-title:has-text("SONO 1-1")').first()
   await firstPoint.click()
   
   // Hold down Ctrl/Cmd key and click another item
-  await page.keyboard.down('Control')
-  const secondPoint = page.locator('.ant-tree-node-content-wrapper').filter({ has: page.locator('.ant-tree-title') }).nth(11)
+  await page.keyboard.down('Meta')
+  const secondPoint = page.locator('.ant-tree-title:has-text("SONO 1-2")').first()
   await secondPoint.click()
-  await page.keyboard.up('Control')
+  await page.keyboard.up('Meta')
   
   // Verify that the delete button is enabled
   await expect(deleteButton).not.toBeDisabled()
   
   // Click the delete button to delete multiple items
   await deleteButton.click()
-  
-  // Verify that the delete button is disabled again after deletion
-  await expect(deleteButton).toBeDisabled()
-
-  // since the 9th item is a folder, the delete will still be disabled
-  await expect(deleteButton).toBeDisabled()
 
   // wait for the ui to update
   await page.waitForTimeout(100)
 
+  // Verify that the delete button is disabled again after deletion
+  await expect(deleteButton).toBeDisabled()
+
+  // check the two items are no longer present
+  await expect(firstPoint).not.toBeVisible()
+  await expect(secondPoint).not.toBeVisible()
+
   // now select the 10th item
-  const anotherNode2 = page.locator('.ant-tree-node-content-wrapper').filter({ has: page.locator('.ant-tree-title') }).nth(11)
-  await anotherNode2.click()
+  const thirdPoint = page.locator('.ant-tree-title:has-text("NEW SONO")').first()
+  await thirdPoint.click()
   
   // Verify that the delete button is enabled
   await expect(deleteButton).not.toBeDisabled()
@@ -83,4 +84,7 @@ test('Deleting items in Layers component', async ({ page }) => {
   
   // Verify that the delete button is disabled again after deletion
   await expect(deleteButton).toBeDisabled()
+
+  // check the item is no longer present
+  await expect(thirdPoint).not.toBeVisible()
 })
