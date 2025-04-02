@@ -74,8 +74,6 @@ const findChildrenOfType = (
   }))
 }
 
-
-
 const addIconLabelFor = (key: string, title: string) => {
   switch(key) {
   case NODE_TRACKS: {
@@ -108,6 +106,7 @@ const getIcon = (feature: Feature | undefined,
   if (!feature) {
     return handleAdd ? (button || <Tooltip title={addIconLabelFor(key, title)}>
       <PlusCircleOutlined
+        className="add-icon"
         style={{ cursor: 'copy' }}
         onClick={(e) => handleAdd(e, key, title)}
       />
@@ -222,7 +221,7 @@ export const ToolButton: React.FC<ToolProps> = ({
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
-  const {clipboardUpdated, setClipboardUpdated} = useAppContext()
+  const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
   const theFeatures = preview ? preview.data.features : features
 
@@ -244,11 +243,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     )
     const asStr = JSON.stringify(selected)
     navigator.clipboard.writeText(asStr).then(() => {
-      setClipboardUpdated(!clipboardUpdated)
+      setClipboardUpdated(clipboardUpdated => !clipboardUpdated)
     }).catch((e) => {
       setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })
-  }, [features, selection, clipboardUpdated, setClipboardUpdated, setMessage])
+  }, [features, selection, setClipboardUpdated, setMessage])
 
   const onDeleteClick = useCallback(() => {
     dispatch({
@@ -458,25 +457,36 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   return (
     <>
       <div
-        style={{ position: 'sticky', top: 0, zIndex: 1, background: '#fff' }}
+        style={{ position: 'relative' }}
       >
         <Flex
           className='toolbar'
           gap='small'
           justify='end'
           wrap
-          style={{ marginTop: '2px', height: '0' }}
+          style={{
+            position: 'absolute',
+            top: '2px',
+            right: '0',
+            zIndex: 10,
+            background: 'rgba(255, 255, 255, 0.9)',
+            padding: '2px',
+            borderRadius: '4px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
         >
           <Button.Group>
             <ToolButton
               onClick={() => setExpandedKeys([])}
               icon={<ShrinkOutlined />}
+              className='layers-collapse-button'
               title='Collapse All'
               disabled={!isExpanded}
             />
             <ToolButton
               onClick={clearSelection}
               disabled={selection.length === 0}
+              className='layers-clear-button'
               icon={<CloseCircleOutlined />}
               title={'Clear selection'}
             />

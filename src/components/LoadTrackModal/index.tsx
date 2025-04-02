@@ -124,6 +124,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
       children: (
         <Form
           name='createTrack'
+          className='create-track'
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 18 }}
           style={{ maxWidth: 400 }}

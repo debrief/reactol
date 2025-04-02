@@ -80,12 +80,13 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
           size='small'>
           <Form.Item label='Visibility' style={itemStyle}>
             <Tooltip title={allVisible ? 'Hide All' : allHidden ? 'Show All' : 'Mixed Visibility, click to hide all'}>
-              <Checkbox onClick={handleVisibilityChange} indeterminate={mixedVisibility} checked={allVisible}></Checkbox>
+              <Checkbox className='multi-feature-visibility' onClick={handleVisibilityChange} indeterminate={mixedVisibility} checked={allVisible}></Checkbox>
             </Tooltip>
           </Form.Item>
           <Form.Item label='Color' style={itemStyle}>
             <Tooltip title={currentColor ? `Current color: ${currentColor}` : 'Mixed colors'}>
               <ColorPicker
+                className='multi-feature-color'
                 value={currentColor}
                 disabledAlpha
                 allowClear={false}
@@ -102,6 +103,7 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
             <Tooltip title="Delete selected features">
               <Button 
                 icon={<DeleteOutlined />} 
+                className='multi-feature-delete'
                 onClick={onDelete}
                 danger
               />
