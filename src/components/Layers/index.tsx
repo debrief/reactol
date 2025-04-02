@@ -152,6 +152,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
           visible={pendingTrack !== null}
           environment={pendingTrack}
           cancel={() => setPendingTrack(null)}
+          newTrack={() => setPendingTrack(null)}
           addToTrack={() => {}}
           createTrackOnly={true}
         />
