@@ -13,9 +13,8 @@ import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
 import { FeatureIcon } from '../Layers/FeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
-import { bearingCalc } from '../../helpers/calculations/bearingCalc'
-import { BEARING_DATA, RANGE_DATA, rangeBearingCalc } from '../../helpers/calculations/rangeBearingCalc'
 import { BACKDROP_TYPE } from '../../constants'
+import { useGraphData } from './useGraphData'
 
 type OptionType = {
   label: string
@@ -143,50 +142,12 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }
   }, [featuresToPlot, time, filterForTime])
 
-  const depthData = useMemo(() => {
-    if (showDepth) {
-      return depthCalc.calculate(liveFeatures)
-    } else {
-      return []
-    }
-  }, [liveFeatures, showDepth])
-
-  const depthPresent = useMemo(() => {
-    const tracks = liveFeatures.filter((feature) => feature.geometry?.type === 'LineString')
-
-    // filter to tracks with depths
-    const withDepth = tracks.filter((feature) => {
-      const lineString = feature as Feature<LineString>
-      const hasPoints = lineString.geometry?.coordinates.length > 0
-      if (hasPoints) {
-        return lineString.geometry.coordinates[0].length === 3
-      }
-      return false
-    })
-    return withDepth.length > 0
-  }, [liveFeatures])
-
-
-  const rangeBearingData = useMemo(() => {
-    if (primaryTrack === '') return []
-    const res = rangeBearingCalc.calculate(liveFeatures, primaryTrack)
-    return res
-  }, [liveFeatures, primaryTrack])
-
-  const bearingData = useMemo(() => {
-    // filter the bearing data
-    return rangeBearingData.filter(d => d.extraProp === BEARING_DATA)
-  }, [rangeBearingData])
-
-  const rangeData = useMemo(() => {
-    // filter the bearing data
-    return rangeBearingData.filter(d => d.extraProp === RANGE_DATA)
-  }, [rangeBearingData])
-
-  const mainData = useMemo(() => {
-    const res = [...bearingData, ...rangeData]
-    return res
-  }, [bearingData, rangeData])
+  // Use the custom hook to calculate all graph data
+  const { depthData, bearingData, rangeData, depthPresent } = useGraphData({
+    liveFeatures,
+    primaryTrack,
+    showDepth
+  })
 
   const fontSize = 12
   
@@ -420,7 +381,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             </div>
           </Splitter.Panel>
         )}
-        {mainData.length > 0 && (
+        {bearingData.length > 0 && rangeData.length > 0 && (
           <Splitter.Panel>
             <div style={{ width: '100%', height: relativePlotHeight }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -455,7 +416,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
                     domain={[0, 360]}
                     ticks={[0, 90, 180, 270, 360]}
                     tickFormatter={(t: number) => `${t}°`}
-                    label={{ value: bearingCalc.label, angle: 90, position: 'insideRight', style: { fill: themeColors.text } }}
+                    label={{ value: 'Bearing (°)', angle: 90, position: 'insideRight', style: { fill: themeColors.text } }}
                     fontSize={fontSize}
                     tick={{ fill: themeColors.text }}
                   />
