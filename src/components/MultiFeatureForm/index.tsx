@@ -46,22 +46,23 @@ const colorPropertiesForFeatureType = (featureType: string | undefined, color: s
 const featureColor = (feature: Feature<Geometry, GeoJsonProperties>): string => {
   const defaultColor = '#ffff00'
   if (feature.properties) {
-    switch(feature.properties?.dataType) {
+    const fProps = feature.properties
+    switch(fProps.dataType) {
     case REFERENCE_POINT_TYPE: 
     case BUOY_FIELD_TYPE: {
-      const props = feature.properties as PointStyleProps
+      const props = fProps as PointStyleProps
       return props['marker-color'] || defaultColor
     }
     case ZONE_TYPE: {
-      const props = feature.properties as LineStyleProps
+      const props = fProps as LineStyleProps
       return props['stroke'] || defaultColor
     }
     case TRACK_TYPE: {
-      const props = feature.properties as PolygonStyleProps
+      const props = fProps as PolygonStyleProps
       return props['stroke'] || defaultColor
     }
     default: {
-      return feature.properties.color || defaultColor
+      return fProps.color || fProps['stroke'] || fProps['marker-color'] || defaultColor
     }
     }
   }
