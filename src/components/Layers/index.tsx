@@ -1,28 +1,19 @@
 import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
 import type { TreeDataNode } from 'antd'
 import './index.css'
-import { Feature, MultiPoint, Point } from 'geojson'
-import {
-  BACKDROP_TYPE,
-  BUOY_FIELD_TYPE,
-  REFERENCE_POINT_TYPE,
-  TRACK_TYPE,
-} from '../../constants'
+import { TRACK_TYPE } from '../../constants'
 import { useDocContext } from '../../state/DocContext'
 import { useAppSelector, useAppDispatch } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
 import {
   NewTrackProps,
   TrackProps,
-  PointProps,
-  BuoyFieldProps,
-  EnvOptions,
-  BackdropProps,
+  EnvOptions
 } from '../../types'
 // These components are now used in LayersToolbar
 import { AddZoneShape } from './AddZoneShape'
 import { LayersToolbar } from './LayersToolbar'
-import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
+import { useFeatureCreation } from './useFeatureCreation'
 
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
@@ -136,69 +127,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
 
   const isExpanded = useMemo(() => expandedKeys.length > 0, [expandedKeys])
 
-  const localSetNewFeature = useCallback((feature: Feature) => {
-    setSelection([])
-    setNewFeature(feature)
-  }, [setNewFeature, setSelection])
-
-  const addBackdrop = useCallback(() => {
-    const backdrop: Feature<MultiPoint, BackdropProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: BACKDROP_TYPE,
-        visible: true,
-        url: '',
-        maxNativeZoom: 0,
-        maxZoom: 0,
-      },
-      geometry: {
-        type: 'MultiPoint',
-        coordinates: [],
-      },
-    }
-    localSetNewFeature(backdrop)
-  }, [localSetNewFeature])
-
-  const addPoint = useCallback(() => {
-    const point: Feature<Point, PointProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: REFERENCE_POINT_TYPE,
-        'marker-color': '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [],
-      },
-    }
-    localSetNewFeature(point)
-  }, [localSetNewFeature])
-
-  const addZone = useCallback((key: string): void => {
-    const zone = zoneFeatureFor(key)
-    localSetNewFeature(zone)
-  }, [localSetNewFeature])
-
-  const addBuoyField = useCallback(() => {
-    const buoyField: Feature<MultiPoint, BuoyFieldProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        shortName: '',
-        dataType: BUOY_FIELD_TYPE,
-        'marker-color': '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'MultiPoint',
-        coordinates: [],
-      },
-    }
-    localSetNewFeature(buoyField)
-  }, [localSetNewFeature])
+  // Use the feature creation hook to get methods for creating new features
+  const { addBackdrop, addPoint, addZone, addBuoyField } = useFeatureCreation(setNewFeature, setSelection)
 
 
 
