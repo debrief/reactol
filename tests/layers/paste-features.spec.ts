@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test'
 
-test('Pasting features in Layers component', async ({ page }) => {
+test('Pasting features in Layers component', async ({ browser }) => {
   const plotName = 'Paste Features Test'
+  
+  // let the app read and write to the clipboard
+  const context = await browser.newContext({
+    permissions: ['clipboard-write', 'clipboard-read'],
+  })
+  const page = await context.newPage()
   
   // Navigate to the application and create a sample plot
   await page.goto('/')
@@ -19,8 +25,12 @@ test('Pasting features in Layers component', async ({ page }) => {
   // Find the paste button
   const pasteButton = page.locator('.layers-paste-button')
   
+  // and the copy button
+  const copyButton = page.locator('.layers-copy-button')
+
   // Initially, the paste button should be disabled (no valid GeoJSON in clipboard)
   await expect(pasteButton).toBeDisabled()
+  await expect(copyButton).toBeDisabled()
   
   // First, we need to copy something to the clipboard
   // Expand the "Points" node to find reference points
@@ -31,54 +41,62 @@ test('Pasting features in Layers component', async ({ page }) => {
   await page.waitForTimeout(100)
   
   // Select a reference point
-  const referencePoint = page.locator('.ant-tree-node-content-wrapper')
-    .filter({ has: page.locator('.ant-tree-title') })
-    .nth(11)
+  const referencePoint = page.locator('.ant-tree-title:has-text("NEW SONO")').first()
   await referencePoint.click()
   
-  // Find and click the copy button
-  const copyButton = page.locator('.layers-copy-button')
-  await copyButton.click()
+  // Execute the actual copy button logic by clicking the button
+  // First, make sure the button is visible and clickable
+  await expect(copyButton).not.toBeDisabled()
   
-  // Now the paste button should be enabled (valid GeoJSON in clipboard)
-  // Note: In a real browser environment, this would work automatically
-  // In Playwright tests, we might need to simulate this since clipboard access is restricted
-  // For this test, we'll assume the paste button becomes enabled after a copy operation
+  // Try clicking the button with force option to bypass any overlay issues
+  console.log('Attempting to click copy button')
+  await copyButton.click({ force: true, timeout: 500 })
+  console.log('Copy locator clicked')
   
-  // Wait for clipboard check to complete
-  await page.waitForTimeout(500)
+  // Give the clipboard operation time to complete
+  // This should be enough time for the app to process everything
+  await page.waitForTimeout(1000)
+  
+  console.log('Checking if paste button is enabled')
+
+  // check paste button is enabled
+  await expect(pasteButton).not.toBeDisabled()
   
   // Clear the selection
-  const clearSelectionButton = page.locator('button', { has: page.locator('.anticon-close-circle') })
+  const clearSelectionButton = page.locator('.layers-clear-button')
   await clearSelectionButton.click()
   
   // Delete the original item to verify paste works
   await referencePoint.click()
   const deleteButton = page.locator('.layers-delete-button')
   await deleteButton.click()
-  
+
+  // check we can't find the deleted item
+  await expect(referencePoint).not.toBeVisible()
+
+  await page.waitForTimeout(50)
+
   // Now click the paste button
-  // Note: In a real browser environment with clipboard permissions, this would paste the copied feature
-  // In Playwright tests, we might need to mock this behavior
-  // TODO: get 'copy' working, so we can do 'paste' testing
-  // await pasteButton.click()
+  // Note: In a real browser environment with clipboard permissions, 
+  // this would paste the copied feature
+  await pasteButton.click()
   
   // // After pasting, we should see a new item in the tree
   // // Wait for the UI to update
-  // await page.waitForTimeout(500)
+  await page.waitForTimeout(500)
   
   // // Expand the Points node again if it collapsed
-  // await pointsNode.click()
+  await pointsNode.click()
   
   // // Wait for the points to be visible
-  // await page.waitForTimeout(100)
+  await page.waitForTimeout(100)
   
   // // Verify that there's at least one point visible after pasting
-  // const pointsAfterPaste = page.locator('.ant-tree-node-content-wrapper')
-  //   .filter({ has: page.locator('.ant-tree-title') })
-  //   .filter({ has: page.locator('.anticon-environment') })
+  const pointsAfterPaste = page.locator('.ant-tree-node-content-wrapper')
+    .filter({ has: page.locator('.ant-tree-title') })
+    .filter({ has: page.locator('.anticon-environment') })
   
   // // There should be at least one point visible
-  // const count = await pointsAfterPaste.count()
-  // expect(count).toBeGreaterThan(0)
+  const count = await pointsAfterPaste.count()
+  expect(count).toBeGreaterThan(0)
 })
