@@ -32,9 +32,7 @@ export const CopyButton: React.FC = () => {
     )
     const asStr = JSON.stringify(selected)
     navigator.clipboard.writeText(asStr).then(() => {
-      setClipboardUpdated(clipboardUpdated =>  {
-        return !clipboardUpdated
-      })
+      setClipboardUpdated(clipboardUpdated => !clipboardUpdated)
     }).catch((e) => {
       setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })

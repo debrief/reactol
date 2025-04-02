@@ -9,8 +9,6 @@ declare global {
   }
 }
 
-const featureName = 'paste-test-feature'
-
 test('Pasting features in Layers component', async ({ browser }) => {
   const plotName = 'Paste Features Test'
   
@@ -32,6 +30,11 @@ test('Pasting features in Layers component', async ({ browser }) => {
   
   // Wait for the plot to load
   await page.waitForSelector('.flexlayout__tab_button_content')
+
+  // collapse the Units node
+  const unitsNode = page.locator('.ant-tree-title:has-text("Units")').first()
+  await unitsNode.click()
+
   
   // Find the paste button
   const pasteButton = page.locator('.layers-paste-button')
@@ -56,59 +59,18 @@ test('Pasting features in Layers component', async ({ browser }) => {
   // Select a reference point
   const referencePoint = page.locator('.ant-tree-title:has-text("NEW SONO")').first()
   await referencePoint.click()
-  
-  // Since clicking the copy button is unreliable, let's use a different approach
-  // Add a test helper function to the page that will directly set clipboard content
-  // and then expose a method to check the clipboard
-  await page.evaluate(() => {
-    // Create a global test helper object
-    window.testHelper = {
-      // Function to set clipboard content with valid GeoJSON
-      setClipboardWithValidGeoJSON: async () => {
-        try {
-          // Create a simple GeoJSON feature
-          const featureData = JSON.stringify([{
-            type: 'Feature',
-            id: 'paste-test-feature',
-            properties: {
-              name: 'Test Feature',
-              dataType: 'reference-point',
-              'marker-color': '#FF0000',
-              visible: true
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [0, 0]
-            }
-          }])
-          
-          // Write to clipboard
-          await navigator.clipboard.writeText(featureData)
-          console.log('Data written to clipboard:', featureData)
-          
-          // Trigger events to notify the app
-          document.dispatchEvent(new Event('visibilitychange'))
-          window.dispatchEvent(new Event('focus'))
-          
-          return true
-        } catch (error) {
-          console.error('Failed to set clipboard:', error)
-          return false
-        }
-      }
-    }
-  })
-  
-  // Now use our test helper to set the clipboard content
-  console.log('Setting clipboard content with test helper')
-  const clipboardSet = await page.evaluate(() => {
-    return window.testHelper?.setClipboardWithValidGeoJSON()
-  })
-  
-  console.log('Clipboard set result:', clipboardSet)
-  
-  // Wait for the app to process the clipboard
-  await page.waitForTimeout(1000)
+
+  await copyButton.click()
+
+  await page.waitForTimeout(100)
+
+  // now delete the `NEW SONO` point
+  const deleteButton = page.locator('.layers-delete-button').first()
+  await deleteButton.click()
+
+  // check item got disabled
+  const refAfterPaste = page.locator('.ant-tree-title:has-text("NEW SONO")').first()
+  await expect(refAfterPaste).not.toBeVisible()
   
   // check paste button is enabled
   await expect(pasteButton).not.toBeDisabled()
@@ -116,7 +78,6 @@ test('Pasting features in Layers component', async ({ browser }) => {
   // Now click the paste button
   // Note: In a real browser environment with clipboard permissions, 
   // this would paste the copied feature
-  console.log('about to click paste')
   expect(await pasteButton.isVisible()).toBeTruthy()
   expect(await pasteButton.isEnabled()).toBeTruthy()
   await pasteButton.click({ force: true })
@@ -124,8 +85,6 @@ test('Pasting features in Layers component', async ({ browser }) => {
   // // After pasting, we should see a new item in the tree
   // // Wait for the UI to update
   await page.waitForTimeout(500)
-
-  console.log('paste clicked')
   
   // // Expand the Points node again if it collapsed
   await pointsNode.click()
@@ -134,6 +93,6 @@ test('Pasting features in Layers component', async ({ browser }) => {
   await page.waitForTimeout(100)
   
   // // Verify that there's at least one point visible after pasting
-  const pointsAfterPaste = page.locator('span:has-text("' + featureName + '")')
+  const pointsAfterPaste = page.locator('span:has-text("NEW SONO")').first()
   await expect(pointsAfterPaste).toBeVisible()
 })
