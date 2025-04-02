@@ -1,5 +1,5 @@
 import {  useEffect, useMemo, useState } from 'react'
-import { Feature, GeoJsonProperties, Geometry, LineString } from 'geojson'
+import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
 import { Select, Space, Splitter, Button, Tooltip as ATooltip } from 'antd'
 import { useAppContext } from '../../state/AppContext'
@@ -11,61 +11,12 @@ import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
-import { FeatureIcon } from '../Layers/FeatureIcon'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { BACKDROP_TYPE } from '../../constants'
 import { useGraphData } from './useGraphData'
 import { FeatureSelectorModal } from './FeatureSelectorModal'
-
-type OptionType = {
-  label: string
-  value: string
-  dataType: string
-  icon: React.ReactNode
-}
-
-const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: number, end: number): Feature<Geometry, GeoJsonProperties> => {
-  if (feature.properties?.dataType === 'track') {
-    const lineFeature = feature as Feature<LineString, GeoJsonProperties>
-    if (!feature.properties?.times) {
-      return feature
-    }
-    let startIndex = -1, endIndex = 0
-    const times = feature.properties.times
-    for (let i = 0; i < times.length; i++) {
-      const time = new Date(times[i]).getTime()
-      if (startIndex === -1 && time >= start && time <= end) {
-        startIndex = i
-      }
-      if (time > start && time <= end) {
-        endIndex = i
-      }
-    }
-    const res: Feature<LineString, GeoJsonProperties> = {
-      ...lineFeature,
-      properties: {
-        ...feature.properties,
-        times: feature.properties.times.slice(startIndex, endIndex + 1),
-        speeds: feature.properties.speeds.slice(startIndex, endIndex + 1),
-        courses: feature.properties.courses.slice(startIndex, endIndex + 1),
-      },
-      geometry: {
-        type: 'LineString',
-        coordinates: lineFeature.geometry.coordinates.slice(startIndex, endIndex + 1)
-      }
-    }
-    return res
-  } else {
-    return feature
-  }
-}
-
-const optionTypeFor: (feature: Feature) => OptionType = (feature: Feature) => ({
-  label: feature.properties?.shortName || feature.properties?.name || feature.id,
-  value: feature.id as string,
-  dataType: feature.properties?.dataType as string,
-  icon: <FeatureIcon dataType={feature.properties?.dataType} color={feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']} environment={feature.properties?.env} />
-})
+import { featureAsOption, OptionType } from './featureUtils'
+import { filteredTrack } from './trackUtils'
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
@@ -106,7 +57,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const buttonStyle = { margin: '0 1px' }
 
   const primaryTrackOptions: OptionType[] = useMemo(() =>
-    features.filter((feature) => feature.properties?.dataType === 'track').map((feature) => optionTypeFor(feature))
+    features.filter((feature) => feature.properties?.dataType === 'track').map((feature) => featureAsOption(feature))
   , [features])
 
   const featuresToPlot = useMemo(() => 
@@ -219,7 +170,6 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               Secondary items:
             </Button>
           </ATooltip>
-          
           <FeatureSelectorModal
             isOpen={isTransferModalVisible}
             title="Manage Secondary Tracks"

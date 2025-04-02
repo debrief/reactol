@@ -1,6 +1,7 @@
 import { Modal, Transfer, Space } from 'antd'
-import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useMemo, useState } from 'react'
+import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import { featureAsOption } from './featureUtils'
 
 interface FeatureSelectorModalProps {
   isOpen: boolean
@@ -13,13 +14,25 @@ interface FeatureSelectorModalProps {
 
 export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpen, title, onSave, onClose, features, defaults}) => { 
   const [selectedTracks, setSelectedTracks] = useState<string[]>(defaults)
-  const dataSource = useMemo(() => features.map(option => ({
-    key: option.id,
-    title: option.properties?.name || option.id,
-    description: option.properties?.dataType,
+
+  const options = useMemo(() => features.map(featureAsOption), [features])
+
+  const dataSource = useMemo(() => options.map(option => ({
+    key: option.value,
+    title: option.label,
+    description: option.dataType,
     disabled: false
-  })), [features])
+  })), [options])
+
   if (!isOpen) return null
+
+  const renderItem = (item: {key: string, title: string, description: string}) => (
+    <Space>
+      {options.find(opt => opt.value === item.key)?.icon}
+      {item.title}
+      <span style={{ color: '#999', fontSize: '12px' }}>{item.description}</span>
+    </Space>
+  )
 
   return <Modal
     title={title}
@@ -41,17 +54,8 @@ export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpe
       dataSource={dataSource}
       titles={['Available', 'Selected']}
       targetKeys={selectedTracks}
-      onChange={(nextTargetKeys) => {
-        console.log('nextTargetKeys', nextTargetKeys)
-        setSelectedTracks(nextTargetKeys as string[])
-      }}
-      render={item => (
-        <Space>
-          {features.find(opt => opt.id === item.key)?.properties?.icon}
-          {item.title}
-          <span style={{ color: '#999', fontSize: '12px' }}>{item.description}</span>
-        </Space>
-      )}
+      onChange={(nextTargetKeys) => setSelectedTracks(nextTargetKeys as string[])}
+      render={renderItem}
       listStyle={{
         width: 250,
         height: 300,
