@@ -16,6 +16,10 @@ test('MultiFeatureForm displays when multiple features are selected and visibili
   // Wait for the plot to load
   await page.waitForSelector('.flexlayout__tab_button_content')
   await page.waitForTimeout(100)
+
+  // get the `Units` node
+  const unitsNode = page.locator('.ant-tree-title:has-text("Units")').first()
+  await unitsNode.click()
   
   // Expand the "Points" node to find reference points
   const pointsNode = page.locator('.ant-tree-title:has-text("Points")').first()
