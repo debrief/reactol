@@ -1,12 +1,9 @@
 import {  useEffect, useMemo, useState } from 'react'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Splitter, Button, Tooltip as ATooltip } from 'antd'
+import { Splitter } from 'antd'
 import { useAppContext } from '../../state/AppContext'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
-import {
-  FilterOutlined,
-  FilterFilled} from '@ant-design/icons'
 import { toShortDTG } from '../../helpers/toDTG'
 import { useDocContext } from '../../state/DocContext'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
@@ -17,6 +14,7 @@ import { useGraphData } from './useGraphData'
 import { FeatureSelectorModal } from './FeatureSelectorModal'
 import { featureAsOption, OptionType } from './featureUtils'
 import { filterTrackDataToPeriod } from './trackUtils'
+import { GraphsToolbar } from './GraphsToolbar'
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
@@ -56,7 +54,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     return null
   }, [time, filterForTime])
 
-  const buttonStyle = { margin: '0 1px' }
+  // Toolbar button styles are now handled in the GraphsToolbar component
 
   const primaryTrackOptions: OptionType[] = useMemo(() =>
     features.filter((feature) => feature.properties?.dataType === 'track').map((feature) => featureAsOption(feature))
@@ -143,67 +141,30 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
       gap: '16px'
     }}>
       <div>
-        <Space align='center'>
-          <ATooltip title="Select primary track">
-            Primary:
-            <Select
-              placeholder="Primary Track"
-              style={{ width: 100 }}
-              value={primaryTrack}
-              size="small"
-              onChange={setPrimaryTrack}
-              options={primaryTrackOptions}
-              optionRender={option => (
-                <Space>
-                  {(option as unknown as OptionType).icon}
-                  {option.label}
-                </Space>
-              )}
-              labelRender={option => (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {(option as OptionType).icon}
-                  {option.label}
-                </span>
-              )}
-            />
-          </ATooltip>
-          <ATooltip title="Manage secondary items">
-            <Button onClick={() => setIsTransferModalVisible(true)}>
-              Secondary items:
-            </Button>
-          </ATooltip>
-          <FeatureSelectorModal
-            isOpen={isTransferModalVisible}
-            title="Manage Secondary Tracks"
-            onSave={setSecondaryTracks}
-            onClose={() => setIsTransferModalVisible(false)}
-            features={features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType !== BACKDROP_TYPE)}
-            defaults={secondaryTracks}
-          />
-          <ATooltip title={depthPresent ? (showDepth ? 'Hide depth' : 'Show depth') : 'No selected tracks contain depth data'}>
-            <Button disabled={!depthPresent} style={buttonStyle} color={showDepth ? 'primary' : 'default'} variant={showDepth ? 'solid' : 'outlined'} onClick={() => setShowDepth(!showDepth)} className={showDepth ? 'fg-profile' : 'fg-profile-o'}></Button>
-          </ATooltip>
-          <ATooltip title={showLegend ? 'Hide legend' : 'Show legend'}>
-            <Button style={buttonStyle} color={showLegend ? 'primary' : 'default'} variant={showLegend ? 'solid' : 'outlined'} onClick={() => setShowLegend(!showLegend)} className={showLegend ? 'fg-map-legend' : 'fg-map-legend-o'}></Button>
-          </ATooltip>
-          <ATooltip title={showTooltip ? 'Hide tooltips' : 'Show tooltips'}>
-            <Button style={buttonStyle} color={showTooltip ? 'primary' : 'default'} variant={showTooltip ? 'solid' : 'outlined'} onClick={() => setShowTooltip(!showTooltip)} className={'fg-measure-line'}></Button>
-          </ATooltip>
-          <ATooltip
-            mouseEnterDelay={0.8}
-            title={time.filterApplied ? 'Trim graphs to current time filter' : 'No time filter applied'}
-          >
-            <Button
-              style={buttonStyle}
-              disabled={!time.filterApplied}
-              color={filterForTime ? 'primary' : 'default'} 
-              variant={filterForTime ? 'solid' : 'outlined'}
-              onClick={() => setFilterForTime(!filterForTime)}
-            >
-              {filterForTime ? <FilterFilled /> : <FilterOutlined />}
-            </Button>
-          </ATooltip>
-        </Space>
+        <GraphsToolbar
+          primaryTrack={primaryTrack}
+          setPrimaryTrack={setPrimaryTrack}
+          primaryTrackOptions={primaryTrackOptions}
+          showDepth={showDepth}
+          setShowDepth={setShowDepth}
+          showLegend={showLegend}
+          setShowLegend={setShowLegend}
+          showTooltip={showTooltip}
+          setShowTooltip={setShowTooltip}
+          filterForTime={filterForTime}
+          setFilterForTime={setFilterForTime}
+          depthPresent={depthPresent}
+          timeFilterApplied={time.filterApplied}
+          openSecondarySelector={() => setIsTransferModalVisible(true)}
+        />
+        <FeatureSelectorModal
+          isOpen={isTransferModalVisible}
+          title="Manage Secondary Tracks"
+          onSave={setSecondaryTracks}
+          onClose={() => setIsTransferModalVisible(false)}
+          features={features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType !== BACKDROP_TYPE)}
+          defaults={secondaryTracks}
+        />
       </div>
       <Splitter layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
