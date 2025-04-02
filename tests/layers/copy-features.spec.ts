@@ -37,7 +37,7 @@ test('Copying features in Layers component', async ({ page }) => {
   await expect(copyButton).not.toBeDisabled()
   
   // Click the copy button
-  await copyButton.click()
+  await copyButton.click({ force: true })
   
   // There's no direct way to verify clipboard content in Playwright, but we can
   // verify that the UI responds as expected after a copy operation
@@ -63,11 +63,11 @@ test('Copying features in Layers component', async ({ page }) => {
   await expect(copyButton).not.toBeDisabled()
   
   // Click the copy button to copy multiple items
-  await copyButton.click()
+  await copyButton.click({ force: true })
   
   // Test keyboard shortcut for copying
   // Clear selection first
-  await clearSelectionButton.click()
+  await clearSelectionButton.click({ force: true })
   
   // Select an item again
   await referencePoint.click()

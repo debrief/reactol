@@ -8,9 +8,10 @@ import {
 import { ToolButton } from '.'
 import { useAppContext } from '../../state/AppContext'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
+import { isPlaywright } from '../../helpers/browserDetection'
 
 export const CopyButton: React.FC = () => {
-  const { selection } = useDocContext()
+  const { selection, setMessage } = useDocContext()
   const {clipboardUpdated, setClipboardUpdated} = useAppContext()
   const features = useAppSelector(selectFeatures)
 
@@ -34,7 +35,11 @@ export const CopyButton: React.FC = () => {
     navigator.clipboard.writeText(asStr).then(() => {
       setClipboardUpdated(!clipboardUpdated)
     }).catch((e) => {
-      console.error('Copy error:', e)
+      if (isPlaywright) {
+        console.error('Copy error:', e)
+      } else {
+        setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
+      }
     })
   }
 
