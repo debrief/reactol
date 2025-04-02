@@ -6,27 +6,8 @@ import { DiffOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
 import { useDocContext } from '../../state/DocContext'
 
-const isValidGeoJSON = (text: string): boolean => {
-  try {
-    const parsed = JSON.parse(text)
-    // Check if it's a Feature or FeatureCollection
-    if (parsed.type === 'Feature') {
-      return true
-    }
-    if (parsed.type === 'FeatureCollection' && Array.isArray(parsed.features)) {
-      return true
-    }
-    if (Array.isArray(parsed)) {
-      const featureArray = parsed as Feature[]
-      if (featureArray.length && featureArray[0].type === 'Feature') {
-        return true
-      }
-    }
-    return false
-  } catch {
-    return false
-  }
-}
+// Importing the validation helper
+import { isValidGeoJSON } from '../../helpers/geoJSONValidation'
 
 export const PasteButton: React.FC = () => {
   const dispatch = useAppDispatch()
