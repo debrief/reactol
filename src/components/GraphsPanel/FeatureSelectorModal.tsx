@@ -1,20 +1,28 @@
 import { Modal, Transfer, Space } from 'antd'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 interface FeatureSelectorModalProps {
   isOpen: boolean
   onClose: () => void
+  title: string
   onSave: (tracks: string[]) => void
   defaults: string[]
   features: Feature<Geometry, GeoJsonProperties>[]
 }
 
-export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpen, onClose, onSave, defaults, features}) => { 
+export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpen, title, onSave, onClose, features, defaults}) => { 
   const [selectedTracks, setSelectedTracks] = useState<string[]>(defaults)
-  
+  const dataSource = useMemo(() => features.map(option => ({
+    key: option.id,
+    title: option.properties?.name || option.id,
+    description: option.properties?.dataType,
+    disabled: false
+  })), [features])
+  if (!isOpen) return null
+
   return <Modal
-    title="Manage Secondary Tracks"
+    title={title}
     open={isOpen}
     onOk={() => {
       onSave(selectedTracks)
@@ -27,17 +35,16 @@ export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpe
         {modal}
       </div>
     )}
+    destroyOnClose
   >
     <Transfer
-      dataSource={features.map(option => ({
-        key: option.id,
-        title: option.properties?.name || option.id,
-        description: option.properties?.dataType,
-        disabled: false
-      }))}
+      dataSource={dataSource}
       titles={['Available', 'Selected']}
       targetKeys={selectedTracks}
-      onChange={(nextTargetKeys) => setSelectedTracks(nextTargetKeys as string[])}
+      onChange={(nextTargetKeys) => {
+        console.log('nextTargetKeys', nextTargetKeys)
+        setSelectedTracks(nextTargetKeys as string[])
+      }}
       render={item => (
         <Space>
           {features.find(opt => opt.id === item.key)?.properties?.icon}

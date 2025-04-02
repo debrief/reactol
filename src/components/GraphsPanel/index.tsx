@@ -60,6 +60,13 @@ const filteredTrack = (feature: Feature<Geometry, GeoJsonProperties>, start: num
   }
 }
 
+const optionTypeFor: (feature: Feature) => OptionType = (feature: Feature) => ({
+  label: feature.properties?.shortName || feature.properties?.name || feature.id,
+  value: feature.id as string,
+  dataType: feature.properties?.dataType as string,
+  icon: <FeatureIcon dataType={feature.properties?.dataType} color={feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']} environment={feature.properties?.env} />
+})
+
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const features = useAppSelector(selectFeatures)
   const { time } = useDocContext()
@@ -74,32 +81,13 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [showTooltip, setShowTooltip] = useState<boolean>(true)
   const [calculatedPlotHeight, setCalculatedPlotHeight] = useState<number | null>(null)
 
-  const featureOptions: OptionType[] = useMemo(() => {
-    if (!primaryTrack) {
-      setPrimaryTrack(features.find(feature => feature.properties?.dataType === 'track')?.id as string || '')
-    }
-    if (!secondaryTracks.length) {
-      setSecondaryTracks(features.filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
-    }
-    return features.map((feature): OptionType => {
-      const dataType = feature.properties?.dataType
-      const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
-      const environment = feature.properties?.env
-      const icon = <FeatureIcon dataType={dataType} color={color} environment={environment} />
-      return {
-        label: feature.properties?.shortName || feature.properties?.name || feature.id,
-        value: feature.id as string,
-        dataType: feature.properties?.dataType as string,
-        icon
-      }
-    })
-  }, [features, primaryTrack, secondaryTracks])
+  useEffect(() => {
+    setPrimaryTrack(features.find(feature => feature.properties?.dataType === 'track')?.id as string)
+  }, [features])
 
   useEffect(() => {
-    if (!secondaryTracks.length) {
-      setSecondaryTracks(features.filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
-    }
-  }, [features, secondaryTracks])
+    setSecondaryTracks(features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
+  }, [features, primaryTrack])
 
   const referenceAreaTop = useMemo(() => {
     if (time.filterApplied && !filterForTime) {
@@ -118,8 +106,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const buttonStyle = { margin: '0 1px' }
 
   const primaryTrackOptions: OptionType[] = useMemo(() =>
-    featureOptions.filter((feature) => feature.dataType === 'track')
-  , [featureOptions])
+    features.filter((feature) => feature.properties?.dataType === 'track').map((feature) => optionTypeFor(feature))
+  , [features])
 
   const featuresToPlot = useMemo(() => 
     features.filter(track => 
@@ -191,6 +179,8 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }
   }, [height, width, depthData.length, splitterHeights])
 
+  console.log('panel secondaries', secondaryTracks)
+
   return (
     <div style={{ 
       display: 'flex',
@@ -232,9 +222,10 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
           
           <FeatureSelectorModal
             isOpen={isTransferModalVisible}
+            title="Manage Secondary Tracks"
             onSave={setSecondaryTracks}
             onClose={() => setIsTransferModalVisible(false)}
-            features={liveFeatures.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType !== BACKDROP_TYPE)}
+            features={features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType !== BACKDROP_TYPE)}
             defaults={secondaryTracks}
           />
           <ATooltip title={depthPresent ? (showDepth ? 'Hide depth' : 'Show depth') : 'No selected tracks contain depth data'}>
