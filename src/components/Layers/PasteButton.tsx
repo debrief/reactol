@@ -35,10 +35,14 @@ export const PasteButton: React.FC = () => {
   const { setMessage } = useDocContext()
 
   const checkClipboard = useCallback(async () => {
+    // NOTE: we've disabled this test to get `paste` working
+    // in playwright tests.  It does result in a 
+    // little more frequent clipboard testing
     // only bother checking clipboard if it has been used
-    if (clipboardUpdated === null) {
-      return
-    }
+    // if (clipboardUpdated === null) {
+    //   console.log('paste clipboard not used')
+    //   return
+    // }
     try {
       const text = await navigator.clipboard.readText()
       const isValid = isValidGeoJSON(text)
@@ -52,7 +56,7 @@ export const PasteButton: React.FC = () => {
         setPasteDisabled(true)
       }
     }
-  }, [setMessage, clipboardUpdated])
+  }, [setMessage])
 
   useEffect(() => {
     checkClipboard()
@@ -83,6 +87,7 @@ export const PasteButton: React.FC = () => {
   }, [checkClipboard])
 
   const onPasteClick = async () => {
+    console.log('paste button clicked')
     try {
       const text = await navigator.clipboard.readText()
       const parsed = JSON.parse(text)
@@ -111,7 +116,7 @@ export const PasteButton: React.FC = () => {
   return (
     <ToolButton
       onClick={onPasteClick}
-      className='layers-paste-button'
+      className='layers-paste-button1'
       disabled={pasteDisabled}
       icon={<DiffOutlined />}
       title={pasteDisabled ? 'No valid GeoJSON data in clipboard' : 'Paste GeoJSON data'}

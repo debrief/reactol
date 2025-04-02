@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { TRACK_TYPE } from '../../constants'
 import { useDocContext } from '../../state/DocContext'
 import { useAppSelector } from '../../state/hooks'
@@ -11,7 +11,7 @@ import { selectFeatures } from '../../state/geoFeaturesSlice'
 
 export const CopyButton: React.FC = () => {
   const { selection, setMessage } = useDocContext()
-  const {clipboardUpdated, setClipboardUpdated} = useAppContext()
+  const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
 
   const copyDisabled = useMemo(
@@ -25,18 +25,20 @@ export const CopyButton: React.FC = () => {
     [selection, features]
   )
 
-  const onCopyClick = () => {
+  const onCopyClick = useCallback(() => {
     // get the selected features
     const selected = features.filter((feature) =>
       selection.includes(feature.id as string)
     )
     const asStr = JSON.stringify(selected)
     navigator.clipboard.writeText(asStr).then(() => {
-      setClipboardUpdated(!clipboardUpdated)
+      setClipboardUpdated(clipboardUpdated =>  {
+        return !clipboardUpdated
+      })
     }).catch((e) => {
       setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })
-  }
+  }, [selection, features, setClipboardUpdated, setMessage])
 
   return (
     <ToolButton

@@ -225,7 +225,7 @@ export const ToolButton: React.FC<ToolProps> = ({
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
-  const {clipboardUpdated, setClipboardUpdated} = useAppContext()
+  const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
   const theFeatures = preview ? preview.data.features : features
 
@@ -247,11 +247,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     )
     const asStr = JSON.stringify(selected)
     navigator.clipboard.writeText(asStr).then(() => {
-      setClipboardUpdated(!clipboardUpdated)
+      setClipboardUpdated(clipboardUpdated => !clipboardUpdated)
     }).catch((e) => {
       setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
     })
-  }, [features, selection, clipboardUpdated, setClipboardUpdated, setMessage])
+  }, [features, selection, setClipboardUpdated, setMessage])
 
   const onDeleteClick = useCallback(() => {
     dispatch({
