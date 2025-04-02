@@ -1,5 +1,5 @@
 import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
-import type { TreeDataNode } from 'antd'
+// TreeDataNode is used in the useMemo type
 import './index.css'
 import { TRACK_TYPE } from '../../constants'
 import { useDocContext } from '../../state/DocContext'
@@ -48,7 +48,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
-  const [model, setModel] = React.useState<TreeDataNode[]>([])
+  // Model data is derived from features and handlers
   const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
 
@@ -153,7 +153,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       e.stopPropagation()
     }, [addBuoyField, addPoint, addBackdrop]) 
 
-  useEffect(() => {
+  // Use useMemo to create the model data only when dependencies change
+  const model = useMemo(() => {
     // Use TreeDataBuilder.buildTreeModel to construct the tree model
     const modelData = TreeDataBuilder.buildTreeModel(theFeatures, handleAdd)
     
@@ -164,7 +165,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         <AddZoneShape addZone={addZone} />)
     }
     
-    setModel(modelData)
+    return modelData
   }, [theFeatures, handleAdd, addZone])
 
   const onSelect = (selectedKeys: React.Key[]) => {
