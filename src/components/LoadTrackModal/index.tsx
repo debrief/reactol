@@ -27,7 +27,6 @@ import { TRACK_TYPE } from '../../constants'
 
 export interface LoadTrackModelProps {
   visible: boolean
-  newTrack: (value: NewTrackProps) => void
   addToTrack: (trackId: string) => void
   cancel: () => void
   createTrackOnly?: boolean
@@ -37,7 +36,6 @@ export interface LoadTrackModelProps {
 export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   visible,
   cancel,
-  newTrack,
   addToTrack,
   environment,
   createTrackOnly = false,
@@ -99,7 +97,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     // Create the track in the store
     createTrack(values)
     // Notify parent component
-    newTrack(values)
+    cancel()
   }
 
   const initialNewTrackValues: Partial<NewTrackProps> = {

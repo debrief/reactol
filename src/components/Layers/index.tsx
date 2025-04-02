@@ -90,14 +90,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
 
   // Track management state
   const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
-  
-  const handleDialogCancel = useCallback(() => {
-    setPendingTrack(null)
-  }, [])
-  
-  const setLoadTrackResults = useCallback(() => {
-    setPendingTrack(null)
-  }, [])
 
   const handleAdd: HandleAddFunction = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {
@@ -163,8 +155,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         <LoadTrackModel
           visible={pendingTrack !== null}
           environment={pendingTrack}
-          cancel={handleDialogCancel}
-          newTrack={setLoadTrackResults}
+          cancel={() => setPendingTrack(null)}
           addToTrack={() => {}}
           createTrackOnly={true}
         />
