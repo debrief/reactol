@@ -22,6 +22,7 @@ import { defaultIntervals } from '../../helpers/timeIntervals'
 import './index.css'
 import { symbolOptions } from '../../helpers/symbolTypes'
 import { useMemo } from 'react'
+import { useTrackCreation } from './useTrackCreation'
 
 export interface LoadTrackModelProps {
   visible: boolean
@@ -57,11 +58,16 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     addToTrack(id.trackId)
   }
 
+  const { createTrack } = useTrackCreation()
+
   const onFinishCreate: FormProps<NewTrackProps>['onFinish'] = (values) => {
     if (typeof values.stroke === 'object') {
       const colorValue = values.stroke as Color
       values.stroke = colorValue.toRgbString()
     }
+    // Create the track in the store
+    createTrack(values)
+    // Notify parent component
     newTrack(values)
   }
 

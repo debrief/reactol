@@ -12,7 +12,7 @@ import { LayersToolbar } from './LayersToolbar'
 import { useFeatureCreation } from './useFeatureCreation'
 import { useKeyboardHandlers } from './useKeyboardHandlers'
 import { useSelectionHandlers } from './useSelectionHandlers'
-import { useTrackManagement } from './useTrackManagement'
+// Track management is now handled directly in the component
 
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
@@ -88,8 +88,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
 
 
 
-  // Track management is handled by a custom hook
-  const { pendingTrack, setPendingTrack, handleDialogCancel, setLoadTrackResults } = useTrackManagement()
+  // Track management state
+  const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
+  
+  const handleDialogCancel = useCallback(() => {
+    setPendingTrack(null)
+  }, [])
+  
+  const setLoadTrackResults = useCallback(() => {
+    setPendingTrack(null)
+  }, [])
 
   const handleAdd: HandleAddFunction = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {

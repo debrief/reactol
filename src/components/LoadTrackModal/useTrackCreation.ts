@@ -1,25 +1,21 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import { useAppDispatch } from '../../state/hooks'
-import { EnvOptions, NewTrackProps, TrackProps } from '../../types'
+import { NewTrackProps, TrackProps } from '../../types'
 import { TRACK_TYPE } from '../../constants'
 
 /**
- * Hook to manage track-related operations in the Layers component
+ * Hook to handle track creation logic
  */
-export const useTrackManagement = () => {
+export const useTrackCreation = () => {
   const dispatch = useAppDispatch()
-  const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
 
-  const handleDialogCancel = useCallback(() => {
-    setPendingTrack(null)
-  }, [])
-
-  const setLoadTrackResults = useCallback(async (values: NewTrackProps) => {
-    setPendingTrack(null)
-    // props in NewTrackProps format to TrackProps format, where they have different type
+  const createTrack = useCallback((values: NewTrackProps) => {
+    // Convert props from NewTrackProps format to TrackProps format
     const newValues = values as unknown as TrackProps
     newValues.labelInterval = parseInt(values.labelInterval)
     newValues.symbolInterval = parseInt(values.symbolInterval)
+    
+    // Create the new track feature
     const newTrack = {
       type: 'Feature',
       geometry: {
@@ -34,6 +30,8 @@ export const useTrackManagement = () => {
         speeds: [],
       },
     }
+    
+    // Dispatch the action to add the feature
     dispatch({
       type: 'fColl/featureAdded',
       payload: newTrack,
@@ -41,9 +39,6 @@ export const useTrackManagement = () => {
   }, [dispatch])
 
   return {
-    pendingTrack,
-    setPendingTrack,
-    handleDialogCancel,
-    setLoadTrackResults
+    createTrack
   }
 }
