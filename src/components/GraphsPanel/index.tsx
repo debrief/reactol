@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 // No geojson types needed directly in this component
 import { useAppSelector } from '../../state/hooks'
-import { Select, Space, Splitter, Button, Tooltip as ATooltip, Modal, Transfer } from 'antd'
-import type { TransferItem } from 'antd/es/transfer'
+import { Select, Space, Splitter, Button, Tooltip as ATooltip } from 'antd'
+import { SecondaryItemsModal } from './SecondaryItemsModal'
 import { useAppContext } from '../../state/AppContext'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import {
@@ -19,14 +19,7 @@ import { getFilteredFeatures } from './trackUtils'
 import { useDepthData } from './useDepthData'
 import { useRangeBearingData } from './useRangeBearingData'
 import { useThemeColors } from './useThemeColors'
-import { TrackSelectionModal } from './TrackSelectionModal'
-
-type OptionType = {
-  label: string
-  value: string
-  dataType: string
-  icon: React.ReactNode
-}
+import { OptionType } from './types'
 
 // Track filtering logic has been moved to trackUtils.ts
 
@@ -42,7 +35,6 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
   const [isTransferModalVisible, setIsTransferModalVisible] = useState<boolean>(false)
   const [tempSecondaryTracks, setTempSecondaryTracks] = useState<string[]>([])
-  const [isTrackSelectionModalOpen, setIsTrackSelectionModalOpen] = useState<boolean>(false)
   const [showTooltip, setShowTooltip] = useState<boolean>(true)
   const [calculatedPlotHeight, setCalculatedPlotHeight] = useState<number | null>(null)
 
@@ -184,26 +176,6 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               )}
             />
           </ATooltip>
-          <ATooltip title="Manage tracks">
-            <Button 
-              onClick={() => {
-                setIsTrackSelectionModalOpen(true)
-              }}
-            >
-              Manage tracks
-            </Button>
-          </ATooltip>
-          
-          <TrackSelectionModal
-            isModalOpen={isTrackSelectionModalOpen}
-            setIsModalOpen={setIsTrackSelectionModalOpen}
-            trackOptions={features.filter(f => f.properties?.dataType === 'track')}
-            primaryTrack={primaryTrack}
-            secondaryTracks={secondaryTracks}
-            setPrimaryTrack={setPrimaryTrack}
-            setSecondaryTracks={setSecondaryTracks}
-          />
-          
           <ATooltip title="Manage secondary items">
             <Button 
               onClick={() => {
@@ -215,49 +187,15 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
             </Button>
           </ATooltip>
           
-          <Modal
-            title="Manage Secondary Tracks"
-            open={isTransferModalVisible}
-            onOk={() => {
-              setSecondaryTracks(tempSecondaryTracks)
-              setIsTransferModalVisible(false)
-            }}
-            onCancel={() => setIsTransferModalVisible(false)}
-            width={600}
-            modalRender={(modal: React.ReactNode) => (
-              <div onWheel={(e) => e.stopPropagation()}>
-                {modal}
-              </div>
-            )}
-          >
-            <Transfer
-              dataSource={secondaryOptions.map(option => ({
-                key: option.value,
-                title: option.label,
-                description: option.dataType,
-                disabled: false
-              }))}
-              titles={['Available', 'Selected']}
-              targetKeys={tempSecondaryTracks}
-              onChange={(nextTargetKeys) => setTempSecondaryTracks(nextTargetKeys as string[])}
-              render={(item: TransferItem) => (
-                <Space>
-                  {featureOptions.find(opt => opt.value === item.key)?.icon}
-                  {item.title}
-                  <span style={{ color: '#999', fontSize: '12px' }}>{item.description}</span>
-                </Space>
-              )}
-              listStyle={{
-                width: 250,
-                height: 300,
-              }}
-              showSearch
-              filterOption={(inputValue: string, item: TransferItem) =>
-                (item.title?.toLowerCase().indexOf(inputValue.toLowerCase()) ?? -1) !== -1 ||
-                (item.description?.toLowerCase().indexOf(inputValue.toLowerCase()) ?? -1) !== -1
-              }
-            />
-          </Modal>
+          <SecondaryItemsModal
+            isModalOpen={isTransferModalVisible}
+            setIsModalOpen={setIsTransferModalVisible}
+            secondaryOptions={secondaryOptions}
+            setSecondaryTracks={setSecondaryTracks}
+            tempSecondaryTracks={tempSecondaryTracks}
+            setTempSecondaryTracks={setTempSecondaryTracks}
+            featureOptions={featureOptions}
+          />
           <ATooltip title={depthPresent ? (showDepth ? 'Hide depth' : 'Show depth') : 'No selected tracks contain depth data'}>
             <Button disabled={!depthPresent} style={buttonStyle} color={showDepth ? 'primary' : 'default'} variant={showDepth ? 'solid' : 'outlined'} onClick={() => setShowDepth(!showDepth)} className={showDepth ? 'fg-profile' : 'fg-profile-o'}></Button>
           </ATooltip>
