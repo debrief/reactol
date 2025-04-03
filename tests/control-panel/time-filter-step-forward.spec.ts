@@ -42,7 +42,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
 
   // Get the initial time text before any actions
   const timeTextBeforeFilter = await page.locator('.time-period-panel p').textContent()
-  console.log('Time period before filter:', timeTextBeforeFilter)
+
 
   // check time step buttons are disabled
   await expect(page.locator('.step-forward')).toBeDisabled()
@@ -50,11 +50,11 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   
   // Get the time text after clicking step forward (should be unchanged)
   const timeTextAfterClick = await page.locator('.time-period-panel p').textContent()
-  console.log('Time period after clicking step forward (before filter):', timeTextAfterClick)
+
   
   // Verify that the time text has NOT changed (because filter is not applied)
   expect(timeTextAfterClick).toEqual(timeTextBeforeFilter)
-  console.log('Verified: Time period did not change when filter is not applied')
+
   
   // Find and click the time filter button in the control panel
   // Based on the application code, it's a button with FilterOutlined/FilterFilled icon
@@ -88,7 +88,7 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   
   // Get the text content of the TimePeriod before stepping forward
   const initialTimeText = await page.locator('.time-period-panel p').textContent()
-  console.log('Initial time period:', initialTimeText)
+
   
   // Click the step forward button again
   await stepForwardButton.click()
@@ -98,11 +98,11 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
   
   // Get the updated text content
   const updatedTimeText = await page.locator('.time-period-panel p').textContent()
-  console.log('Updated time period:', updatedTimeText)
+
   
   // Verify that the time text has changed
   expect(updatedTimeText).not.toEqual(initialTimeText)
-  console.log('Time period changed successfully from', initialTimeText, 'to', updatedTimeText)
+
 
   // check the time start and end times have moved forwards
   expect(await timeStart.textContent()).toEqual('Nov 141800Z')
@@ -117,11 +117,11 @@ test('Open Sample Plot, apply time filter, and step forward in time', async ({ p
 
   // Get the updated text content
   const updatedTimeText2 = await page.locator('.time-period-panel p').textContent()
-  console.log('Updated time period:', updatedTimeText2)
+
   
   // Verify that the time text has changed
   expect(updatedTimeText2).not.toEqual(initialTimeText)
-  console.log('Time period changed successfully from', initialTimeText, 'to', updatedTimeText2)
+
 
   // check the time start and end times have moved to end
   expect(await timeStart.textContent()).toEqual('Nov 151000Z')

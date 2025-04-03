@@ -63,7 +63,7 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   // The difference should be 15 minutes (our selected interval)
   // We can verify this by checking the format (MMM ddHHmm'Z')
   // Format example: 'Nov 141600Z'
-  console.log('Time values:', trimmedStart, updatedStart)
+
   
   // Extract hours and minutes from the time strings
   // The format is 'MMM ddHHmmZ' where HH is at position 6-8 and mm is at position 8-10
@@ -72,7 +72,7 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   const updatedHour = parseInt(updatedStart?.substring(6, 8) || '0')
   const updatedMinute = parseInt(updatedStart?.substring(8, 10) || '0')
   
-  console.log('Parsed time components:', initialHour, initialMinute, updatedHour, updatedMinute)
+
   
   // Calculate the time in minutes for comparison
   const initialTimeInMinutes = initialHour * 60 + initialMinute
@@ -80,7 +80,7 @@ test('Test time step interval selection in control panel', async ({ page }) => {
   
   // Check if the difference is approximately 15 minutes (allowing for rounding)
   const timeDiff = Math.abs(updatedTimeInMinutes - initialTimeInMinutes)
-  console.log('Time difference in minutes:', timeDiff)
+
   
   // We selected 15 minutes as the step, so expect a difference of about 15 minutes
   expect(timeDiff).toEqual(15)
