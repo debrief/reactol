@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Feature, MultiPoint, Point, Polygon } from 'geojson'
 import { TRACK_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE, BUOY_FIELD_TYPE, BACKDROP_TYPE } from '../../../constants'
 import { BuoyFieldProps, BackdropProps } from '../../../types'
@@ -7,19 +7,35 @@ import { BuoyField } from '../BuoyField'
 import Track from '../Track'
 import Zone from '../Zone'
 import { Point as DataPoint } from '../Point'
-
-interface MapFeaturesProps {
-  features: Feature[]
-  onClickHandler: (id: string, modifier: boolean) => void
-}
+import { useAppSelector } from '../../../state/hooks'
+import { useDocContext } from '../../../state/DocContext'
+import { selectFeatures } from '../../../state/geoFeaturesSlice'
 
 const isVisible = (feature: Feature): boolean => {
   return feature.properties?.visible
 }
 
-export const MapFeatures: React.FC<MapFeaturesProps> = ({ features, onClickHandler }) => {
+export const MapFeatures: React.FC = () => {
+  const features = useAppSelector(selectFeatures)
+  const { selection, setSelection, preview } = useDocContext()
+  const relevantFeatures = preview ? preview.data.features : features
+
+  const onClickHandler = useCallback((id: string, modifier: boolean): void => {
+    if (modifier) {
+      // add/remove from selection
+      if (selection.includes(id)) {
+        setSelection(selection.filter((selectedId) => selectedId !== id))
+      } else {
+        setSelection([...selection, id])
+      }
+    } else {
+      // just select this item
+      setSelection([id])
+    }
+  }, [selection, setSelection])
+
   const visibleFeatures = useMemo(() => {
-    const vis = features.filter(feature => isVisible(feature))
+    const vis = relevantFeatures.filter(feature => isVisible(feature))
     const asElements = vis.map((feature: Feature): React.ReactElement | null => {
       switch(feature.properties?.dataType) {
       case TRACK_TYPE:
@@ -38,7 +54,7 @@ export const MapFeatures: React.FC<MapFeaturesProps> = ({ features, onClickHandl
       }
     })
     return asElements.filter(Boolean)
-  }, [features, onClickHandler])
+  }, [relevantFeatures, onClickHandler])
 
   return <>{visibleFeatures}</>
 }
