@@ -87,4 +87,25 @@ test('Feature editing should update properties panel and undo system', async ({ 
   
   // Verify the name field in properties panel shows the original name
   await expect(nameField).toHaveValue(featureName)
+  
+  // Step 10: Open the undo modal again to perform a Redo operation
+  await undoRedoButton.click()
+  await expect(undoModal).toBeVisible()
+  
+  // Step 11: Select the second item in the list (which would be the Redo operation)
+  const redoItem = undoModal.locator('.ant-list-items').locator('.ant-list-item').nth(1)
+  await redoItem.click()
+  
+  // Step 12: Perform the Redo by clicking Restore Version
+  await page.locator('button:has-text("Restore Version")').click()
+  
+  // Wait for the UI to update
+  await page.waitForTimeout(200)
+  
+  // Step 13: Verify the feature name is changed back to the new name
+  await expect(updatedFeature).toBeVisible()
+  await expect(featureInTree).not.toBeVisible()
+  
+  // Verify the name field in properties panel shows the new name again
+  await expect(nameField).toHaveValue(newName)
 })
