@@ -1,87 +1,50 @@
-import {  useEffect, useMemo, useState } from 'react'
-import { Feature, GeoJsonProperties, Geometry } from 'geojson'
-import { useAppSelector } from '../../state/hooks'
+import { useEffect, useMemo, useState } from 'react'
 import { Splitter } from 'antd'
 import { useAppContext } from '../../state/AppContext'
-import { ReferenceArea } from 'recharts'
-import { useDocContext } from '../../state/DocContext'
-import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
-import { selectFeatures } from '../../state/geoFeaturesSlice'
-import { BACKDROP_TYPE } from '../../constants'
+
 import { useGraphData } from './useGraphData'
-import { FeatureSelectorModal } from './FeatureSelectorModal'
-import { featureAsOption, OptionType } from './featureUtils'
-import { filterTrackDataToPeriod } from '../../helpers/filterTrackDataToPeriod'
 import { GraphsToolbar } from './GraphsToolbar'
 import { DepthChart } from './DepthChart'
 import { RangeBearingChart } from './RangeBearingChart'
+import { GraphsProvider } from './GraphsContextProvider'
+import { useGraphsContext } from './useGraphsContext'
 
-export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
-  const features = useAppSelector(selectFeatures)
-  const { time } = useDocContext()
+export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = (props) => {
+  return (
+    <GraphsProvider>
+      <GraphsPanelContent {...props} />
+    </GraphsProvider>
+  )
+}
+
+const GraphsPanelContent: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const { isDarkMode } = useAppContext()
-  const [showDepth, setShowDepth] = useState<boolean>(false)
-  const [showLegend, setShowLegend] = useState<boolean>(true)
-  const [filterForTime, setFilterForTime] = useState<boolean>(false)
-  const [primaryTrack, setPrimaryTrack] = useState<string>('')
-  const [secondaryTracks, setSecondaryTracks] = useState<string[]>([])
+  const {
+    showDepth,
+    showLegend,
+    filterForTime,
+    primaryTrack,
+    secondaryTracks,
+    showTooltip
+  } = useGraphsContext()
+  
   const [splitterHeights, setSplitterHeights] = useState<[number, number] | null>(null)
-  const [isTransferModalVisible, setIsTransferModalVisible] = useState<boolean>(false)
-  const [showTooltip, setShowTooltip] = useState<boolean>(true)
   const [calculatedPlotHeight, setCalculatedPlotHeight] = useState<number | null>(null)
 
-  useEffect(() => {
-    // set the first track as the primary
-    setPrimaryTrack(features.find(feature => feature.properties?.dataType === 'track')?.id as string)
-  }, [features])
+  // These effects are now in GraphsContext
 
-  useEffect(() => {
-    // select all non-primary tracks as the secondary
-    setSecondaryTracks(features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType === 'track').map(feature => feature.id as string))
-  }, [features, primaryTrack])
-
-  const referenceAreaDepth = useMemo(() => {
-    if (time.filterApplied && !filterForTime) {
-      return <ReferenceArea yAxisId="course" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
-    }
-    return null
-  }, [time, filterForTime])
-
-  const referenceAreaRangeBearing = useMemo(() => {
-    if (time.filterApplied && !filterForTime) {
-      return <ReferenceArea yAxisId="bearing" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
-    }
-    return null
-  }, [time, filterForTime])
+  // Reference areas are now handled in the chart components
 
   // Toolbar button styles are now handled in the GraphsToolbar component
 
-  const primaryTrackOptions: OptionType[] = useMemo(() =>
-    features.filter((feature) => feature.properties?.dataType === 'track').map((feature) => featureAsOption(feature))
-  , [features])
-
-  const featuresToPlot = useMemo(() => 
-    features.filter(track => 
-      track.id === primaryTrack || secondaryTracks.includes(track.id as string)
-    )
-  , [primaryTrack, secondaryTracks, features])
-
-  const liveFeatures: Feature<Geometry, GeoJsonProperties>[] = useMemo(() => {
-    if (time && time.filterApplied && filterForTime) {
-      const result = featuresToPlot.filter(feature =>
-        featureIsVisibleInPeriod(feature, time.start, time.end)
-      ).map(feature => filterTrackDataToPeriod(feature, time.start, time.end))
-      return result
-    } else {
-      return featuresToPlot
-    }
-  }, [featuresToPlot, time, filterForTime])
+  // Primary track options are now in GraphsContext
 
   // Use the custom hook to calculate all graph data
   const { depthData, bearingData, rangeData, depthPresent } = useGraphData({
-    liveFeatures,
     primaryTrack,
-    showDepth
+    secondaryTracks,
+    showDepth,
+    filterForTime,
   })
 
   const fontSize = 12
@@ -130,8 +93,6 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }
   }, [height, width, depthData.length, splitterHeights])
 
-  console.log('panel secondaries', secondaryTracks)
-
   return (
     <div style={{ 
       display: 'flex',
@@ -142,28 +103,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
     }}>
       <div>
         <GraphsToolbar
-          primaryTrack={primaryTrack}
-          setPrimaryTrack={setPrimaryTrack}
-          primaryTrackOptions={primaryTrackOptions}
-          showDepth={showDepth}
-          setShowDepth={setShowDepth}
-          showLegend={showLegend}
-          setShowLegend={setShowLegend}
-          showTooltip={showTooltip}
-          setShowTooltip={setShowTooltip}
-          filterForTime={filterForTime}
-          setFilterForTime={setFilterForTime}
           depthPresent={depthPresent}
-          timeFilterApplied={time.filterApplied}
-          openSecondarySelector={() => setIsTransferModalVisible(true)}
-        />
-        <FeatureSelectorModal
-          isOpen={isTransferModalVisible}
-          title="Manage Secondary Tracks"
-          onSave={setSecondaryTracks}
-          onClose={() => setIsTransferModalVisible(false)}
-          features={features.filter(feature => feature.id !== primaryTrack).filter(feature => feature.properties?.dataType !== BACKDROP_TYPE)}
-          defaults={secondaryTracks}
         />
       </div>
       <Splitter layout='vertical' onResize={handleSplitterResize}>
@@ -175,7 +115,6 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               themeColors={themeColors}
               showTooltip={showTooltip}
               showLegend={showLegend}
-              referenceArea={referenceAreaDepth}
               fontSize={fontSize}
             />
           </Splitter.Panel>
@@ -189,7 +128,6 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
               themeColors={themeColors}
               showTooltip={showTooltip}
               showLegend={showLegend}
-              referenceArea={referenceAreaRangeBearing}
               fontSize={fontSize}
             />
           </Splitter.Panel>

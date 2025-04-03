@@ -1,8 +1,10 @@
-import React from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import React, { useMemo } from 'react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { toShortDTG } from '../../helpers/toDTG'
 import { GraphDataset } from '../../types'
 import { depthCalc } from '../../helpers/calculations/depthCalc'
+import { useGraphsContext } from './useGraphsContext'
+import { useDocContext } from '../../state/DocContext'
 
 interface DepthChartProps {
   depthData: GraphDataset[]
@@ -19,7 +21,6 @@ interface DepthChartProps {
   }
   showTooltip: boolean
   showLegend: boolean
-  referenceArea: React.ReactNode
   fontSize: number
 }
 
@@ -29,9 +30,18 @@ export const DepthChart: React.FC<DepthChartProps> = ({
   themeColors,
   showTooltip,
   showLegend,
-  referenceArea,
   fontSize
 }) => {
+  const { time } = useDocContext()
+  const { filterForTime } = useGraphsContext()
+  
+  // Create reference area for time filter visualization
+  const referenceArea = useMemo(() => {
+    if (time.filterApplied && !filterForTime) {
+      return <ReferenceArea yAxisId="course" x1={time?.start} x2={time?.end} y1={0} y2={360} stroke="#777" />
+    }
+    return null
+  }, [time, filterForTime])
   return (
     <div style={{ width: '100%', height }}>
       <ResponsiveContainer width="100%" height="100%">
