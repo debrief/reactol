@@ -205,7 +205,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
                   const previewIndex = future.length - 1 - index
                   setPreview(future[previewIndex])
                 } else {
-                  const previewIndex = past.length - 2 - (index - future.length)
+                  const previewIndex = past.length - 1 - (index - future.length)
                   setPreview(past[previewIndex])  
                 }
                 setSelectedUndoIndex(index)
