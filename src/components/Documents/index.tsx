@@ -1,10 +1,11 @@
 import { ReactNode, useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import App from '../../App'
 import type { InputRef } from 'antd'
-import { Button, Col, Image, Row, Typography, Modal, Space, Input, Tooltip, Alert, Switch } from 'antd'
+import { Button, Col, Row, Typography, Modal, Space, Input, Tooltip, Alert, Switch } from 'antd'
 import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined, BulbOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
 import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action, Actions, DockLocation} from 'flexlayout-react'
+import WelcomePage from '../WelcomePage'
 import './index.css'
 
 type TabWithPath =  {
@@ -350,32 +351,14 @@ const Documents = () => {
         </Space>
       </Modal>
       {tabs.length === 0 && (
-        <div style={{ paddingTop: '50px' }} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-          <Row>
-            <Col span={24}><Typography.Title>Welcome to Albatross</Typography.Title></Col>
-          </Row>
-          <Row>
-            <Col span={24}>&nbsp;</Col>
-          </Row>
-          <Row align='middle' justify='start'>
-            <Col span={12}>
-              <Image alt='Application logo - albatross flying' preview={false} width={200} src='images/albatross-flying.png' />
-            </Col>
-            <Col span={12}>
-              <Row style={{ paddingBottom: '12px' }}>
-                <Col span={6}>&nbsp;</Col>
-                <Col span={12}><Typography.Text type='secondary'>Open an existing document or create a new one</Typography.Text></Col>
-              </Row>
-              <Row>
-                <Col span={6}></Col>
-                <Col span={12}><Button onClick={() => handleNew(false)} size='large' type='primary'>New</Button><Button style={{fontStyle: 'italic', marginLeft: '10px'}} onClick={() => handleNew(true)} size='large' type='primary'>Sample plot</Button></Col>
-              </Row>
-              <Row style={{ paddingTop: '25px' }}>
-                <Col span={8}></Col>
-                <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
-              </Row>
-            </Col>
-          </Row>
+        <>
+          <WelcomePage
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            handleNew={handleNew}
+            openExistingDocument={openExistingDocument}
+          />
           <Row>
             <Col span={24}>&nbsp;</Col>
           </Row>
@@ -383,7 +366,7 @@ const Documents = () => {
             <Col span={6}>&nbsp;</Col>
             <Col span={12}><Typography.Text type='secondary'>Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. </Typography.Text></Col>
           </Row>
-        </div>
+        </>
       )}
     </div>
   )
