@@ -1,296 +1,75 @@
-import React, { Key, useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Flex, Tooltip, Tree } from 'antd'
-import type { GetProps, TreeDataNode } from 'antd'
+import React, { useCallback, useMemo, useState } from 'react'
+// TreeDataNode is used in the useMemo type
 import './index.css'
-import {
-  PlusCircleOutlined,
-  DeleteOutlined,
-  CloseCircleOutlined,
-  ShrinkOutlined,
-  FolderOutlined,
-  LineChartOutlined,
-} from '@ant-design/icons'
-import { Feature, MultiPoint, Point } from 'geojson'
-import {
-  BACKDROP_TYPE,
-  BUOY_FIELD_TYPE,
-  REFERENCE_POINT_TYPE,
-  TRACK_TYPE,
-  ZONE_TYPE,
-} from '../../constants'
+// TRACK_TYPE is now used in useTrackManagement
 import { useDocContext } from '../../state/DocContext'
-import { useAppSelector, useAppDispatch } from '../../state/hooks'
+import { useAppSelector } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
-import {
-  NewTrackProps,
-  TrackProps,
-  PointProps,
-  BuoyFieldProps,
-  EnvOptions,
-  BackdropProps,
-} from '../../types'
-import { CopyButton } from './CopyButton'
-import { PasteButton } from './PasteButton'
+import { EnvOptions } from '../../types'
+// These components are now used in LayersToolbar
 import { AddZoneShape } from './AddZoneShape'
-import { zoneFeatureFor } from '../../helpers/zoneShapePropsFor'
-import { getFeatureIcon } from '../../helpers/getFeatureIcon'
+import { LayersToolbar } from './LayersToolbar'
+import { useFeatureCreation } from './useFeatureCreation'
+import { useKeyboardHandlers } from './useKeyboardHandlers'
+import { useSelectionHandlers } from './useSelectionHandlers'
+// Track management is now handled directly in the component
 
-import { symbolOptions } from '../../helpers/symbolTypes'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
 
-type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
-const { DirectoryTree } = Tree
+// DirectoryTree has been moved to TreeView component
 
-const NODE_TRACKS = 'node-tracks'
-const NODE_FIELDS = 'node-fields'
-const NODE_ZONES = 'node-zones'
-const NODE_POINTS = 'node-points'
-
-const NODE_BACKDROPS = 'node-backdrops'
-
-type FieldDataNode = {
-  title: string
-  key: string
-  children: FieldDataNode[]
-}
+import { HandleAddFunction, TreeDataBuilder } from './TreeDataBuilder'
+import { TreeView } from './TreeView'
+import {
+  NODE_TRACKS,
+  NODE_FIELDS,
+  NODE_ZONES,
+  NODE_POINTS,
+  NODE_BACKDROPS
+} from './constants'
 
 interface LayerProps {
   openGraph: { (): void }
   splitterWidths: number
 }
 
-const findChildrenOfType = (
-  features: Feature[],
-  dType: string
-): FieldDataNode[] => {
-  const items = features.filter(
-    (feature) => feature.properties?.dataType === dType
-  )
-  return items.map((item) => ({
-    title: nameFor(item),
-    key: item.id as string,
-    children: [],
-  }))
-}
+// justLeaves has been moved to useSelectionHandlers
 
-const addIconLabelFor = (key: string, title: string) => {
-  switch(key) {
-  case NODE_TRACKS: {
-    // special case - get the name for the env
-    const env = title as EnvOptions
-    return 'Create new ' +  symbolOptions.find(e => e.value === env)?.label + ' track'
-  }
-  case NODE_FIELDS: {
-    return 'Create new buoy field'
-  }
-  case NODE_ZONES: {
-    return 'Create new zone'
-  }
-  case NODE_POINTS: {
-    return 'Create new reference point'
-  }
-
-  case NODE_BACKDROPS: {
-    return 'Create new backdrop'
-  }
-  default:
-    return 'ERROR - node type not handled: ' + key
-  }
-}
-
-const getIcon = (feature: Feature | undefined, 
-  key:string, title: string,
-  handleAdd?: (e: React.MouseEvent, key: string, title: string) => void, button?: React.ReactNode) => {
-  // If no feature is provided, this is a parent node - show plus icon
-  if (!feature) {
-    return handleAdd ? (button || <Tooltip title={addIconLabelFor(key, title)}>
-      <PlusCircleOutlined
-        className="add-icon"
-        style={{ cursor: 'copy' }}
-        onClick={(e) => handleAdd(e, key, title)}
-      />
-    </Tooltip>) : null
-  }
-
-  // For leaf nodes, show type-specific icon based on dataType
-  const dataType = feature.properties?.dataType
-  const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
-  const environment = feature.properties?.env
-  return getFeatureIcon({ dataType, color, environment }) || <FolderOutlined />
-}
-
-const trackFunc = (features: Feature[], handleAdd: (e: React.MouseEvent, key: string, title: string) => void): TreeDataNode => {
-  // generate new root
-  const root: TreeDataNode = {
-    title: 'Units',
-    key: NODE_TRACKS,
-    icon: <FolderOutlined />,
-    children: [],
-  }
-  const environments = symbolOptions.map((env): TreeDataNode => ({
-    title: env.label,
-    key: env.value,
-    icon: getIcon(undefined, NODE_TRACKS, env.value, handleAdd, undefined),
-    children: features.filter(feature => feature.properties?.env === env.value).map((feature): TreeDataNode => ({
-      title: nameFor(feature),
-      key: idFor(feature),
-      icon: getIcon(feature, idFor(feature), nameFor(feature), undefined, undefined),
-      children: [],
-    }))
-  }))
-
-  root.children = root.children ? root.children.concat(...environments) : [...environments]
-  return root
-}
-
-const mapFunc = (
-  features: Feature[],
-  title: string,
-  key: string,
-  dType: string,
-  handleAdd: (e: React.MouseEvent, key: string, title: string) => void,
-  button?: React.ReactNode
-): TreeDataNode => {
-
-  const children = features
-    ? findChildrenOfType(features, dType).map(child => {
-      // Find the corresponding feature for this child
-      const feature = features.find(f => idFor(f) === child.key)
-      return {
-        ...child,
-        icon: getIcon(feature, child.key, child.title, handleAdd, button),
-      }
-    })
-    : []
-
-  return {
-    title: (
-      <span>
-        {title}
-      </span>
-    ),
-    key,
-    icon: getIcon(undefined, key, title, handleAdd, button), // Parent node gets plus icon
-    children,
-  }
-}
-
-const idFor = (feature: Feature): string => {
-  return `${feature.id || 'unknown'}`
-}
-
-const nameFor = (feature: Feature): string => {
-  return (feature.properties?.name || feature.id)
-  // return (feature.properties?.name || feature.id) + ' : ' + feature.id
-}
-
-// filter out the branches, just leave the leaves
-const justLeaves = (id: Key): boolean => {
-  return !(id as string).startsWith('node-')
-}
-
-interface ToolProps {
-  onClick: () => void
-  icon: React.ReactNode
-  title: string
-  disabled: boolean
-  className?: string
-}
-
-export const ToolButton: React.FC<ToolProps> = ({
-  onClick,
-  icon,
-  title,
-  disabled,
-  className
-}) => {
-  return (
-    <Tooltip title={title}>
-      <Button
-        size={'middle'}
-        className={className}
-        onClick={onClick}
-        disabled={disabled}
-        type='primary'
-        icon={icon}
-      />
-    </Tooltip>
-  )
-}
+// Components have been moved to their own files
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
+  const treeRef = React.useRef<HTMLDivElement>(null)
   const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
+  // Model data is derived from features and handlers
+  // Track management is handled by a custom hook
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
+
   const theFeatures = preview ? preview.data.features : features
 
   const selectedFeatures = theFeatures.filter((feature) =>
     selection.includes(feature.id as string)
   )
-  const dispatch = useAppDispatch()
-  const treeRef = React.useRef<HTMLDivElement>(null)
+  
+  // Use the selection handlers hook to manage selection operations
+  const { onCopyClick, onDeleteClick, clearSelection, onSelect } = useSelectionHandlers({
+    features,
+    selection,
+    setSelection,
+    setMessage,
+    setClipboardUpdated
+  })
 
-  const [model, setModel] = React.useState<TreeDataNode[]>([])
-  const [pendingTrackEnvironment, setPendingTrackEnvironment] =
-    useState<EnvOptions | null>(null)
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
-
-  const onCopyClick = useCallback(() => {
-    // get the selected features
-    const selected = features.filter((feature) =>
-      selection.includes(feature.id as string)
-    )
-    const asStr = JSON.stringify(selected)
-    navigator.clipboard.writeText(asStr).then(() => {
-      setClipboardUpdated(clipboardUpdated => !clipboardUpdated)
-    }).catch((e) => {
-      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
-    })
-  }, [features, selection, setClipboardUpdated, setMessage])
-
-  const onDeleteClick = useCallback(() => {
-    dispatch({
-      type: 'fColl/featuresDeleted',
-      payload: { ids: selection },
-    })
-    setSelection([])
-  }, [dispatch, selection, setSelection])
-
-  const clearSelection = useCallback(() => {
-    setSelection([])
-  }, [setSelection])
-
-  // Handle delete key press
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (selection.length > 0) {
-        // support delete key
-        if (e.key === 'Delete') {
-          onDeleteClick()
-          e.stopPropagation()
-        }
-        // clear selection on `escape`
-        if (e.key === 'Escape') {
-          clearSelection()
-          e.stopPropagation()
-        }
-        // copy items to clipboard on `copy`
-        if (e.key === 'c' && e.ctrlKey) {
-          onCopyClick()
-          e.stopPropagation()
-        }
-      }
-    }
-
-    const treeElement = treeRef.current
-    if (treeElement) {
-      treeElement.addEventListener('keydown', handleKeyDown)
-      return () => {
-        treeElement.removeEventListener('keydown', handleKeyDown)
-      }
-    }
-  }, [selection, onDeleteClick, onCopyClick, setMessage, clearSelection, setSelection, setClipboardUpdated])
+  // Use custom hook for keyboard shortcuts
+  useKeyboardHandlers({
+    selection,
+    onDeleteClick,
+    onCopyClick,
+    clearSelection,
+    elementRef: treeRef
+  })
 
 
   const temporalFeatureSelected = useMemo(
@@ -298,83 +77,21 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     [selectedFeatures]
   )
 
-  const onGraphClick = () => {
-    openGraph()
-  }
+  const isExpanded = useMemo(() => expandedKeys.length > 0, [expandedKeys])
 
-  const isExpanded = useMemo(() => expandedKeys.length, [expandedKeys])
-
-  const localSetNewFeature = useCallback((feature: Feature) => {
-    setSelection([])
-    setNewFeature(feature)
-  }, [setNewFeature, setSelection])
-
-  const addBackdrop = useCallback(() => {
-    const backdrop: Feature<MultiPoint, BackdropProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: BACKDROP_TYPE,
-        visible: true,
-        url: '',
-        maxNativeZoom: 0,
-        maxZoom: 0,
-      },
-      geometry: {
-        type: 'MultiPoint',
-        coordinates: [],
-      },
-    }
-    localSetNewFeature(backdrop)
-  }, [localSetNewFeature])
-
-  const addPoint = useCallback(() => {
-    const point: Feature<Point, PointProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        dataType: REFERENCE_POINT_TYPE,
-        'marker-color': '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [],
-      },
-    }
-    localSetNewFeature(point)
-  }, [localSetNewFeature])
-
-  const addZone = useCallback((key: string): void => {
-    const zone = zoneFeatureFor(key)
-    localSetNewFeature(zone)
-  }, [localSetNewFeature])
-
-  const addBuoyField = useCallback(() => {
-    const buoyField: Feature<MultiPoint, BuoyFieldProps> = {
-      type: 'Feature',
-      properties: {
-        name: '',
-        shortName: '',
-        dataType: BUOY_FIELD_TYPE,
-        'marker-color': '#FF0000',
-        visible: true,
-      },
-      geometry: {
-        type: 'MultiPoint',
-        coordinates: [],
-      },
-    }
-    localSetNewFeature(buoyField)
-  }, [localSetNewFeature])
+  // Use the feature creation hook to get methods for creating new features
+  const { addBackdrop, addPoint, addZone, addBuoyField } = useFeatureCreation(setNewFeature, setSelection)
 
 
 
-  const handleAdd = useCallback(
+  // Track management state
+  const [pendingTrack, setPendingTrack] = useState<EnvOptions | null>(null)
+
+  const handleAdd: HandleAddFunction = useCallback(
     (e: React.MouseEvent, key: string, title: string) => {
       if (key === NODE_TRACKS) {
         // special case - the environment is passed in title
-        setPendingTrackEnvironment(title as EnvOptions)
+        setPendingTrack(title as EnvOptions)
       } else if (key === NODE_FIELDS) {
         addBuoyField()
       } else if (key === NODE_POINTS) {
@@ -382,7 +99,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       } else if (key === NODE_ZONES) {
         throw new Error('This method not responsible for adding zones')
 
-      } else if (key === 'node-backdrops') {
+      } else if (key === NODE_BACKDROPS) {
         addBackdrop()  
       } else {
         console.error(
@@ -390,157 +107,52 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         )
       }
       e.stopPropagation()
-    }, [addBuoyField, addPoint, addBackdrop]) 
+    }, [addBuoyField, addPoint, addBackdrop, setPendingTrack]) 
 
-  useEffect(() => {
-    const items: TreeDataNode[] = []
-    items.push(trackFunc(theFeatures, handleAdd))
-    items.push(
-      mapFunc(theFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd)
-    )
-    items.push(mapFunc(theFeatures, 'Zones', 'node-zones', ZONE_TYPE, handleAdd, 
-      <AddZoneShape addZone={addZone} />))
-    items.push(
-      mapFunc(
-        theFeatures,
-        'Points',
-        'node-points',
-        REFERENCE_POINT_TYPE,
-        handleAdd
-      )
-    )
-
-    items.push(mapFunc(theFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd))
-    const modelData = items
-    setModel(modelData)
+  // Use useMemo to create the model data only when dependencies change
+  const model = useMemo(() => {
+    // Use TreeDataBuilder.buildTreeModel to construct the tree model
+    const modelData = TreeDataBuilder.buildTreeModel(theFeatures, handleAdd)
+    
+    // Add the custom button for zones
+    const zonesNode = modelData.find(node => node.key === NODE_ZONES)
+    if (zonesNode) {
+      zonesNode.icon = TreeDataBuilder.getIcon(undefined, NODE_ZONES, 'Zones', handleAdd, 
+        <AddZoneShape addZone={addZone} />)
+    }
+    
+    return modelData
   }, [theFeatures, handleAdd, addZone])
 
-  const onSelect: DirectoryTreeProps['onSelect'] = (selectedKeys) => {
-    const newKeysArr = selectedKeys as string[]
-    const cleaned = newKeysArr.filter(justLeaves)
-    if (JSON.stringify(cleaned) !== JSON.stringify(selection)) {
-      setSelection(cleaned as string[])
-    }
-  }
+  // onSelect is now provided by useSelectionHandlers
 
-
-
-  const setLoadTrackResults = async (values: NewTrackProps) => {
-    setPendingTrackEnvironment(null)
-    // props in NewTrackProps format to TrackProps format, where they have different type
-    const newValues = values as unknown as TrackProps
-    newValues.labelInterval = parseInt(values.labelInterval)
-    newValues.symbolInterval = parseInt(values.symbolInterval)
-    const newTrack = {
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates: [],
-      },
-      properties: {
-        ...newValues,
-        dataType: TRACK_TYPE,
-        times: [],
-        courses: [],
-        speeds: [],
-      },
-    }
-    dispatch({
-      type: 'fColl/featureAdded',
-      payload: newTrack,
-    })
-  }
-
-  const handleDialogCancel = () => {
-    setPendingTrackEnvironment(null)
-  }
+  // Track management functions are now provided by useTrackManagement
   return (
     <>
-      <div
-        style={{ position: 'relative' }}
-      >
-        <Flex
-          className='toolbar'
-          gap='small'
-          justify='end'
-          wrap
-          style={{
-            position: 'absolute',
-            top: '2px',
-            right: '0',
-            zIndex: 10,
-            background: 'rgba(255, 255, 255, 0.9)',
-            padding: '2px',
-            borderRadius: '4px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}
-        >
-          <Button.Group>
-            <ToolButton
-              onClick={() => setExpandedKeys([])}
-              icon={<ShrinkOutlined />}
-              className='layers-collapse-button'
-              title='Collapse All'
-              disabled={!isExpanded}
-            />
-            <ToolButton
-              onClick={clearSelection}
-              disabled={selection.length === 0}
-              className='layers-clear-button'
-              icon={<CloseCircleOutlined />}
-              title={'Clear selection'}
-            />
-            <ToolButton
-              onClick={onDeleteClick}
-              className='layers-delete-button'
-              disabled={selection.length === 0}
-              icon={<DeleteOutlined />}
-              title={
-                selection.length > 0
-                  ? 'Delete selected items'
-                  : 'Select items to enable delete'
-              }
-            />
-            <CopyButton />
-            <PasteButton />
-            <ToolButton
-              onClick={onGraphClick}
-              disabled={!temporalFeatureSelected}
-              icon={<LineChartOutlined />}
-              title={
-                temporalFeatureSelected
-                  ? 'View graph of selected features'
-                  : 'Select a time-related feature to enable graphs'
-              }
-            />
-          </Button.Group>
-        </Flex>
-      </div>
-      {model.length > 0 && (
-        <div ref={treeRef} tabIndex={0} style={{ height: '100%' }}>
-          <DirectoryTree
-            showLine={true}
-            className="tree-container"
-            style={{ textAlign: 'left', height: '100%', maxHeight: splitterWidths }}
-            defaultSelectedKeys={[]}
-            multiple={true}
-            onSelect={onSelect}
-            showIcon={true}
-            selectedKeys={selection || []}
-            expandedKeys={expandedKeys}
-            onExpand={(keys) => {
-              setExpandedKeys(keys as string[])
-            }}
-            treeData={model}
-          />
-        </div>
-      )}
-      {pendingTrackEnvironment && (
+      <LayersToolbar 
+        onCollapse={() => setExpandedKeys([])} 
+        onClearSelection={clearSelection}
+        onDelete={onDeleteClick}
+        onGraph={openGraph}
+        isExpanded={isExpanded}
+        hasSelection={selection.length > 0}
+        hasTemporalFeature={temporalFeatureSelected}
+      />
+      <TreeView
+        treeData={model}
+        selectedKeys={selection}
+        expandedKeys={expandedKeys}
+        onSelect={onSelect}
+        onExpand={(keys: string[]) => setExpandedKeys(keys)}
+        maxHeight={splitterWidths}
+        treeRef={treeRef}
+      />
+      {pendingTrack && (
         <LoadTrackModel
-          visible={pendingTrackEnvironment !== null}
-          environment={pendingTrackEnvironment}
-          cancel={handleDialogCancel}
-          newTrack={setLoadTrackResults}
+          visible={pendingTrack !== null}
+          environment={pendingTrack}
+          cancel={() => setPendingTrack(null)}
+          newTrack={() => setPendingTrack(null)}
           addToTrack={() => {}}
           createTrackOnly={true}
         />
