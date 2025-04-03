@@ -11,11 +11,20 @@ function getCurrentGitBranch() {
   }
 }
 
+// Get current build date
+function getCurrentBuildDate() {
+  try {
+    return execSync('git log -1 --format=%cd --date=iso-strict').toString().trim()
+  } catch {
+    return 'unknown'
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   define: {
     'import.meta.env.VITE_GIT_BRANCH': JSON.stringify(getCurrentGitBranch()),
-    'import.meta.env.VITE_BUILD_DATE': JSON.stringify(new Date().toISOString())
+    'import.meta.env.VITE_BUILD_DATE': JSON.stringify(getCurrentBuildDate())
   }
 })
