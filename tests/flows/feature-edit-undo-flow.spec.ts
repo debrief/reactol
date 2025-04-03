@@ -93,7 +93,7 @@ test('Feature editing should update properties panel and undo system', async ({ 
   await expect(undoModal).toBeVisible()
   
   // Step 11: Select the second item in the list (which would be the Redo operation)
-  const redoItem = undoModal.locator('.ant-list-items').locator('.ant-list-item').nth(1)
+  const redoItem = undoModal.locator('.ant-list-items').locator('.ant-list-item').first()
   await redoItem.click()
   
   // Step 12: Perform the Redo by clicking Restore Version
