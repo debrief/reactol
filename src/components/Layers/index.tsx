@@ -46,6 +46,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   // Model data is derived from features and handlers
   // Track management is handled by a custom hook
   const [expandedKeys, setExpandedKeys] = useState<string[]>([NODE_TRACKS, 'nav'])
+  const [useTimeFilter, setUseTimeFilter] = useState(false)
 
   const theFeatures = preview ? preview.data.features : features
 
@@ -137,6 +138,8 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
         isExpanded={isExpanded}
         hasSelection={selection.length > 0}
         hasTemporalFeature={temporalFeatureSelected}
+        hasTimeFilter={useTimeFilter}
+        onFilterForTime={setUseTimeFilter}
       />
       <TreeView
         treeData={model}

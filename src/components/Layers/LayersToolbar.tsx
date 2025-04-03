@@ -4,7 +4,8 @@ import {
   ShrinkOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
-  LineChartOutlined
+  FilterFilled,
+  FilterOutlined
 } from '@ant-design/icons'
 import { ToolButton } from './ToolButton'
 import { CopyButton } from './CopyButton'
@@ -18,16 +19,18 @@ interface LayersToolbarProps {
   isExpanded: boolean
   hasSelection: boolean
   hasTemporalFeature: boolean
+  hasTimeFilter: boolean
+  onFilterForTime: (value: boolean) => void
 }
 
 export const LayersToolbar: React.FC<LayersToolbarProps> = ({
   onCollapse,
   onClearSelection,
   onDelete,
-  onGraph,
   isExpanded,
   hasSelection,
-  hasTemporalFeature
+  hasTimeFilter,
+  onFilterForTime
 }) => {
   return (
     <div style={{ position: 'relative' }}>
@@ -75,7 +78,14 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
           />
           <CopyButton />
           <PasteButton />
-          <ToolButton
+          <Button
+            size={'middle'}
+            onClick={() => onFilterForTime(!hasTimeFilter)}
+          >
+            {hasTimeFilter ? <FilterFilled /> : <FilterOutlined />}
+          </Button>
+
+          {/* <ToolButton
             onClick={onGraph}
             disabled={!hasTemporalFeature}
             icon={<LineChartOutlined />}
@@ -84,7 +94,7 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
                 ? 'View graph of selected features'
                 : 'Select a time-related feature to enable graphs'
             }
-          />
+          /> */}
         </Button.Group>
       </Flex>
     </div>
