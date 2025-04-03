@@ -8,13 +8,9 @@ import { filterTrackDataToPeriod } from '../../helpers/filterTrackDataToPeriod'
 import { useAppSelector } from '../../state/hooks'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useDocContext } from '../../state/DocContext'
+import { useGraphsContext } from './useGraphsContext'
 
-interface UseGraphDataProps {
-  primaryTrack: string
-  secondaryTracks: string[]
-  showDepth: boolean
-  filterForTime: boolean
-}
+// No props needed anymore as we get everything from context
 
 interface GraphData {
   depthData: GraphDataset[]
@@ -26,9 +22,10 @@ interface GraphData {
 /**
  * Custom hook to calculate graph data for depth, range and bearing
  */
-export const useGraphData = ({ primaryTrack, secondaryTracks, showDepth, filterForTime }: UseGraphDataProps): GraphData => {
-
+export const useGraphData = (): GraphData => {
+  // Get values from context
   const { time } = useDocContext()
+  const { primaryTrack, secondaryTracks, showDepth, filterForTime } = useGraphsContext()
 
   // Get all features from the store
   const features = useAppSelector(selectFeatures)

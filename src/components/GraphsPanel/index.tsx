@@ -20,11 +20,7 @@ export const GraphsPanel: React.FC<{height: number | null, width: number | null}
 const GraphsPanelContent: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
   const { isDarkMode } = useAppContext()
   const {
-    showDepth,
     showLegend,
-    filterForTime,
-    primaryTrack,
-    secondaryTracks,
     showTooltip
   } = useGraphsContext()
   
@@ -40,12 +36,7 @@ const GraphsPanelContent: React.FC<{height: number | null, width: number | null}
   // Primary track options are now in GraphsContext
 
   // Use the custom hook to calculate all graph data
-  const { depthData, bearingData, rangeData, depthPresent } = useGraphData({
-    primaryTrack,
-    secondaryTracks,
-    showDepth,
-    filterForTime,
-  })
+  const { depthData, bearingData, rangeData } = useGraphData()
 
   const fontSize = 12
   
@@ -102,9 +93,7 @@ const GraphsPanelContent: React.FC<{height: number | null, width: number | null}
       gap: '16px'
     }}>
       <div>
-        <GraphsToolbar
-          depthPresent={depthPresent}
-        />
+        <GraphsToolbar />
       </div>
       <Splitter layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
@@ -119,7 +108,7 @@ const GraphsPanelContent: React.FC<{height: number | null, width: number | null}
             />
           </Splitter.Panel>
         )}
-        {bearingData.length > 0 && rangeData.length > 0 && (
+        {(bearingData.length > 0 || rangeData.length > 0) && (
           <Splitter.Panel>
             <RangeBearingChart
               rangeData={rangeData}

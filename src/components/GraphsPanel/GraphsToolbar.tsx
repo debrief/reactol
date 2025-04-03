@@ -8,15 +8,11 @@ import { FeatureSelectorModal } from './FeatureSelectorModal'
 import { useAppSelector } from '../../state/hooks'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { BACKDROP_TYPE } from '../../constants'
+import { useGraphData } from './useGraphData'
 
-interface GraphsToolbarProps {
-  depthPresent: boolean
-}
-
-export const GraphsToolbar: React.FC<GraphsToolbarProps> = ({
-  depthPresent
-}) => {
+export const GraphsToolbar: React.FC = () => {
   const { time } = useDocContext()
+  const { depthPresent } = useGraphData()
   const features = useAppSelector(selectFeatures)
   const {
     primaryTrack,
