@@ -1,4 +1,5 @@
 import { Button, Col, Image, Row, Typography } from 'antd'
+import './styles.css'
 
 interface WelcomePageProps {
   onDragOver: (event: React.DragEvent<HTMLDivElement>) => void
@@ -15,6 +16,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
   handleNew,
   openExistingDocument
 }) => {
+  // Get debug information from environment variables
+  const gitBranch = import.meta.env.VITE_GIT_BRANCH || 'unknown'
+  const buildDate = import.meta.env.VITE_BUILD_DATE 
+    ? new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()
+    : 'unknown'
   return (
     <div style={{ paddingTop: '50px' }} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
       <Row>
@@ -45,6 +51,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
           </Row>
         </Col>
       </Row>
+      
+      {/* Debug info box */}
+      <div className="debug-info">
+        Branch: <strong>{gitBranch}</strong> | Build: <strong>{buildDate}</strong>
+      </div>
     </div>
   )
 }
