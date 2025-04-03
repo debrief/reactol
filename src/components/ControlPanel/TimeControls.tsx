@@ -68,7 +68,6 @@ const TimeButton: React.FC<TimeButtonProps> = ({
 const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
   const { time, setTime,  interval, setInterval } = useDocContext()
   const [stepTxt, setStepTxt] = useState<string>('01h00m')
-  const [filterApplied] = useState(false)
 
   useEffect(() => {
     try {
@@ -83,7 +82,7 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
   const end = bounds ? bounds[1] : 0
   
   useEffect(() => {
-    if (filterApplied) {
+    if (time.filterApplied) {
       const newStart = TimeSupport.roundDown(new Date(start), interval)
       const newEnd = TimeSupport.increment(newStart, interval)
       const newTime = {
@@ -97,7 +96,7 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
       setTime({ ...time, start, end, filterApplied: false })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interval, start, end, filterApplied, setTime])
+  }, [interval, start, end, time.filterApplied, setTime])
 
   const doStep = (fwd: boolean, large: boolean) => {
     if (large) {
