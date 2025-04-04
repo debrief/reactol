@@ -121,15 +121,18 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       useTimeFilter ? time.start : 0, 
       useTimeFilter ? time.end : 0
     )
+
+    console.log('empty', modelData)
+    const validModels = modelData.filter(node => node !== null)
     
     // Add the custom button for zones
-    const zonesNode = modelData.find(node => node.key === NODE_ZONES)
+    const zonesNode = validModels.find(node => node.key === NODE_ZONES)
     if (zonesNode) {
       zonesNode.icon = TreeDataBuilder.getIcon(undefined, NODE_ZONES, 'Zones', handleAdd, 
         <AddZoneShape addZone={addZone} />)
     }
     
-    return modelData
+    return validModels
   }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied])
 
   // onSelect is now provided by useSelectionHandlers

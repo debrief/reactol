@@ -5,8 +5,9 @@ import { FolderOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
 import { FeatureIcon } from './FeatureIcon'
 import { symbolOptions } from '../../helpers/symbolTypes'
-import { EnvOptions } from '../../types'
+import { EnvOptions, FeatureTypes } from '../../types'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
+import { BUOY_FIELD_TYPE, ZONE_TYPE, REFERENCE_POINT_TYPE, BACKDROP_TYPE } from '../../constants'
 
 // Import node constants from the constants file
 import {
@@ -134,7 +135,7 @@ export class TreeDataBuilder {
    * @param handleAdd The add handler function
    * @returns A TreeDataNode for tracks
    */
-  static buildTrackNode(features: Feature[], handleAdd: HandleAddFunction): TreeDataNode {
+  static buildTrackNode(features: Feature[], handleAdd: HandleAddFunction, useTimeFilter: boolean): TreeDataNode {
     // generate new root
     const root: TreeDataNode = {
       title: 'Units',
@@ -156,7 +157,10 @@ export class TreeDataBuilder {
         }))
     }))
 
-    root.children = root.children ? root.children.concat(...environments) : [...environments]
+    // if time filter is applied, only include environments that contain features
+    const validEnvironments = useTimeFilter ? environments.filter(env => !!env.children?.length) : environments
+
+    root.children = root.children ? root.children.concat(...validEnvironments) : [...validEnvironments]
     return root
   }
 
@@ -174,10 +178,11 @@ export class TreeDataBuilder {
     features: Feature[],
     title: string,
     key: string,
-    dType: string,
+    dType: FeatureTypes,
     handleAdd: HandleAddFunction,
+    useTimeFilter: boolean,
     button?: React.ReactNode
-  ): TreeDataNode {
+  ): TreeDataNode | null {
     const children = features
       ? this.findChildrenOfType(features, dType).map(child => {
         // Find the corresponding feature for this child
@@ -188,6 +193,9 @@ export class TreeDataBuilder {
         }
       })
       : []
+
+    console.log('node', dType, features, children)  
+    if (useTimeFilter && !children.length) return null
 
     return {
       title: (
@@ -216,7 +224,7 @@ export class TreeDataBuilder {
     useTimeFilter: boolean = false, 
     timeStart: number = 0, 
     timeEnd: number = 0
-  ): TreeDataNode[] {
+  ): Array<TreeDataNode | null> {
     // If time filtering is enabled, filter the features
     let filteredFeatures = features
     if (useTimeFilter && timeStart !== 0 && timeEnd !== 0) {
@@ -226,13 +234,13 @@ export class TreeDataBuilder {
         !feature.properties?.time || featureIsVisibleInPeriod(feature, timeStart, timeEnd)
       )
     }
-    
+
     return [
-      this.buildTrackNode(filteredFeatures, handleAdd),
-      this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, 'buoy-field', handleAdd),
-      this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, 'zone', handleAdd),
-      this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, 'reference-point', handleAdd),
-      this.buildTypeNode(filteredFeatures, 'Backdrops', NODE_BACKDROPS, 'backdrop', handleAdd),
+      this.buildTrackNode(filteredFeatures, handleAdd, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, REFERENCE_POINT_TYPE, handleAdd, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, useTimeFilter),
     ]
   }
 
