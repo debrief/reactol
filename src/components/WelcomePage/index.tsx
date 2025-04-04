@@ -23,7 +23,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
   const gitBranch = import.meta.env.VITE_GIT_BRANCH || 'unknown'
   const buildDate = import.meta.env.VITE_BUILD_DATE 
     ? new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()
-    : t('unknown')
+    : 'unknown'
   return (
     <div style={{ paddingTop: '50px' }} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
       <Row>
