@@ -95,22 +95,19 @@ export class TreeDataBuilder {
    * @param key The node key
    * @param title The node title
    * @param handleAdd The add handler function
-   * @param button Optional custom button
    * @returns The icon React node
    */
   static getIcon(
     feature: Feature | undefined, 
     key: string, 
     title: string,
-    handleAdd?: HandleAddFunction, 
+    handleAdd?: HandleAddFunction,
     button?: React.ReactNode
   ): React.ReactNode {
     // If no feature is provided, this is a parent node - show plus icon
     if (!feature) {
       if (!handleAdd) return null
-      
       if (button) return button
-      
       return (
         <Tooltip title={this.addIconLabelFor(key, title)}>
           <PlusCircleOutlined
@@ -146,13 +143,13 @@ export class TreeDataBuilder {
     const environments = symbolOptions.map((env): TreeDataNode => ({
       title: env.label,
       key: env.value,
-      icon: this.getIcon(undefined, NODE_TRACKS, env.value, handleAdd, undefined),
+      icon: this.getIcon(undefined, NODE_TRACKS, env.value, handleAdd),
       children: features
         .filter(feature => feature.properties?.env === env.value)
         .map((feature): TreeDataNode => ({
           title: this.nameFor(feature),
           key: this.idFor(feature),
-          icon: this.getIcon(feature, this.idFor(feature), this.nameFor(feature), undefined, undefined),
+          icon: this.getIcon(feature, this.idFor(feature), this.nameFor(feature), handleAdd),
           children: [],
         }))
     }))
@@ -171,7 +168,6 @@ export class TreeDataBuilder {
    * @param key The node key
    * @param dType The data type to filter by
    * @param handleAdd The add handler function
-   * @param button Optional custom button
    * @returns A TreeDataNode for the specified type
    */
   static buildTypeNode(
@@ -180,8 +176,7 @@ export class TreeDataBuilder {
     key: string,
     dType: FeatureTypes,
     handleAdd: HandleAddFunction,
-    useTimeFilter: boolean,
-    button?: React.ReactNode
+    useTimeFilter: boolean
   ): TreeDataNode | null {
     const children = features
       ? this.findChildrenOfType(features, dType).map(child => {
@@ -189,7 +184,7 @@ export class TreeDataBuilder {
         const feature = features.find(f => this.idFor(f) === child.key)
         return {
           ...child,
-          icon: this.getIcon(feature, child.key, child.title, handleAdd, button),
+          icon: this.getIcon(feature, child.key, child.title, handleAdd),
         }
       })
       : []
@@ -203,7 +198,7 @@ export class TreeDataBuilder {
         </span>
       ),
       key,
-      icon: this.getIcon(undefined, key, title, handleAdd, button), // Parent node gets plus icon
+      icon: this.getIcon(undefined, key, title, handleAdd), // Parent node gets plus icon
       children,
     }
   }
