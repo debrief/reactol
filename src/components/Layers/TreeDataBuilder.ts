@@ -249,7 +249,7 @@ export class TreeDataBuilder {
       this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
       this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, iconCreators, useTimeFilter, zonesIcon),
       this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, REFERENCE_POINT_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
-      this.buildTypeNode(filteredFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
+      this.buildTypeNode(filteredFeatures, 'Backgrounds', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
     ]
   }
 
