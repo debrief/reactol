@@ -5,11 +5,19 @@ import { useTranslation } from 'react-i18next'
 const LanguageSelector: React.FC = () => {
   const { i18n } = useTranslation()
 
+  const changeLanguage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLang = event.target.value
+    i18n.changeLanguage(newLang).then(() => {
+      // Force a re-render of the entire app
+      window.location.reload()
+    })
+  }
+
   return (
-    <select onChange={(e) => i18n.changeLanguage(e.target.value)}>
+    <select onChange={changeLanguage} value={i18n.language}>
       <option value="en">English</option>
       <option value="it">Italiano</option>
-      <option value="nl">Dutch</option>
+      <option value="nl">Nederlands</option>
     </select>
   )
 }
