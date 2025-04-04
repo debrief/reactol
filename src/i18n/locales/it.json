@@ -90,5 +90,56 @@
     "addZone": "Aggiungi nuova zona",
     "addPoint": "Aggiungi nuovo punto",
     "addBackdrop": "Aggiungi nuovo sfondo"
+  },
+  "forms": {
+    "core": {
+      "delete": "Elimina",
+      "deleteFeature": "Elimina elemento",
+      "cancel": "Annulla",
+      "cancelCreation": "Annulla creazione nuovo elemento",
+      "reset": "Ripristina",
+      "resetChanges": "Ripristina modifiche per questo elemento",
+      "save": "Salva",
+      "create": "Crea",
+      "saveEdits": "Salva modifiche"
+    },
+    "common": {
+      "name": "Nome",
+      "shortName": "Nome breve",
+      "visible": "Visibile",
+      "color": "Colore",
+      "fill": "Riempimento",
+      "colorRequired": "il colore è obbligatorio!",
+      "nameRequired": "Inserisci un nome!",
+      "shortNameRequired": "Inserisci un nome breve!",
+      "position": "Posizione",
+      "time": "Tempo",
+      "timeEnd": "Fine tempo",
+      "timeEndAfterTime": "La fine del tempo deve essere dopo l'inizio!",
+      "start": "Inizio",
+      "end": "Fine",
+      "url": "URL",
+      "urlRequired": "Inserisci un URL!",
+      "maxNativeZoom": "Zoom nativo massimo",
+      "maxNativeZoomRequired": "Inserisci lo zoom nativo massimo!",
+      "maxZoom": "Zoom massimo",
+      "maxZoomRequired": "Inserisci lo zoom massimo!",
+      "environment": "Ambiente",
+      "environmentRequired": "Specifica l'ambiente/simbolo",
+      "markers": "Marcatori",
+      "labels": "Etichette",
+      "symbols": "Simboli",
+      "shape": "Forma",
+      "edit": "Modifica"
+    },
+    "multiFeature": {
+      "itemsSelected": "elementi selezionati",
+      "visibility": "Visibilità",
+      "hideAll": "Nascondi tutto",
+      "showAll": "Mostra tutto",
+      "mixedVisibility": "Visibilità mista, clicca per nascondere tutto",
+      "currentColor": "Colore attuale:",
+      "mixedColors": "Colori misti"
+    }
   }
 }

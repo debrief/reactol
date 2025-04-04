@@ -90,5 +90,56 @@
     "addZone": "Neue Zone hinzufügen",
     "addPoint": "Neuen Punkt hinzufügen",
     "addBackdrop": "Neuen Hintergrund hinzufügen"
+  },
+  "forms": {
+    "core": {
+      "delete": "Löschen",
+      "deleteFeature": "Element löschen",
+      "cancel": "Abbrechen",
+      "cancelCreation": "Erstellung eines neuen Elements abbrechen",
+      "reset": "Zurücksetzen",
+      "resetChanges": "Änderungen für dieses Element zurücksetzen",
+      "save": "Speichern",
+      "create": "Erstellen",
+      "saveEdits": "Änderungen speichern"
+    },
+    "common": {
+      "name": "Name",
+      "shortName": "Kurzname",
+      "visible": "Sichtbar",
+      "color": "Farbe",
+      "fill": "Füllung",
+      "colorRequired": "Farbe ist erforderlich!",
+      "nameRequired": "Bitte geben Sie einen Namen ein!",
+      "shortNameRequired": "Bitte geben Sie einen Kurznamen ein!",
+      "position": "Position",
+      "time": "Zeit",
+      "timeEnd": "Endzeit",
+      "timeEndAfterTime": "Die Endzeit muss nach der Startzeit liegen!",
+      "start": "Start",
+      "end": "Ende",
+      "url": "URL",
+      "urlRequired": "Bitte geben Sie eine URL ein!",
+      "maxNativeZoom": "Maximaler nativer Zoom",
+      "maxNativeZoomRequired": "Bitte geben Sie den maximalen nativen Zoom ein!",
+      "maxZoom": "Maximaler Zoom",
+      "maxZoomRequired": "Bitte geben Sie den maximalen Zoom ein!",
+      "environment": "Umgebung",
+      "environmentRequired": "Bitte geben Sie die Umgebung/Symbol an",
+      "markers": "Markierungen",
+      "labels": "Beschriftungen",
+      "symbols": "Symbole",
+      "shape": "Form",
+      "edit": "Bearbeiten"
+    },
+    "multiFeature": {
+      "itemsSelected": "Elemente ausgewählt",
+      "visibility": "Sichtbarkeit",
+      "hideAll": "Alle ausblenden",
+      "showAll": "Alle anzeigen",
+      "mixedVisibility": "Gemischte Sichtbarkeit, klicken Sie, um alle auszublenden",
+      "currentColor": "Aktuelle Farbe:",
+      "mixedColors": "Gemischte Farben"
+    }
   }
 }

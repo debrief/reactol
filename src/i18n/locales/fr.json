@@ -90,5 +90,56 @@
     "addZone": "Ajouter une nouvelle zone",
     "addPoint": "Ajouter un nouveau point",
     "addBackdrop": "Ajouter un nouvel arrière-plan"
+  },
+  "forms": {
+    "core": {
+      "delete": "Supprimer",
+      "deleteFeature": "Supprimer l'élément",
+      "cancel": "Annuler",
+      "cancelCreation": "Annuler la création d'un nouvel élément",
+      "reset": "Réinitialiser",
+      "resetChanges": "Réinitialiser les modifications pour cet élément",
+      "save": "Enregistrer",
+      "create": "Créer",
+      "saveEdits": "Enregistrer les modifications"
+    },
+    "common": {
+      "name": "Nom",
+      "shortName": "Nom court",
+      "visible": "Visible",
+      "color": "Couleur",
+      "fill": "Remplissage",
+      "colorRequired": "la couleur est requise !",
+      "nameRequired": "Veuillez entrer un nom !",
+      "shortNameRequired": "Veuillez entrer un nom court !",
+      "position": "Position",
+      "time": "Temps",
+      "timeEnd": "Fin du temps",
+      "timeEndAfterTime": "La fin du temps doit être après le début !",
+      "start": "Début",
+      "end": "Fin",
+      "url": "URL",
+      "urlRequired": "Veuillez entrer une URL !",
+      "maxNativeZoom": "Zoom natif maximal",
+      "maxNativeZoomRequired": "Veuillez entrer le zoom natif maximal !",
+      "maxZoom": "Zoom maximal",
+      "maxZoomRequired": "Veuillez entrer le zoom maximal !",
+      "environment": "Environnement",
+      "environmentRequired": "Veuillez spécifier l'environnement/symbole",
+      "markers": "Marqueurs",
+      "labels": "Étiquettes",
+      "symbols": "Symboles",
+      "shape": "Forme",
+      "edit": "Éditer"
+    },
+    "multiFeature": {
+      "itemsSelected": "éléments sélectionnés",
+      "visibility": "Visibilité",
+      "hideAll": "Tout masquer",
+      "showAll": "Tout afficher",
+      "mixedVisibility": "Visibilité mixte, cliquez pour tout masquer",
+      "currentColor": "Couleur actuelle :",
+      "mixedColors": "Couleurs mixtes"
+    }
   }
 }

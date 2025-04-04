@@ -8,6 +8,7 @@ import {
 } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BuoyFieldProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 import './index.css'
@@ -29,6 +30,7 @@ export const BuoyFieldForm: React.FC<FieldFormProps> = ({
   field,
   onChange,
 }) => {
+  const { t } = useTranslation()
   const [state, setState] = useState<BuoyFieldProps | null>(null)
 
   useEffect(() => {
@@ -96,23 +98,23 @@ export const BuoyFieldForm: React.FC<FieldFormProps> = ({
         size='small'
       >
         <Form.Item<FormTypeProps>
-          label='Name'
+          label={t('forms.common.name')}
           name='name'
           style={itemStyle}
-          rules={[{ required: true, message: 'Please enter track name!' }]}
+          rules={[{ required: true, message: t('forms.common.nameRequired') }]}
         >
           <Input />
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Short name'
+          label={t('forms.common.shortName')}
           name='shortName'
           style={itemStyle}
-          rules={[{ required: true, message: 'Please enter short name!' }]}
+          rules={[{ required: true, message: t('forms.common.shortNameRequired') }]}
         >
           <Input />
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Visible'
+          label={t('forms.common.visible')}
           name={'visible'}
           style={itemStyle}
           valuePropName='checked'
@@ -120,10 +122,10 @@ export const BuoyFieldForm: React.FC<FieldFormProps> = ({
           <Checkbox />
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Color'
+          label={t('forms.common.color')}
           name='marker-color'
           style={itemStyle}
-          rules={[{ required: true, message: 'color is required!' }]}
+          rules={[{ required: true, message: t('forms.common.colorRequired') }]}
         >
           <ColorPicker
             style={{ marginLeft: 0 }}
@@ -132,11 +134,11 @@ export const BuoyFieldForm: React.FC<FieldFormProps> = ({
             presets={presetColors}
           />
         </Form.Item>
-        <Form.Item<FormTypeProps> label='Time' style={itemStyle} name='dTime'>
+        <Form.Item<FormTypeProps> label={t('forms.common.time')} style={itemStyle} name='dTime'>
           <DatePicker showTime format={'MMM DDHHmm'} />
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Time end'
+          label={t('forms.common.timeEnd')}
           style={itemStyle}
           // validate that dTimeEnd is after dTime
           rules={[
@@ -145,7 +147,7 @@ export const BuoyFieldForm: React.FC<FieldFormProps> = ({
                 // if there is a value, check if it's after the dTime
                 return !value || getFieldValue('dTime') < value
                   ? Promise.resolve()
-                  : Promise.reject(new Error('Time-end must be after time!'))
+                  : Promise.reject(new Error(t('forms.common.timeEndAfterTime')))
               },
             }),
           ]}

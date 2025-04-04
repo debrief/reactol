@@ -90,5 +90,56 @@
     "addZone": "Nieuwe zone toevoegen",
     "addPoint": "Nieuw punt toevoegen",
     "addBackdrop": "Nieuwe achtergrond toevoegen"
+  },
+  "forms": {
+    "core": {
+      "delete": "Verwijderen",
+      "deleteFeature": "Object verwijderen",
+      "cancel": "Annuleren",
+      "cancelCreation": "Aanmaken van nieuw object annuleren",
+      "reset": "Resetten",
+      "resetChanges": "Wijzigingen voor dit object resetten",
+      "save": "Opslaan",
+      "create": "Aanmaken",
+      "saveEdits": "Wijzigingen opslaan"
+    },
+    "common": {
+      "name": "Naam",
+      "shortName": "Korte naam",
+      "visible": "Zichtbaar",
+      "color": "Kleur",
+      "fill": "Vulling",
+      "colorRequired": "kleur is vereist!",
+      "nameRequired": "Voer een naam in!",
+      "shortNameRequired": "Voer een korte naam in!",
+      "position": "Positie",
+      "time": "Tijd",
+      "timeEnd": "Eindtijd",
+      "timeEndAfterTime": "Eindtijd moet na begintijd zijn!",
+      "start": "Start",
+      "end": "Einde",
+      "url": "URL",
+      "urlRequired": "Voer een URL in!",
+      "maxNativeZoom": "Max Eigen Zoom",
+      "maxNativeZoomRequired": "Voer max eigen zoom in!",
+      "maxZoom": "Max Zoom",
+      "maxZoomRequired": "Voer max zoom in!",
+      "environment": "Omgeving",
+      "environmentRequired": "Specificeer de omgeving/symbool",
+      "markers": "Markers",
+      "labels": "Labels",
+      "symbols": "Symbolen",
+      "shape": "Vorm",
+      "edit": "Bewerken"
+    },
+    "multiFeature": {
+      "itemsSelected": "items geselecteerd",
+      "visibility": "Zichtbaarheid",
+      "hideAll": "Alles verbergen",
+      "showAll": "Alles tonen",
+      "mixedVisibility": "Gemengde zichtbaarheid, klik om alles te verbergen",
+      "currentColor": "Huidige kleur:",
+      "mixedColors": "Gemengde kleuren"
+    }
   }
 }
