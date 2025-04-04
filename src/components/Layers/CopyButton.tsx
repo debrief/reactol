@@ -8,8 +8,10 @@ import {
 import { ToolButton } from './ToolButton'
 import { useAppContext } from '../../state/AppContext'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
+import { useTranslation } from 'react-i18next'
 
 export const CopyButton: React.FC = () => {
+  const { t } = useTranslation()
   const { selection, setMessage } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
@@ -34,9 +36,9 @@ export const CopyButton: React.FC = () => {
     navigator.clipboard.writeText(asStr).then(() => {
       setClipboardUpdated(clipboardUpdated => !clipboardUpdated)
     }).catch((e) => {
-      setMessage({ title: 'Error', severity: 'error', message: 'Copy error: ' + e })
+      setMessage({ title: 'Error', severity: 'error', message: t('layers.copyError') + e })
     })
-  }, [selection, features, setClipboardUpdated, setMessage])
+  }, [selection, features, setClipboardUpdated, setMessage, t])
 
   return (
     <ToolButton
@@ -46,8 +48,8 @@ export const CopyButton: React.FC = () => {
       icon={<CopyOutlined />}
       title={
         selection.length > 0
-          ? 'Copy selected items'
-          : 'Select non-track items to enable copy'
+          ? t('layers.copySelected')
+          : t('layers.selectNonTrack')
       }
     />
   )

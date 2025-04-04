@@ -6,6 +6,7 @@ import { useDocContext } from '../../state/DocContext'
 import { useAppSelector } from '../../state/hooks'
 import { LoadTrackModel } from '../LoadTrackModal'
 import { EnvOptions } from '../../types'
+import { useTranslation } from 'react-i18next'
 // These components are now used in LayersToolbar
 import { AddZoneShape } from './AddZoneShape'
 import { LayersToolbar } from './LayersToolbar'
@@ -42,6 +43,7 @@ interface LayerProps {
 // Components have been moved to their own files
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
+  const { t } = useTranslation()
   const treeRef = React.useRef<HTMLDivElement>(null)
   const { selection, setSelection, setNewFeature, preview, setMessage, time } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
@@ -138,7 +140,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     const zonesIcon = TreeDataBuilder.getIcon(
       undefined, 
       NODE_ZONES, 
-      'Zones', 
+      t('layers.zones'), 
       handleAdd, 
       iconCreators,
       <AddZoneShape addZone={addZone} />
@@ -158,7 +160,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     const validModels = modelData.filter(node => node !== null)
     
     return validModels
-  }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied, iconCreators])
+  }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied, iconCreators, t])
 
   // onSelect is now provided by useSelectionHandlers
 

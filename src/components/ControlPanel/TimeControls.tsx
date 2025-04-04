@@ -9,6 +9,7 @@ import {
 import { TimeSupport } from '../../helpers/time-support'
 import { formatInTimeZone } from 'date-fns-tz'
 import { useDocContext } from '../../state/DocContext'
+import { useTranslation } from 'react-i18next'
 
 interface TimeControlsProps {
   bounds: [number, number] | null
@@ -66,6 +67,7 @@ const TimeButton: React.FC<TimeButtonProps> = ({
 }
 
 const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
+  const { t } = useTranslation()
   const { time, setTime,  interval, setInterval } = useDocContext()
   const [stepTxt, setStepTxt] = useState<string>('01h00m')
 
@@ -140,9 +142,9 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
       >
         <thead>
           <tr>
-            <th>Start</th>
-            <th>Step</th>
-            <th>End</th>
+            <th>{t('controlPanel.start')}</th>
+            <th>{t('controlPanel.step')}</th>
+            <th>{t('controlPanel.end')}</th>
           </tr>
         </thead>
         <tbody>
@@ -164,7 +166,7 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
           <tr style={{ fontFamily: 'monospace' }}>
             <td>
               <TimeButton
-                tooltip='Jump to start'
+                tooltip={t('controlPanel.jumpToStart')}
                 icon={<FastBackwardOutlined style={largeIcon} />}
                 forward={false}
                 large={true}
@@ -172,7 +174,7 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
                 disabled={!time.filterApplied}
               />
               <TimeButton
-                tooltip='Step backward'
+                tooltip={t('controlPanel.stepBackward')}
                 icon={<StepBackwardOutlined style={largeIcon} />}
                 forward={false}
                 large={false}
@@ -183,7 +185,7 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
             <td></td>
             <td>
               <TimeButton
-                tooltip='Step forward'
+                tooltip={t('controlPanel.stepForward')}
                 icon={<StepForwardOutlined style={largeIcon} />}
                 forward={true}
                 large={false}
@@ -191,7 +193,7 @@ const TimeControls: FC<TimeControlsProps> = ({ bounds }) => {
                 disabled={!time.filterApplied}
               />
               <TimeButton
-                tooltip='Jump to end'
+                tooltip={t('controlPanel.jumpToEnd')}
                 icon={<FastForwardOutlined style={largeIcon} />}
                 forward={true}
                 large={true}
