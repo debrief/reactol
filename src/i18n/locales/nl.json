@@ -79,6 +79,7 @@
     "pasteError": "Plakfout: ",
     "readClipboardError": "Kan klembord niet lezen: ",
     "invalidGeoJSON": "Ongeldig GeoJSON-formaat",
+    "units": "Eenheden",
     "tracks": "Tracks",
     "fields": "Velden",
     "zones": "Zones",

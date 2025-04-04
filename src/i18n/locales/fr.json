@@ -79,6 +79,7 @@
     "pasteError": "Erreur de collage : ",
     "readClipboardError": "Impossible de lire le presse-papiers : ",
     "invalidGeoJSON": "Format GeoJSON invalide",
+    "units": "Unités",
     "tracks": "Pistes",
     "fields": "Champs",
     "zones": "Zones",

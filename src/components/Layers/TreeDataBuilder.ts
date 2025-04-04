@@ -143,11 +143,12 @@ export class TreeDataBuilder {
     features: Feature[], 
     handleAdd: HandleAddFunction, 
     iconCreators: IconCreators,
-    useTimeFilter: boolean
+    useTimeFilter: boolean,
+    unitsLabel: string = 'Units'
   ): TreeDataNode {
     // generate new root
     const root: TreeDataNode = {
-      title: 'Units',
+      title: unitsLabel,
       key: NODE_TRACKS,
       icon: iconCreators.createFolderIcon(),
       children: [],
@@ -232,7 +233,14 @@ export class TreeDataBuilder {
     useTimeFilter: boolean = false, 
     timeStart: number, 
     timeEnd: number,
-    zonesIcon: React.ReactNode
+    zonesIcon: React.ReactNode,
+    translations?: {
+      units?: string;
+      buoyFields?: string;
+      zones?: string;
+      referencePoints?: string;
+      backgrounds?: string;
+    }
   ): Array<TreeDataNode | null> {
     // If time filtering is enabled, filter the features
     let filteredFeatures = features
@@ -245,11 +253,11 @@ export class TreeDataBuilder {
     }
 
     return [
-      this.buildTrackNode(filteredFeatures, handleAdd, iconCreators, useTimeFilter),
-      this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
-      this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, iconCreators, useTimeFilter, zonesIcon),
-      this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, REFERENCE_POINT_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
-      this.buildTypeNode(filteredFeatures, 'Backgrounds', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
+      this.buildTrackNode(filteredFeatures, handleAdd, iconCreators, useTimeFilter, translations?.units),
+      this.buildTypeNode(filteredFeatures, translations?.buoyFields || 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
+      this.buildTypeNode(filteredFeatures, translations?.zones || 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, iconCreators, useTimeFilter, zonesIcon),
+      this.buildTypeNode(filteredFeatures, translations?.referencePoints || 'Reference Points', NODE_POINTS, REFERENCE_POINT_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
+      this.buildTypeNode(filteredFeatures, translations?.backgrounds || 'Backgrounds', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, iconCreators, useTimeFilter, undefined),
     ]
   }
 

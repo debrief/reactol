@@ -79,6 +79,7 @@
     "pasteError": "Einfügefehler: ",
     "readClipboardError": "Fehler beim Lesen der Zwischenablage: ",
     "invalidGeoJSON": "Ungültiges GeoJSON-Format",
+    "units": "Einheiten",
     "tracks": "Tracks",
     "fields": "Felder",
     "zones": "Zonen",

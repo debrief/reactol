@@ -154,7 +154,14 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       filterForTime, 
       useTimeFilter ? time.start : 0, 
       useTimeFilter ? time.end : 0,
-      zonesIcon
+      zonesIcon,
+      {
+        units: t('layers.units'),
+        buoyFields: t('layers.fields'),
+        zones: t('layers.zones'),
+        referencePoints: t('layers.points'),
+        backgrounds: t('layers.backdrops')
+      }
     )
 
     const validModels = modelData.filter(node => node !== null)

@@ -79,6 +79,7 @@
     "pasteError": "Paste error: ",
     "readClipboardError": "Failed to read clipboard: ",
     "invalidGeoJSON": "Invalid GeoJSON format",
+    "units": "Units",
     "tracks": "Tracks",
     "fields": "Fields",
     "zones": "Zones",
