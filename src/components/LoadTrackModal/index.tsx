@@ -14,6 +14,7 @@ import {
   Typography,
 } from 'antd'
 import { Color } from 'antd/es/color-picker'
+import { useTranslation } from 'react-i18next'
 import { presetColors } from '../../helpers/standardShades'
 import { useAppSelector } from '../../state/hooks'
 import { selectFeatures } from '../../state/geoFeaturesSlice'
@@ -42,6 +43,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   environment,
   createTrackOnly = false,
 }) => {
+  const { t } = useTranslation()
   const features = useAppSelector(selectFeatures)
   const trackOptions = features
     .filter((feature) => feature.properties?.dataType === 'track')
@@ -114,7 +116,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
   const tabs: TabsProps['items'] = [
     {
       key: 'add',
-      label: 'Add to existing track',
+      label: t('layers.addToExistingTrack'),
       children: (
         <Form
           name='addToTrack'
@@ -126,19 +128,19 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           disabled={trackOptions.length === 0}
         >
           { trackOptions.length ? <Typography.Text>
-            Select a track to add data to, from the list below:
+            {t('layers.selectTrackToAddData')}
           </Typography.Text> : <Typography.Text>
-            No tracks available to add to. Please load as a new track.
+            {t('layers.noTracksAvailable')}
           </Typography.Text>  } 
           <Form.Item<AddTrackProps>
-            label='Track'
+            label={t('layers.tracks')}
             name='trackId'
             initialValue={defaultTrackId}
             style={itemStyle}
             rules={[
               {
                 required: true,
-                message: 'Please indicate which track to add data to',
+                message: t('layers.pleaseSelectTrack'),
               },
             ]}
           >
@@ -146,10 +148,10 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           </Form.Item>
           <Form.Item label={null}>
             <Button type='text' onClick={cancel}>
-              Cancel
+              {t('documents.cancel')}
             </Button>
             <Button type='primary' htmlType='submit'>
-              Add
+              {t('layers.add')}
             </Button>
           </Form.Item>
         </Form>
@@ -157,7 +159,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
     },
     {
       key: 'create',
-      label: 'Create new track',
+      label: t('layers.addTrack'),
       children: (
         <Form
           name='createTrack'
@@ -170,25 +172,24 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           autoComplete='off'
         >
           <Typography.Text>
-            Extra details are required for a new track. Please complete the
-            following:
+            {t('layers.extraDetailsForNewTrack')}
           </Typography.Text>
           <Form.Item<NewTrackProps>
-            label='Name'
+            label={t('forms.common.name')}
             name='name'
             style={itemStyle}
-            rules={[{ required: true, message: 'Please enter track name!' }]}
+            rules={[{ required: true, message: t('forms.common.nameRequired') }]}
           >
             <Input />
           </Form.Item>
           <Form.Item<NewTrackProps>
-            label='Short Name'
+            label={t('forms.common.shortName')}
             name='shortName'
             style={itemStyle}
             rules={[
               {
                 required: true,
-                message: 'Please enter abbreviated track name!',
+                message: t('forms.common.shortNameRequired'),
               },
             ]}
           >
@@ -198,31 +199,31 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           </Form.Item>
 
           <Form.Item<NewTrackProps>
-            label='Year'
+            label={t('layers.year')}
             name='initialYear'
             style={itemStyle}
-            rules={[{ required: true, message: 'Please enter Year for data' }]}
+            rules={[{ required: true, message: t('layers.yearRequired') }]}
           >
             <InputNumber min={2020} max={2040} changeOnWheel />
           </Form.Item>
 
           <Form.Item<NewTrackProps>
-            label='Month'
+            label={t('layers.month')}
             name='initialMonth'
             style={itemStyle}
-            rules={[{ required: true, message: 'Please enter Month for data' }]}
+            rules={[{ required: true, message: t('layers.monthRequired') }]}
           >
             <InputNumber min={1} max={12} changeOnWheel />
           </Form.Item>
 
           <Form.Item<NewTrackProps>
-            label='Environment'
+            label={t('forms.common.environment')}
             name='env'
             style={itemStyle}
             rules={[
               {
                 required: true,
-                message: 'Please specify the environment for the track',
+                message: t('forms.common.environmentRequired'),
               },
             ]}
           >
@@ -230,10 +231,10 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           </Form.Item>
 
           <Form.Item<NewTrackProps>
-            label='Colour'
+            label={t('forms.common.color')}
             name='stroke'
             style={itemStyle}
-            rules={[{ required: true, message: 'Please enter track color' }]}
+            rules={[{ required: true, message: t('forms.common.colorRequired') }]}
           >
             <ColorPicker
               presets={presetColors}
@@ -246,17 +247,17 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           </Form.Item>
           <Form.Item<NewTrackProps>
             style={itemStyle}
-            label='Markers'>
+            label={t('forms.common.markers')}>
             <Flex gap='small'>
               <Form.Item<NewTrackProps>
-                label='Labels'
+                label={t('forms.common.labels')}
                 className="labelInterval"
                 name='labelInterval'
                 style={itemStyle}>
                 <Select options={defaultIntervals} size='small' style={{width:'70px'}} />
               </Form.Item>
               <Form.Item<NewTrackProps>
-                label='Symbols'
+                label={t('forms.common.symbols')}
                 name='symbolInterval'
                 className="labelSymbol"
                 style={itemStyle}>
@@ -271,7 +272,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
               Cancel
             </Button>
             <Button type='primary' htmlType='submit'>
-              Create
+              {t('forms.core.create')}
             </Button>
           </Form.Item>
         </Form>
