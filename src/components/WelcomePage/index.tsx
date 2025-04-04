@@ -1,8 +1,8 @@
 // src/components/WelcomePage/index.tsx
 import { Button, Col, Image, Row, Typography } from 'antd'
 import './styles.css'
-import { useTranslation } from 'react-i18next';
-import LanguageSelector from './LanguageSelector';
+import { useTranslation } from 'react-i18next'
+import LanguageSelector from './LanguageSelector'
 
 interface WelcomePageProps {
   onDragOver: (event: React.DragEvent<HTMLDivElement>) => void
@@ -19,11 +19,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
   handleNew,
   openExistingDocument
 }) => {
-  const { t } = useTranslation();
-  const gitBranch = import.meta.env.VITE_GIT_BRANCH || t('unknown');
+  const { t } = useTranslation()
+  const gitBranch = import.meta.env.VITE_GIT_BRANCH || t('unknown')
   const buildDate = import.meta.env.VITE_BUILD_DATE 
     ? new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()
-    : t('unknown');
+    : t('unknown')
   return (
     <div style={{ paddingTop: '50px' }} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
       <Row>
