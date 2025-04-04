@@ -239,8 +239,8 @@ export class TreeDataBuilder {
     if (useTimeFilter && timeStart !== 0 && timeEnd !== 0) {
       // Filter features based on time properties
       filteredFeatures = features.filter(feature => 
-        // Include features that don't have time properties or are visible in the current time period
-        !feature.properties?.time || featureIsVisibleInPeriod(feature, timeStart, timeEnd)
+        // Include features that are visible in the current time period (or don't have time)
+        featureIsVisibleInPeriod(feature, timeStart, timeEnd)
       )
     }
 
