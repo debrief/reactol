@@ -1,11 +1,12 @@
 import React from 'react'
 import { Select } from 'antd'
 import { useTranslation } from 'react-i18next'
+import { GlobalOutlined } from '@ant-design/icons'
 
 const { Option } = Select
 
 const LanguageSelector: React.FC = () => {
-  const { i18n, t } = useTranslation()
+  const { i18n } = useTranslation()
 
   const handleLanguageChange = (value: string) => {
     i18n.changeLanguage(value)
@@ -13,7 +14,7 @@ const LanguageSelector: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <span>{t('common.language')}:</span>
+      <GlobalOutlined style={{ fontSize: '16px' }} />
       <Select
         defaultValue={i18n.language}
         style={{ width: 120 }}
