@@ -1,0 +1,14 @@
+{
+  "welcome": {
+    "title": "Willkommen bei Albatross",
+    "subtitle": "Öffnen Sie ein vorhandenes Dokument oder erstellen Sie ein neues",
+    "new": "Neu",
+    "samplePlot": "Beispiel",
+    "open": "Öffnen"
+  },
+  "common": {
+    "branch": "Branch",
+    "build": "Build",
+    "language": "Sprache"
+  }
+}

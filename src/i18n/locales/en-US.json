@@ -1,0 +1,14 @@
+{
+  "welcome": {
+    "title": "Welcome to Albatross",
+    "subtitle": "Open an existing document or create a new one",
+    "new": "New",
+    "samplePlot": "Sample plot",
+    "open": "Open"
+  },
+  "common": {
+    "branch": "Branch",
+    "build": "Build",
+    "language": "Language"
+  }
+}

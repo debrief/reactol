@@ -7,6 +7,8 @@ import { AppContextProvider } from './state/AppContextProvider'
 import { ErrorBoundary } from 'react-error-boundary'
 import '@ant-design/v5-patch-for-react-19' // shims to allow ant5 work on react 19
 import { ConfigProvider, theme } from 'antd'
+// Import i18n configuration
+import './i18n/i18n'
 import { AppContext } from './state/AppContext'
 
 const fallbackRender: React.FC<{ error: Error, resetErrorBoundary: () => void }> = ({ error, resetErrorBoundary }) => {
