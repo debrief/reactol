@@ -32,6 +32,14 @@
     "multipleFilesError": "Er kan slechts één bestand tegelijk worden geladen",
     "fileTypeError": "Alleen .json en .geojson bestanden worden ondersteund",
     "invalidJsonError": "De bestandsinhoud is geen geldig JSON-formaat. Controleer het bestand en probeer het opnieuw.",
-    "geoJsonError": "Bestand moet een GeoJSON FeatureCollection of Feature bevatten"
+    "geoJsonError": "Bestand moet een GeoJSON FeatureCollection of Feature bevatten",
+    "handlingError": "Verwerkingsfout: ",
+    "localSaveNotSupported": "Lokaal opslaan wordt niet ondersteund in de browser"
+  },
+  "document": {
+    "controlPanel": "Bedieningspaneel",
+    "layers": "Lagen",
+    "detail": "Detail",
+    "graphs": "Grafieken"
   }
 }

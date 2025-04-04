@@ -32,6 +32,14 @@
     "multipleFilesError": "È possibile caricare solo un file alla volta",
     "fileTypeError": "Sono supportati solo file .json e .geojson",
     "invalidJsonError": "Il contenuto del file non è in un formato JSON valido. Controlla il file e riprova.",
-    "geoJsonError": "Il file deve contenere una FeatureCollection GeoJSON o una Feature"
+    "geoJsonError": "Il file deve contenere una FeatureCollection GeoJSON o una Feature",
+    "handlingError": "Errore di gestione: ",
+    "localSaveNotSupported": "Salvataggio locale non supportato nel browser"
+  },
+  "document": {
+    "controlPanel": "Pannello di Controllo",
+    "layers": "Livelli",
+    "detail": "Dettaglio",
+    "graphs": "Grafici"
   }
 }
