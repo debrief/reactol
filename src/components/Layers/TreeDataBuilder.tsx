@@ -194,7 +194,6 @@ export class TreeDataBuilder {
       })
       : []
 
-    console.log('node', dType, features, children)  
     if (useTimeFilter && !children.length) return null
 
     return {

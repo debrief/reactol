@@ -122,7 +122,6 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       useTimeFilter ? time.end : 0
     )
 
-    console.log('empty', modelData)
     const validModels = modelData.filter(node => node !== null)
     
     // Add the custom button for zones
