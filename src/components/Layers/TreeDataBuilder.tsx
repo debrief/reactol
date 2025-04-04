@@ -6,6 +6,7 @@ import { Tooltip } from 'antd'
 import { FeatureIcon } from './FeatureIcon'
 import { symbolOptions } from '../../helpers/symbolTypes'
 import { EnvOptions } from '../../types'
+import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
 
 // Import node constants from the constants file
 import {
@@ -204,15 +205,34 @@ export class TreeDataBuilder {
    * Build the complete tree data model
    * @param features The features to include
    * @param handleAdd The add handler function
+   * @param useTimeFilter Whether to filter features by time
+   * @param timeStart The start time for filtering (if useTimeFilter is true)
+   * @param timeEnd The end time for filtering (if useTimeFilter is true)
    * @returns An array of TreeDataNode objects representing the complete tree
    */
-  static buildTreeModel(features: Feature[], handleAdd: HandleAddFunction): TreeDataNode[] {
+  static buildTreeModel(
+    features: Feature[], 
+    handleAdd: HandleAddFunction, 
+    useTimeFilter: boolean = false, 
+    timeStart: number = 0, 
+    timeEnd: number = 0
+  ): TreeDataNode[] {
+    // If time filtering is enabled, filter the features
+    let filteredFeatures = features
+    if (useTimeFilter && timeStart !== 0 && timeEnd !== 0) {
+      // Filter features based on time properties
+      filteredFeatures = features.filter(feature => 
+        // Include features that don't have time properties or are visible in the current time period
+        !feature.properties?.time || featureIsVisibleInPeriod(feature, timeStart, timeEnd)
+      )
+    }
+    
     return [
-      this.buildTrackNode(features, handleAdd),
-      this.buildTypeNode(features, 'Buoy Fields', NODE_FIELDS, 'buoy-field', handleAdd),
-      this.buildTypeNode(features, 'Zones', NODE_ZONES, 'zone', handleAdd),
-      this.buildTypeNode(features, 'Reference Points', NODE_POINTS, 'reference-point', handleAdd),
-      this.buildTypeNode(features, 'Backdrops', NODE_BACKDROPS, 'backdrop', handleAdd),
+      this.buildTrackNode(filteredFeatures, handleAdd),
+      this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, 'buoy-field', handleAdd),
+      this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, 'zone', handleAdd),
+      this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, 'reference-point', handleAdd),
+      this.buildTypeNode(filteredFeatures, 'Backdrops', NODE_BACKDROPS, 'backdrop', handleAdd),
     ]
   }
 

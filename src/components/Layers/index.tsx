@@ -40,7 +40,7 @@ interface LayerProps {
 
 const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   const treeRef = React.useRef<HTMLDivElement>(null)
-  const { selection, setSelection, setNewFeature, preview, setMessage } = useDocContext()
+  const { selection, setSelection, setNewFeature, preview, setMessage, time } = useDocContext()
   const { setClipboardUpdated } = useAppContext()
   const features = useAppSelector(selectFeatures)
   // Model data is derived from features and handlers
@@ -112,8 +112,15 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
 
   // Use useMemo to create the model data only when dependencies change
   const model = useMemo(() => {
-    // Use TreeDataBuilder.buildTreeModel to construct the tree model
-    const modelData = TreeDataBuilder.buildTreeModel(theFeatures, handleAdd)
+    const filterForTime = time.filterApplied && useTimeFilter
+    // Use TreeDataBuilder.buildTreeModel to construct the tree model with time filtering
+    const modelData = TreeDataBuilder.buildTreeModel(
+      theFeatures, 
+      handleAdd, 
+      filterForTime, 
+      useTimeFilter ? time.start : 0, 
+      useTimeFilter ? time.end : 0
+    )
     
     // Add the custom button for zones
     const zonesNode = modelData.find(node => node.key === NODE_ZONES)
@@ -123,7 +130,7 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     }
     
     return modelData
-  }, [theFeatures, handleAdd, addZone])
+  }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied])
 
   // onSelect is now provided by useSelectionHandlers
 
