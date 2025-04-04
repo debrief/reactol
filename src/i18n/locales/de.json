@@ -4,11 +4,34 @@
     "subtitle": "Öffnen Sie ein vorhandenes Dokument oder erstellen Sie ein neues",
     "new": "Neu",
     "samplePlot": "Beispiel",
-    "open": "Öffnen"
+    "open": "Öffnen",
+    "background": "Hintergrundinformationen zum Tool, wen Sie für Support kontaktieren können. Hintergrundinformationen zum Tool, wen Sie für Support kontaktieren können. Hintergrundinformationen zum Tool, wen Sie für Support kontaktieren können. Hintergrundinformationen zum Tool, wen Sie für Support kontaktieren können. Hintergrundinformationen zum Tool, wen Sie für Support kontaktieren können. Hintergrundinformationen zum Tool, wen Sie für Support kontaktieren können."
   },
   "common": {
     "branch": "Branch",
     "build": "Build",
     "language": "Sprache"
+  },
+  "documents": {
+    "newTab": "Neuer Tab",
+    "new": "Neu",
+    "openExisting": "Vorhandenes Dokument öffnen",
+    "open": "Öffnen",
+    "lightMode": "Zum hellen Modus wechseln",
+    "darkMode": "Zum dunklen Modus wechseln",
+    "documentName": "Bitte geben Sie einen Namen für das Dokument an",
+    "closeTab": "Tab schließen",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "confirmClose": "Sind Sie sicher, dass Sie diesen Tab schließen möchten?",
+    "error": "Fehler",
+    "warning": "Warnung",
+    "info": "Information",
+    "invalidFile": "Ungültige Datei",
+    "loadingError": "Problem beim Laden der Datei: ",
+    "multipleFilesError": "Es kann nur eine Datei gleichzeitig geladen werden",
+    "fileTypeError": "Nur .json und .geojson Dateien werden unterstützt",
+    "invalidJsonError": "Der Dateiinhalt ist kein gültiges JSON-Format. Bitte überprüfen Sie die Datei und versuchen Sie es erneut.",
+    "geoJsonError": "Die Datei muss eine GeoJSON FeatureCollection oder Feature enthalten"
   }
 }

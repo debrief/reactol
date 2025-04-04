@@ -4,11 +4,34 @@
     "subtitle": "Open an existing document or create a new one",
     "new": "New",
     "samplePlot": "Sample plot",
-    "open": "Open"
+    "open": "Open",
+    "background": "Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support."
   },
   "common": {
     "branch": "Branch",
     "build": "Build",
     "language": "Language"
+  },
+  "documents": {
+    "newTab": "New Tab",
+    "new": "New",
+    "openExisting": "Open Existing Document",
+    "open": "Open",
+    "lightMode": "Switch to Light Mode",
+    "darkMode": "Switch to Dark Mode",
+    "documentName": "Please provide a name for the document",
+    "closeTab": "Close Tab",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirmClose": "Are you sure you want to close this tab?",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "invalidFile": "Invalid File",
+    "loadingError": "Problem loading file: ",
+    "multipleFilesError": "Only one file can be loaded at a time",
+    "fileTypeError": "Only .json and .geojson files are supported",
+    "invalidJsonError": "The file content is not a valid JSON format. Please check the file and try again.",
+    "geoJsonError": "File must contain a GeoJSON FeatureCollection or Feature"
   }
 }

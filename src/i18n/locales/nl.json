@@ -4,11 +4,34 @@
     "subtitle": "Open een bestaand document of maak een nieuw document",
     "new": "Nieuw",
     "samplePlot": "Voorbeeldplot",
-    "open": "Openen"
+    "open": "Openen",
+    "background": "Achtergrond over het hulpmiddel, wie te contacteren voor ondersteuning. Achtergrond over het hulpmiddel, wie te contacteren voor ondersteuning. Achtergrond over het hulpmiddel, wie te contacteren voor ondersteuning. Achtergrond over het hulpmiddel, wie te contacteren voor ondersteuning. Achtergrond over het hulpmiddel, wie te contacteren voor ondersteuning. Achtergrond over het hulpmiddel, wie te contacteren voor ondersteuning."
   },
   "common": {
     "branch": "Branch",
     "build": "Build",
     "language": "Taal"
+  },
+  "documents": {
+    "newTab": "Nieuw Tabblad",
+    "new": "Nieuw",
+    "openExisting": "Open Bestaand Document",
+    "open": "Openen",
+    "lightMode": "Schakel naar Lichte Modus",
+    "darkMode": "Schakel naar Donkere Modus",
+    "documentName": "Geef een naam voor het document",
+    "closeTab": "Tabblad Sluiten",
+    "close": "Sluiten",
+    "cancel": "Annuleren",
+    "confirmClose": "Weet je zeker dat je dit tabblad wilt sluiten?",
+    "error": "Fout",
+    "warning": "Waarschuwing",
+    "info": "Informatie",
+    "invalidFile": "Ongeldig Bestand",
+    "loadingError": "Probleem bij het laden van bestand: ",
+    "multipleFilesError": "Er kan slechts één bestand tegelijk worden geladen",
+    "fileTypeError": "Alleen .json en .geojson bestanden worden ondersteund",
+    "invalidJsonError": "De bestandsinhoud is geen geldig JSON-formaat. Controleer het bestand en probeer het opnieuw.",
+    "geoJsonError": "Bestand moet een GeoJSON FeatureCollection of Feature bevatten"
   }
 }

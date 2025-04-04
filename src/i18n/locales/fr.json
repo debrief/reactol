@@ -4,11 +4,34 @@
     "subtitle": "Ouvrez un document existant ou créez-en un nouveau",
     "new": "Nouveau",
     "samplePlot": "Exemple",
-    "open": "Ouvrir"
+    "open": "Ouvrir",
+    "background": "Contexte sur l'outil, qui contacter pour obtenir de l'aide. Contexte sur l'outil, qui contacter pour obtenir de l'aide. Contexte sur l'outil, qui contacter pour obtenir de l'aide. Contexte sur l'outil, qui contacter pour obtenir de l'aide. Contexte sur l'outil, qui contacter pour obtenir de l'aide. Contexte sur l'outil, qui contacter pour obtenir de l'aide."
   },
   "common": {
     "branch": "Branche",
     "build": "Compilation",
     "language": "Langue"
+  },
+  "documents": {
+    "newTab": "Nouvel Onglet",
+    "new": "Nouveau",
+    "openExisting": "Ouvrir un Document Existant",
+    "open": "Ouvrir",
+    "lightMode": "Passer au Mode Clair",
+    "darkMode": "Passer au Mode Sombre",
+    "documentName": "Veuillez fournir un nom pour le document",
+    "closeTab": "Fermer l'Onglet",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "confirmClose": "Êtes-vous sûr de vouloir fermer cet onglet ?",
+    "error": "Erreur",
+    "warning": "Avertissement",
+    "info": "Information",
+    "invalidFile": "Fichier Invalide",
+    "loadingError": "Problème lors du chargement du fichier : ",
+    "multipleFilesError": "Un seul fichier peut être chargé à la fois",
+    "fileTypeError": "Seuls les fichiers .json et .geojson sont pris en charge",
+    "invalidJsonError": "Le contenu du fichier n'est pas au format JSON valide. Veuillez vérifier le fichier et réessayer.",
+    "geoJsonError": "Le fichier doit contenir une FeatureCollection GeoJSON ou une Feature"
   }
 }

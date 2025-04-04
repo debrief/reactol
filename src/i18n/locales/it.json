@@ -4,11 +4,34 @@
     "subtitle": "Apri un documento esistente o creane uno nuovo",
     "new": "Nuovo",
     "samplePlot": "Esempio",
-    "open": "Apri"
+    "open": "Apri",
+    "background": "Informazioni sullo strumento, chi contattare per supporto. Informazioni sullo strumento, chi contattare per supporto. Informazioni sullo strumento, chi contattare per supporto. Informazioni sullo strumento, chi contattare per supporto. Informazioni sullo strumento, chi contattare per supporto. Informazioni sullo strumento, chi contattare per supporto."
   },
   "common": {
     "branch": "Ramo",
     "build": "Compilazione",
     "language": "Lingua"
+  },
+  "documents": {
+    "newTab": "Nuova Scheda",
+    "new": "Nuovo",
+    "openExisting": "Apri Documento Esistente",
+    "open": "Apri",
+    "lightMode": "Passa alla Modalità Chiara",
+    "darkMode": "Passa alla Modalità Scura",
+    "documentName": "Fornisci un nome per il documento",
+    "closeTab": "Chiudi Scheda",
+    "close": "Chiudi",
+    "cancel": "Annulla",
+    "confirmClose": "Sei sicuro di voler chiudere questa scheda?",
+    "error": "Errore",
+    "warning": "Avviso",
+    "info": "Informazione",
+    "invalidFile": "File Non Valido",
+    "loadingError": "Problema durante il caricamento del file: ",
+    "multipleFilesError": "È possibile caricare solo un file alla volta",
+    "fileTypeError": "Sono supportati solo file .json e .geojson",
+    "invalidJsonError": "Il contenuto del file non è in un formato JSON valido. Controlla il file e riprova.",
+    "geoJsonError": "Il file deve contenere una FeatureCollection GeoJSON o una Feature"
   }
 }
