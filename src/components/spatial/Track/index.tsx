@@ -8,6 +8,7 @@ import { TrackProps } from '../../../types'
 import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
 import { divIcon } from 'leaflet'
+import { filterTrackDataToPeriod } from '../../../helpers/filterTrackDataToPeriod'
 
 const ENVIRONMENT_ICON_SCALE = 2.5 // Scaling factor for environment icons
 const BASE_ICON_SIZE = 16 // Base size of the SVG viewBox
@@ -32,18 +33,13 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
   const isSelected = selection.includes(feature.id as string)
 
   const trackCoords: CoordInstance[] = useMemo(() => {
-    const coords = (feature.geometry as LineString).coordinates
-    const props = feature.properties as TrackProps
-    if (time && props?.times) {
-      const times = props?.times
+    if (time && feature.properties?.times) {
+      const filteredTrack = time.filterApplied ? filterTrackDataToPeriod(feature, time.start, time.end) : feature
       const validCoords = filterTrack(
-        time.filterApplied,
-        time.start,
-        time.end,
-        times,
-        coords,
-        props.labelInterval,
-        props.symbolInterval
+        filteredTrack.properties?.times || [],
+        (filteredTrack.geometry as LineString).coordinates,
+        filteredTrack.properties?.labelInterval,
+        filteredTrack.properties?.symbolInterval
       )
       // sanity check, that we don't have too many labels
       const numLabels = validCoords.filter((item) => item.labelVisible).length

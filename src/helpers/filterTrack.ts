@@ -11,11 +11,6 @@ export interface CoordInstance {
   symbolVisible: boolean
 }
 
-const inRange = (filterApplied: boolean, time: string, limits: [number, number]): boolean => {
-  const timeVal = new Date(time).getTime()
-  return filterApplied ? timeVal >= limits[0] && timeVal <= limits[1] : true
-}
-
 export const trackIsVisibleInPeriod = (track: Feature<Geometry, TrackProps>, start: number, end: number): boolean => {
   const times = track.properties?.times
   if (!times) return false
@@ -24,14 +19,12 @@ export const trackIsVisibleInPeriod = (track: Feature<Geometry, TrackProps>, sta
   return firstTime < end && lastTime > start
 }
 
-export const filterTrack = (filterApplied: boolean, start: number, end: number, times: string[], coords: Position[], labelInterval?:number, symbolInterval?:number): CoordInstance[] => {
+export const filterTrack = (times: string[], coords: Position[], labelInterval?:number, symbolInterval?:number): CoordInstance[] => {
   if (!times || !coords) return []
-  const validIndices = times.map((time: string, index: number) => inRange(filterApplied, time, [start, end]) ? index : -1)
-  const timeIndices = validIndices.filter((index: number) => index !== -1)
-  let lastLabelTime = dayjs(times[timeIndices[0]]).valueOf()
-  let lastSymbolTime = dayjs(times[timeIndices[0]]).valueOf()
-  const res = timeIndices.map((index: number): CoordInstance => {
-    const thisTime = dayjs(times[index]).valueOf()
+  let lastLabelTime = dayjs(times[0]).valueOf()
+  let lastSymbolTime = dayjs(times[0]).valueOf()
+  const res = times.map((time: string, index: number): CoordInstance => {
+    const thisTime = dayjs(time).valueOf()
     let labelVisible = false
     let symbolVisible = false
     if (labelInterval && thisTime - lastLabelTime >= labelInterval) {
