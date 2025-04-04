@@ -1,6 +1,8 @@
+// src/components/WelcomePage/index.tsx
 import { Button, Col, Image, Row, Typography } from 'antd'
 import './styles.css'
 import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 
 interface WelcomePageProps {
   onDragOver: (event: React.DragEvent<HTMLDivElement>) => void
@@ -8,17 +10,6 @@ interface WelcomePageProps {
   onDrop: (event: React.DragEvent<HTMLDivElement>) => void
   handleNew: (withSampleData: boolean) => void
   openExistingDocument: () => void
-}
-
-const LanguageSelector = () => {
-  const { i18n } = useTranslation();
-
-  return (
-    <select onChange={(e) => i18n.changeLanguage(e.target.value)}>
-      <option value="en">English</option>
-      <option value="it">Italiano</option>
-    </select>
-  );
 }
 
 const WelcomePage: React.FC<WelcomePageProps> = ({
