@@ -145,7 +145,7 @@ describe('TreeDataBuilder', () => {
         BUOY_FIELD_TYPE,
         mockHandleAdd,
         mockIconCreators,
-        false
+        false,
       )
       
       // Check the node structure
@@ -231,7 +231,10 @@ describe('TreeDataBuilder', () => {
         mockFeatures,
         mockHandleAdd,
         mockIconCreators,
-        false
+        false,
+        0,
+        0,
+        undefined
       )
       
       // Should return an array with 5 nodes (tracks, buoy fields, zones, reference points, backdrops)
@@ -257,7 +260,10 @@ describe('TreeDataBuilder', () => {
         limitedFeatures,
         mockHandleAdd,
         mockIconCreators,
-        true // useTimeFilter = true
+        true, // useTimeFilter = true,
+        0,
+        0,
+        undefined
       )
       
       // Should filter out the buoy fields node
@@ -281,7 +287,8 @@ describe('TreeDataBuilder', () => {
         mockIconCreators,
         true, // useTimeFilter = true
         1000, // timeStart
-        2000  // timeEnd
+        2000, // timeEnd
+        undefined
       )
       
       // The tracks node should only have air tracks
@@ -296,6 +303,34 @@ describe('TreeDataBuilder', () => {
       const nonAirEnvironments = tracksNode?.children?.filter(env => env.key !== 'air') || []
       nonAirEnvironments.forEach(env => {
         expect(env.children?.length).toBe(0)
+      })
+    })
+    
+    test('should apply custom icon to zones node when provided', () => {
+      // Create a custom icon for zones
+      const customZonesIcon = 'custom-zones-icon'
+      
+      const result = TreeDataBuilder.buildTreeModel(
+        mockFeatures,
+        mockHandleAdd,
+        mockIconCreators,
+        false,
+        0,
+        0,
+        customZonesIcon
+      )
+      
+      // Find the zones node
+      const zonesNode = result.find(node => node?.key === NODE_ZONES)
+      
+      // Verify that the zones node has the custom icon
+      expect(zonesNode).toBeDefined()
+      expect(zonesNode?.icon).toBe(customZonesIcon)
+      
+      // Verify that other nodes don't have the custom icon
+      const otherNodes = result.filter(node => node?.key !== NODE_ZONES)
+      otherNodes.forEach(node => {
+        expect(node?.icon).not.toBe(customZonesIcon)
       })
     })
   })

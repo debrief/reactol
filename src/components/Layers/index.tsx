@@ -134,6 +134,16 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
   // Use useMemo to create the model data only when dependencies change
   const model = useMemo(() => {
     const filterForTime = time.filterApplied && useTimeFilter
+
+    const zonesIcon = TreeDataBuilder.getIcon(
+      undefined, 
+      NODE_ZONES, 
+      'Zones', 
+      handleAdd, 
+      iconCreators,
+      <AddZoneShape addZone={addZone} />
+    )
+
     // Use TreeDataBuilder.buildTreeModel to construct the tree model with time filtering
     const modelData = TreeDataBuilder.buildTreeModel(
       theFeatures, 
@@ -141,23 +151,11 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       iconCreators,
       filterForTime, 
       useTimeFilter ? time.start : 0, 
-      useTimeFilter ? time.end : 0
+      useTimeFilter ? time.end : 0,
+      zonesIcon
     )
 
     const validModels = modelData.filter(node => node !== null)
-    
-    // Add the custom button for zones
-    const zonesNode = validModels.find(node => node.key === NODE_ZONES)
-    if (zonesNode) {
-      zonesNode.icon = TreeDataBuilder.getIcon(
-        undefined, 
-        NODE_ZONES, 
-        'Zones', 
-        handleAdd, 
-        iconCreators,
-        <AddZoneShape addZone={addZone} />
-      )
-    }
     
     return validModels
   }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied, iconCreators])
