@@ -7,6 +7,7 @@ import { useAppContext } from '../../state/AppContext'
 import { useTranslation } from 'react-i18next'
 import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action, Actions, DockLocation} from 'flexlayout-react'
 import WelcomePage from '../WelcomePage'
+import LanguageSelector from '../LanguageSelector'
 import './index.css'
 
 type TabWithPath =  {
@@ -274,6 +275,11 @@ const Documents = () => {
       <Tooltip title={t('documents.openExisting')} key="open-doc">
         <Button icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >{t('documents.open')}</Button>
       </Tooltip>
+    )
+    renderValues.buttons.push(
+      <div key='language-selector' style={{ marginLeft: '8px' }}>
+        <LanguageSelector />
+      </div>
     )
     renderValues.buttons.push(
       <Tooltip title={isDarkMode ? t('documents.lightMode') : t('documents.darkMode')} key='theme-toggle'>
