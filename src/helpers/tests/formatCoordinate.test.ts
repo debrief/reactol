@@ -1,4 +1,4 @@
-import { formatCoordinate, formatNatoCoords } from './formatCoordinate'
+import { formatCoordinate, formatNatoCoords } from '../formatCoordinate'
 
 describe('formatCoordinate', () => {
   it('formats zero coordinate', () => {

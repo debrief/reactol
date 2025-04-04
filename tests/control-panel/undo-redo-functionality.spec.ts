@@ -18,7 +18,7 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   await expect(undoRedoButton).toBeDisabled()
   
   // find the delete button in the Layers component
-  const deleteButton = page.locator('.layers-delete-button')
+  const deleteButton = page.locator('.layers-delete-button').first()
   
   // check delete is disabled
   await expect(deleteButton).toBeDisabled()

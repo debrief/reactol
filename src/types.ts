@@ -6,8 +6,10 @@ import { Feature } from 'geojson'
 /** just a centre time if time provided, else start and end times */
 export type TemporalShapeProps = {time?: string, timeEnd?: string} 
 
+export type FeatureTypes = typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE | typeof BUOY_FIELD_TYPE | typeof BACKDROP_TYPE
+
 export type CoreDataProps = {
-  dataType: typeof REFERENCE_POINT_TYPE | typeof TRACK_TYPE | typeof ZONE_TYPE | typeof BUOY_FIELD_TYPE | typeof BACKDROP_TYPE
+  dataType: FeatureTypes
   name: string
   visible: boolean
 }

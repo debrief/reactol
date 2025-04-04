@@ -146,7 +146,8 @@ export const rangeBearingCalc: Calculation = {
 
     const baseTrack = features.find((feature) => feature.id === baseId)
     if (!baseTrack) {
-      console.warn('Couldn\'t find base track', baseId)
+      // base track not found. Maybe it isn't yet visible
+      console.log('Couldn\'t find base track', baseId)
       return result
     }
     const nonBaseTrack = features.filter((feature) => feature.id !== baseId)

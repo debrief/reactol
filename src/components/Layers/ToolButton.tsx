@@ -7,6 +7,7 @@ interface ToolProps {
   title: string
   disabled: boolean
   className?: string
+  filled?: boolean
 }
 
 export const ToolButton: React.FC<ToolProps> = ({
@@ -14,7 +15,8 @@ export const ToolButton: React.FC<ToolProps> = ({
   icon,
   title,
   disabled,
-  className
+  className,
+  filled
 }) => {
   return (
     <Tooltip title={title}>
@@ -23,7 +25,7 @@ export const ToolButton: React.FC<ToolProps> = ({
         className={className}
         onClick={onClick}
         disabled={disabled}
-        type='primary'
+        type={filled !== undefined ? (filled ? 'primary' : 'default') : 'primary'}
         icon={icon}
       />
     </Tooltip>

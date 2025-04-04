@@ -17,7 +17,7 @@ test('Deleting items in Layers component', async ({ page }) => {
   await page.waitForSelector('.flexlayout__tab_button_content')
   
   // Initially, the delete button should be disabled
-  const deleteButton = page.locator('.layers-delete-button')
+  const deleteButton = page.locator('.layers-delete-button').first()
   await expect(deleteButton).toBeDisabled()
   
   // Select a feature from the tree (VAN GALEN is a known feature in the sample plot)

@@ -86,7 +86,6 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
           >
             <Button
               style={buttonStyle}
-              color='primary'
               variant={viewportFrozen ? 'solid' : 'outlined'}
               onClick={toggleFreezeViewport}
             >

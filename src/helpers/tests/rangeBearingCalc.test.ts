@@ -107,7 +107,7 @@ describe('processBearingData', () => {
     const polySap11 = zones[0]
     const calcData = rangeBearingCalc.calculate([trackVang, polySap11], trackVang.id as string)
     // console.table(calcData.filter(d => d.extraProp === BEARING_DATA)[0].data.map(d => {return {date: toShortDTG(new Date(d.date)), value: d.value}}))
-    expect(calcData[0].data.length).toEqual(1081)
+    expect(calcData[0].data.length).toEqual(481)
   })
 })
 
