@@ -1,9 +1,5 @@
-import React from 'react'
 import { Feature } from 'geojson'
 import { TreeDataNode } from 'antd'
-import { FolderOutlined, PlusCircleOutlined } from '@ant-design/icons'
-import { Tooltip } from 'antd'
-import { FeatureIcon } from './FeatureIcon'
 import { symbolOptions } from '../../helpers/symbolTypes'
 import { EnvOptions, FeatureTypes } from '../../types'
 import { featureIsVisibleInPeriod } from '../../helpers/featureIsVisibleAtTime'
@@ -24,7 +20,19 @@ type FieldDataNode = {
   children: FieldDataNode[]
 }
 
+// Import React for type definitions
+import React from 'react'
+
+// Using React.MouseEvent for the event type
 export type HandleAddFunction = (e: React.MouseEvent, key: string, title: string) => void
+
+// Interface for icon creators to be passed from Layers component
+export interface IconCreators {
+  createFolderIcon: () => React.ReactNode
+  createFeatureIcon: (dataType: string, color?: string, environment?: string) => React.ReactNode
+  createAddIcon: (key: string, title: string, handleAdd: HandleAddFunction) => React.ReactNode
+  createTitleElement: (title: string) => React.ReactNode
+}
 
 export class TreeDataBuilder {
   /**
@@ -90,66 +98,70 @@ export class TreeDataBuilder {
   }
 
   /**
-   * Get the icon for a node
+   * Get the appropriate icon for a node using the provided icon creators
    * @param feature The feature (if any)
    * @param key The node key
    * @param title The node title
    * @param handleAdd The add handler function
+   * @param iconCreators The icon creator functions
+   * @param button Optional custom button
    * @returns The icon React node
    */
   static getIcon(
     feature: Feature | undefined, 
     key: string, 
     title: string,
-    handleAdd?: HandleAddFunction,
+    handleAdd: HandleAddFunction | undefined,
+    iconCreators: IconCreators,
     button?: React.ReactNode
   ): React.ReactNode {
     // If no feature is provided, this is a parent node - show plus icon
     if (!feature) {
       if (!handleAdd) return null
       if (button) return button
-      return (
-        <Tooltip title={this.addIconLabelFor(key, title)}>
-          <PlusCircleOutlined
-            className="add-icon"
-            style={{ cursor: 'copy' }}
-            onClick={(e: React.MouseEvent) => handleAdd(e, key, title)}
-          />
-        </Tooltip>
-      )
+      return iconCreators.createAddIcon(key, title, handleAdd)
     }
 
     // For leaf nodes, show type-specific icon based on dataType
     const dataType = feature.properties?.dataType
     const color = feature.properties?.stroke || feature.properties?.color || feature.properties?.['marker-color']
     const environment = feature.properties?.env
-    return dataType ? <FeatureIcon dataType={dataType} color={color} environment={environment} /> : <FolderOutlined />
+    return dataType 
+      ? iconCreators.createFeatureIcon(dataType, color, environment) 
+      : iconCreators.createFolderIcon()
   }
 
   /**
    * Build a track node
    * @param features The features to include
    * @param handleAdd The add handler function
+   * @param iconCreators The icon creator functions
+   * @param useTimeFilter Whether to filter by time
    * @returns A TreeDataNode for tracks
    */
-  static buildTrackNode(features: Feature[], handleAdd: HandleAddFunction, useTimeFilter: boolean): TreeDataNode {
+  static buildTrackNode(
+    features: Feature[], 
+    handleAdd: HandleAddFunction, 
+    iconCreators: IconCreators,
+    useTimeFilter: boolean
+  ): TreeDataNode {
     // generate new root
     const root: TreeDataNode = {
       title: 'Units',
       key: NODE_TRACKS,
-      icon: <FolderOutlined />,
+      icon: iconCreators.createFolderIcon(),
       children: [],
     }
     const environments = symbolOptions.map((env): TreeDataNode => ({
       title: env.label,
       key: env.value,
-      icon: this.getIcon(undefined, NODE_TRACKS, env.value, handleAdd),
+      icon: this.getIcon(undefined, NODE_TRACKS, env.value, handleAdd, iconCreators),
       children: features
         .filter(feature => feature.properties?.env === env.value)
         .map((feature): TreeDataNode => ({
           title: this.nameFor(feature),
           key: this.idFor(feature),
-          icon: this.getIcon(feature, this.idFor(feature), this.nameFor(feature), handleAdd),
+          icon: this.getIcon(feature, this.idFor(feature), this.nameFor(feature), undefined, iconCreators),
           children: [],
         }))
     }))
@@ -168,6 +180,8 @@ export class TreeDataBuilder {
    * @param key The node key
    * @param dType The data type to filter by
    * @param handleAdd The add handler function
+   * @param iconCreators The icon creator functions
+   * @param useTimeFilter Whether to filter by time
    * @returns A TreeDataNode for the specified type
    */
   static buildTypeNode(
@@ -176,6 +190,7 @@ export class TreeDataBuilder {
     key: string,
     dType: FeatureTypes,
     handleAdd: HandleAddFunction,
+    iconCreators: IconCreators,
     useTimeFilter: boolean
   ): TreeDataNode | null {
     const children = features
@@ -184,7 +199,7 @@ export class TreeDataBuilder {
         const feature = features.find(f => this.idFor(f) === child.key)
         return {
           ...child,
-          icon: this.getIcon(feature, child.key, child.title, handleAdd),
+          icon: this.getIcon(feature, child.key, child.title, handleAdd, iconCreators),
         }
       })
       : []
@@ -192,13 +207,9 @@ export class TreeDataBuilder {
     if (useTimeFilter && !children.length) return null
 
     return {
-      title: (
-        <span>
-          {title}
-        </span>
-      ),
+      title: iconCreators.createTitleElement(title),
       key,
-      icon: this.getIcon(undefined, key, title, handleAdd), // Parent node gets plus icon
+      icon: this.getIcon(undefined, key, title, handleAdd, iconCreators), // Parent node gets plus icon
       children,
     }
   }
@@ -207,6 +218,7 @@ export class TreeDataBuilder {
    * Build the complete tree data model
    * @param features The features to include
    * @param handleAdd The add handler function
+   * @param iconCreators The icon creator functions
    * @param useTimeFilter Whether to filter features by time
    * @param timeStart The start time for filtering (if useTimeFilter is true)
    * @param timeEnd The end time for filtering (if useTimeFilter is true)
@@ -215,6 +227,7 @@ export class TreeDataBuilder {
   static buildTreeModel(
     features: Feature[], 
     handleAdd: HandleAddFunction, 
+    iconCreators: IconCreators,
     useTimeFilter: boolean = false, 
     timeStart: number = 0, 
     timeEnd: number = 0
@@ -230,11 +243,11 @@ export class TreeDataBuilder {
     }
 
     return [
-      this.buildTrackNode(filteredFeatures, handleAdd, useTimeFilter),
-      this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd, useTimeFilter),
-      this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, useTimeFilter),
-      this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, REFERENCE_POINT_TYPE, handleAdd, useTimeFilter),
-      this.buildTypeNode(filteredFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, useTimeFilter),
+      this.buildTrackNode(filteredFeatures, handleAdd, iconCreators, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Buoy Fields', NODE_FIELDS, BUOY_FIELD_TYPE, handleAdd, iconCreators, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Zones', NODE_ZONES, ZONE_TYPE, handleAdd, iconCreators, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Reference Points', NODE_POINTS, REFERENCE_POINT_TYPE, handleAdd, iconCreators, useTimeFilter),
+      this.buildTypeNode(filteredFeatures, 'Backdrops', NODE_BACKDROPS, BACKDROP_TYPE, handleAdd, iconCreators, useTimeFilter),
     ]
   }
 

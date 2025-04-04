@@ -18,8 +18,11 @@ import { selectFeatures } from '../../state/geoFeaturesSlice'
 import { useAppContext } from '../../state/AppContext'
 
 // DirectoryTree has been moved to TreeView component
+import { FolderOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import { Tooltip } from 'antd'
+import { FeatureIcon } from './FeatureIcon'
 
-import { HandleAddFunction, TreeDataBuilder } from './TreeDataBuilder'
+import { HandleAddFunction, TreeDataBuilder, IconCreators } from './TreeDataBuilder'
 import { TreeView } from './TreeView'
 import {
   NODE_TRACKS,
@@ -110,13 +113,32 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
       e.stopPropagation()
     }, [addBuoyField, addPoint, addBackdrop, setPendingTrack]) 
 
+  // Create icon creators for TreeDataBuilder. We've done this so
+  // that TreeDataBuilder is plain `.ts`, and can be covered by
+  // unit tests
+  const iconCreators = useMemo<IconCreators>(() => ({
+    createFolderIcon: () => <FolderOutlined />,
+    createFeatureIcon: (dataType, color, environment) => <FeatureIcon dataType={dataType} color={color} environment={environment} />,
+    createAddIcon: (key, title, handleAdd) => (
+      <Tooltip title={TreeDataBuilder.addIconLabelFor(key, title)}>
+        <PlusCircleOutlined
+          className="add-icon"
+          style={{ cursor: 'copy' }}
+          onClick={(e: React.MouseEvent) => handleAdd(e, key, title)}
+        />
+      </Tooltip>
+    ),
+    createTitleElement: (title) => <span>{title}</span>
+  }), [])
+
   // Use useMemo to create the model data only when dependencies change
   const model = useMemo(() => {
     const filterForTime = time.filterApplied && useTimeFilter
     // Use TreeDataBuilder.buildTreeModel to construct the tree model with time filtering
     const modelData = TreeDataBuilder.buildTreeModel(
       theFeatures, 
-      handleAdd, 
+      handleAdd,
+      iconCreators,
       filterForTime, 
       useTimeFilter ? time.start : 0, 
       useTimeFilter ? time.end : 0
@@ -127,12 +149,18 @@ const Layers: React.FC<LayerProps> = ({ openGraph, splitterWidths }) => {
     // Add the custom button for zones
     const zonesNode = validModels.find(node => node.key === NODE_ZONES)
     if (zonesNode) {
-      zonesNode.icon = TreeDataBuilder.getIcon(undefined, NODE_ZONES, 'Zones', handleAdd, 
-        <AddZoneShape addZone={addZone} />)
+      zonesNode.icon = TreeDataBuilder.getIcon(
+        undefined, 
+        NODE_ZONES, 
+        'Zones', 
+        handleAdd, 
+        iconCreators,
+        <AddZoneShape addZone={addZone} />
+      )
     }
     
     return validModels
-  }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied])
+  }, [theFeatures, handleAdd, addZone, useTimeFilter, time.start, time.end, time.filterApplied, iconCreators])
 
   // onSelect is now provided by useSelectionHandlers
 
