@@ -78,13 +78,18 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
           />
           <CopyButton />
           <PasteButton />
-          <Button
-            size={'middle'}
+          <ToolButton
             onClick={() => onFilterForTime(!hasTimeFilter)}
-          >
-            {hasTimeFilter ? <FilterFilled /> : <FilterOutlined />}
-          </Button>
-
+            className='layers-delete-button'
+            disabled={false}
+            filled={hasTimeFilter}
+            icon={hasTimeFilter ? <FilterFilled /> : <FilterOutlined />}
+            title={
+              hasTimeFilter
+                ? 'Cancel filter features by time'
+                : 'Filter features by time'
+            }
+          />
           {/* <ToolButton
             onClick={onGraph}
             disabled={!hasTemporalFeature}
