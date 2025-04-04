@@ -19,7 +19,7 @@ export const trackIsVisibleInPeriod = (track: Feature<Geometry, TrackProps>, sta
   return firstTime < end && lastTime > start
 }
 
-export const filterTrack = (times: string[], coords: Position[], labelInterval?:number, symbolInterval?:number): CoordInstance[] => {
+export const collateTrackCoordinates = (times: string[], coords: Position[], labelInterval?:number, symbolInterval?:number): CoordInstance[] => {
   if (!times || !coords) return []
   let lastLabelTime = dayjs(times[0]).valueOf()
   let lastSymbolTime = dayjs(times[0]).valueOf()

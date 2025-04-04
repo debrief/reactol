@@ -3,7 +3,7 @@ import { LeafletMouseEvent } from 'leaflet'
 import { Polyline, CircleMarker, Tooltip, Marker } from 'react-leaflet'
 import { useMemo } from 'react'
 import { useDocContext } from '../../../state/DocContext'
-import { CoordInstance, filterTrack } from '../../../helpers/filterTrack'
+import { CoordInstance, collateTrackCoordinates } from '../../../helpers/collateTrackCoordinates'
 import { TrackProps } from '../../../types'
 import './index.css'
 import { mouseOut, mouseOver } from '../commonHandlers'
@@ -35,7 +35,7 @@ const Track: React.FC<TrackFeatureProps> = ({ feature, onClickHandler }) => {
   const trackCoords: CoordInstance[] = useMemo(() => {
     if (time && feature.properties?.times) {
       const filteredTrack = time.filterApplied ? filterTrackDataToPeriod(feature, time.start, time.end) : feature
-      const validCoords = filterTrack(
+      const validCoords = collateTrackCoordinates(
         filteredTrack.properties?.times || [],
         (filteredTrack.geometry as LineString).coordinates,
         filteredTrack.properties?.labelInterval,

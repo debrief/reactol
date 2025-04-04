@@ -1,7 +1,7 @@
 import { Feature, Geometry } from 'geojson'
 import { timeVal } from './timeVal'
 import { TemporalShapeProps, TrackProps } from '../types'
-import { trackIsVisibleInPeriod } from './filterTrack'
+import { trackIsVisibleInPeriod } from './collateTrackCoordinates'
 
 export const featureIsVisibleInPeriod = (feature: Feature, startTime: number, endTime: number): boolean => {
   if (feature.properties) {
