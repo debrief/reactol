@@ -19,6 +19,9 @@ test('test', async ({ page }) => {
   await page.getByRole('button', { name: 'Create' }).click()
   await page.waitForTimeout(100)
   await page.getByRole('tree').getByText('Zones').click()
+  if (!page.locator('span:has-text("newZone")').first().isVisible()) {
+    await page.getByRole('tree').getByText('Zones').click()
+  }
   await page.waitForTimeout(100)
   await page.getByRole('tree').getByText(newZone).click()
 })

@@ -23,9 +23,9 @@ test('Copying features in Layers component', async ({ browser }) => {
   await page.waitForSelector('.flexlayout__tab_button_content')
   
   // Find the copy button
-  const copyButton = page.locator('.layers-copy-button')
-  const pasteButton = page.locator('.layers-paste-button')
-  const deleteButton = page.locator('.layers-delete-button')
+  const copyButton = page.locator('.layers-copy-button').first()
+  const pasteButton = page.locator('.layers-paste-button').first()
+  const deleteButton = page.locator('.layers-delete-button').first()
   
   // Initially, the copy button should be disabled
   await expect(copyButton).toBeDisabled()
