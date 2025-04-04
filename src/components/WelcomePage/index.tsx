@@ -20,7 +20,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
   openExistingDocument
 }) => {
   const { t } = useTranslation()
-  const gitBranch = import.meta.env.VITE_GIT_BRANCH || t('unknown')
+  const gitBranch = import.meta.env.VITE_GIT_BRANCH || 'unknown'
   const buildDate = import.meta.env.VITE_BUILD_DATE 
     ? new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()
     : t('unknown')
