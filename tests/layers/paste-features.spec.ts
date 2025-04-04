@@ -57,6 +57,10 @@ test('Pasting features in Layers component', async ({ browser }) => {
   
   // Select a reference point
   const referencePoint = page.locator('.ant-tree-title:has-text("NEW SONO")').first()
+  if (!await referencePoint.isVisible()) {
+    await pointsNode.click()
+    await page.waitForTimeout(100)
+  }
   await referencePoint.click()
 
   await copyButton.click()
@@ -96,7 +100,13 @@ test('Pasting features in Layers component', async ({ browser }) => {
   // // Wait for the points to be visible
   await page.waitForTimeout(100)
   
-  // // Verify that there's at least one point visible after pasting
+  // if points is collapsed
   const pointsAfterPaste = page.locator('span:has-text("NEW SONO")').first()
+  if (!await pointsNode.isVisible()) {
+    await pointsNode.click()
+    await page.waitForTimeout(100)
+  }
+
+  // // Verify that there's at least one point visible after pasting
   await expect(pointsAfterPaste).toBeVisible()
 })
