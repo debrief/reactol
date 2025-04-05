@@ -5,11 +5,13 @@ import { useAppDispatch } from '../../state/hooks'
 import { DiffOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
 import { useDocContext } from '../../state/DocContext'
+import { useTranslation } from 'react-i18next'
 
 // Importing the validation helper
 import { isValidGeoJSON } from '../../helpers/geoJSONValidation'
 
 export const PasteButton: React.FC = () => {
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [pasteDisabled, setPasteDisabled] = useState(true)
   const { clipboardUpdated } = useAppContext()
@@ -28,12 +30,12 @@ export const PasteButton: React.FC = () => {
       if (('' + error).includes('Document is not focused')) {
         // note: we get an error if dev-tools is open, ignore that error.
       } else {
-        setMessage({ title: 'Error', severity: 'error', message: 'Failed to read clipboard: ' + error })
+        setMessage({ title: 'Error', severity: 'error', message: t('layers.readClipboardError') + error })
         console.warn('Failed to read clipboard', error)
         setPasteDisabled(true)
       }
     }
-  }, [setMessage, clipboardUpdated])
+  }, [setMessage, clipboardUpdated, t])
 
   useEffect(() => {
     checkClipboard()
@@ -76,7 +78,7 @@ export const PasteButton: React.FC = () => {
       } else if (Array.isArray(parsed)) {
         features = parsed as Feature[]
       } else {
-        throw new Error('Invalid GeoJSON format')
+        throw new Error(t('layers.invalidGeoJSON'))
       }
 
       dispatch({
@@ -84,10 +86,10 @@ export const PasteButton: React.FC = () => {
         payload: features,
       })
     } catch (e) {
-      setMessage({ title: 'Error', severity: 'error', message: 'Paste error: ' + e })
+      setMessage({ title: 'Error', severity: 'error', message: t('layers.pasteError') + e })
     }
     setPasteDisabled(true)
-  }, [dispatch, setMessage, setPasteDisabled])
+  }, [dispatch, setMessage, setPasteDisabled, t])
 
   return (
     <ToolButton
@@ -95,7 +97,7 @@ export const PasteButton: React.FC = () => {
       className='layers-paste-button'
       disabled={pasteDisabled}
       icon={<DiffOutlined />}
-      title={pasteDisabled ? 'No valid GeoJSON data in clipboard' : 'Paste GeoJSON data'}
+      title={pasteDisabled ? t('layers.noValidData') : t('layers.pasteData')}
     />
   )
 }

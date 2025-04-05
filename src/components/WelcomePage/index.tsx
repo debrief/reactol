@@ -1,4 +1,6 @@
 import { Button, Col, Image, Row, Typography } from 'antd'
+import { useTranslation } from 'react-i18next'
+import LanguageSelector from '../LanguageSelector'
 import './styles.css'
 
 interface WelcomePageProps {
@@ -21,10 +23,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
   const buildDate = import.meta.env.VITE_BUILD_DATE 
     ? new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()
     : 'unknown'
+  const { t } = useTranslation()
   return (
     <div style={{ paddingTop: '50px' }} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
       <Row>
-        <Col span={24}><Typography.Title>Welcome to Albatross</Typography.Title></Col>
+        <Col span={24}><Typography.Title>{t('welcome.title')}</Typography.Title></Col>
       </Row>
       <Row>
         <Col span={24}>&nbsp;</Col>
@@ -36,25 +39,32 @@ const WelcomePage: React.FC<WelcomePageProps> = ({
         <Col span={12}>
           <Row style={{ paddingBottom: '12px' }}>
             <Col span={6}>&nbsp;</Col>
-            <Col span={12}><Typography.Text type='secondary'>Open an existing document or create a new one</Typography.Text></Col>
+            <Col span={12}><Typography.Text type='secondary'>{t('welcome.subtitle')}</Typography.Text></Col>
           </Row>
           <Row>
             <Col span={6}></Col>
             <Col span={12}>
-              <Button onClick={() => handleNew(false)} size='large' type='primary'>New</Button>
-              <Button style={{fontStyle: 'italic', marginLeft: '10px'}} onClick={() => handleNew(true)} size='large' type='primary'>Sample plot</Button>
+              <Button onClick={() => handleNew(false)} size='large' type='primary'>{t('welcome.new')}</Button>
+              <Button style={{fontStyle: 'italic', marginLeft: '10px'}} onClick={() => handleNew(true)} size='large' type='primary'>{t('welcome.samplePlot')}</Button>
             </Col>
           </Row>
           <Row style={{ paddingTop: '25px' }}>
             <Col span={8}></Col>
-            <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>Open</Button></Col>
+            <Col span={8}><Button onClick={openExistingDocument} size='large' block type='primary'>{t('welcome.open')}</Button></Col>
           </Row>
+        </Col>
+      </Row>
+      
+      {/* Language selector */}
+      <Row style={{ position: 'absolute', top: '20px', right: '20px' }}>
+        <Col>
+          <LanguageSelector />
         </Col>
       </Row>
       
       {/* Debug info box */}
       <div className="debug-info">
-        Branch: <strong>{gitBranch}</strong> | Build: <strong>{buildDate}</strong>
+        {t('common.branch')}: <strong>{gitBranch}</strong> | {t('common.build')}: <strong>{buildDate}</strong>
       </div>
     </div>
   )

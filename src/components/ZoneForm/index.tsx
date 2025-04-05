@@ -2,6 +2,7 @@ import { Feature, GeoJsonProperties, Geometry, MultiPoint, Point, Polygon, Posit
 import { Checkbox, ColorPicker, DatePicker, Form, Input, Button } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { ZoneProps } from '../../types'
@@ -109,6 +110,7 @@ export interface ZoneFormProps {
 }
 
 export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
+  const { t } = useTranslation()
   const [state, setState] = useState<FormTypeProps | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formProps, setFormProps] = useState<ZoneProps | null>(shape.properties)
@@ -218,47 +220,47 @@ export const ZoneForm: React.FC<ZoneFormProps> = ({shape, onChange}) => {
       onValuesChange={localChange}
       size='small'>
       <Form.Item<FormTypeProps>
-        label='Name'
+        label={t('forms.common.name')}
         name='name'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter zone name!' }]}>
+        rules={[{ required: true, message: t('forms.common.nameRequired') }]}>
         <Input/>
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label='Visible'
+        label={t('forms.common.visible')}
         name={'visible'}
         style={itemStyle}
         valuePropName="checked" >
         <Checkbox style={{alignItems: 'start'}}  />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Color"
+        label={t('forms.common.color')}
         name='stroke'
         style={itemStyle}
-        rules={[{ required: true, message: 'color is required!' }]}>
+        rules={[{ required: true, message: t('forms.common.colorRequired') }]}>
         <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Fill"
+        label={t('forms.common.fill')}
         name='fill'
         style={itemStyle}
-        rules={[{ required: true, message: 'color is required!' }]}>
+        rules={[{ required: true, message: t('forms.common.colorRequired') }]}>
         <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
       <Form.Item
-        label="Shape"
+        label={t('forms.common.shape')}
         style={itemStyle}>
-        <Button onClick={handleSpecificsEdit}>Edit {shapeName}</Button>
+        <Button onClick={handleSpecificsEdit}>{t('forms.common.edit')} {shapeName}</Button>
         <EditOnMapButton onEdit={mapEdit} />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label='Start'
+        label={t('forms.common.start')}
         name='dTime'
         style={itemStyle}>
         <DatePicker showTime />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label='End'
+        label={t('forms.common.end')}
         name='dTimeEnd'
         style={itemStyle}>
         <DatePicker showTime />

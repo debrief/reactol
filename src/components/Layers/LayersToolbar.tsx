@@ -10,6 +10,7 @@ import {
 import { ToolButton } from './ToolButton'
 import { CopyButton } from './CopyButton'
 import { PasteButton } from './PasteButton'
+import { useTranslation } from 'react-i18next'
 
 interface LayersToolbarProps {
   onCollapse: () => void
@@ -32,6 +33,7 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
   hasTimeFilter,
   onFilterForTime
 }) => {
+  const { t } = useTranslation()
   return (
     <div style={{ position: 'relative' }}>
       <Flex
@@ -55,7 +57,7 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
             onClick={onCollapse}
             icon={<ShrinkOutlined />}
             className='layers-collapse-button'
-            title='Collapse All'
+            title={t('layers.collapseAll')}
             disabled={!isExpanded}
           />
           <ToolButton
@@ -63,7 +65,7 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
             disabled={!hasSelection}
             className='layers-clear-button'
             icon={<CloseCircleOutlined />}
-            title={'Clear selection'}
+            title={t('layers.clearSelection')}
           />
           <ToolButton
             onClick={onDelete}
@@ -72,8 +74,8 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
             icon={<DeleteOutlined />}
             title={
               hasSelection
-                ? 'Delete selected items'
-                : 'Select items to enable delete'
+                ? t('layers.deleteSelected')
+                : t('layers.selectToEnable')
             }
           />
           <CopyButton />
@@ -86,8 +88,8 @@ export const LayersToolbar: React.FC<LayersToolbarProps> = ({
             icon={hasTimeFilter ? <FilterFilled /> : <FilterOutlined />}
             title={
               hasTimeFilter
-                ? 'Cancel filter features by time'
-                : 'Filter features by time'
+                ? t('layers.cancelTimeFilter')
+                : t('layers.filterByTime')
             }
           />
           {/* <ToolButton

@@ -2,6 +2,7 @@ import { Feature, LineString } from 'geojson'
 import { Checkbox, ColorPicker, Flex, Form, Input, Select } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TrackProps } from '../../types'
 import { presetColors } from '../../helpers/standardShades'
 import './index.css'
@@ -20,6 +21,7 @@ type FormTypeProps = Omit<TrackProps, 'labelInterval' | 'symbolInterval'> & {
 
 
 export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
+  const { t } = useTranslation()
   const [state, setState] = useState<FormTypeProps | null>(null)
   const [form] = Form.useForm()
   useEffect(() => {
@@ -75,34 +77,34 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
         onValuesChange={localChange}
         size='small'>
         <Form.Item<FormTypeProps>
-          label='Name'
+          label={t('forms.common.name')}
           name='name'
           style={itemStyle}
-          rules={[{ required: true, message: 'Please enter track name!' }]}>
+          rules={[{ required: true, message: t('forms.common.nameRequired') }]}>
           <Input/>
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Short name'
+          label={t('forms.common.shortName')}
           name='shortName'
           style={itemStyle}
-          rules={[{ required: true, message: 'Please enter short name!' }]}>
+          rules={[{ required: true, message: t('forms.common.shortNameRequired') }]}>
           <Input/>
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Visible'
+          label={t('forms.common.visible')}
           name={'visible'}
           style={itemStyle}
           valuePropName="checked" >
           <Checkbox />
         </Form.Item>
         <Form.Item<FormTypeProps>
-          label='Environment'
+          label={t('forms.common.environment')}
           name='env'
           style={itemStyle}
           rules={[
             {
               required: true,
-              message: 'Please specify the environment/symbol for the track',
+              message: t('forms.common.environmentRequired'),
             },
           ]}
         >
@@ -119,17 +121,17 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
         </Form.Item>
         <Form.Item<FormTypeProps>
           style={itemStyle}
-          label='Markers'>
+          label={t('forms.common.markers')}>
           <Flex gap='small'>
             <Form.Item<FormTypeProps>
-              label='Labels'
+              label={t('forms.common.labels')}
               className="labelInterval"
               name='labelInterval'
               style={itemStyle}>
               <Select options={defaultIntervals} size='small' style={{width:'55px'}} />
             </Form.Item>
             <Form.Item<FormTypeProps>
-              label='Symbols'
+              label={t('forms.common.symbols')}
               name='symbolInterval'
               className="labelSymbol"
               style={itemStyle}>
@@ -138,10 +140,10 @@ export const TrackForm: React.FC<TrackFormProps> = ({track, onChange}) => {
           </Flex>
         </Form.Item>  
         <Form.Item<FormTypeProps>
-          label="Color"
+          label={t('forms.common.color')}
           name='stroke'
           style={itemStyle}
-          rules={[{ required: true, message: 'color is required!' }]}>
+          rules={[{ required: true, message: t('forms.common.colorRequired') }]}>
           <ColorPicker style={{marginLeft: 0}} format='hex' trigger='click' presets={presetColors} />
         </Form.Item>
       </Form>

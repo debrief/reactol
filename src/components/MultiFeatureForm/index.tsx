@@ -5,6 +5,7 @@ import {
   ExportOutlined
 } from '@ant-design/icons'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from '../../state/hooks'
 import { Color } from 'antd/es/color-picker'
 import { presetColors } from '../../helpers/standardShades'
@@ -26,6 +27,7 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
   onDelete,
   onExport
 }) => {
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
 
   // Check if all features have the same visibility
@@ -71,20 +73,20 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
   return (
     <div style={{ padding: '16px' }}>
       <Space direction="vertical" style={{ width: '100%' }}>
-        <Text strong>{features.length} items selected</Text>
+        <Text strong>{features.length} {t('forms.multiFeature.itemsSelected')}</Text>
         <Form name='multi-feature-form'
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 400 }}
           autoComplete='off'
           size='small'>
-          <Form.Item label='Visibility' style={itemStyle}>
-            <Tooltip title={allVisible ? 'Hide All' : allHidden ? 'Show All' : 'Mixed Visibility, click to hide all'}>
+          <Form.Item label={t('forms.multiFeature.visibility')} style={itemStyle}>
+            <Tooltip title={allVisible ? t('forms.multiFeature.hideAll') : allHidden ? t('forms.multiFeature.showAll') : t('forms.multiFeature.mixedVisibility')}>
               <Checkbox className='multi-feature-visibility' onClick={handleVisibilityChange} indeterminate={mixedVisibility} checked={allVisible}></Checkbox>
             </Tooltip>
           </Form.Item>
-          <Form.Item label='Color' style={itemStyle}>
-            <Tooltip title={currentColor ? `Current color: ${currentColor}` : 'Mixed colors'}>
+          <Form.Item label={t('forms.common.color')} style={itemStyle}>
+            <Tooltip title={currentColor ? `${t('forms.multiFeature.currentColor')} ${currentColor}` : t('forms.multiFeature.mixedColors')}>
               <ColorPicker
                 className='multi-feature-color'
                 value={currentColor}
@@ -99,8 +101,8 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
               />
             </Tooltip>
           </Form.Item>
-          <Form.Item label='Delete' style={itemStyle}>
-            <Tooltip title="Delete selected features">
+          <Form.Item label={t('forms.core.delete')} style={itemStyle}>
+            <Tooltip title={t('forms.core.deleteFeature')}>
               <Button 
                 icon={<DeleteOutlined />} 
                 className='multi-feature-delete'
@@ -111,7 +113,7 @@ const MultiFeatureForm: React.FC<MultiFeatureFormProps> = ({
           </Form.Item>
         </Form>
         {onExport && (
-          <Tooltip title="Export selected features">
+          <Tooltip title={t('layers.copySelected')}>
             <Button 
               icon={<ExportOutlined />} 
               onClick={onExport}
