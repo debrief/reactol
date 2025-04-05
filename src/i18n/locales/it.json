@@ -54,6 +54,11 @@
     "undo": "Annulla ...",
     "redo": "Ripeti ...",
     "nothingToUndoRedo": "Niente da annullare/ripetere",
+    "selectVersionTo": "Seleziona versione da",
+    "currentState": "stato attuale",
+    "restoreVersion": "Ripristina Versione",
+    "hidingViewportChanges": "Nascondi modifiche alla viewport",
+    "showingViewportChanges": "Mostra modifiche alla viewport",
     "start": "Inizio",
     "step": "Passo",
     "end": "Fine",
@@ -89,7 +94,17 @@
     "addField": "Aggiungi nuovo campo",
     "addZone": "Aggiungi nuova zona",
     "addPoint": "Aggiungi nuovo punto",
-    "addBackdrop": "Aggiungi nuovo sfondo"
+    "addBackdrop": "Aggiungi nuovo sfondo",
+    "addToExistingTrack": "Aggiungi a traccia esistente",
+    "selectTrackToAddData": "Seleziona una traccia a cui aggiungere dati",
+    "noTracksAvailable": "Nessuna traccia disponibile",
+    "pleaseSelectTrack": "Seleziona una traccia",
+    "add": "Aggiungi",
+    "extraDetailsForNewTrack": "Inserisci dettagli per la nuova traccia",
+    "year": "Anno",
+    "yearRequired": "Inserisci l'anno",
+    "month": "Mese",
+    "monthRequired": "Inserisci il mese"
   },
   "forms": {
     "core": {
@@ -130,7 +145,17 @@
       "labels": "Etichette",
       "symbols": "Simboli",
       "shape": "Forma",
-      "edit": "Modifica"
+      "edit": "Modifica",
+      "topLeft": "In alto a sinistra",
+      "bottomRight": "In basso a destra",
+      "origin": "Origine",
+      "radiusM": "Raggio (m)",
+      "innerRadiusM": "Raggio interno (m)",
+      "outerRadiusM": "Raggio esterno (m)",
+      "startAngle": "Angolo iniziale",
+      "endAngle": "Angolo finale",
+      "polygonCoordinates": "Coordinate del poligono",
+      "addCoordinate": "Aggiungi coordinata"
     },
     "multiFeature": {
       "itemsSelected": "elementi selezionati",
@@ -141,5 +166,9 @@
       "currentColor": "Colore attuale:",
       "mixedColors": "Colori misti"
     }
+  },
+  "graphs": {
+    "available": "Disponibili",
+    "selected": "Selezionati"
   }
 }

@@ -54,6 +54,11 @@
     "undo": "Undo ...",
     "redo": "Redo ...",
     "nothingToUndoRedo": "Nothing to undo/redo",
+    "selectVersionTo": "Select version to",
+    "currentState": "current state",
+    "restoreVersion": "Restore Version",
+    "hidingViewportChanges": "Hiding viewport changes",
+    "showingViewportChanges": "Showing viewport changes",
     "start": "Start",
     "step": "Step",
     "end": "End",
@@ -89,7 +94,17 @@
     "addField": "Add new field",
     "addZone": "Add new zone",
     "addPoint": "Add new point",
-    "addBackdrop": "Add new backdrop"
+    "addBackdrop": "Add new backdrop",
+    "addToExistingTrack": "Add to existing track",
+    "selectTrackToAddData": "Select a track to add data to",
+    "noTracksAvailable": "No tracks available",
+    "pleaseSelectTrack": "Please select a track",
+    "add": "Add",
+    "extraDetailsForNewTrack": "Enter details for the new track",
+    "year": "Year",
+    "yearRequired": "Please enter year",
+    "month": "Month",
+    "monthRequired": "Please enter month"
   },
   "forms": {
     "core": {
@@ -130,7 +145,17 @@
       "labels": "Labels",
       "symbols": "Symbols",
       "shape": "Shape",
-      "edit": "Edit"
+      "edit": "Edit",
+      "topLeft": "Top Left",
+      "bottomRight": "Bottom Right",
+      "origin": "Origin",
+      "radiusM": "Radius (m)",
+      "innerRadiusM": "Inner Radius (m)",
+      "outerRadiusM": "Outer Radius (m)",
+      "startAngle": "Start Angle",
+      "endAngle": "End Angle",
+      "polygonCoordinates": "Polygon Coordinates",
+      "addCoordinate": "Add Coordinate"
     },
     "multiFeature": {
       "itemsSelected": "items selected",

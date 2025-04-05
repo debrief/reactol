@@ -103,7 +103,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item<ZoneCircularRingProps>
-              label='Origin'
+              label={t('forms.common.origin')}
               name='origin'
               rules={[{ required: true }]}
             >
@@ -135,7 +135,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item<ZoneSectionCircularRingProps>
-              label='Origin'
+              label={t('forms.common.origin')}
               name='origin'
               rules={[{ required: true }]}
             >
@@ -144,7 +144,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
           </Col>
           <Col span={12}>
             <Form.Item<ZoneSectionCircularRingProps>
-              label='Inner Radius (m)'
+              label={t('forms.common.innerRadiusM')}
               name='innerRadiusM'
               rules={[{ required: true }]}
             >
@@ -153,7 +153,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
           </Col>
           <Col span={12}>
             <Form.Item<ZoneSectionCircularRingProps>
-              label='Outer Radius (m)'
+              label={t('forms.common.outerRadiusM')}
               name='outerRadiusM'
               rules={[{ required: true }]}
             >
@@ -185,7 +185,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item<ZoneCircularSectorProps>
-              label='Origin'
+              label={t('forms.common.origin')}
               name='origin'
               rules={[{ required: true }]}
             >
@@ -194,7 +194,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
           </Col>
           <Col span={12}>
             <Form.Item<ZoneCircularSectorProps>
-              label='Start Angle'
+              label={t('forms.common.startAngle')}
               name='startAngle'
               rules={[{ required: true }]}
             >
@@ -203,7 +203,7 @@ export const ZoneSpecificsModal: React.FC<ZoneSpecificsModalProps> = ({
           </Col>
           <Col span={12}>
             <Form.Item<ZoneCircularSectorProps>
-              label='End Angle'
+              label={t('forms.common.endAngle')}
               name='endAngle'
               rules={[{ required: true }]}
             >

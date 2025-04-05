@@ -145,7 +145,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     <DraggableModal
       draggableTitle={
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
-          <span style={{ marginRight: '16px' }}>{t('controlPanel.selectVersionTo')} {modalOptions}</span>
+          <span className='undo-title' style={{ marginRight: '16px' }}>{t('controlPanel.selectVersionTo')} {modalOptions}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
             marginTop: '10px', marginRight:'30px'}}>
             <Switch
@@ -168,6 +168,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
       footer={[
         <Button 
           key="cancel" 
+          className="undo-cancel-button"
           onClick={() => {
             // Reset preview if canceling
             setPreview(null)
@@ -181,6 +182,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
           key="restore"
           type="primary"
           disabled={selectedUndoIndex === null}
+          className="undo-restore-button"
           onClick={doRestore}
         >
           {t('controlPanel.restoreVersion')}

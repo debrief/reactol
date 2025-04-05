@@ -54,6 +54,11 @@
     "undo": "Rückgängig ...",
     "redo": "Wiederherstellen ...",
     "nothingToUndoRedo": "Nichts rückgängig zu machen/wiederherzustellen",
+    "selectVersionTo": "Version auswählen zum",
+    "currentState": "aktueller Zustand",
+    "restoreVersion": "Version wiederherstellen",
+    "hidingViewportChanges": "Ansichtsänderungen ausblenden",
+    "showingViewportChanges": "Ansichtsänderungen anzeigen",
     "start": "Start",
     "step": "Schritt",
     "end": "Ende",
@@ -89,7 +94,17 @@
     "addField": "Neues Feld hinzufügen",
     "addZone": "Neue Zone hinzufügen",
     "addPoint": "Neuen Punkt hinzufügen",
-    "addBackdrop": "Neuen Hintergrund hinzufügen"
+    "addBackdrop": "Neuen Hintergrund hinzufügen",
+    "addToExistingTrack": "Zu bestehendem Track hinzufügen",
+    "selectTrackToAddData": "Wählen Sie einen Track aus, um Daten hinzuzufügen",
+    "noTracksAvailable": "Keine Tracks verfügbar",
+    "pleaseSelectTrack": "Bitte wählen Sie einen Track aus",
+    "add": "Hinzufügen",
+    "extraDetailsForNewTrack": "Geben Sie Details für den neuen Track ein",
+    "year": "Jahr",
+    "yearRequired": "Bitte geben Sie das Jahr ein",
+    "month": "Monat",
+    "monthRequired": "Bitte geben Sie den Monat ein"
   },
   "forms": {
     "core": {
@@ -130,7 +145,17 @@
       "labels": "Beschriftungen",
       "symbols": "Symbole",
       "shape": "Form",
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "topLeft": "Oben links",
+      "bottomRight": "Unten rechts",
+      "origin": "Ursprung",
+      "radiusM": "Radius (m)",
+      "innerRadiusM": "Innerer Radius (m)",
+      "outerRadiusM": "Äußerer Radius (m)",
+      "startAngle": "Startwinkel",
+      "endAngle": "Endwinkel",
+      "polygonCoordinates": "Polygon-Koordinaten",
+      "addCoordinate": "Koordinate hinzufügen"
     },
     "multiFeature": {
       "itemsSelected": "Elemente ausgewählt",
@@ -141,5 +166,9 @@
       "currentColor": "Aktuelle Farbe:",
       "mixedColors": "Gemischte Farben"
     }
+  },
+  "graphs": {
+    "available": "Verfügbar",
+    "selected": "Ausgewählt"
   }
 }

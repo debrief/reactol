@@ -269,7 +269,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
 
           <Form.Item style={itemStyle} label={null}>
             <Button type='text' onClick={cancel}>
-              Cancel
+              {t('documents.cancel')}
             </Button>
             <Button type='primary' htmlType='submit'>
               {t('forms.core.create')}

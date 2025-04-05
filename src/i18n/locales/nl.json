@@ -54,6 +54,11 @@
     "undo": "Ongedaan maken ...",
     "redo": "Opnieuw ...",
     "nothingToUndoRedo": "Niets om ongedaan te maken/opnieuw uit te voeren",
+    "selectVersionTo": "Selecteer versie om",
+    "currentState": "huidige staat",
+    "restoreVersion": "Versie herstellen",
+    "hidingViewportChanges": "Viewport-wijzigingen verbergen",
+    "showingViewportChanges": "Viewport-wijzigingen tonen",
     "start": "Start",
     "step": "Stap",
     "end": "Einde",
@@ -75,7 +80,7 @@
     "filterByTime": "Objecten filteren op tijd",
     "viewGraph": "Grafiek van geselecteerde objecten bekijken",
     "selectTimeFeature": "Selecteer een tijdgerelateerd object om grafieken te activeren",
-    "copyError": "Kopiëerfout: ",
+    "copyError": "Kopiëeerfout: ",
     "pasteError": "Plakfout: ",
     "readClipboardError": "Kan klembord niet lezen: ",
     "invalidGeoJSON": "Ongeldig GeoJSON-formaat",
@@ -89,7 +94,17 @@
     "addField": "Nieuw veld toevoegen",
     "addZone": "Nieuwe zone toevoegen",
     "addPoint": "Nieuw punt toevoegen",
-    "addBackdrop": "Nieuwe achtergrond toevoegen"
+    "addBackdrop": "Nieuwe achtergrond toevoegen",
+    "addToExistingTrack": "Toevoegen aan bestaande track",
+    "selectTrackToAddData": "Selecteer een track om gegevens aan toe te voegen",
+    "noTracksAvailable": "Geen tracks beschikbaar",
+    "pleaseSelectTrack": "Selecteer een track",
+    "add": "Toevoegen",
+    "extraDetailsForNewTrack": "Voer details in voor de nieuwe track",
+    "year": "Jaar",
+    "yearRequired": "Voer het jaar in",
+    "month": "Maand",
+    "monthRequired": "Voer de maand in"
   },
   "forms": {
     "core": {
@@ -130,7 +145,17 @@
       "labels": "Labels",
       "symbols": "Symbolen",
       "shape": "Vorm",
-      "edit": "Bewerken"
+      "edit": "Bewerken",
+      "topLeft": "Linksboven",
+      "bottomRight": "Rechtsonder",
+      "origin": "Oorsprong",
+      "radiusM": "Straal (m)",
+      "innerRadiusM": "Binnenstraal (m)",
+      "outerRadiusM": "Buitenstraal (m)",
+      "startAngle": "Starthoek",
+      "endAngle": "Eindhoek",
+      "polygonCoordinates": "Polygoon coördinaten",
+      "addCoordinate": "Coördinaat toevoegen"
     },
     "multiFeature": {
       "itemsSelected": "items geselecteerd",
@@ -141,5 +166,9 @@
       "currentColor": "Huidige kleur:",
       "mixedColors": "Gemengde kleuren"
     }
+  },
+  "graphs": {
+    "available": "Beschikbaar",
+    "selected": "Geselecteerd"
   }
 }

@@ -54,6 +54,11 @@
     "undo": "Annuler ...",
     "redo": "Rétablir ...",
     "nothingToUndoRedo": "Rien à annuler/rétablir",
+    "selectVersionTo": "Sélectionner la version à",
+    "currentState": "état actuel",
+    "restoreVersion": "Restaurer la Version",
+    "hidingViewportChanges": "Masquer les changements de vue",
+    "showingViewportChanges": "Afficher les changements de vue",
     "start": "Début",
     "step": "Étape",
     "end": "Fin",
@@ -89,7 +94,17 @@
     "addField": "Ajouter un nouveau champ",
     "addZone": "Ajouter une nouvelle zone",
     "addPoint": "Ajouter un nouveau point",
-    "addBackdrop": "Ajouter un nouvel arrière-plan"
+    "addBackdrop": "Ajouter un nouvel arrière-plan",
+    "addToExistingTrack": "Ajouter à une piste existante",
+    "selectTrackToAddData": "Sélectionnez une piste à laquelle ajouter des données",
+    "noTracksAvailable": "Aucune piste disponible",
+    "pleaseSelectTrack": "Veuillez sélectionner une piste",
+    "add": "Ajouter",
+    "extraDetailsForNewTrack": "Entrez les détails pour la nouvelle piste",
+    "year": "Année",
+    "yearRequired": "Veuillez entrer l'année",
+    "month": "Mois",
+    "monthRequired": "Veuillez entrer le mois"
   },
   "forms": {
     "core": {
@@ -130,7 +145,17 @@
       "labels": "Étiquettes",
       "symbols": "Symboles",
       "shape": "Forme",
-      "edit": "Éditer"
+      "edit": "Éditer",
+      "topLeft": "En haut à gauche",
+      "bottomRight": "En bas à droite",
+      "origin": "Origine",
+      "radiusM": "Rayon (m)",
+      "innerRadiusM": "Rayon interne (m)",
+      "outerRadiusM": "Rayon externe (m)",
+      "startAngle": "Angle de départ",
+      "endAngle": "Angle de fin",
+      "polygonCoordinates": "Coordonnées du polygone",
+      "addCoordinate": "Ajouter une coordonnée"
     },
     "multiFeature": {
       "itemsSelected": "éléments sélectionnés",
@@ -141,5 +166,9 @@
       "currentColor": "Couleur actuelle :",
       "mixedColors": "Couleurs mixtes"
     }
+  },
+  "graphs": {
+    "available": "Disponibles",
+    "selected": "Sélectionnés"
   }
 }
