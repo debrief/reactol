@@ -180,7 +180,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             style={itemStyle}
             rules={[{ required: true, message: t('forms.common.nameRequired') }]}
           >
-            <Input />
+            <Input className='create-track-name' />
           </Form.Item>
           <Form.Item<NewTrackProps>
             label={t('forms.common.shortName')}
@@ -194,7 +194,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             ]}
           >
             <Space.Compact>
-              <Input maxLength={4} />
+              <Input className='create-track-shortName' maxLength={4} />
             </Space.Compact>
           </Form.Item>
 
@@ -204,7 +204,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             style={itemStyle}
             rules={[{ required: true, message: t('layers.yearRequired') }]}
           >
-            <InputNumber min={2020} max={2040} changeOnWheel />
+            <InputNumber className='create-track-year' min={2020} max={2040} changeOnWheel />
           </Form.Item>
 
           <Form.Item<NewTrackProps>
@@ -213,7 +213,7 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
             style={itemStyle}
             rules={[{ required: true, message: t('layers.monthRequired') }]}
           >
-            <InputNumber min={1} max={12} changeOnWheel />
+            <InputNumber className='create-track-month' min={1} max={12} changeOnWheel />
           </Form.Item>
 
           <Form.Item<NewTrackProps>
@@ -268,10 +268,10 @@ export const LoadTrackModel: React.FC<LoadTrackModelProps> = ({
           
 
           <Form.Item style={itemStyle} label={null}>
-            <Button type='text' onClick={cancel}>
+            <Button type='text' className='cancel-create-track-button' onClick={cancel}>
               {t('documents.cancel')}
             </Button>
-            <Button type='primary' htmlType='submit'>
+            <Button type='primary' className='create-track-button' htmlType='submit'>
               {t('forms.core.create')}
             </Button>
           </Form.Item>
