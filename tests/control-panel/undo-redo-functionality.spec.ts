@@ -73,8 +73,11 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   await undoRedoButton.click()
   await expect(undoModal).toBeVisible()
 
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
   // Select the first version
-  await undoModal.locator('.ant-list-items').locator('.ant-list-item').first().click()
+  await page.locator('.undo-list-item').first().click()
 
   // do restore
   await page.locator('.undo-restore-button').click()

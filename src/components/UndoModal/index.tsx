@@ -195,6 +195,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
         dataSource={undoHistory}
         renderItem={(item, index) => (
           <List.Item
+            className="undo-list-item"
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
