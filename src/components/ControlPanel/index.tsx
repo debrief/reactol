@@ -13,6 +13,7 @@ import React, { useMemo, useState } from 'react'
 import { useAppSelector } from '../../state/hooks'
 import { UndoModal } from '../UndoModal'
 import { useDocContext } from '../../state/DocContext'
+import { useTranslation } from 'react-i18next'
 
 
 import { SampleDataLoader } from '../SampleDataLoader'
@@ -27,6 +28,7 @@ export interface TimeProps {
 
 
 const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
+  const { t } = useTranslation()
   const canUndo = useAppSelector(state => state.fColl.past.length > 1)
   const canRedo = useAppSelector(state => state.fColl.future.length > 0)
   const { viewportFrozen, setViewportFrozen, copyMapToClipboard, time, setTime } = useDocContext()
@@ -34,15 +36,15 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
 
   const undoRedoTitle = useMemo(() => {
     if(canUndo && canRedo) {
-      return 'Undo/Redo ...'
+      return t('controlPanel.undoRedo')
     } else if (canUndo) {
-      return 'Undo ...'
+      return t('controlPanel.undo')
     } else if (canRedo) {
-      return 'Redo ...'
+      return t('controlPanel.redo')
     } else {
       return null
     }
-  }, [canUndo, canRedo])
+  }, [canUndo, canRedo, t])
 
   const toggleFreezeViewport = () => {
     setViewportFrozen(!viewportFrozen)
@@ -50,9 +52,9 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
 
   const copyTooltip = useMemo(() => {
     return viewportFrozen
-      ? 'Copy snapshot of map to the clipboard'
-      : 'Lock the viewport in order to take a snapshot of the map'
-  }, [viewportFrozen])
+      ? t('controlPanel.copySnapshot')
+      : t('controlPanel.lockViewportFirst')
+  }, [viewportFrozen, t])
 
   const toggleFilterApplied = () => {
     setTime(prevTime => ({ ...prevTime, filterApplied: !prevTime.filterApplied }))
@@ -61,18 +63,18 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
   const buttonStyle = { margin: '0 5px' }
 
   const saveButton = useMemo(() => {
-    return <Tooltip placement='bottom' title={isDirty ? 'Save changes' : 'Document unchanged'}>
+    return <Tooltip placement='bottom' title={isDirty ? t('controlPanel.saveChanges') : t('controlPanel.documentUnchanged')}>
       <Button onClick={handleSave} disabled={!isDirty} variant='outlined' >
         <SaveOutlined/>
       </Button>
     </Tooltip>
-  }, [handleSave, isDirty])
+  }, [handleSave, isDirty, t])
 
   const enableTip = useMemo(() => {
     return bounds
-      ? 'Enable time controls, to filter tracks by time'
-      : 'No time data available'
-  }, [bounds])
+      ? t('controlPanel.enableTimeControls')
+      : t('controlPanel.noTimeData')
+  }, [bounds, t])
 
   return (
     <>
@@ -82,7 +84,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
         <Col span={20} style={{ textAlign: 'left' , display: 'flex', alignItems: 'center'}}>
           <Tooltip
             mouseEnterDelay={0.8}
-            title='Lock viewport to prevent accidental map movement. When time filtering, mouse wheel updates time'
+            title={t('controlPanel.lockViewport')}
           >
             <Button
               style={buttonStyle}
@@ -107,7 +109,7 @@ const ControlPanel: React.FC<TimeProps> = ({ bounds, handleSave, isDirty }) => {
               {time.filterApplied ? <FilterFilled /> : <FilterOutlined />}
             </Button>
           </Tooltip>
-          <Tooltip placement='bottom' title={undoRedoTitle || 'Nothing to undo/redo'}>
+          <Tooltip placement='bottom' title={undoRedoTitle || t('controlPanel.nothingToUndoRedo')}>
             <Button
               style={buttonStyle}
               className='undo-redo-button'

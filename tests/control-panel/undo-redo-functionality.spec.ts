@@ -51,11 +51,14 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   await undoRedoButton.click()
   
   // Verify the undo modal appears
-  const undoModal = page.locator('.ant-modal-content').filter({ hasText: 'Select a version' })
+  const undoModal = page.locator('.undo-title')
   await expect(undoModal).toBeVisible()
-  
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
   // Close the modal
-  await undoModal.locator('button:has-text("Cancel")').click()
+  await page.locator('.undo-cancel-button').click()
 
   // Wait for the UI to update
   await page.waitForTimeout(100)
@@ -70,11 +73,17 @@ test('Test undo/redo button in control panel', async ({ page }) => {
   await undoRedoButton.click()
   await expect(undoModal).toBeVisible()
 
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
+
   // Select the first version
-  await undoModal.locator('.ant-list-items').locator('.ant-list-item').first().click()
+  await page.locator('.undo-list-item').first().click()
 
   // do restore
-  await page.locator('button:has-text("Restore Version")').click()
+  await page.locator('.undo-restore-button').click()
+
+  // Wait for the UI to update
+  await page.waitForTimeout(100)
 
   // check undo modal closed
   await expect(undoModal).not.toBeVisible()

@@ -1,5 +1,6 @@
 import { Modal, Transfer, Space } from 'antd'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import { featureAsOption } from './featureUtils'
 
@@ -13,6 +14,7 @@ interface FeatureSelectorModalProps {
 }
 
 export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpen, title, onSave, onClose, features, defaults}) => { 
+  const { t } = useTranslation()
   const [selectedTracks, setSelectedTracks] = useState<string[]>(defaults)
 
   const options = useMemo(() => features.map(featureAsOption), [features])
@@ -52,7 +54,7 @@ export const FeatureSelectorModal: React.FC<FeatureSelectorModalProps> = ({isOpe
   >
     <Transfer
       dataSource={dataSource}
-      titles={['Available', 'Selected']}
+      titles={[t('graphs.available'), t('graphs.selected')]}
       targetKeys={selectedTracks}
       onChange={(nextTargetKeys) => setSelectedTracks(nextTargetKeys as string[])}
       render={renderItem}

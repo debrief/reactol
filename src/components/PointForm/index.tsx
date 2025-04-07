@@ -2,6 +2,7 @@ import { Feature, Geometry, Point, Position } from 'geojson'
 import { Checkbox, ColorPicker, DatePicker, Form, Input } from 'antd'
 import { Color } from 'antd/es/color-picker'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { PointProps } from '../../types'
@@ -58,6 +59,7 @@ const convertBack = (shape: Readonly<FormTypeProps>): CompositeProps => {
 }
 
 export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
+  const { t } = useTranslation()
   const [state, setState] = useState<FormTypeProps | null>(null)
 
   // Cleanup when component unmounts
@@ -99,41 +101,41 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
       onValuesChange={localChange}
       size='small'>
       <Form.Item<FormTypeProps>
-        label='Name'
+        label={t('forms.common.name')}
         name='name'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter track name!' }]}>
+        rules={[{ required: true, message: t('forms.common.nameRequired') }]}>
         <Input/>
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label='Visible'
+        label={t('forms.common.visible')}
         name={'visible'}
         style={itemStyle}
         valuePropName="checked" >
         <Checkbox style={{alignItems: 'start'}}  />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label='Position'
+        label={t('forms.common.position')}
         name='position'
         style={itemStyle}
         rules={[{ required: true }]} >
         <CoordinateInput />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Color"
+        label={t('forms.common.color')}
         name='marker-color'
         style={itemStyle}
-        rules={[{ required: true, message: 'color is required!' }]}>
+        rules={[{ required: true, message: t('forms.common.colorRequired') }]}>
         <ColorPicker format='hex' trigger='click' presets={presetColors} />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Time"
+        label={t('forms.common.time')}
         style={itemStyle}
         name='dTime'>
         <DatePicker showTime format={'MMM DDHHmm'} />
       </Form.Item>
       <Form.Item<FormTypeProps>
-        label="Time end"
+        label={t('forms.common.timeEnd')}
         style={itemStyle}
         // validate that dTimeEnd is after dTime
         rules={[
@@ -142,7 +144,7 @@ export const PointForm: React.FC<PointFormProps> = ({shape, onChange}) => {
               // if there is a value, check if it's after the dTime
               return !value || getFieldValue('dTime') < value
                 ? Promise.resolve()
-                : Promise.reject(new Error('Time-end must be after time!'))
+                : Promise.reject(new Error(t('forms.common.timeEndAfterTime')))
             },
           }),
         ]}

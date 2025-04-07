@@ -4,8 +4,10 @@ import type { InputRef } from 'antd'
 import { Button, Col, Row, Typography, Modal, Space, Input, Tooltip, Alert, Switch } from 'antd'
 import { ExclamationCircleFilled, FileAddOutlined, PlusOutlined, BulbOutlined } from '@ant-design/icons'
 import { useAppContext } from '../../state/AppContext'
+import { useTranslation } from 'react-i18next'
 import {Layout, Model, TabNode, ITabSetRenderValues, TabSetNode, BorderNode, Action, Actions, DockLocation} from 'flexlayout-react'
 import WelcomePage from '../WelcomePage'
+import LanguageSelector from '../LanguageSelector'
 import './index.css'
 
 type TabWithPath =  {
@@ -25,6 +27,7 @@ const DEFAULT_DOC_NAME = 'Pending'
 
 const Documents = () => {
   const { isDarkMode, toggleDarkMode } = useAppContext()
+  const { t } = useTranslation()
   
   // Dynamically import the appropriate flexlayout theme
   useEffect(() => {
@@ -103,7 +106,7 @@ const Documents = () => {
     const files = event.dataTransfer.files
 
     if (files.length > 1) {
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only one file can be loaded at a time' })
+      setMessage({ title: t('documents.error'), severity: 'warning', message: t('documents.multipleFilesError') })
       return
     }
 
@@ -112,7 +115,7 @@ const Documents = () => {
     // Check file extension
     const fileName = file.name.toLowerCase()
     if (!fileName.endsWith('.json') && !fileName.endsWith('.geojson')) {
-      setMessage({ title: 'Error', severity: 'warning', message: 'Only .json and .geojson files are supported' })
+      setMessage({ title: t('documents.error'), severity: 'warning', message: t('documents.fileTypeError') })
       return
     }
     
@@ -122,7 +125,7 @@ const Documents = () => {
       try {
         const data = JSON.parse(content)
         if (data.type !== 'FeatureCollection' && data.type !== 'Feature') {
-          throw new Error('File must contain a GeoJSON FeatureCollection or Feature')
+          throw new Error(t('documents.geoJsonError'))
         }
         const newTab: TabWithPath = {
           key: '' + Date.now(),
@@ -132,15 +135,15 @@ const Documents = () => {
         setTabs([...tabs, newTab])
         addTabToLayout(newTab)
       } catch (e) {
-        setMessage({ title: 'Error', severity: 'error', message: 'The file content is not a valid JSON format. Please check the file and try again. ' + e })
+        setMessage({ title: t('documents.error'), severity: 'error', message: t('documents.invalidJsonError') + ' ' + e })
         return
       }
 
     } catch (e) {
       console.error('Error handling file:', e)
-      setMessage({ title: 'Error', severity: 'error', message: 'Failed to load file: ' + e })
+      setMessage({ title: t('documents.error'), severity: 'error', message: t('documents.loadingError') + e })
     }
-  }, [setMessage, tabs, addTabToLayout])
+  }, [setMessage, tabs, addTabToLayout, t])
 
   const factory = (node: TabNode) => {
     const component = node.getComponent()
@@ -164,7 +167,7 @@ const Documents = () => {
   const handleNew = async (withSample?: boolean) => {
     if (window.electron) {
       const options = { 
-        title: 'New document', 
+        title: t('documents.new'), 
         filters: [{ name: 'GeoJSON Files', extensions: ['geojson', 'json'] }] 
       }
       const result = await window.electron.saveFileDialog(options)
@@ -239,8 +242,8 @@ const Documents = () => {
           addTabToLayout(newTab)
         } catch (error) {
           Modal.error({
-            title: 'Invalid File',
-            content: 'Problem loading file: ' + error,
+            title: t('documents.invalidFile'),
+            content: t('documents.loadingError') + error,
           })
         }
       }
@@ -262,19 +265,24 @@ const Documents = () => {
   }
 
   const onRenderTabSet = (_tabSetNode: TabSetNode | BorderNode, renderValues: ITabSetRenderValues) => {
-    renderValues.buttons.push(<Tooltip title="New Tab" key={'new-tab-btn'}>
+    renderValues.buttons.push(<Tooltip title={t('documents.newTab')} key={'new-tab-btn'}>
       <Button
         icon={<PlusOutlined />}
         size="small"
-        onClick={() => handleNew()}>New</Button>
+        onClick={() => handleNew()}>{t('documents.new')}</Button>
     </Tooltip>)
     renderValues.buttons.push(
-      <Tooltip title="Open Existing Document" key="open-doc">
-        <Button icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >Open</Button>
+      <Tooltip title={t('documents.openExisting')} key="open-doc">
+        <Button icon={<FileAddOutlined />} onClick={openExistingDocument} size="small" >{t('documents.open')}</Button>
       </Tooltip>
     )
     renderValues.buttons.push(
-      <Tooltip title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'} key='theme-toggle'>
+      <div key='language-selector' style={{ marginLeft: '8px' }}>
+        <LanguageSelector />
+      </div>
+    )
+    renderValues.buttons.push(
+      <Tooltip title={isDarkMode ? t('documents.lightMode') : t('documents.darkMode')} key='theme-toggle'>
         <Switch
           checkedChildren={<BulbOutlined />}
           unCheckedChildren={<BulbOutlined />}
@@ -324,7 +332,7 @@ const Documents = () => {
         />
       }
       <Modal
-        title="Please provide a name for the document"
+        title={t('documents.documentName')}
         open={newTabState !== null}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -338,16 +346,16 @@ const Documents = () => {
         />
       </Modal>
       <Modal
-        title="Close Tab"
+        title={t('documents.closeTab')}
         open={tabToClose !== null}
         onOk={handleCloseTabConfirm}
         onCancel={handleCloseTabCancel}
-        okText="Close"
-        cancelText="Cancel"
+        okText={t('documents.close')}
+        cancelText={t('documents.cancel')}
       >
         <Space>
           <ExclamationCircleFilled style={{ color: '#faad14', fontSize: '22px' }} />
-          <p>Are you sure you want to close this tab?</p>
+          <p>{t('documents.confirmClose')}</p>
         </Space>
       </Modal>
       {tabs.length === 0 && (
@@ -364,7 +372,7 @@ const Documents = () => {
           </Row>
           <Row>
             <Col span={6}>&nbsp;</Col>
-            <Col span={12}><Typography.Text type='secondary'>Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. Background on the tool, who to contact for support. </Typography.Text></Col>
+            <Col span={12}><Typography.Text type='secondary'>{t('welcome.background')}</Typography.Text></Col>
           </Row>
         </>
       )}

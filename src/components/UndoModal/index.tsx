@@ -1,6 +1,7 @@
 import { Button, List, Switch } from 'antd'
 import { DraggableModal } from '../DraggableModal'
 import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '../../state/hooks'
 import { UNDO_ACTION, REDO_ACTION  } from '../../state/store'
@@ -25,6 +26,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
   onCancel,
   onRestore
 }) => {
+  const { t } = useTranslation()
   const dispatch = useDispatch()
   const { past, present, future } = useAppSelector(state => state.fColl)
   const { setPreview } = useDocContext()
@@ -35,15 +37,15 @@ export const UndoModal: React.FC<UndoModalProps> = ({
 
   const modalOptions = useMemo(() => {
     if(past.length > 1 && future.length) {
-      return 'Undo/Redo'
+      return t('controlPanel.undoRedo')
     } else if (past.length) {
-      return 'Undo'
+      return t('controlPanel.undo')
     } else if (future.length) {
-      return 'Redo'
+      return t('controlPanel.redo')
     } else {
-      return 'Nothing to undo/redo'
+      return t('controlPanel.nothingToUndoRedo')
     }
-  }, [past.length, future.length])
+  }, [past.length, future.length, t])
 
   // Get the undo history from the redux store
   const undoHistory = useMemo(() => {
@@ -143,12 +145,12 @@ export const UndoModal: React.FC<UndoModalProps> = ({
     <DraggableModal
       draggableTitle={
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', paddingRight: '32px' }}>
-          <span style={{ marginRight: '16px' }}>Select a version to {modalOptions} to</span>
+          <span className='undo-title' style={{ marginRight: '16px' }}>{t('controlPanel.selectVersionTo')} {modalOptions}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto',
             marginTop: '10px', marginRight:'30px'}}>
             <Switch
-              checkedChildren={'Hiding Viewport changes'}
-              unCheckedChildren={'Showing Viewport changes'}
+              checkedChildren={t('controlPanel.hidingViewportChanges')}
+              unCheckedChildren={t('controlPanel.showingViewportChanges')}
               size="small"
               checked={hideViewportChanges}
               onChange={(checked) => setHideViewportChanges(checked)}
@@ -166,6 +168,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
       footer={[
         <Button 
           key="cancel" 
+          className="undo-cancel-button"
           onClick={() => {
             // Reset preview if canceling
             setPreview(null)
@@ -173,15 +176,16 @@ export const UndoModal: React.FC<UndoModalProps> = ({
             onCancel()
           }}
         >
-          Cancel
+          {t('documents.cancel')}
         </Button>,
         <Button
           key="restore"
           type="primary"
           disabled={selectedUndoIndex === null}
+          className="undo-restore-button"
           onClick={doRestore}
         >
-          Restore Version
+          {t('controlPanel.restoreVersion')}
         </Button>
       ]}
     >
@@ -191,6 +195,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
         dataSource={undoHistory}
         renderItem={(item, index) => (
           <List.Item
+            className="undo-list-item"
             onClick={() => {
               if (index === selectedUndoIndex) {
                 // If clicking the same item again, treat it as deselection
@@ -247,7 +252,7 @@ export const UndoModal: React.FC<UndoModalProps> = ({
                 textAlign: 'right'
               }}>
                 {index === future.length ? (
-                  <strong>{item.time}<br/>(current state)</strong>
+                  <strong>{item.time}<br/>({t('controlPanel.currentState')})</strong>
                 ) : (
                   item.time
                 )}

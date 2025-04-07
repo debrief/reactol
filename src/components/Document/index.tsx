@@ -1,6 +1,7 @@
 import { Alert, Card, ConfigProvider, Modal, Splitter, Tabs } from 'antd'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { Feature, Geometry, GeoJsonProperties } from 'geojson'
+import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../../state/hooks'
 import { useDocContext } from '../../state/DocContext'
 import { useAppContext } from '../../state/AppContext'
@@ -51,6 +52,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
   const features = useAppSelector(selectFeatures)
   const documentContents = useAppSelector(state => state.fColl.present.data)
   const dispatch = useAppDispatch()
+  const { t } = useTranslation()
   const { setTime, time, message, setMessage, interval } = useDocContext()
   const [timeBounds, setTimeBounds] = useState<[number, number] | null>(null)
   const [graphOpen, setGraphOpen] = useState(false)
@@ -148,7 +150,7 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
           handler.handle(await file.text(), features, dispatch)
         } catch (e) {
           console.error('handler error', file, handler, e)
-          setMessage({ title: 'Error', severity: 'error', message: 'Handling error: ' + e })
+          setMessage({ title: t('documents.error'), severity: 'error', message: t('documents.handlingError') + e })
         }
       }
     }
@@ -185,18 +187,18 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
       const doc = JSON.stringify(documentContents)
       await window.electron.saveFile(filePath, doc)  
     } else {
-      window.alert('Local save not supportedin browser')
+      window.alert(t('documents.localSaveNotSupported'))
     }
-  }, [filePath, documentContents])
+  }, [filePath, documentContents, t])
 
   const detailTabs = [ {
     key: '1',
-    label: 'Detail',
+    label: t('document.detail'),
     children: <Properties />
   }, 
   { 
     key: '2',
-    label: 'Graphs',
+    label: t('document.graphs'),
     children: <GraphsPanel width={splitterWidths ? splitterWidths[0] : 300} height={splitterHeights ? splitterHeights[2] : 400} />
   }]
 
@@ -240,12 +242,12 @@ function Document({ filePath, withSampleData }: { filePath?: string, withSampleD
             <Splitter.Panel key='left' collapsible defaultSize='300' min='200' max='600'>
               <Splitter layout="vertical" style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }} onResizeEnd={handleSplitterVerticalResize}>
                 <Splitter.Panel style={{minHeight: '170px'}}  defaultSize='170' min='170' max='170' resizable={false}>
-                  <Card title='Control Panel'>
+                  <Card title={t('document.controlPanel')}>
                     <ControlPanel isDirty={dirty} handleSave={doSave} bounds={timeBounds}/>
                   </Card>
                 </Splitter.Panel>
                 <Splitter.Panel style={{overflow: 'visible'}} >
-                  <Card title='Layers' style={{width: '100%', height: '100%'}}>
+                  <Card title={t('document.layers')} style={{width: '100%', height: '100%'}}>
                     {features && <Layers splitterWidths={splitterHeights ? splitterHeights[1] : 330} openGraph={() => setGraphOpen(true)} />}
                   </Card>
                 </Splitter.Panel>

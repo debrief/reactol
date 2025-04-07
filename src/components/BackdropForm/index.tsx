@@ -1,6 +1,7 @@
 import { Feature, Geometry } from 'geojson'
 import { Checkbox, Form, Input } from 'antd'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BackdropProps } from '../../types'
 import './index.css'
 
@@ -12,6 +13,7 @@ export interface BackdropFormProps {
 
 
 export const BackdropForm: React.FC<BackdropFormProps> = ({backdrop, onChange, create = false}) => {
+  const { t } = useTranslation()
   const [state, setState] = useState<BackdropProps | null>(null)
   const [form] = Form.useForm()
 
@@ -49,14 +51,14 @@ export const BackdropForm: React.FC<BackdropFormProps> = ({backdrop, onChange, c
       onValuesChange={localChange}
       size='small'>
       <Form.Item<BackdropProps>
-        label='Name'
+        label={t('forms.common.name')}
         name='name'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter backdrop name!' }]}>
+        rules={[{ required: true, message: t('forms.common.nameRequired') }]}>
         <Input/>
       </Form.Item>
       <Form.Item<BackdropProps>
-        label='Visible'
+        label={t('forms.common.visible')}
         name={'visible'}
         style={itemStyle}
         valuePropName="checked" >
@@ -64,24 +66,24 @@ export const BackdropForm: React.FC<BackdropFormProps> = ({backdrop, onChange, c
       </Form.Item>
 
       { create && <><Form.Item<BackdropProps>
-        label='URL'
+        label={t('forms.common.url')}
         name='url'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter backdrop URL!' }]}>
+        rules={[{ required: true, message: t('forms.common.urlRequired') }]}>
         <Input.TextArea rows={3}/>
       </Form.Item>
       <Form.Item<BackdropProps>
-        label='Max Native Zoom'
+        label={t('forms.common.maxNativeZoom')}
         name= 'maxNativeZoom'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter backdrop max native zoom!' }]}>
+        rules={[{ required: true, message: t('forms.common.maxNativeZoomRequired') }]}>
         <Input/>
       </Form.Item>
       <Form.Item<BackdropProps>
-        label='Max Zoom'
+        label={t('forms.common.maxZoom')}
         name='maxZoom'
         style={itemStyle}
-        rules={[{ required: true, message: 'Please enter backdrop max zoom!' }]}>
+        rules={[{ required: true, message: t('forms.common.maxZoomRequired') }]}>
         <Input/>
       </Form.Item>
       </>}
