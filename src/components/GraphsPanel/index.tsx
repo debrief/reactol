@@ -1,23 +1,59 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Splitter } from 'antd'
 import { useAppContext } from '../../state/AppContext'
-
 import { useGraphData } from './useGraphData'
 import { GraphsToolbar } from './GraphsToolbar'
 import { DepthChart } from './DepthChart'
 import { RangeBearingChart } from './RangeBearingChart'
 import { GraphsProvider } from './GraphsContextProvider'
 import { useGraphsContext } from './useGraphsContext'
+import NewWindow from 'react-new-window'
+import { DetachGraphsPanelButton } from './DetachGraphsPanelButton'
 
 export const GraphsPanel: React.FC<{height: number | null, width: number | null}> = (props) => {
+  const [detached, setDetached] = useState(false)
+
+  // Handler to detach the panel
+  const handleDetach = () => setDetached(true)
+  // Handler to re-attach when window closes
+  const handleWindowClose = () => setDetached(false)
+
   return (
     <GraphsProvider>
-      <GraphsPanelContent {...props} />
+      {!detached && (
+        <GraphsPanelContent {...props} 
+          detachable
+          onDetach={handleDetach}
+          detached={false}
+        />
+      )}
+      {detached && (
+        <NewWindow
+          title="Graphs Panel"
+          features={{ width: 600, height: 800 }}
+          onUnload={handleWindowClose}
+          copyStyles
+        >
+          <GraphsPanelContent {...props} 
+            detachable
+            detached={true}
+            onDetach={() => {}}
+          />
+        </NewWindow>
+      )}
     </GraphsProvider>
   )
 }
 
-const GraphsPanelContent: React.FC<{height: number | null, width: number | null}> = ({height, width}) => {
+interface GraphsPanelContentProps {
+  height: number | null;
+  width: number | null;
+  detachable?: boolean;
+  detached?: boolean;
+  onDetach?: () => void;
+}
+
+const GraphsPanelContent: React.FC<GraphsPanelContentProps> = ({height, width, detachable = false, detached = false, onDetach}) => {
   const { isDarkMode } = useAppContext()
   const {
     showLegend,
@@ -92,8 +128,11 @@ const GraphsPanelContent: React.FC<{height: number | null, width: number | null}
       overflow: 'auto',
       gap: '16px'
     }}>
-      <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <GraphsToolbar />
+        {detachable && (
+          <DetachGraphsPanelButton onDetach={onDetach!} detached={detached} />
+        )}
       </div>
       <Splitter layout='vertical' onResize={handleSplitterResize}>
         {depthData.length > 0 && (
